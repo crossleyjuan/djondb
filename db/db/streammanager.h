@@ -16,6 +16,9 @@
  * =====================================================================================
  */
 
+#ifndef STREAMMANAGER_INCLUDED_H
+#define STREAMMANAGER_INCLUDED_H
+
 #include "fileinputoutputstream.h"
 #include "util.h"
 #include <map>
@@ -60,3 +63,4 @@ class StreamManager {
 		Logger* _logger;
 };
 
+#endif // STREAMMANAGER_INCLUDED_H

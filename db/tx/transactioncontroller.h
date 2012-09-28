@@ -26,3 +26,44 @@
  * =====================================================================================
  */
 
+#ifndef TRANSACTIONCONTROLLER_INCLUDED_H
+#define TRANSACTIONCONTROLLER_INCLUDED_H
+
+#include "filterdefs.h"
+#include "streammanager.h"
+
+#include <string>
+#include <vector>
+
+class DBController;
+class BSONObj;
+
+class TransactionController: public Controller 
+{
+	public:
+		TransactionController(DBController* dbcontroller);
+		TransactionController(const TransactionController& orig);
+		~TransactionController();
+
+		virtual BSONObj* insert(char* db, char* ns, BSONObj* bson);
+		virtual bool dropNamespace(char* db, char* ns);
+		virtual void update(char* db, char* ns, BSONObj* bson);
+		virtual void deleteRecord(char* db, char* ns, const std::string& documentId, const std::string& revision);
+		virtual std::vector<BSONObj*>* find(char* db, char* ns, const char* select, const char* filter) throw (ParseException);
+		virtual BSONObj* findFirst(char* db, char* ns, const char* select, const char* filter) throw (ParseException);
+		virtual BSONObj* readBSON(StreamType* stream);
+		virtual std::vector<std::string>* dbs() const;
+		virtual std::vector<std::string>* namespaces(const char* db) const;
+
+	private:
+		DBController* _dbcontroller;
+
+		enum TRANSACTION_OPER {
+			INSERT,
+			DROPNAMESPACE,
+			UPDATE,
+			DELETERECORD
+		};
+
+}
+#endif // TRANSACTIONCONTROLLER_INCLUDED_H

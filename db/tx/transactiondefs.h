@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  transactioncontroller.cpp
+ *       Filename:  transactiondefs.h
  *
  *    Description:  
  *
  *        Version:  1.0
- *        Created:  09/26/2012 08:26:29 PM
+ *        Created:  09/27/2012 11:14:26 PM
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -23,55 +23,42 @@
  * charge yourself if you want), bare in mind that you will be required to provide a copy of the license terms that ensures
  * this program will be open sourced and all its derivated work will be too.
  * =====================================================================================
- */
-#include "transactioncontroller.h"
+ */ 
+#ifndef TRANSACTIONDEFS_INCLUDED_H
+#define TRANSACTIONDEFS_INCLUDED_H 
 
-TransactionController(DBController* dbcontroller) {
-	_dbcontroller = dbcontroller;
-}
+enum TRANSACTION_ACTION {
+	TA_INSERT,
+	TA_DELETE,
+	TA_UPDATE
+};
 
-TransactionController(const TransactionController& orig) {
-	this->_dbcontroller = orig._dbcontroller;
-}
+class Transaction {
+	public:
+		Transaction(TRANSACTION_ACTION action) {
+			_action = action;
+		}
 
-~TransactionController() {
+		TRANSACTION_ACTION action() const {
+			return _action;
+		}
 
-}
+	private:
+		TRANSACTION_ACTION _action;
+};
 
+class InsertTransaction: public Transaction {
+	public:
+		InsertTransaction(const std::string& db, const std::string& ns, const BSONObj& obj): Transaction(TA_INSERT){
+			_db = db;
+			_ns = ns;
+			_bson = obj;
+		}
 
-BSONObj* insert(char* db, char* ns, BSONObj* bson) {
+	private:
+		std::string _db;
+		std::string _ns;
+		std::string _bson;
+};
 
-}
-
-bool dropNamespace(char* db, char* ns) {
-
-}
-
-void update(char* db, char* ns, BSONObj* bson) {
-
-}
-
-void deleteRecord(char* db, char* ns, const std::string& documentId, const std::string& revision) {
-
-}
-
-std::vector<BSONObj*>* find(char* db, char* ns, const char* select, const char* filter) throw (ParseException) {
-
-}
-
-BSONObj* findFirst(char* db, char* ns, const char* select, const char* filter) throw (ParseException) {
-
-}
-
-BSONObj* readBSON(StreamType* stream) {
-
-}
-
-std::vector<std::string>* dbs() const {
-
-}
-
-std::vector<std::string>* namespaces(const char* db) const {
-
-}
-
+#endif /* TRANSACTIONDEFS_INCLUDED_H */
