@@ -30,21 +30,28 @@
 #define TRANSACTIONCONTROLLER_INCLUDED_H
 
 #include "filterdefs.h"
-#include "streammanager.h"
+#include "dbcontroller.h"
 
 #include <string>
 #include <vector>
+#include <map>
 
 class DBController;
 class BSONObj;
+class FileInputOutputStream;
+class FileInputStream;
+class FileOutputStream;
+class Command;
 
 class TransactionController: public Controller 
 {
 	public:
 		TransactionController(DBController* dbcontroller);
+		TransactionController(DBController* dbcontroller, std::string transactionId);
 		TransactionController(const TransactionController& orig);
 		~TransactionController();
 
+		void loadControlFile();
 		virtual BSONObj* insert(char* db, char* ns, BSONObj* bson);
 		virtual bool dropNamespace(char* db, char* ns);
 		virtual void update(char* db, char* ns, BSONObj* bson);
@@ -57,6 +64,34 @@ class TransactionController: public Controller
 
 	private:
 		DBController* _dbcontroller;
+		std::string* _transactionId;
+		std::string _dataDir;
+
+		// This contains all the NORMAL records
+		std::map<std::string, std::map<std::string, std::vector<BSONObj*> > > _elements;
+
+		FileInputOutputStream* _controlFile;
+
+		enum OPERATION_STATUS {
+			DIRTY, // in writing process, it's not trustable yet
+			NORMAL, // the record it's ok and it's trustable
+			REMOVED, // rollbacked or any other state, should not be used
+			DONE // Moved to the main data repository, ready to be dropped.
+		};
+
+		struct Operation {
+			OPERATION_STATUS status;
+			Command* command;	
+		};
+
+		struct Control {
+			long startPos; // Contains the first valid position to be used on the first logFile
+			long lastValidPos; // this is a reference to the last valid position in the last logFile
+			std::vector<FileInputStream*> logFiles;
+			FileInputOutputStream* currentFile;
+		};	
+
+		Control _control;
 
 		enum TRANSACTION_OPER {
 			INSERT,
@@ -65,5 +100,10 @@ class TransactionController: public Controller
 			DELETERECORD
 		};
 
-}
+	private:
+		void checkState();
+		void writeRegister(MemoryStream* ms);
+
+};
+
 #endif // TRANSACTIONCONTROLLER_INCLUDED_H

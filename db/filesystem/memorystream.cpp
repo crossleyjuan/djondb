@@ -289,3 +289,7 @@ char* MemoryStream::toChars() {
 
 	return result;
 }
+
+long MemoryStream::length() const {
+	return _length;
+}

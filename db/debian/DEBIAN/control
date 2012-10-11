@@ -1,6 +1,6 @@
 Source: djondb
 Section: database
-Version: 0.120120913
+Version: 0.120121010
 Priority: optional
 Maintainer: djondb <info@djondb.com>
 Depends: libxss1 (>= 1.2.0-2), libc6 (>= 2.12.1), libx11-6 (>= 2.1.3), libantlr3c-3.2-0, libuuid1 (>= 2.17.2), libstdc++6 (>= 4.5), libv8-dev (>= 3.1)

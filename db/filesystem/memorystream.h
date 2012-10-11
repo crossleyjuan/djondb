@@ -59,6 +59,7 @@ class MemoryStream: public InputStream, public OutputStream
         virtual bool isClosed();
 
 		  char* toChars();
+		  long length() const;
 
 	 private:
 		  void write(const char * ptr, size_t count);
