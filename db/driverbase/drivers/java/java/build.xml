@@ -1,0 +1,59 @@
+<project name="djondb_java" default="dist" basedir=".">
+    <description>
+		 Java driver for djondb
+    </description>
+  <!-- set global properties for this build -->
+  <property name="src" location="src"/>
+  <property name="build" location="build"/>
+  <property name="dist"  location="dist"/>
+
+  <target name="checkos">
+	  <echo message="Checking os" />
+	  <condition property="isWindows">
+		  <os family="windows" />
+	  </condition>
+
+	  <condition property="isLinux">
+		  <os family="unix" />
+	  </condition>
+  </target>
+
+  <target name="if_windows" depends="checkos" if="isWindows">
+	  <property name="native_file" value="/vs2008/Release/djonjavadriver.dll" />
+  </target>
+
+  <target name="if_unix" depends="checkos" if="isLinux">
+	  <property name="native_file" value="/obj/usr/lib/libdjon-javadriver.so" />
+  </target>
+
+  <target name="init" depends="if_windows, if_unix">
+	  <!-- Create the time stamp -->
+	  <tstamp/>
+	  <!-- Create the build directory structure used by compile -->
+	  <mkdir dir="${build}"/>
+  </target>
+
+  <target name="compile" depends="init"
+	  description="compile the source " >
+	  <!-- Compile the java code from ${src} into ${build} -->
+	  <javac srcdir="${src}" destdir="${build}"/>
+	  <echo message="copying from ${native_file}" />
+	  <copy file="../native${native_file}" todir="${build}" />
+  </target>
+
+  <target name="dist" depends="compile,if_windows,if_unix"
+	  description="generate the distribution" >
+	  <!-- Create the distribution directory -->
+	  <mkdir dir="${dist}/lib"/>
+
+	  <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
+	  <jar jarfile="${dist}/lib/djondb_java.jar" basedir="${build}" />
+  </target>
+
+  <target name="clean"
+	  description="clean up" >
+	  <!-- Delete the ${build} and ${dist} directory trees -->
+	  <delete dir="${build}"/>
+	  <delete dir="${dist}"/>
+  </target>
+</project>

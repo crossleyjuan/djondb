@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <sstream>
+#include <limits.h>
 
 
 const int MEMORY_BUFFER_SIZE = 1024;
@@ -126,24 +127,25 @@ void MemoryStream::writeChar (unsigned char v)
 /* Write 2 bytes in the output (little endian order) */
 void MemoryStream::writeShortInt (short int v)
 {
-	unsigned char c = (v & 255);
-	unsigned char c2= ((v >> 8) & 255);
-	writeChar (c);
-	writeChar (c2);
+	writeData<short int>(v);
 }
 
 /* Write 4 bytes in the output (little endian order) */
 void MemoryStream::writeInt (int v)
 {
-	writeShortInt ((v) & 0xffff);
-	writeShortInt ((v >> 16) & 0xffff);
+	writeData<int>(v);
 }
 
 /* Write 4 bytes in the output (little endian order) */
 void MemoryStream::writeLong (long v)
 {
-	writeShortInt ((v) & 0xffff);
-	writeShortInt ((v >> 16) & 0xffff);
+	writeData<long>(v);
+}
+
+/* Write 8 bytes in the output (little endian order) */
+void MemoryStream::writeLong64 (long long v)
+{
+	writeData<long long>(v);
 }
 
 /* Write a 4 byte float in the output */
@@ -197,22 +199,25 @@ unsigned char MemoryStream::readChar() {
 
 /* Reads 2 bytes in the input (little endian order) */
 short int MemoryStream::readShortInt () {
-	int v = readChar() | readChar() << 8;
+	short int v = readData<short int>();
 	return v;
 }
 
 /* Reads 4 bytes in the input (little endian order) */
 int MemoryStream::readInt () {
-	int v = readShortInt() | readShortInt() << 16;
+	int v = readData<int>();
 
 	return v;
 }
 
 /* Reads 4 bytes in the input (little endian order) */
 long MemoryStream::readLong () {
-	long v = readShortInt() | readShortInt() << 16;
+	return readData<long>();
+}
 
-	return v;
+/* Reads 4 bytes in the input (little endian order) */
+long long MemoryStream::readLong64 () {
+	return readData<long long>();
 }
 
 /* Reads a 4 byte float in the input */

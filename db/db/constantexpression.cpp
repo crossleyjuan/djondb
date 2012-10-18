@@ -33,6 +33,8 @@
 {
 	_expression = new std::string(expression);
 	_intValue = NULL;
+	_longValue = NULL;
+	_long64Value = NULL;
 	_doubleValue = NULL;
 	_value = new ExpressionResult(ExpressionResult::RT_STRINGDB, _expression);
 }
@@ -43,8 +45,34 @@
 	_expression = NULL;
 	_intValue = new int();
 	*_intValue = expression;
+	_longValue = NULL;
+	_long64Value = NULL;
 	_doubleValue = NULL;
 	_value = new ExpressionResult(ExpressionResult::RT_INT, _intValue);
+}
+
+	ConstantExpression::ConstantExpression(long expression)
+:BaseExpression(ET_CONSTANT)
+{
+	_expression = NULL;
+	_intValue = NULL;
+	_longValue = new long();
+	*_longValue = expression;
+	_long64Value = NULL;
+	_doubleValue = NULL;
+	_value = new ExpressionResult(ExpressionResult::RT_LONG, _longValue);
+}
+
+	ConstantExpression::ConstantExpression(__LONG64 expression)
+:BaseExpression(ET_CONSTANT)
+{
+	_expression = NULL;
+	_intValue = NULL;
+	_longValue = NULL;
+	_long64Value = new __LONG64();
+	*_long64Value = expression;
+	_doubleValue = NULL;
+	_value = new ExpressionResult(ExpressionResult::RT_LONG64, _long64Value);
 }
 
 	ConstantExpression::ConstantExpression(double expression)
@@ -89,6 +117,10 @@ BaseExpression* ConstantExpression::copyExpression() {
 		result = new ConstantExpression(this->_expression->c_str());
 	} else if (_intValue != NULL) {
 		result = new ConstantExpression(*this->_intValue);
+	} else if (_longValue != NULL) {
+		result = new ConstantExpression(*this->_longValue);
+	} else if (_long64Value != NULL) {
+		result = new ConstantExpression(*this->_long64Value);
 	} else {
 		result = new ConstantExpression(*this->_doubleValue);
 	}

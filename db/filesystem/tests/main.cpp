@@ -27,6 +27,7 @@
 #include <string.h>
 #include <memory>
 #include <cpptest.h>
+#include <limits.h>
 
 using namespace std;
 
@@ -55,9 +56,10 @@ class TestFileSystemSuite: public Test::Suite
 			memset(test, 'a', 200000);
 			streamo.writeChars("Hello World!", 12);
 			streamo.writeShortInt(2);
+			streamo.writeShortInt(127);
 			streamo.writeInt(200000);
-			streamo.writeLong(200000L);
-			streamo.writeChars(test, strlen(test));
+			streamo.writeLong(LONG_MAX);
+			//streamo.writeChars(test, strlen(test));
 			streamo.close();
 
 			FileInputStream streami("test.txt", "rb");
@@ -65,12 +67,15 @@ class TestFileSystemSuite: public Test::Suite
 			TEST_ASSERT(strcmp(text, "Hello World!") == 0);
 			int i1 = streami.readShortInt();
 			TEST_ASSERT(i1 == 2);
+			int si1 = streami.readShortInt();
+			TEST_ASSERT(si1 == 127);
 			int i2 = streami.readInt();
 			TEST_ASSERT(i2 == 200000);
 			long l = streami.readLong();
-			TEST_ASSERT(l == 200000);
-			char* tchar = streami.readChars();
-			TEST_ASSERT(strcmp(test, tchar) == 0);
+			TEST_ASSERT(l == LONG_MAX);
+
+			//char* tchar = streami.readChars();
+			//TEST_ASSERT(strcmp(test, tchar) == 0);
 			streami.close();
 			free(test);
 		}
@@ -88,29 +93,29 @@ class TestFileSystemSuite: public Test::Suite
 
 		void testFileInputOutputStreams()
 		{
-			FileInputOutputStream streamo("test.txt", "rwb");
+			FileInputOutputStream streamo("test2.txt", "w+b");
+			streamo.writeInt(INT_MAX);
 			char* test = (char*)malloc(200001);
 			memset(test, 0, 200001);
 			memset(test, 'a', 200000);
 			streamo.writeChars("Hello World!", 12);
 			streamo.writeShortInt(2);
-			streamo.writeInt(200000);
 			streamo.writeLong(200000L);
 			streamo.writeChars(test, strlen(test));
 
 			streamo.seek(0);
+			int i2 = streamo.readInt();
+			TEST_ASSERT(i2 == INT_MAX);
 			char* text = streamo.readChars();
 			TEST_ASSERT(strcmp(text, "Hello World!") == 0);
 			int i1 = streamo.readShortInt();
 			TEST_ASSERT(i1 == 2);
-			int i2 = streamo.readInt();
-			TEST_ASSERT(i2 == 200000);
 			long l = streamo.readLong();
 			TEST_ASSERT(l == 200000);
 			char* tchar = streamo.readChars();
 			TEST_ASSERT(strcmp(test, tchar) == 0);
-			streamo.close();
 			free(test);
+			streamo.close();
 		}
 
 		void testBSONStreams()
@@ -123,7 +128,8 @@ class TestFileSystemSuite: public Test::Suite
 			obj->add("int", 1);
 			obj->add("string", std::string("test"));
 			obj->add("char*", (char*)"char*");
-			obj->add("long", 1L);
+			obj->add("long", 100000000L);
+			obj->add("long64", LLONG_MAX);
 			obj->add("double", 1.1);
 
 			bsonOut->writeBSON(*obj);
@@ -145,7 +151,10 @@ class TestFileSystemSuite: public Test::Suite
 			TEST_ASSERT(obj->getString("char*").compare("char*") == 0);
 
 			TEST_ASSERT(obj->getLong("long") != NULL);
-			TEST_ASSERT(*obj->getLong("long") == 1L);
+			TEST_ASSERT(*obj->getLong("long") == 100000000L);
+
+			TEST_ASSERT(obj->getLong64("long64") != NULL);
+			TEST_ASSERT(*obj->getLong64("long64") == LLONG_MAX);
 
 			TEST_ASSERT(obj->getDouble("double") != NULL);
 			TEST_ASSERT(*obj->getDouble("double") == 1.1);
@@ -247,6 +256,7 @@ class TestFileSystemSuite: public Test::Suite
 			obj->add("string", std::string("test"));
 			obj->add("char*", (char*)"char*");
 			obj->add("long", 1L);
+			obj->add("long64", 10000000000000L);
 			obj->add("double", 1.1);
 
 			BSONObj inner;
@@ -254,6 +264,7 @@ class TestFileSystemSuite: public Test::Suite
 			inner.add("string", std::string("test"));
 			inner.add("char*", (char*)"char*");
 			inner.add("long", 1L);
+			inner.add("long64", 10000000000000L);
 			inner.add("double", 1.1);
 
 			obj->add("inner", inner);
@@ -279,6 +290,9 @@ class TestFileSystemSuite: public Test::Suite
 			TEST_ASSERT(obj->getLong("long") != NULL);
 			TEST_ASSERT(*obj->getLong("long") == 1L);
 
+			TEST_ASSERT(obj->getLong64("long64") != NULL);
+			TEST_ASSERT(*obj->getLong64("long64") == 10000000000000L);
+
 			TEST_ASSERT(obj->getDouble("double") != NULL);
 			TEST_ASSERT(*obj->getDouble("double") == 1.1);
 
@@ -294,6 +308,9 @@ class TestFileSystemSuite: public Test::Suite
 
 			TEST_ASSERT(innerTest->getLong("long") != NULL);
 			TEST_ASSERT(*innerTest->getLong("long") == 1L);
+
+			TEST_ASSERT(innerTest->getLong64("long64") != NULL);
+			TEST_ASSERT(*innerTest->getLong64("long64") == 10000000000000L);
 
 			TEST_ASSERT(innerTest->getDouble("double") != NULL);
 			TEST_ASSERT(*innerTest->getDouble("double") == 1.1);

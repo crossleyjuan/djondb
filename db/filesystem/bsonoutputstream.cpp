@@ -39,8 +39,8 @@ void BSONOutputStream::writeBSON(const BSONObj& bson) {
 	Logger* log = getLogger(NULL);
 	if (log->isDebug()) log->debug("BSONOutputStream::writeBSON bson elements: %d", bson.length());
     _outputStream->writeLong(bson.length());
-    for (std::map<t_keytype, BSONContent* >::const_iterator i = bson.begin(); i != bson.end(); i++) {
-        t_keytype key = i->first;
+    for (std::map<std::string, BSONContent* >::const_iterator i = bson.begin(); i != bson.end(); i++) {
+        std::string key = i->first;
 		  if (log->isDebug()) log->debug("BSONOutputStream::writeBSON name: %s", key.c_str());
         _outputStream->writeString(key);
         BSONContent* cont = i->second;
@@ -58,6 +58,9 @@ void BSONOutputStream::writeBSON(const BSONObj& bson) {
                 break;
             case LONG_TYPE:
                 _outputStream->writeLong(*((long*)cont->_element));
+                break;
+            case LONG64_TYPE:
+                _outputStream->writeLong64(*((__LONG64*)cont->_element));
                 break;
             case DOUBLE_TYPE:
                 _outputStream->writeDoubleIEEE(*((double*)cont->_element));

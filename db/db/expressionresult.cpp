@@ -30,6 +30,20 @@ void* copyValue(ExpressionResult::RESULT_TYPE type, void* value) {
 				result = i;
 				break;
 			}
+		case ExpressionResult::RT_LONG:
+			{
+				long* l = new long();
+				*l = *(long*)value;
+				result = l;
+				break;
+			}
+		case ExpressionResult::RT_LONG64:
+			{
+				__LONG64* l = new __LONG64();
+				*l = *(__LONG64*)value;
+				result = l;
+				break;
+			}
 		case ExpressionResult::RT_DOUBLE:
 			{
 				double* d = new double();
@@ -82,6 +96,12 @@ ExpressionResult::~ExpressionResult() {
 		switch (_type) {
 			case ExpressionResult::RT_INT:
 				delete ((int*)_value);
+				break;
+			case ExpressionResult::RT_LONG:
+				delete ((long*)_value);
+				break;
+			case ExpressionResult::RT_LONG64:
+				delete ((__LONG64*)_value);
 				break;
 			case ExpressionResult::RT_DOUBLE:
 				delete ((double*)_value);

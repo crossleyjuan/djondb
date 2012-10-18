@@ -21,6 +21,7 @@
 #include "bsonobj.h"
 #include "bsonarrayobj.h"
 #include <stdio.h>
+#include <limits.h>
 
 struct BSONStruct {
 	char* name;
@@ -110,7 +111,7 @@ BSONObj* BSONParser::parseBSON(const char* c, int& pos) {
 			} else if (state == 0) {
 				memset(buffer, 0, lenBuffer);
 				state = 1;// name
-				type = INT_TYPE;
+				type = LONG64_TYPE;
 			} else { // state == 1
 				throw "json value is not allowed as name";
 			}
@@ -135,6 +136,26 @@ BSONObj* BSONParser::parseBSON(const char* c, int& pos) {
 										  res->add(name, iVal);
 										  break;
 									  }
+					case LONG_TYPE: {
+												long lVal = atol((char*)value);
+												res->add(name, lVal);
+												break;
+											}
+					case LONG64_TYPE: {
+#ifdef WINDOWS
+												__LONG64 lVal = _atoi64((char*)value);
+#else
+												__LONG64 lVal = atoll((char*)value);
+#endif
+												if (lVal <= INT_MAX) {
+													res->add(name, (int)lVal);
+												} else if (lVal <= LONG_MAX) {
+													res->add(name, (long)lVal);
+												} else {
+													res->add(name, lVal);
+												}
+												break;
+											}
 					case DOUBLE_TYPE: {
 												double dVal = atof((char*)value);
 												res->add(name, dVal);
@@ -169,7 +190,7 @@ BSONObj* BSONParser::parseBSON(const char* c, int& pos) {
 					break;
 				else {
 					state = 1; // name
-					type = INT_TYPE;
+					type = LONG64_TYPE;
 					continue;
 				}
 			}
@@ -182,7 +203,7 @@ BSONObj* BSONParser::parseBSON(const char* c, int& pos) {
 			memset(buffer, 0, lenBuffer);
 			state = 2; //value
 			// default type
-			type = INT_TYPE;
+			type = LONG64_TYPE;
 		} else {
 			if (c[x] == '\'' || (c[x] == '\"')) {
 				// Collect all the characters

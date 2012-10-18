@@ -3,9 +3,6 @@
 
 #include <string>
 
-typedef std::string t_keytype;
-
-
 enum BSONTYPE {
     INT_TYPE,
     DOUBLE_TYPE,
@@ -15,7 +12,8 @@ enum BSONTYPE {
     BSON_TYPE,
 	 BSONARRAY_TYPE,
     UNKNOWN_TYPE,
-	 NULL_TYPE
+	 NULL_TYPE,
+    LONG64_TYPE
 //    PTR
 };
 

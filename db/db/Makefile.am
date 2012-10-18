@@ -39,10 +39,11 @@ libdjon_db_la_SOURCES = bplusindex.cpp \
 
 TESTS = test-db
 check_PROGRAMS = test-db
-test_db_LDADD = libdjon-db.la -ldjon-filesystem -ldjon-cache -ldjon-bson -ldjon-util -lX11 -lXss -lrt -luuid -lcpptest -lantlr3c
+test_db_LDADD = libdjon-db.la -ldjon-filesystem -ldjon-cache -ldjon-bson -ldjon-util -lrt -luuid -lcpptest -lantlr3c
 test_db_SOURCES = tests/main.cpp
 
-djon_db_libincludedir = $(libdir)/djon-db-1.0/include
+library_includedir = $(includedir)/djondb
+library_include_HEADERS=filterdefs.h
 #nodist_djon_db_libinclude_HEADERS = config.h
 
 

@@ -36,9 +36,11 @@
 #include <X11/extensions/scrnsaver.h>
 #endif
 #ifdef MAC
+/*
 #include <CoreFoundation/CoreFoundation.h>
-#include <CoreServices/CoreServices.h>
 #include <IOKit/IOKitLib.h>
+#include <CoreServices/CoreServices.h>
+*/
 #endif
 #ifdef WINDOWS
 #include <Windows.h>
@@ -133,63 +135,6 @@ void* mmalloc(size_t size) {
         exit(EXIT_FAILURE);
     }
     return p;
-}
-
-
-long idleTime() {
-    long idlesecs;
-#ifdef LINUX
-    bool _idleDetectionPossible;
-    XScreenSaverInfo *_mit_info;
-
-    int event_base, error_base;
-    Display* display = XOpenDisplay(NULL);
-    if(XScreenSaverQueryExtension(display, &event_base, &error_base))
-        _idleDetectionPossible = true;
-    else
-        _idleDetectionPossible = false;
-    _mit_info = XScreenSaverAllocInfo();
-
-    XScreenSaverQueryInfo(display, DefaultRootWindow(display), _mit_info);
-
-    XCloseDisplay(display);
-
-    idlesecs = (_mit_info->idle/1000);
-
-#endif
-#ifdef WINDOWS
-
-    LASTINPUTINFO lif;
-    lif.cbSize = sizeof(LASTINPUTINFO);
-    GetLastInputInfo(&lif);
-    DWORD tickCount = GetTickCount();
-    idlesecs = (tickCount - lif.dwTime) / 1000;
-
-#endif
-#ifdef MAC
-    idlesecs = -1;//int64_t
-    io_iterator_t iter = 0;
-    if (IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceMatching("IOHIDSystem"), &iter) == KERN_SUCCESS) {
-        io_registry_entry_t entry = IOIteratorNext(iter);
-        if (entry) {
-            CFMutableDictionaryRef dict = NULL;
-            if (IORegistryEntryCreateCFProperties(entry, &dict, kCFAllocatorDefault, 0) == KERN_SUCCESS) {
-                CFNumberRef obj = (CFNumberRef)CFDictionaryGetValue(dict, CFSTR("HIDIdleTime"));
-                if (obj) {
-                    int64_t nanoseconds = 0;
-                    if (CFNumberGetValue(obj, kCFNumberSInt64Type, &nanoseconds)) {
-                        idlesecs = (nanoseconds >> 30); // Divide by 10^9 to convert from nanoseconds to seconds.
-                    }
-                }
-                CFRelease(dict);
-            }
-            IOObjectRelease(entry);
-        }
-        IOObjectRelease(iter);
-    }
-#endif
-
-    return idlesecs;
 }
 
 Version getCurrentVersion() {

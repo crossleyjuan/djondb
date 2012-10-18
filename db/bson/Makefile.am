@@ -21,19 +21,15 @@ library_include_HEADERS = bson.h bsonobj.h bsonutil.h bsonparser.h bsondefs.h bs
 
 TESTS = test-bson
 check_PROGRAMS = test-bson test-performance
-test_bson_LDADD = libdjon-bson.la $(top_builddir)/util/libdjon-util.la -lX11 -lXss -lcpptest
+test_bson_LDADD = libdjon-bson.la $(top_builddir)/util/libdjon-util.la -lcpptest
 if !MAC
      test_bson_LDADD += -lrt -luuid
-else
-     test_bson_LDFLAGS = -framework CoreFoundation -framework IOKit
 endif
 
 test_bson_SOURCES = tests/main.cpp
 
 test_performance_SOURCES = tests/testperformance.cpp
-test_performance_LDADD = libdjon-bson.la $(top_builddir)/util/libdjon-util.la -lX11 -lXss
+test_performance_LDADD = libdjon-bson.la $(top_builddir)/util/libdjon-util.la 
 if !MAC
      test_performance_LDADD += -lrt -luuid
-else
-     test_performance_LDFLAGS = -framework CoreFoundation -framework IOKit
 endif

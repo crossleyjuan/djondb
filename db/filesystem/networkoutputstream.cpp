@@ -21,8 +21,10 @@
 #include <string.h>
 #include <fcntl.h>
 #include <iostream>
+#include <stdio.h>
 #include "util.h"
 #include <assert.h>
+#include <limits.h>
 #ifndef _WIN32
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -78,10 +80,7 @@ void NetworkOutputStream::writeChar (unsigned char v)
 void NetworkOutputStream::writeShortInt (short int v)
 {
 	if (_logger->isDebug()) _logger->debug(3, "NetworkOutputStream::writeShortInt, short: %d", v);
-	unsigned char c = (v & 255);
-	unsigned char c2= ((v >> 8) & 255);
-	writeChar (c);
-	writeChar (c2);
+	writeData<short int>(v);
 	if (_logger->isDebug()) _logger->debug(3, "~NetworkOutputStream::writeInt");
 }
 
@@ -89,18 +88,24 @@ void NetworkOutputStream::writeShortInt (short int v)
 void NetworkOutputStream::writeInt (int v)
 {
 	if (_logger->isDebug()) _logger->debug(3, "NetworkOutputStream::writeInt, int: %d", v);
-	writeShortInt ((v) & 0xffff);
-	writeShortInt ((v >> 16) & 0xffff);
+	writeData<int>(v);
 	if (_logger->isDebug()) _logger->debug(3, "~NetworkOutputStream::writeInt");
 }
 
 /* Write 4 bytes in the output (little endian order) */
 void NetworkOutputStream::writeLong (long v)
 {
-	if (_logger->isDebug()) _logger->debug(3, "NetworkOutputStream::writeLong, long: %d", v);
-	writeShortInt ((v) & 0xffff);
-	writeShortInt ((v >> 16) & 0xffff);
-	if (_logger->isDebug()) _logger->debug(3, "~NetworkOutputStream::writeLong");
+#ifdef _64BITS
+	writeLong64((__LONG64)v);
+#else
+	writeInt((int)v);
+#endif
+}
+
+/* Write 8 bytes in the output (little endian order) */
+void NetworkOutputStream::writeLong64 (__LONG64 v)
+{
+	writeData<__LONG64>(v);
 }
 
 /* Write a 4 byte float in the output */

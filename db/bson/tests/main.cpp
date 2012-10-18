@@ -22,6 +22,7 @@
 #include <string>
 #include <string.h>
 #include <cpptest.h>
+#include <limits.h>
 
 using namespace std;
 
@@ -56,7 +57,7 @@ class TestBSONSuite : public Test::Suite
 			// Add in
 			obj->add("int", 1);
 			obj->add("string", std::string("test"));
-			obj->add("long", 1L);
+			obj->add("long", (long long) 10000000000L);
 			obj->add("double", 1.1);
 
 			BSONObj rel;
@@ -77,8 +78,9 @@ class TestBSONSuite : public Test::Suite
 
 			TEST_ASSERT(obj->getString("string").compare("test") == 0);
 
-			TEST_ASSERT(obj->getLong("long") != NULL);
-			TEST_ASSERT(*obj->getLong("long") == 1L);
+			TEST_ASSERT(obj->getLong64("long") != NULL);
+			cout << "long: " << *obj->getLong64("long") << endl;
+			TEST_ASSERT(*obj->getLong64("long") == 10000000000L);
 
 			TEST_ASSERT(obj->getDouble("double") != NULL);
 			TEST_ASSERT(*obj->getDouble("double") == 1.1);
@@ -137,6 +139,8 @@ class TestBSONSuite : public Test::Suite
 			int chars = 1000;
 			// Add in
 			obj->add("int", 1);
+			obj->add("long", LONG_MAX);
+			obj->add("long long", LLONG_MAX);
 			obj->add("string", std::string(chars, 'a'));
 			char* temp = (char*)malloc(chars+1);
 			memset(temp, 0, chars+1);
@@ -155,6 +159,12 @@ class TestBSONSuite : public Test::Suite
 			
 			TEST_ASSERT(obj->getInt("int") != NULL);
 			TEST_ASSERT(*obj->getInt("int") == 1);
+
+			TEST_ASSERT(obj->getLong("long") != NULL);
+			TEST_ASSERT(*obj->getLong("long") == LONG_MAX);
+
+			TEST_ASSERT(obj->getLong64("long long") != NULL);
+			TEST_ASSERT(*obj->getLong64("long long") == LLONG_MAX);
 
 			TEST_ASSERT(obj->getString("string").compare(std::string(chars, 'a')) == 0);
 
@@ -261,13 +271,16 @@ class TestBSONSuite : public Test::Suite
 			BSONObj* testEmpty = BSONParser::parse("{}");
 			TEST_ASSERT(testEmpty->length() == 0);
 
-			BSONObj* obj = BSONParser::parse("{age: 1, name: 'John:test\\'test2\\'', salary: 3500.25}");
+			BSONObj* obj = BSONParser::parse("{age: 1, name: 'John:test\\'test2\\'', salary: 3500.25, lnumber: 100000000000}");
 			TEST_ASSERT(obj->getInt("age") != NULL);
 			TEST_ASSERT(*obj->getInt("age") == 1);
 			TEST_ASSERT(obj->getString("name").compare("John:test\\'test2\\'") == 0);
 
 			TEST_ASSERT(obj->getDouble("salary") != NULL);
 			TEST_ASSERT(*obj->getDouble("salary") == 3500.25);
+
+			TEST_ASSERT(obj->getLong64("lnumber") != NULL);
+			TEST_ASSERT(*obj->getLong64("lnumber") == 100000000000);
 
 			delete obj;
 			delete testEmpty;

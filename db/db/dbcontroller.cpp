@@ -150,7 +150,7 @@ void DBController::initialize(std::string dataDir) {
 
 long DBController::checkStructure(BSONObj* obj) {
 	Structure* structure = new Structure();
-	for (std::map<t_keytype, BSONContent* >::const_iterator i = obj->begin(); i != obj->end(); i++) {
+	for (std::map<std::string, BSONContent* >::const_iterator i = obj->begin(); i != obj->end(); i++) {
 		structure->add(i->first);
 	}
 

@@ -34,7 +34,7 @@ libdjon_command_la_SOURCES = command.cpp \
 TESTS = test-command
 check_PROGRAMS = test-command
 #test_command_LDFLAGS = $(all_includes)
-test_command_LDADD = libdjon-command.la -ldjon-db -ldjon-filesystem -ldjon-cache -ldjon-bson -ldjon-util -lX11 -lXss -lrt -luuid  -lcpptest -lantlr3c
+test_command_LDADD = libdjon-command.la -ldjon-db -ldjon-filesystem -ldjon-cache -ldjon-bson -ldjon-util -lrt -luuid  -lcpptest -lantlr3c
 test_command_SOURCES = tests/main.cpp
 
 library_includedir=$(includedir)/djon-command-1.0/djon-command

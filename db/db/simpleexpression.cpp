@@ -57,6 +57,20 @@ ExpressionResult* SimpleExpression::eval(const BSONObj& bson) {
 				result = new ExpressionResult(type, &i);
 				break;
 			}
+		case LONG_TYPE:
+			{
+				type = ExpressionResult::RT_LONG;
+				long i = (long)content;
+				result = new ExpressionResult(type, &i);
+				break;
+			}
+		case LONG64_TYPE:
+			{
+				type = ExpressionResult::RT_LONG64;
+				__LONG64 i = (__LONG64)content;
+				result = new ExpressionResult(type, &i);
+				break;
+			}
 		case DOUBLE_TYPE:
 			{
 				type = ExpressionResult::RT_DOUBLE;

@@ -1,0 +1,14 @@
+Source: djondb
+Section: database
+Version: 0.120120821
+Priority: optional
+Maintainer: djondb <info@djondb.com>
+Depends: libxss1 (>= 1.2.0-2), libc6 (>= 2.12.1), libx11-6 (>= 2.1.3), libantlr3c-3.2-0, libuuid1 (>= 2.17.2), libstdc++6 (>= 4.5), libv8-dev (>= 3.1)
+Homepage: http://djondb.com
+Package: djondb
+Architecture: amd64
+Installed-Size: 450
+Description: Enterprise NoSQL Server 
+ djondb is a NoSQL document store created to be 
+ easy to use and ready enterprise level. Your 
+ data is save with djondb.

@@ -10,13 +10,10 @@ AM_CPPFLAGS += $(all_includes)
 
 lib_LTLIBRARIES = libdjon-client.la
 libdjon_client_la_LDFLAGS=-shared# -fPIC
-libdjon_client_la_LIBADD = $(top_builddir)/command/libdjon-command.la $(top_builddir)/db/libdjon-db.la $(top_builddir)/filesystem/libdjon-filesystem.la $(top_builddir)/cache/libdjon-cache.la $(top_builddir)/bson/libdjon-bson.la $(top_builddir)/util/libdjon-util.la -lX11 -lXss -lcpptest -lantlr3c 
+libdjon_client_la_LIBADD = $(top_builddir)/command/libdjon-command.la $(top_builddir)/db/libdjon-db.la $(top_builddir)/filesystem/libdjon-filesystem.la $(top_builddir)/cache/libdjon-cache.la $(top_builddir)/bson/libdjon-bson.la $(top_builddir)/util/libdjon-util.la -lantlr3c 
 
 if !MAC
 libdjon_client_la_LIBADD += -lrt -lpthread -luuid
-endif
-if MAC
-libdjon_client_la_LDFLAGS += -framework CoreFoundation -framework IOKit
 endif
 libdjon_client_la_SOURCES= connection.cpp \
 									connection.h \
@@ -25,24 +22,18 @@ libdjon_client_la_SOURCES= connection.cpp \
 TESTS = test-driverbase
 check_PROGRAMS = test-driverbase
 test_driverbase_CPPFLAGS = $(all_includes)
-test_driverbase_LDADD = libdjon-client.la $(top_builddir)/command/libdjon-command.la $(top_builddir)/db/libdjon-db.la $(top_builddir)/filesystem/libdjon-filesystem.la $(top_builddir)/cache/libdjon-cache.la $(top_builddir)/bson/libdjon-bson.la $(top_builddir)/util/libdjon-util.la -lX11 -lXss -lcpptest -lantlr3c
+test_driverbase_LDADD = libdjon-client.la $(top_builddir)/command/libdjon-command.la $(top_builddir)/db/libdjon-db.la $(top_builddir)/filesystem/libdjon-filesystem.la $(top_builddir)/cache/libdjon-cache.la $(top_builddir)/bson/libdjon-bson.la $(top_builddir)/util/libdjon-util.la -lcpptest -lantlr3c -lsupc++
 test_driverbase_SOURCES = tests/main.cpp
 if !MAC
 test_driverbase_LDADD += -lrt -lpthread -luuid
 endif
-if MAC
-test_driverbase_LDFLAGS = -framework CoreFoundation -framework IOKit
-endif
 
 bin_PROGRAMS = test-performance
 test_performance_SOURCES = tests/testperformance.cpp
-test_performance_LDADD = libdjon-client.la $(top_builddir)/command/libdjon-command.la $(top_builddir)/db/libdjon-db.la $(top_builddir)/filesystem/libdjon-filesystem.la $(top_builddir)/cache/libdjon-cache.la $(top_builddir)/bson/libdjon-bson.la $(top_builddir)/util/libdjon-util.la -lX11 -lXss -lcpptest -lantlr3c
+test_performance_LDADD = libdjon-client.la $(top_builddir)/command/libdjon-command.la $(top_builddir)/db/libdjon-db.la $(top_builddir)/filesystem/libdjon-filesystem.la $(top_builddir)/cache/libdjon-cache.la $(top_builddir)/bson/libdjon-bson.la $(top_builddir)/util/libdjon-util.la -lcpptest -lantlr3c
 
 if !MAC
-test_performance_LDADD += -lrt -lpthread -luuid
-endif
-if MAC
-test_performance_LDFLAGS = -framework CoreFoundation -framework IOKit
+test_performance_LDADD += -lrt -lpthread -luuid -lsupc++ 
 endif
 
 library_includedir=$(includedir)/djondb

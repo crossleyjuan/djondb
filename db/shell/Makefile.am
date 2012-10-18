@@ -23,13 +23,10 @@ bin_PROGRAMS = djon-shell
 djon_shell_SOURCES = shell.cpp \
 							linenoise.c
 
-djon_shell_LDADD = $(top_builddir)/service/libdjon-service.la $(top_builddir)/driverbase/libdjon-client.la $(top_builddir)/network/libdjon-network.la $(top_builddir)/command/libdjon-command.la $(top_builddir)/db/libdjon-db.la $(top_builddir)/filesystem/libdjon-filesystem.la $(top_builddir)/cache/libdjon-cache.la $(top_builddir)/bson/libdjon-bson.la $(top_builddir)/util/libdjon-util.la -lX11 -lXss -lv8 -lantlr3c
+djon_shell_LDADD = $(top_builddir)/service/libdjon-service.la $(top_builddir)/driverbase/libdjon-client.la $(top_builddir)/network/libdjon-network.la $(top_builddir)/command/libdjon-command.la $(top_builddir)/db/libdjon-db.la $(top_builddir)/filesystem/libdjon-filesystem.la $(top_builddir)/cache/libdjon-cache.la $(top_builddir)/bson/libdjon-bson.la $(top_builddir)/util/libdjon-util.la -lv8 -lantlr3c
 
 if !MAC
 djon_shell_LDFLAGS = -static
 djon_shell_LDADD += -lrt -luuid
 endif
 
-if MAC
-djon_shell_LDFLAGS = -framework CoreFoundation -framework IOKit
-endif

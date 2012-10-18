@@ -26,6 +26,7 @@
 #define CONSTANTEXPRESSION_INCLUDE_H
 
 #include "baseexpression.h"
+#include "util.h"
 
 class ExpressionResult;
 
@@ -33,6 +34,8 @@ class ConstantExpression: public BaseExpression {
 	public:
 		ConstantExpression(const char* expression);
 		ConstantExpression(int expression);
+		ConstantExpression(long expression);
+		ConstantExpression(__LONG64 expression);
 		ConstantExpression(double expression);
 		ConstantExpression(const ConstantExpression& orig);
 		virtual ~ConstantExpression();
@@ -42,6 +45,8 @@ class ConstantExpression: public BaseExpression {
 	private:
 		std::string* _expression;
 		int* _intValue;
+		long* _longValue;
+		__LONG64* _long64Value;
 		double* _doubleValue;
 		ExpressionResult* _value;
 

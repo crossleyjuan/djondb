@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <cpptest.h> 
+#include <limits.h> 
 
 using namespace std; 
 using namespace djondb;
@@ -263,6 +264,7 @@ class TestDriverBaseSuite: public Test::Suite {
 			test.add("_id", *guid);
 			test.add("int", 1);
 			test.add("long", 10L);
+			test.add("longmax", LONG_MAX);
 			test.add("char", "testing");
 
 			conn->insert("db", "driver.test", test);
@@ -276,6 +278,8 @@ class TestDriverBaseSuite: public Test::Suite {
 			TEST_ASSERT(*objResult->getInt("int") == 1);
 			TEST_ASSERT(objResult->has("long"));
 			TEST_ASSERT(*objResult->getLong("long") == 10);
+			TEST_ASSERT(objResult->has("longmax"));
+			TEST_ASSERT(*objResult->getLong("longmax") == LONG_MAX);
 			TEST_ASSERT(objResult->has("char"));
 			TEST_ASSERT(objResult->getString("char").compare("testing") == 0);
 

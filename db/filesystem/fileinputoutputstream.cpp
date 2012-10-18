@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <sstream>
+#include <limits.h>
 
 FileInputOutputStream::FileInputOutputStream(const std::string& fileName, const char* flags) {
 	Logger* log = getLogger(NULL);
@@ -53,25 +54,27 @@ void FileInputOutputStream::writeChar (unsigned char v)
 /* Write 2 bytes in the output (little endian order) */
 void FileInputOutputStream::writeShortInt (short int v)
 {
-    unsigned char c = (v & 255);
-    unsigned char c2= ((v >> 8) & 255);
-    writeChar (c);
-    writeChar (c2);
+	writeData<short int>(v);
 }
 
 /* Write 4 bytes in the output (little endian order) */
 void FileInputOutputStream::writeInt (int v)
 {
-    writeShortInt ((v) & 0xffff);
-    writeShortInt ((v >> 16) & 0xffff);
+	writeData<int>(v);
 }
 
 /* Write 4 bytes in the output (little endian order) */
 void FileInputOutputStream::writeLong (long v)
 {
-    writeShortInt ((v) & 0xffff);
-    writeShortInt ((v >> 16) & 0xffff);
+	writeData<long>(v);
 }
+
+/* Write 8 bytes in the output (little endian order) */
+void FileInputOutputStream::writeLong64 (__LONG64 v)
+{
+	writeData<__LONG64>(v);
+}
+
 
 /* Write a 4 byte float in the output */
 void FileInputOutputStream::writeFloatIEEE (float v)
@@ -130,22 +133,29 @@ unsigned char FileInputOutputStream::readChar() {
 
 /* Reads 2 bytes in the input (little endian order) */
 short int FileInputOutputStream::readShortInt () {
+	int v = readData<short int>();
+	return v;
+	/*
     int v = readChar() | readChar() << 8;
     return v;
+	 */
 }
 
 /* Reads 4 bytes in the input (little endian order) */
 int FileInputOutputStream::readInt () {
-    int v = readShortInt() | readShortInt() << 16;
-
-    return v;
+	int v = readData<int>();
+	return v;
 }
 
 /* Reads 4 bytes in the input (little endian order) */
 long FileInputOutputStream::readLong () {
-    long v = readShortInt() | readShortInt() << 16;
+	return readData<long>();
+}
 
-    return v;
+/* Reads 8 bytes in the input (little endian order) */
+__LONG64 FileInputOutputStream::readLong64 () {
+	__LONG64 result = readData<__LONG64>();
+	return result;
 }
 
 /* Reads a 4 byte float in the input */

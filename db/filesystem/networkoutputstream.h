@@ -22,6 +22,8 @@ class NetworkOutputStream: public OutputStream
         virtual void writeInt (int v);
         /* Write 4 bytes in the output (little endian order) */
         virtual void writeLong (long v);
+        /* Write 8 bytes in the output (little endian order) */
+        virtual void writeLong64 (__LONG64 v);
         /* Write a 4 byte float in the output */
         virtual void writeFloatIEEE (float v);
         /* Write a 8 byte double in the output */

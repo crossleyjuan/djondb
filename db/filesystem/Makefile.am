@@ -22,11 +22,9 @@ libdjon_filesystem_la_SOURCES = bsoninputstream.cpp \
 
 TESTS = test-filesystem
 check_PROGRAMS = test-filesystem
-test_filesystem_LDADD = libdjon-filesystem.la $(top_builddir)/bson/libdjon-bson.la $(top_builddir)/util/libdjon-util.la -lpthread -lX11 -lXss -lcpptest
+test_filesystem_LDADD = libdjon-filesystem.la $(top_builddir)/bson/libdjon-bson.la $(top_builddir)/util/libdjon-util.la -lpthread -lcpptest
 if !MAC
    test_filesystem_LDADD += -lrt -luuid 
-else
-   test_filesystem_LDFLAGS = -framework CoreFoundation -framework IOKit
 endif
 test_filesystem_SOURCES = tests/main.cpp
 

@@ -223,6 +223,7 @@ class TestDBSuite: public Test::Suite
 				obj.add("age", 35);
 				obj.add("state", 1);
 				obj.add("name", "John");
+				obj.add("llong", LLONG_MAX);
 
 				FilterParser* parser = NULL;
 				ExpressionResult* result = NULL;
@@ -335,13 +336,16 @@ class TestDBSuite: public Test::Suite
 				TEST_ASSERT(result->type() == ExpressionResult::RT_BOOLEAN);
 				bres = (bool*)result->value();
 				TEST_ASSERT(!*bres);
-				/* 
-					parser = FilterParser::parse("$'name' == \"John\" and $'age' > 25");
-					result = parser->eval(obj);
-					TEST_ASSERT(result->type() == ExpressionResult::RT_BOOLEAN);
-					bres = (bool*)result->value();
-					TEST_ASSERT(!*bres);
-					*/
+
+				char filter[1000];
+				memset(filter, 0, 1000);
+				sprintf(filter, "$'llong' == %lld", LLONG_MAX);
+				parser = FilterParser::parse(filter);
+				result = parser->eval(obj);
+				TEST_ASSERT(result->type() == ExpressionResult::RT_BOOLEAN);
+				bres = (bool*)result->value();
+				TEST_ASSERT(*bres);
+
 			} catch (ParseException& e) {
 				TEST_FAIL(e.what());
 			}

@@ -32,6 +32,8 @@ class ExpressionResult {
 		enum RESULT_TYPE {
 			RT_INT,
 			RT_DOUBLE,
+			RT_LONG,
+			RT_LONG64,
 			RT_BOOLEAN,
 			RT_STRINGDB,
 			RT_BSON,

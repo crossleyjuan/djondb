@@ -1,24 +1,37 @@
 #ifndef DEFS_H_INCLUDED
 #define DEFS_H_INCLUDED
 
-#ifdef _WIN32
+#if (defined _WIN32 | _WIN64)
 #define WINDOWS
 #endif
 #ifdef __linux
 #define LINUX
 #endif
 
-#ifndef _WIN32
+#ifndef WINDOWS
 #include "config.h"
 #else
 #define VERSION "0.120121010"
 #define PACKAGE_VERSION "0.1"
 #endif
 
-#ifdef __MACH__ || __APPLE__ || TARGET_OS_MAC
+#if (defined __MACH__ || __APPLE__ || TARGET_OS_MAC)
 #define MAC
 #endif
 
+
+// Define architecture
+#if (defined __amd64__ || __amd64 || __x86_64__ || __x86_64)
+#define _64BITS
+#else
+#define _32BITS
+#endif
+
+#ifndef WINDOWS
+#define __LONG64 long long
+#else
+#define __LONG64 __int64
+#endif
 
 // #define TESTING
 
