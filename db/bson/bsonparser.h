@@ -2,6 +2,7 @@
 #define BSONPARSER_H
 
 #include <string>
+#include "bsondefs.h"
 
 class BSONObj;
 class BSONArrayObj;
@@ -19,7 +20,7 @@ class BSONParser
 
 	protected:
 	private:
-		static BSONObj* parseBSON(const char* c, int& pos);
+		static BSONObj* parseBSON(const char* c, int& pos) throw(BSONException);
 		static BSONArrayObj* parseArray(const char* chrs, int& pos);
 };
 

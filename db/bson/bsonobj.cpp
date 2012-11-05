@@ -161,50 +161,50 @@ char* BSONObj::toChar() const {
 	return cresult;
 }
 
-int* BSONObj::getInt(std::string key) const {
+int BSONObj::getInt(std::string key) const throw(BSONException) {
 	BSONContent* content = getContent(key);
 	if ((content != NULL) && (content->type() == INT_TYPE)) {
 		int* res = (int*)content->_element;
-		return res;
+		return *res;
 	} else {
-		return NULL;
+		throw BSONException(format("key not found %s", key.c_str()).c_str());
 	}
 }
 
-double* BSONObj::getDouble(std::string key) const {
+double BSONObj::getDouble(std::string key) const throw(BSONException) {
 	BSONContent* content = getContent(key);
 	if ((content != NULL) && (content->type() == DOUBLE_TYPE)) {
 		double* res = (double*)content->_element;
-		return res;
+		return *res;
 	} else {
-		return NULL;
+		throw BSONException(format("key not found %s", key.c_str()).c_str());
 	}
 }
 
-__LONG64* BSONObj::getLong64(std::string key) const {
+__LONG64 BSONObj::getLong64(std::string key) const throw(BSONException) {
 	BSONContent* content = getContent(key);
 	if ((content != NULL) && (content->type() == LONG64_TYPE)) {
 		__LONG64* res = (__LONG64*)content->_element;
-		return res;
+		return *res;
 	} else {
-		return NULL;
+		throw BSONException(format("key not found %s", key.c_str()).c_str());
 	}
 }
 
-long int* BSONObj::getLong(std::string key) const {
+long int BSONObj::getLong(std::string key) const throw(BSONException) {
 	BSONContent* content = getContent(key);
 	if ((content != NULL) && (content->type() == LONG_TYPE)) {
 		long int* res = (long int*)content->_element;
-		return res;
+		return *res;
 	} else {
-		return NULL;
+		throw BSONException(format("key not found %s", key.c_str()).c_str());
 	}
 }
 
-std::string BSONObj::getString(std::string key) const {
+std::string BSONObj::getString(std::string key) const throw(BSONException) {
 	BSONContent* content = getContent(key);
 	if (!content) {
-		return std::string();
+		throw BSONException(format("key not found %s", key.c_str()).c_str());
 	}
 	std::string result;
 	if (content->type() == STRING_TYPE) {
@@ -215,23 +215,23 @@ std::string BSONObj::getString(std::string key) const {
 	return result;
 }
 
-BSONObj* BSONObj::getBSON(std::string key) const {
+BSONObj* BSONObj::getBSON(std::string key) const throw(BSONException) {
 	BSONContent* content = getContent(key);
 	if ((content != NULL) && (content->type() == BSON_TYPE)) {
 		BSONObj* res = (BSONObj*)content->_element;
 		return res;
 	} else {
-		return NULL;
+		throw BSONException(format("key not found %s", key.c_str()).c_str());
 	}
 }
 
-BSONArrayObj* BSONObj::getBSONArray(std::string key) const {
+BSONArrayObj* BSONObj::getBSONArray(std::string key) const throw(BSONException) {
 	BSONContent* content = getContent(key);
 	if ((content != NULL) && (content->type() == BSONARRAY_TYPE)) {
 		BSONArrayObj* res = (BSONArrayObj*)content->_element;
 		return res;
 	} else {
-		return NULL;
+		throw BSONException(format("key not found %s", key.c_str()).c_str());
 	}
 }
 
@@ -306,7 +306,7 @@ BSONTYPE BSONObj::type(std::string key) const {
 	}
 }
 
-void* BSONObj::get(std::string key) const {
+BSONContent BSONObj::get(std::string key) const throw(BSONException) {
 	BSONContent* content = NULL;
 	//    SEARCHBSON(key, STRING_TYPE);
 	for (std::map<std::string, BSONContent* >::const_iterator it = _elements.begin(); it != _elements.end(); it++) {
@@ -317,9 +317,9 @@ void* BSONObj::get(std::string key) const {
 		}
 	}
 	if (content != NULL) {
-		return content->_element;
+		return *content;
 	} else {
-		return NULL;
+		throw BSONException(format("key not found %s", key.c_str()).c_str());
 	}
 }
 

@@ -23,6 +23,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "djondb_win", "..\djondb_win
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "shell", "..\shell\shell.vcproj", "{486DE774-34B1-48F1-8EDA-6DC7F12E24E6}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "djonjavadriver", "..\driverbase\drivers\java\native\vs2008\djonjavadriver.vcproj", "{3F4E72FD-F616-4BA5-87C7-D44561004F0E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -119,6 +121,14 @@ Global
 		{486DE774-34B1-48F1-8EDA-6DC7F12E24E6}.Release|Win32.Build.0 = Release|Win32
 		{486DE774-34B1-48F1-8EDA-6DC7F12E24E6}.Release|x64.ActiveCfg = Release|x64
 		{486DE774-34B1-48F1-8EDA-6DC7F12E24E6}.Release|x64.Build.0 = Release|x64
+		{3F4E72FD-F616-4BA5-87C7-D44561004F0E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3F4E72FD-F616-4BA5-87C7-D44561004F0E}.Debug|Win32.Build.0 = Debug|Win32
+		{3F4E72FD-F616-4BA5-87C7-D44561004F0E}.Debug|x64.ActiveCfg = Debug|x64
+		{3F4E72FD-F616-4BA5-87C7-D44561004F0E}.Debug|x64.Build.0 = Debug|x64
+		{3F4E72FD-F616-4BA5-87C7-D44561004F0E}.Release|Win32.ActiveCfg = Release|Win32
+		{3F4E72FD-F616-4BA5-87C7-D44561004F0E}.Release|Win32.Build.0 = Release|Win32
+		{3F4E72FD-F616-4BA5-87C7-D44561004F0E}.Release|x64.ActiveCfg = Release|x64
+		{3F4E72FD-F616-4BA5-87C7-D44561004F0E}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

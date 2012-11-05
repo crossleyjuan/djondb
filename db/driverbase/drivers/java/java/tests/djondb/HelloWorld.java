@@ -23,7 +23,7 @@ public class HelloWorld {
 
             con.insert("dbjava", "nsjava", "{ 'name': 'John', 'lastName': 'Smith' }");
 
-            ArrayList<BSONObj> wrapper = con.find("dbjava", "nsjava", "$'lastName' == 'Smith'");
+            BSONObjVectorPtr wrapper = con.find("dbjava", "nsjava", "$'lastName' == 'Smith'");
 
             BSONObj bson = wrapper.get(0);
 

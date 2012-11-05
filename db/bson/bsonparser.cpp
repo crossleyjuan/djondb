@@ -90,7 +90,7 @@ BSONObj* convertStruct(struct BSONStruct* param) {
 	return obj;
 }
 
-BSONObj* BSONParser::parseBSON(const char* c, int& pos) {
+BSONObj* BSONParser::parseBSON(const char* c, int& pos) throw(BSONException) {
 	BSONObj* res = new BSONObj();
 	int state = 0; // 0 - nothing, 1 - name, 2- value
 	int lenBuffer = strlen(c);
@@ -226,7 +226,7 @@ BSONObj* BSONParser::parseBSON(const char* c, int& pos) {
 					char c[100];
 					sprintf(c, "An error ocurred parsing the bson. Error: unclosed string at %d",  startPos);
 
-					throw new BSONParseException(c);
+					throw new BSONException(c);
 				}
 				continue;
 			}

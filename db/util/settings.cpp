@@ -40,7 +40,7 @@ void readSettings() {
 #else
 	char* ccont = readFile("djondb.conf");
 #endif
-	std::string content = std::string(ccont);
+	std::string content(ccont);
 
 	std::vector<std::string> lines = splitLines(content);
 	for (std::vector<std::string>::const_iterator i = lines.begin(); i != lines.end(); i++) {

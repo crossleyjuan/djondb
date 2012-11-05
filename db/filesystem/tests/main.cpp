@@ -100,6 +100,7 @@ class TestFileSystemSuite: public Test::Suite
 			memset(test, 'a', 200000);
 			streamo.writeChars("Hello World!", 12);
 			streamo.writeShortInt(2);
+			streamo.writeInt(2);
 			streamo.writeLong(200000L);
 			streamo.writeChars(test, strlen(test));
 
@@ -125,7 +126,7 @@ class TestFileSystemSuite: public Test::Suite
 
 			std::auto_ptr<BSONObj> obj(new BSONObj());
 			// Add in
-			obj->add("int", 1);
+			obj->add("int", INT_MAX);
 			obj->add("string", std::string("test"));
 			obj->add("char*", (char*)"char*");
 			obj->add("long", 100000000L);
@@ -143,21 +144,21 @@ class TestFileSystemSuite: public Test::Suite
 
 			obj = std::auto_ptr<BSONObj>(bsonIn->readBSON());
 
-			TEST_ASSERT(obj->getInt("int") != NULL);
-			TEST_ASSERT(*obj->getInt("int") == 1);
+			TEST_ASSERT(obj->has("int"));
+			TEST_ASSERT(obj->getInt("int") == INT_MAX);
 
 			TEST_ASSERT(obj->getString("string").compare("test") == 0);
 
 			TEST_ASSERT(obj->getString("char*").compare("char*") == 0);
 
-			TEST_ASSERT(obj->getLong("long") != NULL);
-			TEST_ASSERT(*obj->getLong("long") == 100000000L);
+			TEST_ASSERT(obj->has("long"));
+			TEST_ASSERT(obj->getLong("long") == 100000000L);
 
-			TEST_ASSERT(obj->getLong64("long64") != NULL);
-			TEST_ASSERT(*obj->getLong64("long64") == LLONG_MAX);
+			TEST_ASSERT(obj->has("long64"));
+			TEST_ASSERT(obj->getLong64("long64") == LLONG_MAX);
 
-			TEST_ASSERT(obj->getDouble("double") != NULL);
-			TEST_ASSERT(*obj->getDouble("double") == 1.1);
+			TEST_ASSERT(obj->has("double"));
+			TEST_ASSERT(obj->getDouble("double") == 1.1);
 
 			fis->close();
 
@@ -230,14 +231,14 @@ class TestFileSystemSuite: public Test::Suite
 			std::auto_ptr<BSONInputStream> bsonIn(new BSONInputStream(fis.get()));
 
 			BSONObj* obj = bsonIn->readBSON();
-			TEST_ASSERT(obj->getInt("age") != NULL);
-			TEST_ASSERT(*obj->getInt("age") == 1);
+			TEST_ASSERT(obj->has("age"));
+			TEST_ASSERT(obj->getInt("age") == 1);
 			TEST_ASSERT(obj->getString("name").compare("John") == 0);
 
-			TEST_ASSERT(obj->getDouble("salary") != NULL);
-			TEST_ASSERT(*obj->getDouble("salary") == 3500.25);
+			TEST_ASSERT(obj->has("salary"));
+			TEST_ASSERT(obj->getDouble("salary") == 3500.25);
 
-			TEST_ASSERT(obj->getBSONArray("rel1") != NULL);
+			TEST_ASSERT(obj->has("rel1"));
 			TEST_ASSERT(obj->getBSONArray("rel1")->length() == 4);
 			TEST_ASSERT(obj->getBSONArray("rel1")->get(0)->getString("innertext").compare("inner text") == 0);
 
@@ -280,40 +281,40 @@ class TestFileSystemSuite: public Test::Suite
 
 			obj = std::auto_ptr<BSONObj>(bsonIn->readBSON());
 
-			TEST_ASSERT(obj->getInt("int") != NULL);
-			TEST_ASSERT(*obj->getInt("int") == 1);
+			TEST_ASSERT(obj->has("int"));
+			TEST_ASSERT(obj->getInt("int") == 1);
 
 			TEST_ASSERT(obj->getString("string").compare("test") == 0);
 
 			TEST_ASSERT(obj->getString("char*").compare("char*") == 0);
 
-			TEST_ASSERT(obj->getLong("long") != NULL);
-			TEST_ASSERT(*obj->getLong("long") == 1L);
+			TEST_ASSERT(obj->has("long"));
+			TEST_ASSERT(obj->getLong("long") == 1L);
 
-			TEST_ASSERT(obj->getLong64("long64") != NULL);
-			TEST_ASSERT(*obj->getLong64("long64") == 10000000000000L);
+			TEST_ASSERT(obj->has("long64"));
+			TEST_ASSERT(obj->getLong64("long64") == 10000000000000L);
 
-			TEST_ASSERT(obj->getDouble("double") != NULL);
-			TEST_ASSERT(*obj->getDouble("double") == 1.1);
+			TEST_ASSERT(obj->has("double"));
+			TEST_ASSERT(obj->getDouble("double") == 1.1);
 
 			BSONObj* innerTest = obj->getBSON("inner");
 			TEST_ASSERT(innerTest != NULL);
 
-			TEST_ASSERT(innerTest->getInt("int") != NULL);
-			TEST_ASSERT(*innerTest->getInt("int") == 1);
+			TEST_ASSERT(innerTest->has("int"));
+			TEST_ASSERT(innerTest->getInt("int") == 1);
 
 			TEST_ASSERT(innerTest->getString("string").compare("test") == 0);
 
 			TEST_ASSERT(innerTest->getString("char*").compare("char*") == 0);
 
-			TEST_ASSERT(innerTest->getLong("long") != NULL);
-			TEST_ASSERT(*innerTest->getLong("long") == 1L);
+			TEST_ASSERT(innerTest->has("long"));
+			TEST_ASSERT(innerTest->getLong("long") == 1L);
 
-			TEST_ASSERT(innerTest->getLong64("long64") != NULL);
-			TEST_ASSERT(*innerTest->getLong64("long64") == 10000000000000L);
+			TEST_ASSERT(innerTest->has("long64"));
+			TEST_ASSERT(innerTest->getLong64("long64") == 10000000000000L);
 
-			TEST_ASSERT(innerTest->getDouble("double") != NULL);
-			TEST_ASSERT(*innerTest->getDouble("double") == 1.1);
+			TEST_ASSERT(innerTest->has("double"));
+			TEST_ASSERT(innerTest->getDouble("double") == 1.1);
 
 			fis->close();
 		}
@@ -348,18 +349,18 @@ class TestFileSystemSuite: public Test::Suite
 			TEST_ASSERT(result->size() == 10);
 			for (std::vector<BSONObj*>::const_iterator i = result->begin(); i != result->end(); i++) {
 				BSONObj* obj = *i;
-				TEST_ASSERT(obj->getInt("int") != NULL);
-				TEST_ASSERT(*obj->getInt("int") == 1);
+				TEST_ASSERT(obj->has("int"));
+				TEST_ASSERT(obj->getInt("int") == 1);
 
 				TEST_ASSERT(obj->getString("string").compare("test") == 0);
 
 				TEST_ASSERT(obj->getString("char*").compare("char*") == 0);
 
-				TEST_ASSERT(obj->getLong("long") != NULL);
-				TEST_ASSERT(*obj->getLong("long") == 1L);
+				TEST_ASSERT(obj->has("long"));
+				TEST_ASSERT(obj->getLong("long") == 1L);
 
-				TEST_ASSERT(obj->getDouble("double") != NULL);
-				TEST_ASSERT(*obj->getDouble("double") == 1.1);
+				TEST_ASSERT(obj->has("double"));
+				TEST_ASSERT(obj->getDouble("double") == 1.1);
 
 			}
 

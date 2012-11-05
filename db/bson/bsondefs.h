@@ -17,13 +17,13 @@ enum BSONTYPE {
 //    PTR
 };
 
-class BSONParseException: public std::exception {
+class BSONException: public std::exception {
 	public:
-		BSONParseException(const char* error) {
+		BSONException(const char* error) {
 			_errorMessage = error;
 		}
 
-		BSONParseException(const BSONParseException& orig) {
+		BSONException(const BSONException& orig) {
 			this->_errorMessage = orig._errorMessage;
 		}
 

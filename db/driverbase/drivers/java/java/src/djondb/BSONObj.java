@@ -71,24 +71,20 @@ public class BSONObj {
     return djonwrapperJNI.BSONObj_has(swigCPtr, this, arg0);
   }
 
-  public SWIGTYPE_p_int getInt(String arg0) {
-    long cPtr = djonwrapperJNI.BSONObj_getInt(swigCPtr, this, arg0);
-    return (cPtr == 0) ? null : new SWIGTYPE_p_int(cPtr, false);
+  public int getInt(String arg0) {
+    return djonwrapperJNI.BSONObj_getInt(swigCPtr, this, arg0);
   }
 
-  public SWIGTYPE_p_double getDouble(String arg0) {
-    long cPtr = djonwrapperJNI.BSONObj_getDouble(swigCPtr, this, arg0);
-    return (cPtr == 0) ? null : new SWIGTYPE_p_double(cPtr, false);
+  public double getDouble(String arg0) {
+    return djonwrapperJNI.BSONObj_getDouble(swigCPtr, this, arg0);
   }
 
-  public SWIGTYPE_p_long getLong(String arg0) {
-    long cPtr = djonwrapperJNI.BSONObj_getLong(swigCPtr, this, arg0);
-    return (cPtr == 0) ? null : new SWIGTYPE_p_long(cPtr, false);
+  public int getLong(String arg0) {
+    return djonwrapperJNI.BSONObj_getLong(swigCPtr, this, arg0);
   }
 
   public SWIGTYPE_p___LONG64 getLong64(String arg0) {
-    long cPtr = djonwrapperJNI.BSONObj_getLong64(swigCPtr, this, arg0);
-    return (cPtr == 0) ? null : new SWIGTYPE_p___LONG64(cPtr, false);
+    return new SWIGTYPE_p___LONG64(djonwrapperJNI.BSONObj_getLong64(swigCPtr, this, arg0), true);
   }
 
   public String getString(String arg0) {
@@ -105,9 +101,8 @@ public class BSONObj {
     return (cPtr == 0) ? null : new BSONArrayObj(cPtr, false);
   }
 
-  public SWIGTYPE_p_void get(String arg0) {
-    long cPtr = djonwrapperJNI.BSONObj_get(swigCPtr, this, arg0);
-    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
+  public SWIGTYPE_p_BSONContent get(String arg0) {
+    return new SWIGTYPE_p_BSONContent(djonwrapperJNI.BSONObj_get(swigCPtr, this, arg0), true);
   }
 
   public SWIGTYPE_p_BSONContent getContent(String arg0) {

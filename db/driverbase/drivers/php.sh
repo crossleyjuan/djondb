@@ -5,9 +5,15 @@ sh update.sh
 rm -rf php
 mkdir php
 
-cp ../../obj/usr/lib/libdjon-client.0.dylib ../../obj/usr/lib/libdjon-client.dylib ../../obj/usr/lib/libdjon-client.la php/
+OS=`uname -s`
+if [ OS eq 'Darwin' ];
+then
+cp ../../obj/usr/lib/libdjon-client.0.dylib ../../obj/usr/lib/libdjon-client.dylib php/
+else
+cp ../../obj/usr/lib/libdjon-client.la php/
+fi
 
-swig -c++ -php -outdir php -o php/djonphpdriver.cpp driver.i
+swig2.0 -c++ -php -outdir php -o php/djonphpdriver.cpp driver.i
 
 cp config.m4 php
 cd php

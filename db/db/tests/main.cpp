@@ -86,6 +86,7 @@ class TestDBSuite: public Test::Suite
 			fos.writeString(std::string("13"));
 			fos.close();
 
+			TEST_ADD(TestDBSuite::testInsertComplexBSON);
 			TEST_ADD(TestDBSuite::testSimpleIndex);
 			TEST_ADD(TestDBSuite::testComplexIndex);
 			TEST_ADD(TestDBSuite::testIndexFactory);
@@ -99,7 +100,6 @@ class TestDBSuite: public Test::Suite
 			TEST_ADD(TestDBSuite::testMassiveInsert);
 			TEST_ADD(TestDBSuite::testFinds);
 			TEST_ADD(TestDBSuite::testFindsFilterErrors);
-			TEST_ADD(TestDBSuite::testInsertComplexBSON);
 			TEST_ADD(TestDBSuite::testFindsByFilter);
 			TEST_ADD(TestDBSuite::testFindsByTextFilter);
 			TEST_ADD(TestDBSuite::testFindPartial);
@@ -405,10 +405,12 @@ class TestDBSuite: public Test::Suite
 			controller->dropNamespace("dbtest", "sp1.customercomplex");
 			BSONObj obj;
 			obj.add("int", 1);
+			obj.add("double", 1.1);
 			obj.add("char", "test");
 
 			BSONObj inner;
-			inner.add("int", 200000);
+			inner.add("int", (int)200000);
+			inner.add("double", 1.1);
 			inner.add("char", "testInner");
 			obj.add("inner", inner);
 
@@ -420,12 +422,26 @@ class TestDBSuite: public Test::Suite
 				BSONObj* res = *array->begin();
 				TEST_ASSERT(res != NULL);
 				TEST_ASSERT(res->has("_id"));
+				TEST_ASSERT(res->has("int"));
+				if (res->has("int")) {
+					cout << "\n\nint value: " << res->getInt("int") << endl << endl;
+					TEST_ASSERT(res->getInt("int") == 1);
+				}
+				TEST_ASSERT(res->has("double"));
+				if (res->has("double")) {
+					TEST_ASSERT(res->getDouble("double") == 1.1);
+				}
 				TEST_ASSERT(res->getBSON("inner") != NULL);
 				BSONObj* innerRes = res->getBSON("inner");
 				TEST_ASSERT(innerRes != NULL);
+				TEST_ASSERT(innerRes->has("char"));
+				if (innerRes->has("char")) {
+					TEST_ASSERT(innerRes->getString("char").compare("testInner") == 0);
+				}
 				TEST_ASSERT(innerRes->has("int"));
 				if (innerRes->has("int")) {
-					TEST_ASSERT(*innerRes->getInt("int") == 200000);
+					cout << "\n\ninner int value: " << innerRes->getInt("int") << endl << endl;
+					TEST_ASSERT(innerRes->getInt("int") == 200000);
 				}
 				delete res;
 			}

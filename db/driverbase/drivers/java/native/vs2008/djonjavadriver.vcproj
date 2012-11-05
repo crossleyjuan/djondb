@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="djonjavadriver"
-	ProjectGUID="{9E11FDDD-C304-4CE1-A9D7-2031CB56A866}"
+	ProjectGUID="{3F4E72FD-F616-4BA5-87C7-D44561004F0E}"
 	RootNamespace="djonjavadriver"
 	TargetFrameworkVersion="196613"
 	>
@@ -43,7 +43,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="C:\development\boost;C:\workspace\djondb\db\windows\includes;C:\development\Java\jdk1.7.0_04\include;C:\development\Java\jdk1.7.0_04\include\win32;..\..\.."
+				AdditionalIncludeDirectories="C:\development\boost_1_47_0;C:\development\pthreads.2;C:\development\Java\jdk1.7.0_03\include\win32;C:\development\Java\jdk1.7.0_03\include;C:\workspace\personal\djondb\db\driverbase\drivers"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -61,10 +61,81 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="driverbase.lib bson.lib db.lib util.lib"
-				AdditionalLibraryDirectories="C:\workspace\djondb\db\windows\libs"
+				AdditionalDependencies="driverbase.lib Rpcrt4.lib Ws2_32.lib network.lib command.lib db.lib filesystem.lib cache.lib bson.lib util.lib antlr3c.lib"
+				AdditionalLibraryDirectories="C:\workspace\personal\djondb\db\windows\libs;C:\workspace\personal\djondb\db\third_party\libs"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Debug|x64"
+			OutputDirectory="$(ProjectDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="2"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories="C:\development\boost_1_47_0;C:\development\pthreads.2;C:\development\Java\jdk1.7.0_03\include\win32;C:\development\Java\jdk1.7.0_03\include;C:\workspace\personal\djondb\db\driverbase\drivers"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="driverbase.lib Rpcrt4.lib Ws2_32.lib network.lib command.lib db.lib filesystem.lib cache.lib bson.lib util.lib antlr3c.lib"
+				AdditionalLibraryDirectories="C:\workspace\personal\djondb\db\windows\libs;C:\workspace\personal\djondb\db\third_party\libs"
+				GenerateDebugInformation="true"
+				TargetMachine="17"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -115,7 +186,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="C:\development\boost;C:\workspace\djondb\db\windows\includes;C:\development\Java\jdk1.7.0_04\include;C:\development\Java\jdk1.7.0_04\include\win32;..\..\.."
+				AdditionalIncludeDirectories="C:\development\boost_1_47_0;C:\development\pthreads.2;C:\development\Java\jdk1.7.0_03\include\win32;C:\development\Java\jdk1.7.0_03\include;C:\workspace\personal\djondb\db\driverbase\drivers"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
@@ -132,8 +203,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="driverbase.lib bson.lib db.lib util.lib"
-				AdditionalLibraryDirectories="C:\workspace\djondb\db\windows\libs"
+				AdditionalDependencies="driverbase.lib Rpcrt4.lib Ws2_32.lib network.lib command.lib db.lib filesystem.lib cache.lib bson.lib util.lib antlr3c.lib"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="C:\workspace\personal\djondb\db\windows\libs;C:\workspace\personal\djondb\db\third_party\libs"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -162,80 +234,9 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Debug|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="2"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				TargetEnvironment="3"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				AdditionalIncludeDirectories="C:\development\boost;C:\workspace\djondb\db\windows\includes;C:\development\Java\jdk1.7.0_04\include;C:\development\Java\jdk1.7.0_04\include\win32;..\..\.."
-				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
-				WarningLevel="3"
-				DebugInformationFormat="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="driverbase.lib bson.lib db.lib util.lib"
-				AdditionalLibraryDirectories="C:\workspace\djondb\db\windows\libs"
-				GenerateDebugInformation="true"
-				TargetMachine="17"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
 			Name="Release|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="$(ProjectDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
@@ -260,7 +261,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="C:\development\boost;C:\workspace\djondb\db\windows\includes;C:\development\Java\jdk1.7.0_04\include;C:\development\Java\jdk1.7.0_04\include\win32;..\..\.."
+				AdditionalIncludeDirectories="C:\development\boost_1_47_0;C:\development\pthreads.2;C:\development\Java\jdk1.7.0_03\include\win32;C:\development\Java\jdk1.7.0_03\include;C:\workspace\personal\djondb\db\driverbase\drivers"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
@@ -277,8 +278,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="driverbase.lib bson.lib db.lib util.lib"
-				AdditionalLibraryDirectories="C:\workspace\djondb\db\windows\libs"
+				AdditionalDependencies="driverbase.lib Rpcrt4.lib Ws2_32.lib network.lib command.lib db.lib filesystem.lib cache.lib bson.lib util.lib antlr3c.lib"
+				AdditionalLibraryDirectories="C:\workspace\personal\djondb\db\windows\libs;C:\workspace\personal\djondb\db\third_party\libs"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"

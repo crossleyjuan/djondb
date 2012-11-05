@@ -28,14 +28,14 @@ class BSONObj
 
         bool has(std::string) const;
 
-        int* getInt(std::string) const;
-        double* getDouble(std::string) const;
-        long int* getLong(std::string) const;
-        __LONG64* getLong64(std::string) const;
-        std::string getString(std::string) const;
-        BSONObj* getBSON(std::string) const;
-        BSONArrayObj* getBSONArray(std::string) const;
-        void* get(std::string) const;
+        int getInt(std::string) const throw(BSONException);
+        double getDouble(std::string) const throw(BSONException);
+        long int getLong(std::string) const throw(BSONException);
+        __LONG64 getLong64(std::string) const throw(BSONException);
+        std::string getString(std::string) const throw(BSONException);
+        BSONObj* getBSON(std::string) const throw(BSONException);
+        BSONArrayObj* getBSONArray(std::string) const throw(BSONException);
+        BSONContent get(std::string) const throw(BSONException);
         BSONContent* getContent(std::string) const;
         BSONContent* getContent(std::string, BSONTYPE) const;
 

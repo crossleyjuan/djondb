@@ -222,7 +222,7 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 
 
 #include "bsonarrayobj.h"
-#include "djondb/bson.h"
+#include "bson.h"
 #include "bsonobj.h"
 #include "bsonparser.h"
 #include "filterdefs.h"
@@ -992,11 +992,11 @@ SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_BSONObj_1has(JNIEnv *jenv
 }
 
 
-SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_BSONObj_1getInt(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
-  jlong jresult = 0 ;
+SWIGEXPORT jint JNICALL Java_djondb_djonwrapperJNI_BSONObj_1getInt(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+  jint jresult = 0 ;
   BSONObj *arg1 = (BSONObj *) 0 ;
   std::string arg2 ;
-  int *result = 0 ;
+  int result;
   
   (void)jenv;
   (void)jcls;
@@ -1010,17 +1010,25 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_BSONObj_1getInt(JNIEnv *jenv
   if (!arg2_pstr) return 0;
   (&arg2)->assign(arg2_pstr);
   jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
-  result = (int *)((BSONObj const *)arg1)->getInt(arg2);
-  *(int **)&jresult = result; 
+  try {
+    result = (int)((BSONObj const *)arg1)->getInt(arg2);
+  }
+  catch(BSONException &_e) {
+    (void)_e;
+    SWIG_JavaThrowException(jenv, SWIG_JavaRuntimeException, "C++ BSONException exception thrown");
+    return 0; 
+  }
+  
+  jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_BSONObj_1getDouble(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
-  jlong jresult = 0 ;
+SWIGEXPORT jdouble JNICALL Java_djondb_djonwrapperJNI_BSONObj_1getDouble(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+  jdouble jresult = 0 ;
   BSONObj *arg1 = (BSONObj *) 0 ;
   std::string arg2 ;
-  double *result = 0 ;
+  double result;
   
   (void)jenv;
   (void)jcls;
@@ -1034,17 +1042,25 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_BSONObj_1getDouble(JNIEnv *j
   if (!arg2_pstr) return 0;
   (&arg2)->assign(arg2_pstr);
   jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
-  result = (double *)((BSONObj const *)arg1)->getDouble(arg2);
-  *(double **)&jresult = result; 
+  try {
+    result = (double)((BSONObj const *)arg1)->getDouble(arg2);
+  }
+  catch(BSONException &_e) {
+    (void)_e;
+    SWIG_JavaThrowException(jenv, SWIG_JavaRuntimeException, "C++ BSONException exception thrown");
+    return 0; 
+  }
+  
+  jresult = (jdouble)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_BSONObj_1getLong(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
-  jlong jresult = 0 ;
+SWIGEXPORT jint JNICALL Java_djondb_djonwrapperJNI_BSONObj_1getLong(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+  jint jresult = 0 ;
   BSONObj *arg1 = (BSONObj *) 0 ;
   std::string arg2 ;
-  long *result = 0 ;
+  long result;
   
   (void)jenv;
   (void)jcls;
@@ -1058,8 +1074,16 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_BSONObj_1getLong(JNIEnv *jen
   if (!arg2_pstr) return 0;
   (&arg2)->assign(arg2_pstr);
   jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
-  result = (long *)((BSONObj const *)arg1)->getLong(arg2);
-  *(long **)&jresult = result; 
+  try {
+    result = (long)((BSONObj const *)arg1)->getLong(arg2);
+  }
+  catch(BSONException &_e) {
+    (void)_e;
+    SWIG_JavaThrowException(jenv, SWIG_JavaRuntimeException, "C++ BSONException exception thrown");
+    return 0; 
+  }
+  
+  jresult = (jint)result; 
   return jresult;
 }
 
@@ -1068,7 +1092,7 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_BSONObj_1getLong64(JNIEnv *j
   jlong jresult = 0 ;
   BSONObj *arg1 = (BSONObj *) 0 ;
   std::string arg2 ;
-  __LONG64 *result = 0 ;
+  __LONG64 result;
   
   (void)jenv;
   (void)jcls;
@@ -1082,8 +1106,16 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_BSONObj_1getLong64(JNIEnv *j
   if (!arg2_pstr) return 0;
   (&arg2)->assign(arg2_pstr);
   jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
-  result = (__LONG64 *)((BSONObj const *)arg1)->getLong64(arg2);
-  *(__LONG64 **)&jresult = result; 
+  try {
+    result = ((BSONObj const *)arg1)->getLong64(arg2);
+  }
+  catch(BSONException &_e) {
+    (void)_e;
+    SWIG_JavaThrowException(jenv, SWIG_JavaRuntimeException, "C++ BSONException exception thrown");
+    return 0; 
+  }
+  
+  *(__LONG64 **)&jresult = new __LONG64((const __LONG64 &)result); 
   return jresult;
 }
 
@@ -1106,7 +1138,15 @@ SWIGEXPORT jstring JNICALL Java_djondb_djonwrapperJNI_BSONObj_1getString(JNIEnv 
   if (!arg2_pstr) return 0;
   (&arg2)->assign(arg2_pstr);
   jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
-  result = ((BSONObj const *)arg1)->getString(arg2);
+  try {
+    result = ((BSONObj const *)arg1)->getString(arg2);
+  }
+  catch(BSONException &_e) {
+    (void)_e;
+    SWIG_JavaThrowException(jenv, SWIG_JavaRuntimeException, "C++ BSONException exception thrown");
+    return 0; 
+  }
+  
   jresult = jenv->NewStringUTF((&result)->c_str()); 
   return jresult;
 }
@@ -1130,7 +1170,15 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_BSONObj_1getBSON(JNIEnv *jen
   if (!arg2_pstr) return 0;
   (&arg2)->assign(arg2_pstr);
   jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
-  result = (BSONObj *)((BSONObj const *)arg1)->getBSON(arg2);
+  try {
+    result = (BSONObj *)((BSONObj const *)arg1)->getBSON(arg2);
+  }
+  catch(BSONException &_e) {
+    (void)_e;
+    SWIG_JavaThrowException(jenv, SWIG_JavaRuntimeException, "C++ BSONException exception thrown");
+    return 0; 
+  }
+  
   *(BSONObj **)&jresult = result; 
   return jresult;
 }
@@ -1154,7 +1202,15 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_BSONObj_1getBSONArray(JNIEnv
   if (!arg2_pstr) return 0;
   (&arg2)->assign(arg2_pstr);
   jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
-  result = (BSONArrayObj *)((BSONObj const *)arg1)->getBSONArray(arg2);
+  try {
+    result = (BSONArrayObj *)((BSONObj const *)arg1)->getBSONArray(arg2);
+  }
+  catch(BSONException &_e) {
+    (void)_e;
+    SWIG_JavaThrowException(jenv, SWIG_JavaRuntimeException, "C++ BSONException exception thrown");
+    return 0; 
+  }
+  
   *(BSONArrayObj **)&jresult = result; 
   return jresult;
 }
@@ -1164,7 +1220,7 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_BSONObj_1get(JNIEnv *jenv, j
   jlong jresult = 0 ;
   BSONObj *arg1 = (BSONObj *) 0 ;
   std::string arg2 ;
-  void *result = 0 ;
+  BSONContent result;
   
   (void)jenv;
   (void)jcls;
@@ -1178,8 +1234,16 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_BSONObj_1get(JNIEnv *jenv, j
   if (!arg2_pstr) return 0;
   (&arg2)->assign(arg2_pstr);
   jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
-  result = (void *)((BSONObj const *)arg1)->get(arg2);
-  *(void **)&jresult = result; 
+  try {
+    result = ((BSONObj const *)arg1)->get(arg2);
+  }
+  catch(BSONException &_e) {
+    (void)_e;
+    SWIG_JavaThrowException(jenv, SWIG_JavaRuntimeException, "C++ BSONException exception thrown");
+    return 0; 
+  }
+  
+  *(BSONContent **)&jresult = new BSONContent((const BSONContent &)result); 
   return jresult;
 }
 

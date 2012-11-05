@@ -93,6 +93,7 @@ v8::Handle<v8::Value> Load(const v8::Arguments& args);
 v8::Handle<v8::Value> Quit(const v8::Arguments& args);
 v8::Handle<v8::Value> Version(const v8::Arguments& args);
 v8::Handle<v8::Value> insert(const v8::Arguments& args);
+v8::Handle<v8::Value> update(const v8::Arguments& args);
 v8::Handle<v8::Value> shutdown(const v8::Arguments& args);
 v8::Handle<v8::Value> fuuid(const v8::Arguments& args);
 v8::Handle<v8::Value> connect(const v8::Arguments& args);
@@ -113,6 +114,7 @@ char* commands[] = {
 	"quit",
 	"version",
 	"insert",
+	"update",
 	"shutdown",
 	"fuuid",
 	"connect",
@@ -179,6 +181,8 @@ v8::Persistent<v8::Context> CreateShellContext() {
 	global->Set(v8::String::New("version"), v8::FunctionTemplate::New(Version));
 	// Bind the 'db.insert' function
 	global->Set(v8::String::New("insert"), v8::FunctionTemplate::New(insert));
+	// Bind the 'db.update' function
+	global->Set(v8::String::New("update"), v8::FunctionTemplate::New(update));
 	// Bind the 'db.uuid' function
 	global->Set(v8::String::New("uuid"), v8::FunctionTemplate::New(fuuid));
 	// Bind the 'connect' function
@@ -280,6 +284,33 @@ v8::Handle<v8::Value> insert(const v8::Arguments& args) {
 	return v8::String::New("");
 }
 
+v8::Handle<v8::Value> update(const v8::Arguments& args) {
+	if (args.Length() < 3) {
+		return v8::ThrowException(v8::String::New("usage: update(db, namespace, json)"));
+	}
+
+	v8::HandleScope handle_scope;
+	v8::String::Utf8Value str(args[0]);
+	std::string db = ToCString(str);
+	v8::String::Utf8Value str2(args[1]);
+	std::string ns = ToCString(str2);
+	std::string json;
+	if (args[2]->IsObject()) {
+		v8::String::Utf8Value strValue(toJson(args[2]));
+		json = ToCString(strValue);
+	} else {
+		v8::String::Utf8Value sjson(args[2]);
+		json = ToCString(sjson);
+	}
+
+	if (__djonConnection == NULL) {
+		return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
+	}
+	__djonConnection->update(db, ns, json);
+
+	return v8::String::New("");
+}
+
 v8::Handle<v8::Value> shutdown(const v8::Arguments& args) {
 	if (args.Length() != 0) {
 		return v8::ThrowException(v8::String::New("usage: db.shutdown()"));
@@ -377,6 +408,7 @@ v8::Handle<v8::Value> help(const v8::Arguments& args) {
 			printf("find('db', 'namespace'[, 'select'][, 'filter']);\n\tExecutes a find using the provided filter.\n");
 			printf("help();\n\tThis help\n");
 			printf("insert('db', 'namespace', { json...object});\n\tInserts a new document.\n");
+			printf("update('db', 'namespace', { json...object});\n\tUpdates a document.\n");
 			printf("load('file');\n\tLoads and executes a script.\n");
 			printf("print(data);\n\tPrint console messages.\n");
 			printf("quit();\n\tBye bye fellow.\n");

@@ -73,22 +73,22 @@ class TestBSONSuite : public Test::Suite
 			array.add(b2);
 			obj->add("array", array);
 
-			TEST_ASSERT(obj->getInt("int") != NULL);
-			TEST_ASSERT(*obj->getInt("int") == 1);
+			TEST_ASSERT(obj->has("int"));
+			TEST_ASSERT(obj->getInt("int") == 1);
 
 			TEST_ASSERT(obj->getString("string").compare("test") == 0);
 
-			TEST_ASSERT(obj->getLong64("long") != NULL);
-			cout << "long: " << *obj->getLong64("long") << endl;
-			TEST_ASSERT(*obj->getLong64("long") == 10000000000L);
+			TEST_ASSERT(obj->has("long"));
+			cout << "long: " << obj->getLong64("long") << endl;
+			TEST_ASSERT(obj->getLong64("long") == 10000000000L);
 
-			TEST_ASSERT(obj->getDouble("double") != NULL);
-			TEST_ASSERT(*obj->getDouble("double") == 1.1);
+			TEST_ASSERT(obj->has("double"));
+			TEST_ASSERT(obj->getDouble("double") == 1.1);
 
-			TEST_ASSERT(obj->getBSON("rel1") != NULL);
+			TEST_ASSERT(obj->has("rel1"));
 			TEST_ASSERT(obj->getBSON("rel1")->getString("innertext").compare("inner text") == 0);
 			
-			TEST_ASSERT(obj->getBSONArray("array") != NULL);
+			TEST_ASSERT(obj->has("array"));
 			BSONArrayObj* arrayR = obj->getBSONArray("array");
 			TEST_ASSERT(arrayR != NULL);
 			TEST_ASSERT(arrayR->length() == 2);
@@ -100,11 +100,17 @@ class TestBSONSuite : public Test::Suite
 			TEST_ASSERT(el2 != NULL);
 
 			// test a non existant attribute
-			long* l = obj->getLong("xx");
-			TEST_ASSERT(l == NULL);
+			try {
+				obj->getLong("xx");
+				TEST_FAIL("The getLong should throw an exception");
+			} catch (BSONException e) {
+			}
 
-			std::string s = obj->getString("xxx");
-			TEST_ASSERT(s.length() == 0);
+			try {
+				obj->getString("xxx");
+				TEST_FAIL("The getString should throw an exception");
+			} catch (BSONException e) {
+			}
 			delete obj;
 		}
 
@@ -156,21 +162,21 @@ class TestBSONSuite : public Test::Suite
 
 			BSONObj* obj2 = BSONParser::parse(json);
 			free(json);
-			
-			TEST_ASSERT(obj->getInt("int") != NULL);
-			TEST_ASSERT(*obj->getInt("int") == 1);
 
-			TEST_ASSERT(obj->getLong("long") != NULL);
-			TEST_ASSERT(*obj->getLong("long") == LONG_MAX);
+			TEST_ASSERT(obj->has("int"));
+			TEST_ASSERT(obj->getInt("int") == 1);
 
-			TEST_ASSERT(obj->getLong64("long long") != NULL);
-			TEST_ASSERT(*obj->getLong64("long long") == LLONG_MAX);
+			TEST_ASSERT(obj->has("long"));
+			TEST_ASSERT(obj->getLong("long") == LONG_MAX);
+
+			TEST_ASSERT(obj->has("long long"));
+			TEST_ASSERT(obj->getLong64("long long") == LLONG_MAX);
 
 			TEST_ASSERT(obj->getString("string").compare(std::string(chars, 'a')) == 0);
 
-			TEST_ASSERT(obj->getBSON("rel1") != NULL);
+			TEST_ASSERT(obj->has("rel1"));
 			TEST_ASSERT(obj->getBSON("rel1")->getString("innertext").compare(std::string(chars, 'a')) == 0);
-			
+
 			delete obj;
 			delete obj2;
 		}
@@ -203,16 +209,16 @@ class TestBSONSuite : public Test::Suite
 			delete objOrig;
 			objOrig = NULL;
 
-			TEST_ASSERT(obj->getInt("int") != NULL);
-			TEST_ASSERT(*obj->getInt("int") == 1);
+			TEST_ASSERT(obj->has("int"));
+			TEST_ASSERT(obj->getInt("int") == 1);
 
 			TEST_ASSERT(obj->getString("string").compare("test") == 0);
 
-			TEST_ASSERT(obj->getLong("long") != NULL);
-			TEST_ASSERT(*obj->getLong("long") == 1L);
+			TEST_ASSERT(obj->has("long"));
+			TEST_ASSERT(obj->getLong("long") == 1L);
 
-			TEST_ASSERT(obj->getDouble("double") != NULL);
-			TEST_ASSERT(*obj->getDouble("double") == 1.1);
+			TEST_ASSERT(obj->has("double"));
+			TEST_ASSERT(obj->getDouble("double") == 1.1);
 
 			BSONObj* temp = obj->getBSON("rel1");
 			TEST_ASSERT(temp != NULL);
@@ -225,7 +231,7 @@ class TestBSONSuite : public Test::Suite
 
 			BSONObj* el1 = arrayR->get(0);
 			TEST_ASSERT(el1 != NULL);
-			
+
 			BSONObj* el2 = arrayR->get(1);
 			TEST_ASSERT(el2 != NULL);
 			delete obj;
@@ -272,15 +278,15 @@ class TestBSONSuite : public Test::Suite
 			TEST_ASSERT(testEmpty->length() == 0);
 
 			BSONObj* obj = BSONParser::parse("{age: 1, name: 'John:test\\'test2\\'', salary: 3500.25, lnumber: 100000000000}");
-			TEST_ASSERT(obj->getInt("age") != NULL);
-			TEST_ASSERT(*obj->getInt("age") == 1);
+			TEST_ASSERT(obj->has("age"));
+			TEST_ASSERT(obj->getInt("age") == 1);
 			TEST_ASSERT(obj->getString("name").compare("John:test\\'test2\\'") == 0);
 
-			TEST_ASSERT(obj->getDouble("salary") != NULL);
-			TEST_ASSERT(*obj->getDouble("salary") == 3500.25);
+			TEST_ASSERT(obj->has("salary"));
+			TEST_ASSERT(obj->getDouble("salary") == 3500.25);
 
-			TEST_ASSERT(obj->getLong64("lnumber") != NULL);
-			TEST_ASSERT(*obj->getLong64("lnumber") == 100000000000);
+			TEST_ASSERT(obj->has("lnumber"));
+			TEST_ASSERT(obj->getLong64("lnumber") == 100000000000);
 
 			delete obj;
 			delete testEmpty;
@@ -306,8 +312,8 @@ class TestBSONSuite : public Test::Suite
 			cout << "testParserRelation" << endl;
 
 			BSONObj* obj = BSONParser::parse("{age: 1, name: 'John', rel1: {innertext: 'inner text', salary: 150000, rent: 10000}}");
-			TEST_ASSERT(obj->getInt("age") != NULL);
-			TEST_ASSERT(*obj->getInt("age") == 1);
+			TEST_ASSERT(obj->has("age"));
+			TEST_ASSERT(obj->getInt("age") == 1);
 			TEST_ASSERT(obj->has("name"));
 			TEST_ASSERT(obj->getString("name").compare("John") == 0);
 
@@ -332,13 +338,13 @@ class TestBSONSuite : public Test::Suite
 
 			BSONObj* obj = array->get(0);
 			TEST_ASSERT(obj != NULL);
-			TEST_ASSERT(obj->getInt("age") != NULL);
-			TEST_ASSERT(*obj->getInt("age") == 1);
+			TEST_ASSERT(obj->has("age"));
+			TEST_ASSERT(obj->getInt("age") == 1);
 			TEST_ASSERT(obj->has("name"));
 			TEST_ASSERT(obj->getString("name").compare("John") == 0);
 
-			TEST_ASSERT(obj->getDouble("salary") != NULL);
-			TEST_ASSERT(*obj->getDouble("salary") == 3500.25);
+			TEST_ASSERT(obj->has("salary"));
+			TEST_ASSERT(obj->getDouble("salary") == 3500.25);
 
 			TEST_ASSERT(obj->getBSON("rel1") != NULL);
 			TEST_ASSERT(obj->getBSON("rel1")->getString("innertext").compare("inner text") == 0);
@@ -354,13 +360,13 @@ class TestBSONSuite : public Test::Suite
 			cout << "testParserCollection" << endl;
 
 			BSONObj* obj = BSONParser::parse("{age: 1, name: 'John', salary: 3500.25, rel1: [{innertext: 'inner text'}, {innertext: 'inner text'}, {innertext: 'inner text'}, {innertext: 'inner text'} ] }");
-			TEST_ASSERT(obj->getInt("age") != NULL);
-			TEST_ASSERT(*obj->getInt("age") == 1);
+			TEST_ASSERT(obj->has("age"));
+			TEST_ASSERT(obj->getInt("age") == 1);
 			TEST_ASSERT(obj->has("name"));
 			TEST_ASSERT(obj->getString("name").compare("John") == 0);
 
-			TEST_ASSERT(obj->getDouble("salary") != NULL);
-			TEST_ASSERT(*obj->getDouble("salary") == 3500.25);
+			TEST_ASSERT(obj->has("salary"));
+			TEST_ASSERT(obj->getDouble("salary") == 3500.25);
 
 			TEST_ASSERT(obj->getBSONArray("rel1") != NULL);
 			TEST_ASSERT(obj->getBSONArray("rel1")->length() == 4);
@@ -375,13 +381,13 @@ class TestBSONSuite : public Test::Suite
 			cout << "testParserDoubleRelation" << endl;
 
 			BSONObj* obj = BSONParser::parse("{age: 1, name: 'John', salary: 3500.25, rel1: {innertext: 'inner text', innerrel1: {innertext:'text2'}}}");
-			TEST_ASSERT(obj->getInt("age") != NULL);
-			TEST_ASSERT(*obj->getInt("age") == 1);
+			TEST_ASSERT(obj->has("age"));
+			TEST_ASSERT(obj->getInt("age") == 1);
 			TEST_ASSERT(obj->has("name"));
 			TEST_ASSERT(obj->getString("name").compare("John") == 0);
 
-			TEST_ASSERT(obj->getDouble("salary") != NULL);
-			TEST_ASSERT(*obj->getDouble("salary") == 3500.25);
+			TEST_ASSERT(obj->has("salary"));
+			TEST_ASSERT(obj->getDouble("salary") == 3500.25);
 
 			TEST_ASSERT(obj->getBSON("rel1") != NULL);
 			TEST_ASSERT(obj->getBSON("rel1")->getString("innertext").compare("inner text") == 0);
@@ -475,7 +481,7 @@ class TestBSONSuite : public Test::Suite
 			result = bson_splitSelect("$\"test2\"");
 			TEST_ASSERT(result.size() == 1);
 			TEST_ASSERT(result.find("test2") != result.end());
-			
+
 			selectsimple = "$\"test\", $\"test2.inner1\"";
 			result = bson_splitSelect("$\"test\"");
 			TEST_ASSERT(result.size() == 1);
@@ -489,7 +495,7 @@ class TestBSONSuite : public Test::Suite
 			char* subresult = bson_subselect(selectsimple, "test2");
 			char* expected = "$\"inner\"";
 			TEST_ASSERT(strcmp(subresult, expected) == 0);
-			
+
 			selectsimple = "$\"test1\", $\"test2.inner\", $\"test1.testinner\", $\"test2.inner2\", $\"test2.inner2.testii\"";
 			subresult = bson_subselect(selectsimple, "test2");
 			expected = "$\"inner\", $\"inner2\", $\"inner2.testii\"";

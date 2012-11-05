@@ -275,11 +275,11 @@ class TestDriverBaseSuite: public Test::Suite {
 
 			TEST_ASSERT(objResult != NULL);
 			TEST_ASSERT(objResult->has("int"));
-			TEST_ASSERT(*objResult->getInt("int") == 1);
+			TEST_ASSERT(objResult->getInt("int") == 1);
 			TEST_ASSERT(objResult->has("long"));
-			TEST_ASSERT(*objResult->getLong("long") == 10);
+			TEST_ASSERT(objResult->getLong("long") == 10);
 			TEST_ASSERT(objResult->has("longmax"));
-			TEST_ASSERT(*objResult->getLong("longmax") == LONG_MAX);
+			TEST_ASSERT(objResult->getLong("longmax") == LONG_MAX);
 			TEST_ASSERT(objResult->has("char"));
 			TEST_ASSERT(objResult->getString("char").compare("testing") == 0);
 

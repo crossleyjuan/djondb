@@ -1,5 +1,4 @@
 
-import djondb.BSONObj.Entry;
 import java.util.*;
 import djondb.*;
 import java.util.logging.Level;
@@ -60,12 +59,12 @@ class Main {
             con.insert("dbjava", "nsjava", "{ 'name': 'Juan' }");
             String obj = "{ \"name\": \"John\", \"lastName\": \"Doe\"}";
             con.insert("testdb", "javans", obj);
-            ArrayList<BSONObj> wrapper = con.find("dbjava", "nsjava", "$'name' == 'Juan'");
+            BSONObjVectorPtr result = con.find("dbjava", "nsjava", "$'name' == 'Juan'");
 
-            System.out.println("Size: " + wrapper.size());
+            System.out.println("Size: " + result.size());
 
-            for (int x = 0; x < wrapper.size(); x++) {
-                BSONObj bson = wrapper.get(x);
+            for (int x = 0; x < result.size(); x++) {
+                BSONObj bson = result.get(x);
                 System.out.println(bson.toString());
             }
 
@@ -89,16 +88,13 @@ class Main {
             con.insert("dbjava", "nsjava", "{ 'name': 'Juan' }");
             String obj = "{ \"name\": \"John\", \"lastName\": \"Doe\", \"inner\": { \"innerval\": 1}, \"array\": [1, 2, 3]}";
             con.insert("testdb", "javans", obj);
-            ArrayList<BSONObj> wrapper = con.find("testdb", "javans", "");
+            BSONObjVectorPtr wrapper = con.find("testdb", "javans", "");
 
             System.out.println("Size: " + wrapper.size());
             for (int x = 0; x < wrapper.size(); x++) {
                 BSONObj bson = wrapper.get(x);
-                Iterator<Entry> it = bson.iterator();
-                for (; it.hasNext(); ) {
-                    Entry e = it.next();
-                    System.out.println("key: " + e.getKey() + ", value: " + e.getValue());
-                }
+		BSONObj inner = bson.getBSON("inner");
+                System.out.println(inner.getInt("innerval"));
             }
 
             ConnectionManager.releaseConnection(con);
