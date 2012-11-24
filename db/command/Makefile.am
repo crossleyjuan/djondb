@@ -18,14 +18,7 @@ libdjon_command_la_SOURCES = command.cpp \
 									  findcommand.cpp \
 									  insertcommand.cpp \
 									  updatecommand.cpp \
-									  command.h \
-									  commandreader.h \
-									  commandresult.h \
-									  commandwriter.h \
-									  findcommand.h \
-									  insertcommand.h \
-									  updatecommand.h \
-									  dropnamespacecommand.h \
+									  removecommand.cpp \
 									  dropnamespacecommand.cpp \
 									  shutdowncommand.cpp \
 									  showdbscommand.cpp \

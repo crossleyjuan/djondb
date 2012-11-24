@@ -1,11 +1,12 @@
 #!/bin/sh
 
 JAVA=$JAVA_HOME
-while getopts j: o
+while getopts j:d: o
    do case "$o" in
-	    j)  JAVA="$OPTARG";;
-       \?)  echo "Usage: $0 -jdkhome <java_home>" && exit 1;;
-   esac
+		j)  JAVA="$OPTARG";;
+		d)  DIR="$OPTARG";;
+		\?)  echo "Usage: $0 -jdkhome <java_home>" && exit 1;;
+	esac
 done
 
 if [ -z "${JAVA}" ];
@@ -20,3 +21,8 @@ swig2.0 -outdir java/java/src/djondb -o java/native/javadriver_wrap.cpp -c++ -ja
 
 cd java
 ./release.sh
+
+if [ ! -z "${DIR}" ]; 
+then
+	cp dist/* $DIR
+fi

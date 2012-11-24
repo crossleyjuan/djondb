@@ -1,0 +1,19 @@
+{
+  "name": "djondb",
+  "version": "0.1.20121121",
+  "description": "djondb driver for nodejs",
+  "main": "./build/Release/djondb",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install": "node-gyp rebuild"
+  },
+  "repository": "",
+  "keywords": [
+    "djondb",
+    "nosql"
+  ],
+  "author": "Juan Pablo Crossley",
+  "license": "GPL",
+  "gypfile": true,
+  "readmeFilename": "README"
+}

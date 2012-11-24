@@ -2,7 +2,7 @@
 
 include("djonwrapper.php");
 
-$c = ConnectionManager::getConnection("localhost");
+$c = DjondbConnectionManager::getConnection("localhost");
 $c->open();
 
 $json = "{ name: 'Peter', lastName: 'Parker', occupations: [ { company: 'Daily Bugle', position: 'Photographer'}, { position: 'Superhero' } ], nicknames: [{ name: 'Spiderman', main: 1}, {'name': 'Spìdey'}] }";
@@ -47,6 +47,6 @@ for ($x = 0; $x < $res->size(); $x++) {
 	echo 'Name: '.$obj->{'name'};
 }
 
-ConnectionManager::releaseConnection($c);
+DjondbConnectionManager::releaseConnection($c);
 
 ?>

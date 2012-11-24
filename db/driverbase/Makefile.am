@@ -15,9 +15,9 @@ libdjon_client_la_LIBADD = $(top_builddir)/command/libdjon-command.la $(top_buil
 if !MAC
 libdjon_client_la_LIBADD += -lrt -lpthread -luuid
 endif
-libdjon_client_la_SOURCES= connection.cpp \
-									connection.h \
-									connectionmanager.cpp 
+libdjon_client_la_SOURCES= djondbconnection.cpp \
+									djondbconnection.h \
+									djondbconnectionmanager.cpp 
 									
 TESTS = test-driverbase
 check_PROGRAMS = test-driverbase
@@ -37,4 +37,4 @@ test_performance_LDADD += -lrt -lpthread -luuid -lsupc++
 endif
 
 library_includedir=$(includedir)/djondb
-library_include_HEADERS = djondb_client.h connectionmanager.h connection.h
+library_include_HEADERS = djondb_client.h djondbconnectionmanager.h djondbconnection.h

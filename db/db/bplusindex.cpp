@@ -97,7 +97,7 @@ void BPlusIndex::add(const BSONObj& elem, const std::string documentId, long fil
 	 delete index.key;
 }
 
-Index* BPlusIndex::find(const BSONObj& elem)
+Index* BPlusIndex::find(BSONObj* const elem)
 {
 //    char* key = elem->toChar();
 //    boost::crc_32_type crc32;
@@ -107,7 +107,7 @@ Index* BPlusIndex::find(const BSONObj& elem)
 	Logger* log = getLogger(NULL);
 	
 	Index* result = NULL;
-	INDEXPOINTERTYPE key = elem.toChar();
+	INDEXPOINTERTYPE key = elem->toChar();
 	/* 
 	PriorityCache<INDEXPOINTERTYPE, Index*>::iterator it = _priorityCache->get(key);
 	if (it != _priorityCache->end()) {
@@ -121,7 +121,7 @@ Index* BPlusIndex::find(const BSONObj& elem)
 	}
 	if (result == NULL) {
 		Index index;
-		index.key = new BSONObj(elem);
+		index.key = new BSONObj(*elem);
 		BucketElement* element = findBucketElement(_head, index, false);
 		if (element != NULL) {
 			result = element->index;

@@ -36,6 +36,7 @@
 #include <iostream>
 #include <sstream>
 #include <string.h>
+#include <assert.h>
 
 using namespace std;
 
@@ -205,7 +206,7 @@ BSONObj* DBController::insert(char* db, char* ns, BSONObj* obj) {
 		delete trev;
 	}
 	// _status flag
-	obj->add("_status", 1);
+	obj->add("_status", 1); // Active
 
 	std::string id;
 	if (obj->type("_id") == STRING_TYPE) {
@@ -236,8 +237,25 @@ void DBController::update(char* db, char* ns, BSONObj* obj) {
 	//    char* text = obj->toChar();
 	//    streamData->writeChars(text, strlen(text));
 	//    free(text);
+	//
+	Index* index = findIndex(db, ns, obj);
 
-	updateIndex(db, ns, obj, streamData->currentPos());
+	long currentPos = streamData->currentPos();
+
+	// Moves to the last record
+	streamData->seek(index->posData);
+
+	BSONObj* previous = readBSON(streamData);
+	previous->add("_status", 3); // Updated
+
+	streamData->seek(index->posData);
+	writeBSON(streamData, previous);
+
+	streamData->seek(currentPos);
+
+	updateIndex(db, ns, index, streamData->currentPos());
+
+	obj->add("_status", 1); // Active
 
 	writeBSON(streamData, obj);
 
@@ -246,7 +264,7 @@ void DBController::update(char* db, char* ns, BSONObj* obj) {
 	CacheManager::objectCache()->add(id, new BSONObj(*obj));
 }
 
-void DBController::deleteRecord(char* db, char* ns, const std::string& documentId, const std::string& revision) {
+void DBController::remove(char* db, char* ns, const std::string& documentId, const std::string& revision) {
 	if (_logger->isDebug()) _logger->debug(2, "DBController::update db: %s, ns: %s, documentId: %s, revision: %s", db, ns, documentId.c_str(), revision.c_str());
 	StreamType* streamData = StreamManager::getStreamManager()->open(std::string(db), std::string(ns), DATA_FTYPE);
 
@@ -260,7 +278,7 @@ void DBController::deleteRecord(char* db, char* ns, const std::string& documentI
 
 	BSONObj indexBSON;
 	indexBSON.add("_id", documentId);
-	Index* index = impl->find(indexBSON);
+	Index* index = impl->find(&indexBSON);
 	if (index != NULL) {
 
 		// TODO check the revision id
@@ -274,24 +292,30 @@ void DBController::deleteRecord(char* db, char* ns, const std::string& documentI
 		BSONObj* obj = readBSON(out);
 		obj->add("_status", 2); // DELETED
 
+		// Get back to the record start
+		out->seek(index->posData);
 		writeBSON(out, obj);
 
+		// restores the last position
 		out->seek(currentPos);
 
 		std::string id = obj->getString("_id");
 
-		CacheManager::objectCache()->add(id, new BSONObj(*obj));
+		CacheManager::objectCache()->remove(id);
 	}
 }
 
-void DBController::updateIndex(char* db, char* ns, BSONObj* bson, long filePos) {
-
+Index* DBController::findIndex(char* db, char* ns, BSONObj* bson) {
 	IndexAlgorithm* impl = IndexFactory::indexFactory.index(db, ns, "_id");
 
 	BSONObj indexBSON;
 	indexBSON.add("_id", bson->getString("_id"));
-	Index* index = impl->find(indexBSON);
+	Index* index = impl->find(&indexBSON);
 
+	return index;
+}
+
+void DBController::updateIndex(char* db, char* ns, Index* index, long filePos) {
 	index->posData = filePos;
 
 	StreamType* out = StreamManager::getStreamManager()->open(db, ns, INDEX_FTYPE);
@@ -385,17 +409,19 @@ BSONObj* DBController::findFirst(char* db, char* ns, const char* select, const c
 	BSONObj* bsonResult = NULL;
 	while (!fis->eof()) {
 		BSONObj* obj = bis->readBSON();
-
-		ExpressionResult* result = parser->eval(*obj);
-		if (result->type() == ExpressionResult::RT_BOOLEAN) {
-			bool* bres = (bool*)result->value();
-			if (*bres) {
-				bsonResult = obj->select(select);
-				delete obj;
-				break;
+		// Only "active" Records
+		if (obj->getInt("_status") == 1) {
+			ExpressionResult* result = parser->eval(*obj);
+			if (result->type() == ExpressionResult::RT_BOOLEAN) {
+				bool* bres = (bool*)result->value();
+				if (*bres) {
+					bsonResult = obj->select(select);
+					delete obj;
+					break;
+				}
 			}
+			delete result;
 		}
-		delete result;
 		delete obj;
 		if (bsonResult) {
 			break;
@@ -423,19 +449,20 @@ std::vector<BSONObj*>* DBController::findFullScan(char* db, char* ns, const char
 
 	while (!fis->eof()) {
 		BSONObj* obj = bis->readBSON();
-
-		bool match = false;
-		ExpressionResult* expresult = parser->eval(*obj);
-		if (expresult->type() == ExpressionResult::RT_BOOLEAN) {
-			bool* bres = (bool*)expresult->value();
-			match = *bres;
-		}
-		if (match) {
-			result->push_back(obj->select(select));
-		} else {
+		// Only "active" Records
+		if (obj->getInt("_status") == 1) {
+			bool match = false;
+			ExpressionResult* expresult = parser->eval(*obj);
+			if (expresult->type() == ExpressionResult::RT_BOOLEAN) {
+				bool* bres = (bool*)expresult->value();
+				match = *bres;
+			}
+			delete expresult;
+			if (match) {
+				result->push_back(obj->select(select));
+			}
 		}
 		delete obj;
-		delete expresult;
 	}
 
 	delete parser;

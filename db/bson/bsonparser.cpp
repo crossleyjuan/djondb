@@ -21,6 +21,7 @@
 #include "bsonobj.h"
 #include "bsonarrayobj.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <limits.h>
 
 struct BSONStruct {

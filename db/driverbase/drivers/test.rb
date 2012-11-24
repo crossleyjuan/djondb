@@ -1,9 +1,9 @@
 #!/usr/bin/ruby
 
-require 'djonwrapper'
+require 'djondb'
 
 begin
-	 con = Djonwrapper::ConnectionManager.getConnection('localhost')
+	 con = Djondb::DjondbConnectionManager.getConnection('localhost')
 	 con.open();
 	 con.insert("rubydb", "ns", "{ name: 'Mary', lastName: 'Johnson'}");
 
@@ -14,7 +14,7 @@ begin
 
 	 puts "Testing a different way"
 
-	 b = Djonwrapper::BSONObj.new
+	 b = Djondb::BSONObj.new
 	 b.add("name", "John")
 	 b.add("lastName", "Smith")
 	 b.add("age", 38)

@@ -103,6 +103,8 @@ class TestDBSuite: public Test::Suite
 			TEST_ADD(TestDBSuite::testFindsByFilter);
 			TEST_ADD(TestDBSuite::testFindsByTextFilter);
 			TEST_ADD(TestDBSuite::testFindPartial);
+			TEST_ADD(TestDBSuite::testUpdate);
+			TEST_ADD(TestDBSuite::testDelete);
 			TEST_ADD(TestDBSuite::testDropnamespace);
 			TEST_ADD(TestDBSuite::testDbs);
 			TEST_ADD(TestDBSuite::testNamespaces);
@@ -184,6 +186,62 @@ class TestDBSuite: public Test::Suite
 			TEST_ASSERT(result8->type() == ExpressionResult::RT_BOOLEAN);
 			bool* bresult8 = (bool*)result8->value();
 			TEST_ASSERT(*bresult8 == true);
+		}
+
+		void testUpdate() {
+			cout << "\ntestUpdate" << endl;
+
+			controller->dropNamespace("dbupdate", "ns");
+			BSONObj obj;
+			string* id = uuid();
+			obj.add("_id", *id);
+			obj.add("name", "John");
+			obj.add("age", 18);
+			controller->insert("dbupdate", "ns", &obj);
+
+			std::string filter = "$'_id' == '" + *id + "'";
+			BSONObj* res1 = controller->findFirst("dbupdate", "ns", "*", filter.c_str());
+			TEST_ASSERT(res1->getInt("age") == 18);
+
+			obj.add("age", 22);
+			controller->update("dbupdate", "ns", &obj);
+
+			BSONObj* res2 = controller->findFirst("dbupdate", "ns", "*", filter.c_str());
+
+			TEST_ASSERT(res2->getInt("age") == 22);
+
+			delete res1;
+			delete res2;
+			delete id;
+
+		}
+
+		void testDelete() {
+			cout << "\ntestDelete" << endl;
+
+			controller->dropNamespace("dbdelete", "ns");
+			BSONObj obj;
+			string* id = uuid();
+			obj.add("_id", *id);
+			string* revision = uuid();
+			obj.add("_revision", *revision);
+			obj.add("name", "John");
+			obj.add("age", 18);
+			controller->insert("dbdelete", "ns", &obj);
+
+			std::string filter = "$'_id' == '" + *id + "'";
+			BSONObj* res1 = controller->findFirst("dbdelete", "ns", "*", filter.c_str());
+			TEST_ASSERT(res1->getInt("age") == 18);
+
+			controller->remove("dbdelete", "ns", *id, *revision);
+
+			BSONObj* res2 = controller->findFirst("dbdelete", "ns", "*", filter.c_str());
+
+			TEST_ASSERT(res2 == NULL);
+
+			delete res1;
+			delete id;
+
 		}
 
 		void testDbs() {
@@ -451,7 +509,7 @@ class TestDBSuite: public Test::Suite
 		void testMassiveInsert()
 		{
 			cout << "\ntestMassiveInsert" << endl;
-			int inserts = 1000;
+			int inserts = 100;
 			std::auto_ptr<Logger> log(getLogger(NULL));
 
 			log->startTimeRecord();
@@ -477,7 +535,6 @@ class TestDBSuite: public Test::Suite
 				}
 				if ((x % 1000000) == 0)
 				{
-
 					cout<< "inserts " << x << endl;
 				}
 				delete obj;
@@ -767,7 +824,7 @@ class TestDBSuite: public Test::Suite
 
 				BSONObj id;
 				id.add("_id", guid);
-				Index* index = tree->find(id);
+				Index* index = tree->find(&id);
 				TEST_ASSERT_MSG(index != NULL, ("guid not found: " + guid).c_str());
 				if (index != NULL) {
 					BSONObj* key = index->key;

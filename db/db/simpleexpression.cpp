@@ -27,6 +27,7 @@
 #include "filterparser.h"
 #include "expressionresult.h"
 #include "bson.h"
+#include <stdlib.h>
 
 SimpleExpression::SimpleExpression(const char* expression)
 	:BaseExpression(ET_SIMPLE)

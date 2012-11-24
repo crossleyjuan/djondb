@@ -524,7 +524,7 @@ class ParseException extends Exception {
 	}
 }
 
-class Connection {
+class DjondbConnection {
 	public $_cPtr=null;
 	protected $_pData=array();
 
@@ -544,44 +544,44 @@ class Connection {
 	}
 
 	function __construct($host_or_orig,$port=null) {
-		if (is_resource($host_or_orig) && get_resource_type($host_or_orig) === '_p_djondb__Connection') {
+		if (is_resource($host_or_orig) && get_resource_type($host_or_orig) === '_p_djondb__DjondbConnection') {
 			$this->_cPtr=$host_or_orig;
 			return;
 		}
 		switch (func_num_args()) {
-		case 1: $this->_cPtr=new_Connection($host_or_orig); break;
-		default: $this->_cPtr=new_Connection($host_or_orig,$port);
+		case 1: $this->_cPtr=new_DjondbConnection($host_or_orig); break;
+		default: $this->_cPtr=new_DjondbConnection($host_or_orig,$port);
 		}
 	}
 
 	function open() {
-		return Connection_open($this->_cPtr);
+		return DjondbConnection_open($this->_cPtr);
 	}
 
 	function close() {
-		Connection_close($this->_cPtr);
+		DjondbConnection_close($this->_cPtr);
 	}
 
 	function internalClose() {
-		Connection_internalClose($this->_cPtr);
+		DjondbConnection_internalClose($this->_cPtr);
 	}
 
 	function isOpen() {
-		return Connection_isOpen($this->_cPtr);
+		return DjondbConnection_isOpen($this->_cPtr);
 	}
 
 	function shutdown() {
-		return Connection_shutdown($this->_cPtr);
+		return DjondbConnection_shutdown($this->_cPtr);
 	}
 
 	function insert($db,$ns,$json_or_obj) {
-		return Connection_insert($this->_cPtr,$db,$ns,$json_or_obj);
+		return DjondbConnection_insert($this->_cPtr,$db,$ns,$json_or_obj);
 	}
 
 	function findByKey($db,$ns,$select_or_id,$id=null) {
 		switch (func_num_args()) {
-		case 3: $r=Connection_findByKey($this->_cPtr,$db,$ns,$select_or_id); break;
-		default: $r=Connection_findByKey($this->_cPtr,$db,$ns,$select_or_id,$id);
+		case 3: $r=DjondbConnection_findByKey($this->_cPtr,$db,$ns,$select_or_id); break;
+		default: $r=DjondbConnection_findByKey($this->_cPtr,$db,$ns,$select_or_id,$id);
 		}
 		if (!is_resource($r)) return $r;
 		switch (get_resource_type($r)) {
@@ -592,8 +592,8 @@ class Connection {
 
 	function find($db,$ns,$select_or_filter,$filter=null) {
 		switch (func_num_args()) {
-		case 3: $r=Connection_find($this->_cPtr,$db,$ns,$select_or_filter); break;
-		default: $r=Connection_find($this->_cPtr,$db,$ns,$select_or_filter,$filter);
+		case 3: $r=DjondbConnection_find($this->_cPtr,$db,$ns,$select_or_filter); break;
+		default: $r=DjondbConnection_find($this->_cPtr,$db,$ns,$select_or_filter,$filter);
 		}
 		if (!is_resource($r)) return $r;
 		switch (get_resource_type($r)) {
@@ -603,15 +603,19 @@ class Connection {
 	}
 
 	function update($db,$ns,$json_or_bson) {
-		return Connection_update($this->_cPtr,$db,$ns,$json_or_bson);
+		return DjondbConnection_update($this->_cPtr,$db,$ns,$json_or_bson);
+	}
+
+	function remove($db,$ns,$id,$revision) {
+		return DjondbConnection_remove($this->_cPtr,$db,$ns,$id,$revision);
 	}
 
 	function dropNamespace($db,$ns) {
-		return Connection_dropNamespace($this->_cPtr,$db,$ns);
+		return DjondbConnection_dropNamespace($this->_cPtr,$db,$ns);
 	}
 
 	function dbs() {
-		$r=Connection_dbs($this->_cPtr);
+		$r=DjondbConnection_dbs($this->_cPtr);
 		if (is_resource($r)) {
 			$c=substr(get_resource_type($r), (strpos(get_resource_type($r), '__') ? strpos(get_resource_type($r), '__') + 2 : 3));
 			if (!class_exists($c)) {
@@ -623,7 +627,7 @@ class Connection {
 	}
 
 	function namespaces($db) {
-		$r=Connection_namespaces($this->_cPtr,$db);
+		$r=DjondbConnection_namespaces($this->_cPtr,$db);
 		if (is_resource($r)) {
 			$c=substr(get_resource_type($r), (strpos(get_resource_type($r), '__') ? strpos(get_resource_type($r), '__') + 2 : 3));
 			if (!class_exists($c)) {
@@ -635,7 +639,7 @@ class Connection {
 	}
 
 	function host() {
-		return Connection_host($this->_cPtr);
+		return DjondbConnection_host($this->_cPtr);
 	}
 }
 
@@ -677,7 +681,7 @@ class ConnectionReference {
 	}
 }
 
-class ConnectionManager {
+class DjondbConnectionManager {
 	public $_cPtr=null;
 	protected $_pData=array();
 
@@ -697,27 +701,27 @@ class ConnectionManager {
 	}
 
 	function __construct($res=null) {
-		if (is_resource($res) && get_resource_type($res) === '_p_djondb__ConnectionManager') {
+		if (is_resource($res) && get_resource_type($res) === '_p_djondb__DjondbConnectionManager') {
 			$this->_cPtr=$res;
 			return;
 		}
-		$this->_cPtr=new_ConnectionManager();
+		$this->_cPtr=new_DjondbConnectionManager();
 	}
 
 	static function getConnection($host,$port=null) {
 		switch (func_num_args()) {
-		case 1: $r=ConnectionManager_getConnection($host); break;
-		default: $r=ConnectionManager_getConnection($host,$port);
+		case 1: $r=DjondbConnectionManager_getConnection($host); break;
+		default: $r=DjondbConnectionManager_getConnection($host,$port);
 		}
 		if (!is_resource($r)) return $r;
 		switch (get_resource_type($r)) {
-		case '_p_djondb__Connection': return new Connection($r);
-		default: return new Connection($r);
+		case '_p_djondb__DjondbConnection': return new DjondbConnection($r);
+		default: return new DjondbConnection($r);
 		}
 	}
 
 	static function releaseConnection($conn) {
-		ConnectionManager_releaseConnection($conn);
+		DjondbConnectionManager_releaseConnection($conn);
 	}
 }
 

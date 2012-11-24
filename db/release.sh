@@ -17,7 +17,17 @@ mv usr ../debian/
 # cp /usr/lib/libv8.so.3.7.12.22 ../debian/usr/lib
 
 cd ..
-sh debian.sh
+sh debian.sh $@
 
+mkdir -p debian_dev/usr/lib
+cp debian/usr/lib/libdjon-client* debian_dev/usr/lib/
+
+sh debian_dev.sh $@
 # scp djondb.deb crossleyjuan@d-jon.com:html/downloads/djondb.deb
 
+cd driverbase/drivers
+
+./php.sh $@
+./java.sh $@
+cd nodejs
+npm publish

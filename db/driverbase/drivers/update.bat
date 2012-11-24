@@ -5,9 +5,9 @@ copy ..\..\bson\bsoncontent.h .
 copy ..\..\bson\bsonobj.h .
 copy ..\..\bson\bsonparser.h .
 copy ..\..\bson\bsonutil.h .
-copy ..\..\driverbase\connection.h .
+copy ..\..\driverbase\djondbconnection.h .
 copy ..\..\driverbase\djondb_client.h .
-copy ..\..\driverbase\connectionmanager.h .
+copy ..\..\driverbase\djondbconnectionmanager.h .
 copy ..\..\db\constantexpression.h .
 copy ..\..\db\expressionresult.h .
 copy ..\..\db\dbcontroller.h .

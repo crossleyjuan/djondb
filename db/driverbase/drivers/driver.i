@@ -10,8 +10,8 @@
 #include "bsonparser.h"
 #include "filterdefs.h"
 #include "bsonutil.h"
-#include "connection.h"
-#include "connectionmanager.h"
+#include "djondbconnection.h"
+#include "djondbconnectionmanager.h"
 #include "djondb_client.h"
 %}
 
@@ -27,7 +27,7 @@ namespace std {
 %include "bsonparser.h"
 %include "filterdefs.h"
 %include "bsonutil.h"
-%include "connection.h"
-%include "connectionmanager.h"
+%include "djondbconnection.h"
+%include "djondbconnectionmanager.h"
 %include "djondb_client.h"
 

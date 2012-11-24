@@ -43,7 +43,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="C:\development\boost_1_47_0;C:\development\pthreads.2;C:\development\Java\jdk1.7.0_03\include\win32;C:\development\Java\jdk1.7.0_03\include;C:\workspace\personal\djondb\db\driverbase\drivers"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)/../third_party/boost&quot;;&quot;$(SolutionDir)/../third_party/pthreads&quot;;C:\development\Java\jdk1.7.0_09_x86\include\win32;C:\development\Java\jdk1.7.0_09_x86\include;&quot;$(SolutionDir)/../driverbase/drivers&quot;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -61,8 +61,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="driverbase.lib Rpcrt4.lib Ws2_32.lib network.lib command.lib db.lib filesystem.lib cache.lib bson.lib util.lib antlr3c.lib"
-				AdditionalLibraryDirectories="C:\workspace\personal\djondb\db\windows\libs;C:\workspace\personal\djondb\db\third_party\libs"
+				AdditionalDependencies=" Rpcrt4.lib Ws2_32.lib driverbase.lib network.lib command.lib db.lib filesystem.lib cache.lib bson.lib util.lib antlr3c.lib"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)\libs&quot;;&quot;$(SolutionDir)/../third_party/libs/$(PlatformName)&quot;"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
@@ -114,7 +114,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="C:\development\boost_1_47_0;C:\development\pthreads.2;C:\development\Java\jdk1.7.0_03\include\win32;C:\development\Java\jdk1.7.0_03\include;C:\workspace\personal\djondb\db\driverbase\drivers"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)/../third_party/boost&quot;;&quot;$(SolutionDir)/../third_party/pthreads&quot;;C:\development\Java\jdk1.7.0_09_x86\include\win32;C:\development\Java\jdk1.7.0_09_x86\include;&quot;$(SolutionDir)/../driverbase/drivers&quot;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -132,8 +132,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="driverbase.lib Rpcrt4.lib Ws2_32.lib network.lib command.lib db.lib filesystem.lib cache.lib bson.lib util.lib antlr3c.lib"
-				AdditionalLibraryDirectories="C:\workspace\personal\djondb\db\windows\libs;C:\workspace\personal\djondb\db\third_party\libs"
+				AdditionalDependencies=" Rpcrt4.lib Ws2_32.lib driverbase.lib network.lib command.lib db.lib filesystem.lib cache.lib bson.lib util.lib antlr3c.lib"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)\libs&quot;;&quot;$(SolutionDir)/../third_party/libs/$(PlatformName)&quot;"
 				GenerateDebugInformation="true"
 				TargetMachine="17"
 			/>
@@ -186,7 +186,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="C:\development\boost_1_47_0;C:\development\pthreads.2;C:\development\Java\jdk1.7.0_03\include\win32;C:\development\Java\jdk1.7.0_03\include;C:\workspace\personal\djondb\db\driverbase\drivers"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)/../third_party/boost&quot;;&quot;$(SolutionDir)/../third_party/pthreads&quot;;C:\development\Java\jdk1.7.0_09_x86\include\win32;C:\development\Java\jdk1.7.0_09_x86\include;&quot;$(SolutionDir)/../driverbase/drivers&quot;"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
@@ -203,9 +203,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="driverbase.lib Rpcrt4.lib Ws2_32.lib network.lib command.lib db.lib filesystem.lib cache.lib bson.lib util.lib antlr3c.lib"
+				AdditionalDependencies=" Rpcrt4.lib Ws2_32.lib driverbase.lib network.lib command.lib db.lib filesystem.lib cache.lib bson.lib util.lib antlr3c.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="C:\workspace\personal\djondb\db\windows\libs;C:\workspace\personal\djondb\db\third_party\libs"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)\libs&quot;;&quot;$(SolutionDir)/../third_party/libs/$(PlatformName)&quot;"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -261,7 +261,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="C:\development\boost_1_47_0;C:\development\pthreads.2;C:\development\Java\jdk1.7.0_03\include\win32;C:\development\Java\jdk1.7.0_03\include;C:\workspace\personal\djondb\db\driverbase\drivers"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)/../third_party/boost&quot;;&quot;$(SolutionDir)/../third_party/pthreads&quot;;C:\development\Java\jdk1.7.0_09_x86\include\win32;C:\development\Java\jdk1.7.0_09_x86\include;&quot;$(SolutionDir)/../driverbase/drivers&quot;"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
@@ -278,8 +278,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="driverbase.lib Rpcrt4.lib Ws2_32.lib network.lib command.lib db.lib filesystem.lib cache.lib bson.lib util.lib antlr3c.lib"
-				AdditionalLibraryDirectories="C:\workspace\personal\djondb\db\windows\libs;C:\workspace\personal\djondb\db\third_party\libs"
+				AdditionalDependencies=" Rpcrt4.lib Ws2_32.lib driverbase.lib network.lib command.lib db.lib filesystem.lib cache.lib bson.lib util.lib antlr3c.lib"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)\libs&quot;;&quot;$(SolutionDir)/../third_party/libs/$(PlatformName)&quot;"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"

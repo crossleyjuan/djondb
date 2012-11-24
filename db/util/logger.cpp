@@ -199,7 +199,6 @@ Logger::Logger(void* clazz) {
 		_configSettings->m_info = true;
 		_configSettings->_detail = detail;
 	}
-
 }
 
 void Logger::print(std::string type, std::string text) {

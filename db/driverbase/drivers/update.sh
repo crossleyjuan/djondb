@@ -5,9 +5,9 @@ cp ../../bson/bson.h .
 cp ../../bson/bsonobj.h .
 cp ../../bson/bsonparser.h .
 cp ../../bson/bsonutil.h .
-cp ../../driverbase/connection.h .
+cp ../../driverbase/djondbconnection.h .
 cp ../../driverbase/djondb_client.h .
-cp ../../driverbase/connectionmanager.h .
+cp ../../driverbase/djondbconnectionmanager.h .
 cp ../../db/constantexpression.h .
 cp ../../db/expressionresult.h .
 cp ../../db/dbcontroller.h .

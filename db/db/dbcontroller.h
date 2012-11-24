@@ -40,6 +40,7 @@ class BSONObj;
 class Command;
 class Logger;
 class FilterParser;
+class Index;
 
 class DBController: public Controller
 {
@@ -52,26 +53,27 @@ class DBController: public Controller
         void shutdown();
 
 
-        virtual BSONObj* insert(char* db, char* ns, BSONObj* bson);
-		  virtual bool dropNamespace(char* db, char* ns);
-        virtual void update(char* db, char* ns, BSONObj* bson);
-        virtual void deleteRecord(char* db, char* ns, const std::string& documentId, const std::string& revision);
-        virtual std::vector<BSONObj*>* find(char* db, char* ns, const char* select, const char* filter) throw (ParseException);
-        virtual BSONObj* findFirst(char* db, char* ns, const char* select, const char* filter) throw (ParseException);
-        virtual BSONObj* readBSON(StreamType* stream);
-		  virtual std::vector<std::string>* dbs() const;
-		  virtual std::vector<std::string>* namespaces(const char* db) const;
+        BSONObj* insert(char* db, char* ns, BSONObj* bson);
+		  bool dropNamespace(char* db, char* ns);
+        void update(char* db, char* ns, BSONObj* bson);
+        void remove(char* db, char* ns, const std::string& documentId, const std::string& revision);
+        std::vector<BSONObj*>* find(char* db, char* ns, const char* select, const char* filter) throw (ParseException);
+        BSONObj* findFirst(char* db, char* ns, const char* select, const char* filter) throw (ParseException);
+        BSONObj* readBSON(StreamType* stream);
+		  std::vector<std::string>* dbs() const;
+		  std::vector<std::string>* namespaces(const char* db) const;
 
     private:
-		  std::vector<BSONObj*>* findFullScan(char* db, char* ns, const char* select, FilterParser* parser) throw (ParseException);
 		  Logger* _logger;
 		  bool _initialized;
 		  std::string _dataDir;
 
 	 private:
+		  std::vector<BSONObj*>* findFullScan(char* db, char* ns, const char* select, FilterParser* parser) throw (ParseException);
 		  void clearCache();
 		  long checkStructure(BSONObj* bson);
-		  void updateIndex(char* db, char* ns, BSONObj* bson, long filePos);
+		  void updateIndex(char* db, char* ns, Index* index, long filePos);
+		  Index* findIndex(char* db, char* ns, BSONObj* bson);
 		  void insertIndex(char* db, char* ns, BSONObj* bson, long filePos);
 		  void writeBSON(StreamType* stream, BSONObj* obj);
 };

@@ -24,6 +24,7 @@
 #include "memorystream.h"
 
 #include <memory>
+#include <stdlib.h>
 
 BSONInputStream::BSONInputStream(InputStream* is)
 {

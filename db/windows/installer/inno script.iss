@@ -21,7 +21,7 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
-OutputBaseFilename=setup
+OutputBaseFilename=setup_djondb
 Compression=lzma
 SolidCompression=yes
 
@@ -38,7 +38,6 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "C:\workspace\personal\djondb\db\windows\Release\djondb_win.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\workspace\personal\djondb\db\windows\libs\driverbase.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\workspace\personal\djondb\db\windows\Release\msvcm90.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\workspace\personal\djondb\db\windows\Release\msvcp90.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\workspace\personal\djondb\db\windows\Release\msvcr90.dll"; DestDir: "{app}"; Flags: ignoreversion

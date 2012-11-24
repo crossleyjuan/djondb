@@ -227,8 +227,8 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 #include "bsonparser.h"
 #include "filterdefs.h"
 #include "bsonutil.h"
-#include "connection.h"
-#include "connectionmanager.h"
+#include "djondbconnection.h"
+#include "djondbconnectionmanager.h"
 #include "djondb_client.h"
 
 SWIGINTERN std::vector< BSONObj * >::const_reference std_vector_Sl_BSONObj_Sm__Sg__get(std::vector< BSONObj * > *self,int i){
@@ -1384,7 +1384,7 @@ SWIGEXPORT jstring JNICALL Java_djondb_djonwrapperJNI_BSONObj_1toChar(JNIEnv *je
   (void)jcls;
   (void)jarg1_;
   arg1 = *(BSONObj **)&jarg1; 
-  result = (char *)((BSONObj const *)arg1)->toChar();
+  result = (char *)(arg1)->toChar();
   if (result) jresult = jenv->NewStringUTF((const char *)result);
   return jresult;
 }
@@ -1657,10 +1657,10 @@ SWIGEXPORT jint JNICALL Java_djondb_djonwrapperJNI_SERVER_1PORT_1get(JNIEnv *jen
 }
 
 
-SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_new_1Connection_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_new_1DjondbConnection_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jstring jarg1) {
   jlong jresult = 0 ;
   std::string arg1 ;
-  djondb::Connection *result = 0 ;
+  djondb::DjondbConnection *result = 0 ;
   
   (void)jenv;
   (void)jcls;
@@ -1672,17 +1672,17 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_new_1Connection_1_1SWIG_10(J
   if (!arg1_pstr) return 0;
   (&arg1)->assign(arg1_pstr);
   jenv->ReleaseStringUTFChars(jarg1, arg1_pstr); 
-  result = (djondb::Connection *)new djondb::Connection(arg1);
-  *(djondb::Connection **)&jresult = result; 
+  result = (djondb::DjondbConnection *)new djondb::DjondbConnection(arg1);
+  *(djondb::DjondbConnection **)&jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_new_1Connection_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jstring jarg1, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_new_1DjondbConnection_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jstring jarg1, jint jarg2) {
   jlong jresult = 0 ;
   std::string arg1 ;
   int arg2 ;
-  djondb::Connection *result = 0 ;
+  djondb::DjondbConnection *result = 0 ;
   
   (void)jenv;
   (void)jcls;
@@ -1695,111 +1695,111 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_new_1Connection_1_1SWIG_11(J
   (&arg1)->assign(arg1_pstr);
   jenv->ReleaseStringUTFChars(jarg1, arg1_pstr); 
   arg2 = (int)jarg2; 
-  result = (djondb::Connection *)new djondb::Connection(arg1,arg2);
-  *(djondb::Connection **)&jresult = result; 
+  result = (djondb::DjondbConnection *)new djondb::DjondbConnection(arg1,arg2);
+  *(djondb::DjondbConnection **)&jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_new_1Connection_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_new_1DjondbConnection_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
-  djondb::Connection *arg1 = 0 ;
-  djondb::Connection *result = 0 ;
+  djondb::DjondbConnection *arg1 = 0 ;
+  djondb::DjondbConnection *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(djondb::Connection **)&jarg1;
+  arg1 = *(djondb::DjondbConnection **)&jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "djondb::Connection const & reference is null");
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "djondb::DjondbConnection const & reference is null");
     return 0;
   } 
-  result = (djondb::Connection *)new djondb::Connection((djondb::Connection const &)*arg1);
-  *(djondb::Connection **)&jresult = result; 
+  result = (djondb::DjondbConnection *)new djondb::DjondbConnection((djondb::DjondbConnection const &)*arg1);
+  *(djondb::DjondbConnection **)&jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_delete_1Connection(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_delete_1DjondbConnection(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   
   (void)jenv;
   (void)jcls;
-  arg1 = *(djondb::Connection **)&jarg1; 
+  arg1 = *(djondb::DjondbConnection **)&jarg1; 
   delete arg1;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_Connection_1open(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1open(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   bool result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(djondb::Connection **)&jarg1; 
+  arg1 = *(djondb::DjondbConnection **)&jarg1; 
   result = (bool)(arg1)->open();
   jresult = (jboolean)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_Connection_1close(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1close(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(djondb::Connection **)&jarg1; 
+  arg1 = *(djondb::DjondbConnection **)&jarg1; 
   (arg1)->close();
 }
 
 
-SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_Connection_1internalClose(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1internalClose(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(djondb::Connection **)&jarg1; 
+  arg1 = *(djondb::DjondbConnection **)&jarg1; 
   (arg1)->internalClose();
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_Connection_1isOpen(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1isOpen(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   bool result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(djondb::Connection **)&jarg1; 
-  result = (bool)((djondb::Connection const *)arg1)->isOpen();
+  arg1 = *(djondb::DjondbConnection **)&jarg1; 
+  result = (bool)((djondb::DjondbConnection const *)arg1)->isOpen();
   jresult = (jboolean)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_Connection_1shutdown(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1shutdown(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   bool result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(djondb::Connection **)&jarg1; 
-  result = (bool)((djondb::Connection const *)arg1)->shutdown();
+  arg1 = *(djondb::DjondbConnection **)&jarg1; 
+  result = (bool)((djondb::DjondbConnection const *)arg1)->shutdown();
   jresult = (jboolean)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_Connection_1insert_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jstring jarg4) {
+SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1insert_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jstring jarg4) {
   jboolean jresult = 0 ;
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
   std::string *arg4 = 0 ;
@@ -1808,7 +1808,7 @@ SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_Connection_1insert_1_1SWI
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(djondb::Connection **)&jarg1; 
+  arg1 = *(djondb::DjondbConnection **)&jarg1; 
   if(!jarg2) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
     return 0;
@@ -1842,9 +1842,9 @@ SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_Connection_1insert_1_1SWI
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_Connection_1insert_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jlong jarg4, jobject jarg4_) {
+SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1insert_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jlong jarg4, jobject jarg4_) {
   jboolean jresult = 0 ;
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
   BSONObj *arg4 = 0 ;
@@ -1854,7 +1854,7 @@ SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_Connection_1insert_1_1SWI
   (void)jcls;
   (void)jarg1_;
   (void)jarg4_;
-  arg1 = *(djondb::Connection **)&jarg1; 
+  arg1 = *(djondb::DjondbConnection **)&jarg1; 
   if(!jarg2) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
     return 0;
@@ -1884,9 +1884,9 @@ SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_Connection_1insert_1_1SWI
 }
 
 
-SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_Connection_1findByKey_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jstring jarg4, jstring jarg5) {
+SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1findByKey_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jstring jarg4, jstring jarg5) {
   jlong jresult = 0 ;
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
   std::string *arg4 = 0 ;
@@ -1896,7 +1896,7 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_Connection_1findByKey_1_1SWI
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(djondb::Connection **)&jarg1; 
+  arg1 = *(djondb::DjondbConnection **)&jarg1; 
   if(!jarg2) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
     return 0;
@@ -1939,9 +1939,9 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_Connection_1findByKey_1_1SWI
 }
 
 
-SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_Connection_1findByKey_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jstring jarg4) {
+SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1findByKey_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jstring jarg4) {
   jlong jresult = 0 ;
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
   std::string *arg4 = 0 ;
@@ -1950,7 +1950,7 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_Connection_1findByKey_1_1SWI
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(djondb::Connection **)&jarg1; 
+  arg1 = *(djondb::DjondbConnection **)&jarg1; 
   if(!jarg2) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
     return 0;
@@ -1984,9 +1984,9 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_Connection_1findByKey_1_1SWI
 }
 
 
-SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_Connection_1find_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jstring jarg4, jstring jarg5) {
+SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1find_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jstring jarg4, jstring jarg5) {
   jlong jresult = 0 ;
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
   std::string *arg4 = 0 ;
@@ -1996,7 +1996,7 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_Connection_1find_1_1SWIG_10(
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(djondb::Connection **)&jarg1; 
+  arg1 = *(djondb::DjondbConnection **)&jarg1; 
   if(!jarg2) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
     return 0;
@@ -2047,9 +2047,9 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_Connection_1find_1_1SWIG_10(
 }
 
 
-SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_Connection_1find_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jstring jarg4) {
+SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1find_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jstring jarg4) {
   jlong jresult = 0 ;
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
   std::string *arg4 = 0 ;
@@ -2058,7 +2058,7 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_Connection_1find_1_1SWIG_11(
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(djondb::Connection **)&jarg1; 
+  arg1 = *(djondb::DjondbConnection **)&jarg1; 
   if(!jarg2) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
     return 0;
@@ -2100,9 +2100,9 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_Connection_1find_1_1SWIG_11(
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_Connection_1update_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jstring jarg4) {
+SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1update_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jstring jarg4) {
   jboolean jresult = 0 ;
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
   std::string *arg4 = 0 ;
@@ -2111,7 +2111,7 @@ SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_Connection_1update_1_1SWI
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(djondb::Connection **)&jarg1; 
+  arg1 = *(djondb::DjondbConnection **)&jarg1; 
   if(!jarg2) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
     return 0;
@@ -2145,9 +2145,9 @@ SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_Connection_1update_1_1SWI
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_Connection_1update_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jlong jarg4, jobject jarg4_) {
+SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1update_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jlong jarg4, jobject jarg4_) {
   jboolean jresult = 0 ;
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
   BSONObj *arg4 = 0 ;
@@ -2157,7 +2157,7 @@ SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_Connection_1update_1_1SWI
   (void)jcls;
   (void)jarg1_;
   (void)jarg4_;
-  arg1 = *(djondb::Connection **)&jarg1; 
+  arg1 = *(djondb::DjondbConnection **)&jarg1; 
   if(!jarg2) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
     return 0;
@@ -2187,9 +2187,64 @@ SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_Connection_1update_1_1SWI
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_Connection_1dropNamespace(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3) {
+SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1remove(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jstring jarg4, jstring jarg5) {
   jboolean jresult = 0 ;
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
+  std::string *arg2 = 0 ;
+  std::string *arg3 = 0 ;
+  std::string *arg4 = 0 ;
+  std::string *arg5 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(djondb::DjondbConnection **)&jarg1; 
+  if(!jarg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
+    return 0;
+  }
+  const char *arg2_pstr = (const char *)jenv->GetStringUTFChars(jarg2, 0); 
+  if (!arg2_pstr) return 0;
+  std::string arg2_str(arg2_pstr);
+  arg2 = &arg2_str;
+  jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
+  if(!jarg3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
+    return 0;
+  }
+  const char *arg3_pstr = (const char *)jenv->GetStringUTFChars(jarg3, 0); 
+  if (!arg3_pstr) return 0;
+  std::string arg3_str(arg3_pstr);
+  arg3 = &arg3_str;
+  jenv->ReleaseStringUTFChars(jarg3, arg3_pstr); 
+  if(!jarg4) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
+    return 0;
+  }
+  const char *arg4_pstr = (const char *)jenv->GetStringUTFChars(jarg4, 0); 
+  if (!arg4_pstr) return 0;
+  std::string arg4_str(arg4_pstr);
+  arg4 = &arg4_str;
+  jenv->ReleaseStringUTFChars(jarg4, arg4_pstr); 
+  if(!jarg5) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
+    return 0;
+  }
+  const char *arg5_pstr = (const char *)jenv->GetStringUTFChars(jarg5, 0); 
+  if (!arg5_pstr) return 0;
+  std::string arg5_str(arg5_pstr);
+  arg5 = &arg5_str;
+  jenv->ReleaseStringUTFChars(jarg5, arg5_pstr); 
+  result = (bool)(arg1)->remove((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4,(std::string const &)*arg5);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1dropNamespace(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3) {
+  jboolean jresult = 0 ;
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
   bool result;
@@ -2197,7 +2252,7 @@ SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_Connection_1dropNamespace
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(djondb::Connection **)&jarg1; 
+  arg1 = *(djondb::DjondbConnection **)&jarg1; 
   if(!jarg2) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
     return 0;
@@ -2222,31 +2277,31 @@ SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_Connection_1dropNamespace
 }
 
 
-SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_Connection_1dbs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1dbs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   std::vector< std::string > *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(djondb::Connection **)&jarg1; 
-  result = (std::vector< std::string > *)((djondb::Connection const *)arg1)->dbs();
+  arg1 = *(djondb::DjondbConnection **)&jarg1; 
+  result = (std::vector< std::string > *)((djondb::DjondbConnection const *)arg1)->dbs();
   *(std::vector< std::string > **)&jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_Connection_1namespaces(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1namespaces(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   jlong jresult = 0 ;
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   std::string *arg2 = 0 ;
   std::vector< std::string > *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(djondb::Connection **)&jarg1; 
+  arg1 = *(djondb::DjondbConnection **)&jarg1; 
   if(!jarg2) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
     return 0;
@@ -2256,22 +2311,22 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_Connection_1namespaces(JNIEn
   std::string arg2_str(arg2_pstr);
   arg2 = &arg2_str;
   jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
-  result = (std::vector< std::string > *)((djondb::Connection const *)arg1)->namespaces((std::string const &)*arg2);
+  result = (std::vector< std::string > *)((djondb::DjondbConnection const *)arg1)->namespaces((std::string const &)*arg2);
   *(std::vector< std::string > **)&jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jstring JNICALL Java_djondb_djonwrapperJNI_Connection_1host(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jstring JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1host(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jstring jresult = 0 ;
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   std::string result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(djondb::Connection **)&jarg1; 
-  result = ((djondb::Connection const *)arg1)->host();
+  arg1 = *(djondb::DjondbConnection **)&jarg1; 
+  result = ((djondb::DjondbConnection const *)arg1)->host();
   jresult = jenv->NewStringUTF((&result)->c_str()); 
   return jresult;
 }
@@ -2279,14 +2334,14 @@ SWIGEXPORT jstring JNICALL Java_djondb_djonwrapperJNI_Connection_1host(JNIEnv *j
 
 SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_ConnectionReference_1_1connection_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   djondb::ConnectionReference *arg1 = (djondb::ConnectionReference *) 0 ;
-  djondb::Connection *arg2 = (djondb::Connection *) 0 ;
+  djondb::DjondbConnection *arg2 = (djondb::DjondbConnection *) 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   (void)jarg2_;
   arg1 = *(djondb::ConnectionReference **)&jarg1; 
-  arg2 = *(djondb::Connection **)&jarg2; 
+  arg2 = *(djondb::DjondbConnection **)&jarg2; 
   if (arg1) (arg1)->_connection = arg2;
 }
 
@@ -2294,14 +2349,14 @@ SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_ConnectionReference_1_1connec
 SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_ConnectionReference_1_1connection_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   djondb::ConnectionReference *arg1 = (djondb::ConnectionReference *) 0 ;
-  djondb::Connection *result = 0 ;
+  djondb::DjondbConnection *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(djondb::ConnectionReference **)&jarg1; 
-  result = (djondb::Connection *) ((arg1)->_connection);
-  *(djondb::Connection **)&jresult = result; 
+  result = (djondb::DjondbConnection *) ((arg1)->_connection);
+  *(djondb::DjondbConnection **)&jresult = result; 
   return jresult;
 }
 
@@ -2356,32 +2411,32 @@ SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_delete_1ConnectionReference(J
 }
 
 
-SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_new_1ConnectionManager(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_new_1DjondbConnectionManager(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
-  djondb::ConnectionManager *result = 0 ;
+  djondb::DjondbConnectionManager *result = 0 ;
   
   (void)jenv;
   (void)jcls;
-  result = (djondb::ConnectionManager *)new djondb::ConnectionManager();
-  *(djondb::ConnectionManager **)&jresult = result; 
+  result = (djondb::DjondbConnectionManager *)new djondb::DjondbConnectionManager();
+  *(djondb::DjondbConnectionManager **)&jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_delete_1ConnectionManager(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  djondb::ConnectionManager *arg1 = (djondb::ConnectionManager *) 0 ;
+SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_delete_1DjondbConnectionManager(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  djondb::DjondbConnectionManager *arg1 = (djondb::DjondbConnectionManager *) 0 ;
   
   (void)jenv;
   (void)jcls;
-  arg1 = *(djondb::ConnectionManager **)&jarg1; 
+  arg1 = *(djondb::DjondbConnectionManager **)&jarg1; 
   delete arg1;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_ConnectionManager_1getConnection_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_DjondbConnectionManager_1getConnection_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jstring jarg1) {
   jlong jresult = 0 ;
   std::string arg1 ;
-  djondb::Connection *result = 0 ;
+  djondb::DjondbConnection *result = 0 ;
   
   (void)jenv;
   (void)jcls;
@@ -2393,17 +2448,17 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_ConnectionManager_1getConnec
   if (!arg1_pstr) return 0;
   (&arg1)->assign(arg1_pstr);
   jenv->ReleaseStringUTFChars(jarg1, arg1_pstr); 
-  result = (djondb::Connection *)djondb::ConnectionManager::getConnection(arg1);
-  *(djondb::Connection **)&jresult = result; 
+  result = (djondb::DjondbConnection *)djondb::DjondbConnectionManager::getConnection(arg1);
+  *(djondb::DjondbConnection **)&jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_ConnectionManager_1getConnection_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jstring jarg1, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_DjondbConnectionManager_1getConnection_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jstring jarg1, jint jarg2) {
   jlong jresult = 0 ;
   std::string arg1 ;
   int arg2 ;
-  djondb::Connection *result = 0 ;
+  djondb::DjondbConnection *result = 0 ;
   
   (void)jenv;
   (void)jcls;
@@ -2416,20 +2471,20 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_ConnectionManager_1getConnec
   (&arg1)->assign(arg1_pstr);
   jenv->ReleaseStringUTFChars(jarg1, arg1_pstr); 
   arg2 = (int)jarg2; 
-  result = (djondb::Connection *)djondb::ConnectionManager::getConnection(arg1,arg2);
-  *(djondb::Connection **)&jresult = result; 
+  result = (djondb::DjondbConnection *)djondb::DjondbConnectionManager::getConnection(arg1,arg2);
+  *(djondb::DjondbConnection **)&jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_ConnectionManager_1releaseConnection(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_DjondbConnectionManager_1releaseConnection(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(djondb::Connection **)&jarg1; 
-  djondb::ConnectionManager::releaseConnection(arg1);
+  arg1 = *(djondb::DjondbConnection **)&jarg1; 
+  djondb::DjondbConnectionManager::releaseConnection(arg1);
 }
 
 

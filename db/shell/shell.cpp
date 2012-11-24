@@ -72,7 +72,7 @@
 
 using namespace djondb;
 
-Connection* __djonConnection;
+DjondbConnection* __djonConnection;
 
 CircularQueue<std::string> _commands(10);
 
@@ -94,6 +94,7 @@ v8::Handle<v8::Value> Quit(const v8::Arguments& args);
 v8::Handle<v8::Value> Version(const v8::Arguments& args);
 v8::Handle<v8::Value> insert(const v8::Arguments& args);
 v8::Handle<v8::Value> update(const v8::Arguments& args);
+v8::Handle<v8::Value> remove(const v8::Arguments& args);
 v8::Handle<v8::Value> shutdown(const v8::Arguments& args);
 v8::Handle<v8::Value> fuuid(const v8::Arguments& args);
 v8::Handle<v8::Value> connect(const v8::Arguments& args);
@@ -115,6 +116,7 @@ char* commands[] = {
 	"version",
 	"insert",
 	"update",
+	"remove",
 	"shutdown",
 	"fuuid",
 	"connect",
@@ -183,6 +185,8 @@ v8::Persistent<v8::Context> CreateShellContext() {
 	global->Set(v8::String::New("insert"), v8::FunctionTemplate::New(insert));
 	// Bind the 'db.update' function
 	global->Set(v8::String::New("update"), v8::FunctionTemplate::New(update));
+	// Bind the 'db.remove' function
+	global->Set(v8::String::New("remove"), v8::FunctionTemplate::New(remove));
 	// Bind the 'db.uuid' function
 	global->Set(v8::String::New("uuid"), v8::FunctionTemplate::New(fuuid));
 	// Bind the 'connect' function
@@ -311,6 +315,29 @@ v8::Handle<v8::Value> update(const v8::Arguments& args) {
 	return v8::String::New("");
 }
 
+v8::Handle<v8::Value> remove(const v8::Arguments& args) {
+	if (args.Length() < 4) {
+		return v8::ThrowException(v8::String::New("usage: remove(db, namespace, id, revision)"));
+	}
+
+	v8::HandleScope handle_scope;
+	v8::String::Utf8Value str(args[0]);
+	std::string db = ToCString(str);
+	v8::String::Utf8Value str2(args[1]);
+	std::string ns = ToCString(str2);
+	v8::String::Utf8Value str3(args[2]);
+	std::string id = ToCString(str3);
+	v8::String::Utf8Value str4(args[3]);
+	std::string revision = ToCString(str4);
+
+	if (__djonConnection == NULL) {
+		return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
+	}
+	__djonConnection->remove(db, ns, id, revision);
+
+	return v8::String::New("");
+}
+
 v8::Handle<v8::Value> shutdown(const v8::Arguments& args) {
 	if (args.Length() != 0) {
 		return v8::ThrowException(v8::String::New("usage: db.shutdown()"));
@@ -409,6 +436,7 @@ v8::Handle<v8::Value> help(const v8::Arguments& args) {
 			printf("help();\n\tThis help\n");
 			printf("insert('db', 'namespace', { json...object});\n\tInserts a new document.\n");
 			printf("update('db', 'namespace', { json...object});\n\tUpdates a document.\n");
+			printf("remove('db', 'namespace', 'id', 'revision');\n\tRemoves a document.\n");
 			printf("load('file');\n\tLoads and executes a script.\n");
 			printf("print(data);\n\tPrint console messages.\n");
 			printf("quit();\n\tBye bye fellow.\n");
@@ -521,7 +549,7 @@ v8::Handle<v8::Value> connect(const v8::Arguments& args) {
 	if (args.Length() == 2) {
 		port = args[1]->Int32Value();	
 	}
-	__djonConnection = ConnectionManager::getConnection(server, port);
+	__djonConnection = DjondbConnectionManager::getConnection(server, port);
 	if (__djonConnection->open()) {
 		printf("Connected to %s\n", server.c_str());
 	} else {

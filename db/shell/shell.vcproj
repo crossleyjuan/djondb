@@ -43,7 +43,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\third_party\includes;..\util;..\db;C:\development\boost;..\bson;..\driverbase"
+				AdditionalIncludeDirectories="..\third_party\includes;..\util;..\db;&quot;$(SolutionDir)/../third_party/boost&quot;;..\bson;..\driverbase"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -64,87 +64,13 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="v8_base.lib v8_snapshot.lib util.lib driverbase.lib bson.lib WS2_32.lib Rpcrt4.lib WINMM.LIB antlr3c.lib"
+				AdditionalDependencies="v8_base.lib v8_snapshot.lib util.lib cache.lib driverbase.lib bson.lib WS2_32.lib Rpcrt4.lib WINMM.LIB antlr3c.lib db.lib command.lib filesystem.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;$(SolutionDir)\libs&quot;;../windows/libs;..\third_party\libs;&quot;../third_party/libs/$(ConfigurationName)&quot;"
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				SubSystem="1"
-				TargetMachine="1"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\third_party\includes;..\util;..\db;C:\development\boost;..\bson;..\driverbase"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;"
-				RuntimeLibrary="2"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="v8_base.lib v8_snapshot.lib util.lib driverbase.lib bson.lib WS2_32.lib Rpcrt4.lib WINMM.LIB antlr3c.lib"
-				OutputFile="$(OutDir)\djondb_shell.exe"
-				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)\libs&quot;;../windows/libs;..\third_party\libs;&quot;../third_party/libs/$(ConfigurationName)&quot;"
-				GenerateDebugInformation="true"
-				SubSystem="1"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -194,7 +120,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\third_party\includes;..\util;..\db;C:\development\boost;..\bson;..\driverbase"
+				AdditionalIncludeDirectories="..\third_party\includes;..\util;..\db;&quot;$(SolutionDir)/../third_party/boost&quot;;..\bson;..\driverbase"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -215,7 +141,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="v8_base.lib v8_snapshot.lib util.lib driverbase.lib bson.lib WS2_32.lib Rpcrt4.lib WINMM.LIB antlr3c.lib"
+				AdditionalDependencies="v8_base.lib v8_snapshot.lib util.lib cache.lib driverbase.lib bson.lib WS2_32.lib Rpcrt4.lib WINMM.LIB antlr3c.lib db.lib command.lib filesystem.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;$(SolutionDir)\libs&quot;;../windows/libs;..\third_party\libs;&quot;../third_party/libs/$(ConfigurationName)&quot;"
 				IgnoreAllDefaultLibraries="false"
@@ -223,6 +149,80 @@
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="..\third_party\includes;..\util;..\db;&quot;$(SolutionDir)/../third_party/boost&quot;;..\bson;..\driverbase"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;"
+				RuntimeLibrary="2"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="v8_base.lib v8_snapshot.lib util.lib cache.lib driverbase.lib bson.lib WS2_32.lib Rpcrt4.lib WINMM.LIB antlr3c.lib db.lib command.lib filesystem.lib"
+				OutputFile="$(OutDir)\djondb_shell.exe"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)\libs&quot;;../windows/libs;..\third_party\libs;&quot;../third_party/libs/$(ConfigurationName)&quot;"
+				GenerateDebugInformation="true"
+				SubSystem="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -270,7 +270,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\third_party\includes;..\util;..\db;C:\development\boost;..\bson;..\driverbase"
+				AdditionalIncludeDirectories="..\third_party\includes;..\util;..\db;&quot;$(SolutionDir)/../third_party/boost&quot;;..\bson;..\driverbase"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -289,7 +289,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="v8_base.lib v8_snapshot.lib util.lib driverbase.lib bson.lib WS2_32.lib Rpcrt4.lib WINMM.LIB antlr3c.lib"
+				AdditionalDependencies="v8_base.lib v8_snapshot.lib util.lib cache.lib driverbase.lib bson.lib WS2_32.lib Rpcrt4.lib WINMM.LIB antlr3c.lib db.lib command.lib filesystem.lib"
 				OutputFile="$(OutDir)\djondb_shell.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;$(SolutionDir)\libs&quot;;../windows/libs;..\third_party\libs;&quot;../third_party/libs/$(ConfigurationName)&quot;"

@@ -20,6 +20,7 @@
 #include "djondb_client.h"
 #include <unistd.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 using namespace std; 
 using namespace djondb;
@@ -31,7 +32,7 @@ class TestPerfomance {
 		}
 
 		void testPerfomance(int port, int top = 10000000) {
-			Connection* conn = ConnectionManager::getConnection("localhost", port);
+			DjondbConnection* conn = DjondbConnectionManager::getConnection("localhost", port);
 
 			if (!conn->open()) {
 				cout << "Not connected" << endl;

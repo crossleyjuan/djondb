@@ -35,13 +35,13 @@ public class ConnectionReference {
     }
   }
 
-  public void set_connection(Connection value) {
-    djonwrapperJNI.ConnectionReference__connection_set(swigCPtr, this, Connection.getCPtr(value), value);
+  public void set_connection(DjondbConnection value) {
+    djonwrapperJNI.ConnectionReference__connection_set(swigCPtr, this, DjondbConnection.getCPtr(value), value);
   }
 
-  public Connection get_connection() {
+  public DjondbConnection get_connection() {
     long cPtr = djonwrapperJNI.ConnectionReference__connection_get(swigCPtr, this);
-    return (cPtr == 0) ? null : new Connection(cPtr, false);
+    return (cPtr == 0) ? null : new DjondbConnection(cPtr, false);
   }
 
   public void set_references(int value) {

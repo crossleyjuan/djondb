@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../network;../command;../db;../filesystem;../cache;../bson;../util;C:\development\boost;..\windows\includes"
+				AdditionalIncludeDirectories="../network;../command;../db;../filesystem;../cache;../bson;../util;&quot;$(SolutionDir)/../third_party/boost&quot;;..\windows\includes"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -82,8 +82,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)\libs"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			>
 			<Tool
@@ -105,7 +105,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../network;../command;../db;../filesystem;../cache;../bson;../util;C:\development\boost;..\windows\includes"
+				AdditionalIncludeDirectories="../network;../command;../db;../filesystem;../cache;../bson;../util;&quot;$(SolutionDir)/../third_party/boost&quot;;..\windows\includes"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -176,7 +176,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="../network;../command;../db;../filesystem;../cache;../bson;../util;C:\development\boost;..\windows\includes"
+				AdditionalIncludeDirectories="../network;../command;../db;../filesystem;../cache;../bson;../util;&quot;$(SolutionDir)/../third_party/boost&quot;;..\windows\includes"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -214,8 +214,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)\libs"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			>
 			<Tool
@@ -236,7 +236,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="../network;../command;../db;../filesystem;../cache;../bson;../util;C:\development\boost;..\windows\includes"
+				AdditionalIncludeDirectories="../network;../command;../db;../filesystem;../cache;../bson;../util;&quot;$(SolutionDir)/../third_party/boost&quot;;..\windows\includes"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -299,15 +299,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\connection.h"
-				>
-			</File>
-			<File
-				RelativePath=".\connectionmanager.h"
-				>
-			</File>
-			<File
 				RelativePath=".\djondb_client.h"
+				>
+			</File>
+			<File
+				RelativePath=".\djondbconnection.h"
+				>
+			</File>
+			<File
+				RelativePath=".\djondbconnectionmanager.h"
 				>
 			</File>
 		</Filter>
@@ -323,11 +323,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\connection.cpp"
+				RelativePath=".\djondbconnection.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\connectionmanager.cpp"
+				RelativePath=".\djondbconnectionmanager.cpp"
 				>
 			</File>
 		</Filter>

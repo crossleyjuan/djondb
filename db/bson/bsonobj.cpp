@@ -29,12 +29,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <set>
+#include <assert.h>
 
 using namespace std;
 
 #define MAX_BSONOBJ_BUFFER 8000
 BSONObj::BSONObj()
 {
+	_cBSON = NULL;
 }
 
 BSONObj::~BSONObj()
@@ -44,6 +46,10 @@ BSONObj::~BSONObj()
 		delete(cont);
 	}
 	_elements.clear();
+	if (_cBSON != NULL) {
+		free(_cBSON);
+		_cBSON = 0;
+	}
 }
 
 /*
@@ -92,7 +98,12 @@ void BSONObj::add(std::string key, const BSONArrayObj& val) {
 }
 
 
-char* BSONObj::toChar() const {
+char* BSONObj::toChar() {
+	// if the toChar was already calculated before use it
+	if (_cBSON != NULL) {
+		return strcpy(_cBSON);
+	}
+
 	Logger* log = getLogger(NULL);
 	
 	char* result = (char*)malloc(MAX_BSONOBJ_BUFFER);
@@ -154,10 +165,12 @@ char* BSONObj::toChar() const {
 
 	int len = strlen(result);
 
+	// Saves the value to cache the calculated value
+	_cBSON = result;
+
 	char* cresult = strcpy(result);
 
 	delete log;
-	free(result);
 	return cresult;
 }
 
@@ -286,6 +299,11 @@ BSONObj::BSONObj(const BSONObj& orig) {
 		BSONContent* content = new BSONContent(*origContent);
 
 		this->_elements.insert(pair<std::string, BSONContent* >(i->first, content));
+	}
+	if (orig._cBSON != NULL) {
+		this->_cBSON = strcpy(orig._cBSON);
+	} else {
+		this->_cBSON = NULL;
 	}
 }
 
@@ -489,4 +507,10 @@ void BSONObj::fillContent(std::string kkey, BSONTYPE ttype, void* vval) {
 	content->setType(ttype); 
 	content->_element = vval; 
 	_elements.insert(pair<std::string, BSONContent* >(kkey, content));
+
+	// cleans up the cached toChar value
+	if (_cBSON != NULL) {
+		free(_cBSON);
+		_cBSON = 0;
+	}
 }

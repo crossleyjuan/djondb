@@ -1818,49 +1818,47 @@ int SWIG_Ruby_arity( VALUE proc, int minimal )
 
 #define SWIGTYPE_p_BSONArrayObj swig_types[0]
 #define SWIGTYPE_p_BSONContent swig_types[1]
-#define SWIGTYPE_p_BSONObj swig_types[2]
-#define SWIGTYPE_p_BSONParser swig_types[3]
-#define SWIGTYPE_p_BSONTYPE swig_types[4]
-#define SWIGTYPE_p_ParseException swig_types[5]
-#define SWIGTYPE_p___LONG64 swig_types[6]
-#define SWIGTYPE_p_allocator_type swig_types[7]
-#define SWIGTYPE_p_char swig_types[8]
-#define SWIGTYPE_p_const_iterator swig_types[9]
-#define SWIGTYPE_p_const_reference swig_types[10]
-#define SWIGTYPE_p_difference_type swig_types[11]
-#define SWIGTYPE_p_djondb__Connection swig_types[12]
-#define SWIGTYPE_p_djondb__ConnectionManager swig_types[13]
-#define SWIGTYPE_p_djondb__ConnectionReference swig_types[14]
-#define SWIGTYPE_p_double swig_types[15]
-#define SWIGTYPE_p_int swig_types[16]
-#define SWIGTYPE_p_iterator swig_types[17]
-#define SWIGTYPE_p_long swig_types[18]
-#define SWIGTYPE_p_p_void swig_types[19]
-#define SWIGTYPE_p_reference swig_types[20]
-#define SWIGTYPE_p_size_type swig_types[21]
-#define SWIGTYPE_p_std__allocatorT_BSONObj_p_t swig_types[22]
-#define SWIGTYPE_p_std__allocatorT_std__string_t swig_types[23]
-#define SWIGTYPE_p_std__exception swig_types[24]
-#define SWIGTYPE_p_std__mapT_std__string_BSONContent_p_t__const_iterator swig_types[25]
-#define SWIGTYPE_p_std__setT_std__string_t swig_types[26]
-#define SWIGTYPE_p_std__vectorT_BSONObj_p_std__allocatorT_BSONObj_p_t_t swig_types[27]
-#define SWIGTYPE_p_std__vectorT_std__string_std__allocatorT_std__string_t_t swig_types[28]
-#define SWIGTYPE_p_swig__ConstIterator swig_types[29]
-#define SWIGTYPE_p_swig__GC_VALUE swig_types[30]
-#define SWIGTYPE_p_swig__Iterator swig_types[31]
-#define SWIGTYPE_p_value_type swig_types[32]
-#define SWIGTYPE_p_void swig_types[33]
-static swig_type_info *swig_types[35];
-static swig_module_info swig_module = {swig_types, 34, 0, 0, 0, 0};
+#define SWIGTYPE_p_BSONException swig_types[2]
+#define SWIGTYPE_p_BSONObj swig_types[3]
+#define SWIGTYPE_p_BSONParser swig_types[4]
+#define SWIGTYPE_p_BSONTYPE swig_types[5]
+#define SWIGTYPE_p_ParseException swig_types[6]
+#define SWIGTYPE_p___LONG64 swig_types[7]
+#define SWIGTYPE_p_allocator_type swig_types[8]
+#define SWIGTYPE_p_char swig_types[9]
+#define SWIGTYPE_p_const_iterator swig_types[10]
+#define SWIGTYPE_p_const_reference swig_types[11]
+#define SWIGTYPE_p_difference_type swig_types[12]
+#define SWIGTYPE_p_djondb__ConnectionReference swig_types[13]
+#define SWIGTYPE_p_djondb__DjondbConnection swig_types[14]
+#define SWIGTYPE_p_djondb__DjondbConnectionManager swig_types[15]
+#define SWIGTYPE_p_iterator swig_types[16]
+#define SWIGTYPE_p_p_void swig_types[17]
+#define SWIGTYPE_p_reference swig_types[18]
+#define SWIGTYPE_p_size_type swig_types[19]
+#define SWIGTYPE_p_std__allocatorT_BSONObj_p_t swig_types[20]
+#define SWIGTYPE_p_std__allocatorT_std__string_t swig_types[21]
+#define SWIGTYPE_p_std__exception swig_types[22]
+#define SWIGTYPE_p_std__mapT_std__string_BSONContent_p_t__const_iterator swig_types[23]
+#define SWIGTYPE_p_std__setT_std__string_t swig_types[24]
+#define SWIGTYPE_p_std__vectorT_BSONObj_p_std__allocatorT_BSONObj_p_t_t swig_types[25]
+#define SWIGTYPE_p_std__vectorT_std__string_std__allocatorT_std__string_t_t swig_types[26]
+#define SWIGTYPE_p_swig__ConstIterator swig_types[27]
+#define SWIGTYPE_p_swig__GC_VALUE swig_types[28]
+#define SWIGTYPE_p_swig__Iterator swig_types[29]
+#define SWIGTYPE_p_value_type swig_types[30]
+#define SWIGTYPE_p_void swig_types[31]
+static swig_type_info *swig_types[33];
+static swig_module_info swig_module = {swig_types, 32, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
 /* -------- TYPES TABLE (END) -------- */
 
-#define SWIG_init    Init_djonwrapper
-#define SWIG_name    "Djonwrapper"
+#define SWIG_init    Init_djondb
+#define SWIG_name    "Djondb"
 
-static VALUE mDjonwrapper;
+static VALUE mDjondb;
 
 #define SWIG_RUBY_THREAD_BEGIN_BLOCK
 #define SWIG_RUBY_THREAD_END_BLOCK
@@ -2543,13 +2541,13 @@ SWIG_From_ptrdiff_t  (ptrdiff_t value)
 
 
 #include "bsonarrayobj.h"
-#include "djondb/bson.h"
+#include "bson.h"
 #include "bsonobj.h"
 #include "bsonparser.h"
 #include "filterdefs.h"
 #include "bsonutil.h"
-#include "connection.h"
-#include "connectionmanager.h"
+#include "djondbconnection.h"
+#include "djondbconnectionmanager.h"
 #include "djondb_client.h"
 
 
@@ -4833,11 +4831,14 @@ SWIG_AsVal_double (VALUE obj, double *val)
   return SWIG_TypeError;
 }
 
+
+  #define SWIG_From_double   rb_float_new 
+
 swig_class SwigClassGC_VALUE;
 
 
 /*
-  Document-method: Djonwrapper::GC_VALUE.inspect
+  Document-method: Djondb::GC_VALUE.inspect
 
   call-seq:
     inspect -> VALUE
@@ -4865,7 +4866,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::GC_VALUE.to_s
+  Document-method: Djondb::GC_VALUE.to_s
 
   call-seq:
     to_s -> VALUE
@@ -4934,7 +4935,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::ConstIterator.dup
+  Document-method: Djondb::ConstIterator.dup
 
   call-seq:
     dup -> ConstIterator
@@ -4967,7 +4968,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::ConstIterator.inspect
+  Document-method: Djondb::ConstIterator.inspect
 
   call-seq:
     inspect -> VALUE
@@ -5000,7 +5001,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::ConstIterator.to_s
+  Document-method: Djondb::ConstIterator.to_s
 
   call-seq:
     to_s -> VALUE
@@ -5255,7 +5256,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::ConstIterator.==
+  Document-method: Djondb::ConstIterator.==
 
   call-seq:
     ==(x) -> bool
@@ -5299,7 +5300,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::ConstIterator.+
+  Document-method: Djondb::ConstIterator.+
 
   call-seq:
     +(n) -> ConstIterator
@@ -5350,7 +5351,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::ConstIterator.-
+  Document-method: Djondb::ConstIterator.-
 
   call-seq:
     -(n) -> ConstIterator
@@ -5517,7 +5518,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::Iterator.dup
+  Document-method: Djondb::Iterator.dup
 
   call-seq:
     dup -> Iterator
@@ -5772,7 +5773,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::Iterator.inspect
+  Document-method: Djondb::Iterator.inspect
 
   call-seq:
     inspect -> VALUE
@@ -5805,7 +5806,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::Iterator.to_s
+  Document-method: Djondb::Iterator.to_s
 
   call-seq:
     to_s -> VALUE
@@ -5838,7 +5839,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::Iterator.==
+  Document-method: Djondb::Iterator.==
 
   call-seq:
     ==(x) -> bool
@@ -5882,7 +5883,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::Iterator.+
+  Document-method: Djondb::Iterator.+
 
   call-seq:
     +(n) -> Iterator
@@ -5933,7 +5934,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::Iterator.-
+  Document-method: Djondb::Iterator.-
 
   call-seq:
     -(n) -> Iterator
@@ -6077,7 +6078,7 @@ swig_class SwigClassBSONObjVectorPtr;
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.dup
+  Document-method: Djondb::BSONObjVectorPtr.dup
 
   call-seq:
     dup -> BSONObjVectorPtr
@@ -6110,7 +6111,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.inspect
+  Document-method: Djondb::BSONObjVectorPtr.inspect
 
   call-seq:
     inspect -> VALUE
@@ -6143,7 +6144,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.to_a
+  Document-method: Djondb::BSONObjVectorPtr.to_a
 
   call-seq:
     to_a -> VALUE
@@ -6176,7 +6177,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.to_s
+  Document-method: Djondb::BSONObjVectorPtr.to_s
 
   call-seq:
     to_s -> VALUE
@@ -6209,7 +6210,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.slice
+  Document-method: Djondb::BSONObjVectorPtr.slice
 
   call-seq:
     slice(i, j) -> VALUE
@@ -6258,7 +6259,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.each
+  Document-method: Djondb::BSONObjVectorPtr.each
 
   call-seq:
     each -> BSONObjVectorPtr
@@ -6291,7 +6292,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.select
+  Document-method: Djondb::BSONObjVectorPtr.select
 
   call-seq:
     select -> BSONObjVectorPtr
@@ -6324,7 +6325,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.reject!
+  Document-method: Djondb::BSONObjVectorPtr.reject!
 
   call-seq:
     reject! -> BSONObjVectorPtr
@@ -6357,7 +6358,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.delete_at
+  Document-method: Djondb::BSONObjVectorPtr.delete_at
 
   call-seq:
     delete_at(i) -> VALUE
@@ -6432,7 +6433,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.pop
+  Document-method: Djondb::BSONObjVectorPtr.pop
 
   call-seq:
     pop -> VALUE
@@ -6465,7 +6466,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.push
+  Document-method: Djondb::BSONObjVectorPtr.push
 
   call-seq:
     push(e) -> value_type
@@ -6508,7 +6509,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.reject
+  Document-method: Djondb::BSONObjVectorPtr.reject
 
   call-seq:
     reject -> BSONObjVectorPtr
@@ -6541,7 +6542,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.at
+  Document-method: Djondb::BSONObjVectorPtr.at
 
   call-seq:
     at(i) -> VALUE
@@ -6582,7 +6583,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.[]
+  Document-method: Djondb::BSONObjVectorPtr.[]
 
   call-seq:
     [](i, j) -> VALUE
@@ -6758,7 +6759,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.[]=
+  Document-method: Djondb::BSONObjVectorPtr.[]=
 
   call-seq:
     []=(i, x) -> VALUE
@@ -6935,7 +6936,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.shift
+  Document-method: Djondb::BSONObjVectorPtr.shift
 
   call-seq:
     shift -> VALUE
@@ -6968,7 +6969,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.insert
+  Document-method: Djondb::BSONObjVectorPtr.insert
 
   call-seq:
     insert(pos, argc, ?) -> BSONObjVectorPtr
@@ -7018,7 +7019,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.unshift
+  Document-method: Djondb::BSONObjVectorPtr.unshift
 
   call-seq:
     unshift(argc, ?) -> BSONObjVectorPtr
@@ -7103,7 +7104,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.empty?
+  Document-method: Djondb::BSONObjVectorPtr.empty?
 
   call-seq:
     empty? -> bool
@@ -7136,7 +7137,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.size
+  Document-method: Djondb::BSONObjVectorPtr.size
 
   call-seq:
     size -> size_type
@@ -7169,7 +7170,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.clear
+  Document-method: Djondb::BSONObjVectorPtr.clear
 
   call-seq:
     clear
@@ -7255,7 +7256,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.begin
+  Document-method: Djondb::BSONObjVectorPtr.begin
 
   call-seq:
     begin -> iterator
@@ -7290,7 +7291,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.end
+  Document-method: Djondb::BSONObjVectorPtr.end
 
   call-seq:
     end -> iterator
@@ -7325,7 +7326,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.rbegin
+  Document-method: Djondb::BSONObjVectorPtr.rbegin
 
   call-seq:
     rbegin -> reverse_iterator
@@ -7360,7 +7361,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.rend
+  Document-method: Djondb::BSONObjVectorPtr.rend
 
   call-seq:
     rend -> reverse_iterator
@@ -7418,7 +7419,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.resize
+  Document-method: Djondb::BSONObjVectorPtr.resize
 
   call-seq:
     resize(new_size)
@@ -7457,7 +7458,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.erase
+  Document-method: Djondb::BSONObjVectorPtr.erase
 
   call-seq:
     erase(pos) -> iterator
@@ -7722,7 +7723,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.front
+  Document-method: Djondb::BSONObjVectorPtr.front
 
   call-seq:
     front -> value_type
@@ -7755,7 +7756,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.back
+  Document-method: Djondb::BSONObjVectorPtr.back
 
   call-seq:
     back -> value_type
@@ -7788,7 +7789,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.assign
+  Document-method: Djondb::BSONObjVectorPtr.assign
 
   call-seq:
     assign(n, x)
@@ -7834,7 +7835,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.resize
+  Document-method: Djondb::BSONObjVectorPtr.resize
 
   call-seq:
     resize(new_size)
@@ -7935,7 +7936,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.insert
+  Document-method: Djondb::BSONObjVectorPtr.insert
 
   call-seq:
     insert(pos, argc, ?) -> BSONObjVectorPtr
@@ -8134,7 +8135,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.reserve
+  Document-method: Djondb::BSONObjVectorPtr.reserve
 
   call-seq:
     reserve(n)
@@ -8172,7 +8173,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObjVectorPtr.capacity
+  Document-method: Djondb::BSONObjVectorPtr.capacity
 
   call-seq:
     capacity -> size_type
@@ -8212,7 +8213,7 @@ swig_class SwigClassStringVector;
 
 
 /*
-  Document-method: Djonwrapper::StringVector.dup
+  Document-method: Djondb::StringVector.dup
 
   call-seq:
     dup -> StringVector
@@ -8245,7 +8246,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.inspect
+  Document-method: Djondb::StringVector.inspect
 
   call-seq:
     inspect -> VALUE
@@ -8278,7 +8279,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.to_a
+  Document-method: Djondb::StringVector.to_a
 
   call-seq:
     to_a -> VALUE
@@ -8311,7 +8312,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.to_s
+  Document-method: Djondb::StringVector.to_s
 
   call-seq:
     to_s -> VALUE
@@ -8344,7 +8345,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.slice
+  Document-method: Djondb::StringVector.slice
 
   call-seq:
     slice(i, j) -> VALUE
@@ -8393,7 +8394,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.each
+  Document-method: Djondb::StringVector.each
 
   call-seq:
     each -> StringVector
@@ -8426,7 +8427,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.select
+  Document-method: Djondb::StringVector.select
 
   call-seq:
     select -> StringVector
@@ -8459,7 +8460,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.reject!
+  Document-method: Djondb::StringVector.reject!
 
   call-seq:
     reject! -> StringVector
@@ -8492,7 +8493,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.delete_at
+  Document-method: Djondb::StringVector.delete_at
 
   call-seq:
     delete_at(i) -> VALUE
@@ -8572,7 +8573,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.pop
+  Document-method: Djondb::StringVector.pop
 
   call-seq:
     pop -> VALUE
@@ -8605,7 +8606,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.push
+  Document-method: Djondb::StringVector.push
 
   call-seq:
     push(e) -> value_type
@@ -8653,7 +8654,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.reject
+  Document-method: Djondb::StringVector.reject
 
   call-seq:
     reject -> StringVector
@@ -8686,7 +8687,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.at
+  Document-method: Djondb::StringVector.at
 
   call-seq:
     at(i) -> VALUE
@@ -8727,7 +8728,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.[]
+  Document-method: Djondb::StringVector.[]
 
   call-seq:
     [](i, j) -> VALUE
@@ -8903,7 +8904,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.[]=
+  Document-method: Djondb::StringVector.[]=
 
   call-seq:
     []=(i, x) -> VALUE
@@ -9084,7 +9085,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.shift
+  Document-method: Djondb::StringVector.shift
 
   call-seq:
     shift -> VALUE
@@ -9117,7 +9118,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.insert
+  Document-method: Djondb::StringVector.insert
 
   call-seq:
     insert(pos, argc, ?) -> StringVector
@@ -9167,7 +9168,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.unshift
+  Document-method: Djondb::StringVector.unshift
 
   call-seq:
     unshift(argc, ?) -> StringVector
@@ -9252,7 +9253,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.empty?
+  Document-method: Djondb::StringVector.empty?
 
   call-seq:
     empty? -> bool
@@ -9285,7 +9286,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.size
+  Document-method: Djondb::StringVector.size
 
   call-seq:
     size -> size_type
@@ -9318,7 +9319,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.clear
+  Document-method: Djondb::StringVector.clear
 
   call-seq:
     clear
@@ -9404,7 +9405,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.begin
+  Document-method: Djondb::StringVector.begin
 
   call-seq:
     begin -> iterator
@@ -9439,7 +9440,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.end
+  Document-method: Djondb::StringVector.end
 
   call-seq:
     end -> iterator
@@ -9474,7 +9475,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.rbegin
+  Document-method: Djondb::StringVector.rbegin
 
   call-seq:
     rbegin -> reverse_iterator
@@ -9509,7 +9510,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.rend
+  Document-method: Djondb::StringVector.rend
 
   call-seq:
     rend -> reverse_iterator
@@ -9567,7 +9568,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.resize
+  Document-method: Djondb::StringVector.resize
 
   call-seq:
     resize(new_size)
@@ -9606,7 +9607,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.erase
+  Document-method: Djondb::StringVector.erase
 
   call-seq:
     erase(pos) -> iterator
@@ -9877,7 +9878,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.front
+  Document-method: Djondb::StringVector.front
 
   call-seq:
     front -> value_type
@@ -9910,7 +9911,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.back
+  Document-method: Djondb::StringVector.back
 
   call-seq:
     back -> value_type
@@ -9943,7 +9944,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.assign
+  Document-method: Djondb::StringVector.assign
 
   call-seq:
     assign(n, x)
@@ -9996,7 +9997,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.resize
+  Document-method: Djondb::StringVector.resize
 
   call-seq:
     resize(new_size)
@@ -10103,7 +10104,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.insert
+  Document-method: Djondb::StringVector.insert
 
   call-seq:
     insert(pos, argc, ?) -> StringVector
@@ -10314,7 +10315,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.reserve
+  Document-method: Djondb::StringVector.reserve
 
   call-seq:
     reserve(n)
@@ -10352,7 +10353,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.capacity
+  Document-method: Djondb::StringVector.capacity
 
   call-seq:
     capacity -> size_type
@@ -10409,7 +10410,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::StringVector.__delete__
+  Document-method: Djondb::StringVector.__delete__
 
   call-seq:
     __delete__(val) -> VALUE
@@ -10559,7 +10560,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONArrayObj.length
+  Document-method: Djondb::BSONArrayObj.length
 
   call-seq:
     length -> int
@@ -10680,7 +10681,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONArrayObj.select
+  Document-method: Djondb::BSONArrayObj.select
 
   call-seq:
     select(select) -> BSONArrayObj
@@ -10724,7 +10725,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONArrayObj.begin
+  Document-method: Djondb::BSONArrayObj.begin
 
   call-seq:
     begin -> iterator
@@ -10759,7 +10760,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONArrayObj.end
+  Document-method: Djondb::BSONArrayObj.end
 
   call-seq:
     end -> iterator
@@ -11370,7 +11371,7 @@ _wrap_BSONObj_getInt(int argc, VALUE *argv, VALUE self) {
   std::string arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  int *result = 0 ;
+  int result;
   VALUE vresult = Qnil;
   
   if ((argc < 1) || (argc > 1)) {
@@ -11390,8 +11391,14 @@ _wrap_BSONObj_getInt(int argc, VALUE *argv, VALUE self) {
     arg2 = *ptr;
     if (SWIG_IsNewObj(res)) delete ptr;
   }
-  result = (int *)((BSONObj const *)arg1)->getInt(arg2);
-  vresult = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_int, 0 |  0 );
+  try {
+    result = (int)((BSONObj const *)arg1)->getInt(arg2);
+  }
+  catch(BSONException &_e) {
+    rb_exc_raise(SWIG_Ruby_ExceptionType(SWIGTYPE_p_BSONException, SWIG_NewPointerObj((new BSONException(static_cast< const BSONException& >(_e))),SWIGTYPE_p_BSONException,SWIG_POINTER_OWN))); SWIG_fail;
+  }
+  
+  vresult = SWIG_From_int(static_cast< int >(result));
   return vresult;
 fail:
   return Qnil;
@@ -11404,7 +11411,7 @@ _wrap_BSONObj_getDouble(int argc, VALUE *argv, VALUE self) {
   std::string arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  double *result = 0 ;
+  double result;
   VALUE vresult = Qnil;
   
   if ((argc < 1) || (argc > 1)) {
@@ -11424,8 +11431,14 @@ _wrap_BSONObj_getDouble(int argc, VALUE *argv, VALUE self) {
     arg2 = *ptr;
     if (SWIG_IsNewObj(res)) delete ptr;
   }
-  result = (double *)((BSONObj const *)arg1)->getDouble(arg2);
-  vresult = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_double, 0 |  0 );
+  try {
+    result = (double)((BSONObj const *)arg1)->getDouble(arg2);
+  }
+  catch(BSONException &_e) {
+    rb_exc_raise(SWIG_Ruby_ExceptionType(SWIGTYPE_p_BSONException, SWIG_NewPointerObj((new BSONException(static_cast< const BSONException& >(_e))),SWIGTYPE_p_BSONException,SWIG_POINTER_OWN))); SWIG_fail;
+  }
+  
+  vresult = SWIG_From_double(static_cast< double >(result));
   return vresult;
 fail:
   return Qnil;
@@ -11438,7 +11451,7 @@ _wrap_BSONObj_getLong(int argc, VALUE *argv, VALUE self) {
   std::string arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  long *result = 0 ;
+  long result;
   VALUE vresult = Qnil;
   
   if ((argc < 1) || (argc > 1)) {
@@ -11458,8 +11471,14 @@ _wrap_BSONObj_getLong(int argc, VALUE *argv, VALUE self) {
     arg2 = *ptr;
     if (SWIG_IsNewObj(res)) delete ptr;
   }
-  result = (long *)((BSONObj const *)arg1)->getLong(arg2);
-  vresult = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_long, 0 |  0 );
+  try {
+    result = (long)((BSONObj const *)arg1)->getLong(arg2);
+  }
+  catch(BSONException &_e) {
+    rb_exc_raise(SWIG_Ruby_ExceptionType(SWIGTYPE_p_BSONException, SWIG_NewPointerObj((new BSONException(static_cast< const BSONException& >(_e))),SWIGTYPE_p_BSONException,SWIG_POINTER_OWN))); SWIG_fail;
+  }
+  
+  vresult = SWIG_From_long(static_cast< long >(result));
   return vresult;
 fail:
   return Qnil;
@@ -11472,7 +11491,7 @@ _wrap_BSONObj_getLong64(int argc, VALUE *argv, VALUE self) {
   std::string arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  __LONG64 *result = 0 ;
+  __LONG64 result;
   VALUE vresult = Qnil;
   
   if ((argc < 1) || (argc > 1)) {
@@ -11492,8 +11511,14 @@ _wrap_BSONObj_getLong64(int argc, VALUE *argv, VALUE self) {
     arg2 = *ptr;
     if (SWIG_IsNewObj(res)) delete ptr;
   }
-  result = (__LONG64 *)((BSONObj const *)arg1)->getLong64(arg2);
-  vresult = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p___LONG64, 0 |  0 );
+  try {
+    result = ((BSONObj const *)arg1)->getLong64(arg2);
+  }
+  catch(BSONException &_e) {
+    rb_exc_raise(SWIG_Ruby_ExceptionType(SWIGTYPE_p_BSONException, SWIG_NewPointerObj((new BSONException(static_cast< const BSONException& >(_e))),SWIGTYPE_p_BSONException,SWIG_POINTER_OWN))); SWIG_fail;
+  }
+  
+  vresult = SWIG_NewPointerObj((new __LONG64(static_cast< const __LONG64& >(result))), SWIGTYPE_p___LONG64, SWIG_POINTER_OWN |  0 );
   return vresult;
 fail:
   return Qnil;
@@ -11526,7 +11551,13 @@ _wrap_BSONObj_getString(int argc, VALUE *argv, VALUE self) {
     arg2 = *ptr;
     if (SWIG_IsNewObj(res)) delete ptr;
   }
-  result = ((BSONObj const *)arg1)->getString(arg2);
+  try {
+    result = ((BSONObj const *)arg1)->getString(arg2);
+  }
+  catch(BSONException &_e) {
+    rb_exc_raise(SWIG_Ruby_ExceptionType(SWIGTYPE_p_BSONException, SWIG_NewPointerObj((new BSONException(static_cast< const BSONException& >(_e))),SWIGTYPE_p_BSONException,SWIG_POINTER_OWN))); SWIG_fail;
+  }
+  
   vresult = SWIG_From_std_string(static_cast< std::string >(result));
   return vresult;
 fail:
@@ -11560,7 +11591,13 @@ _wrap_BSONObj_getBSON(int argc, VALUE *argv, VALUE self) {
     arg2 = *ptr;
     if (SWIG_IsNewObj(res)) delete ptr;
   }
-  result = (BSONObj *)((BSONObj const *)arg1)->getBSON(arg2);
+  try {
+    result = (BSONObj *)((BSONObj const *)arg1)->getBSON(arg2);
+  }
+  catch(BSONException &_e) {
+    rb_exc_raise(SWIG_Ruby_ExceptionType(SWIGTYPE_p_BSONException, SWIG_NewPointerObj((new BSONException(static_cast< const BSONException& >(_e))),SWIGTYPE_p_BSONException,SWIG_POINTER_OWN))); SWIG_fail;
+  }
+  
   vresult = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_BSONObj, 0 |  0 );
   return vresult;
 fail:
@@ -11594,7 +11631,13 @@ _wrap_BSONObj_getBSONArray(int argc, VALUE *argv, VALUE self) {
     arg2 = *ptr;
     if (SWIG_IsNewObj(res)) delete ptr;
   }
-  result = (BSONArrayObj *)((BSONObj const *)arg1)->getBSONArray(arg2);
+  try {
+    result = (BSONArrayObj *)((BSONObj const *)arg1)->getBSONArray(arg2);
+  }
+  catch(BSONException &_e) {
+    rb_exc_raise(SWIG_Ruby_ExceptionType(SWIGTYPE_p_BSONException, SWIG_NewPointerObj((new BSONException(static_cast< const BSONException& >(_e))),SWIGTYPE_p_BSONException,SWIG_POINTER_OWN))); SWIG_fail;
+  }
+  
   vresult = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_BSONArrayObj, 0 |  0 );
   return vresult;
 fail:
@@ -11608,7 +11651,7 @@ _wrap_BSONObj_get(int argc, VALUE *argv, VALUE self) {
   std::string arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *result = 0 ;
+  BSONContent result;
   VALUE vresult = Qnil;
   
   if ((argc < 1) || (argc > 1)) {
@@ -11628,8 +11671,14 @@ _wrap_BSONObj_get(int argc, VALUE *argv, VALUE self) {
     arg2 = *ptr;
     if (SWIG_IsNewObj(res)) delete ptr;
   }
-  result = (void *)((BSONObj const *)arg1)->get(arg2);
-  vresult = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  try {
+    result = ((BSONObj const *)arg1)->get(arg2);
+  }
+  catch(BSONException &_e) {
+    rb_exc_raise(SWIG_Ruby_ExceptionType(SWIGTYPE_p_BSONException, SWIG_NewPointerObj((new BSONException(static_cast< const BSONException& >(_e))),SWIGTYPE_p_BSONException,SWIG_POINTER_OWN))); SWIG_fail;
+  }
+  
+  vresult = SWIG_NewPointerObj((new BSONContent(static_cast< const BSONContent& >(result))), SWIGTYPE_p_BSONContent, SWIG_POINTER_OWN |  0 );
   return vresult;
 fail:
   return Qnil;
@@ -11811,7 +11860,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObj.select
+  Document-method: Djondb::BSONObj.select
 
   call-seq:
     select(sel) -> BSONObj
@@ -11913,7 +11962,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObj.begin
+  Document-method: Djondb::BSONObj.begin
 
   call-seq:
     begin -> const_iterator
@@ -11946,7 +11995,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObj.end
+  Document-method: Djondb::BSONObj.end
 
   call-seq:
     end -> const_iterator
@@ -11979,7 +12028,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObj.length
+  Document-method: Djondb::BSONObj.length
 
   call-seq:
     length -> int
@@ -12012,7 +12061,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::BSONObj.==
+  Document-method: Djondb::BSONObj.==
 
   call-seq:
     ==(obj) -> bool
@@ -12422,12 +12471,12 @@ fail:
 }
 
 
-swig_class SwigClassConnection;
+swig_class SwigClassDjondbConnection;
 
 SWIGINTERN VALUE
-_wrap_new_Connection__SWIG_0(int argc, VALUE *argv, VALUE self) {
+_wrap_new_DjondbConnection__SWIG_0(int argc, VALUE *argv, VALUE self) {
   std::string arg1 ;
-  djondb::Connection *result = 0 ;
+  djondb::DjondbConnection *result = 0 ;
   
   if ((argc < 1) || (argc > 1)) {
     rb_raise(rb_eArgError, "wrong # of arguments(%d for 1)",argc); SWIG_fail;
@@ -12436,12 +12485,12 @@ _wrap_new_Connection__SWIG_0(int argc, VALUE *argv, VALUE self) {
     std::string *ptr = (std::string *)0;
     int res = SWIG_AsPtr_std_string(argv[0], &ptr);
     if (!SWIG_IsOK(res) || !ptr) {
-      SWIG_exception_fail(SWIG_ArgError((ptr ? res : SWIG_TypeError)), Ruby_Format_TypeError( "", "std::string","djondb::Connection", 1, argv[0] )); 
+      SWIG_exception_fail(SWIG_ArgError((ptr ? res : SWIG_TypeError)), Ruby_Format_TypeError( "", "std::string","djondb::DjondbConnection", 1, argv[0] )); 
     }
     arg1 = *ptr;
     if (SWIG_IsNewObj(res)) delete ptr;
   }
-  result = (djondb::Connection *)new djondb::Connection(arg1);
+  result = (djondb::DjondbConnection *)new djondb::DjondbConnection(arg1);
   DATA_PTR(self) = result;
   return self;
 fail:
@@ -12450,12 +12499,12 @@ fail:
 
 
 SWIGINTERN VALUE
-_wrap_new_Connection__SWIG_1(int argc, VALUE *argv, VALUE self) {
+_wrap_new_DjondbConnection__SWIG_1(int argc, VALUE *argv, VALUE self) {
   std::string arg1 ;
   int arg2 ;
   int val2 ;
   int ecode2 = 0 ;
-  djondb::Connection *result = 0 ;
+  djondb::DjondbConnection *result = 0 ;
   
   if ((argc < 2) || (argc > 2)) {
     rb_raise(rb_eArgError, "wrong # of arguments(%d for 2)",argc); SWIG_fail;
@@ -12464,17 +12513,17 @@ _wrap_new_Connection__SWIG_1(int argc, VALUE *argv, VALUE self) {
     std::string *ptr = (std::string *)0;
     int res = SWIG_AsPtr_std_string(argv[0], &ptr);
     if (!SWIG_IsOK(res) || !ptr) {
-      SWIG_exception_fail(SWIG_ArgError((ptr ? res : SWIG_TypeError)), Ruby_Format_TypeError( "", "std::string","djondb::Connection", 1, argv[0] )); 
+      SWIG_exception_fail(SWIG_ArgError((ptr ? res : SWIG_TypeError)), Ruby_Format_TypeError( "", "std::string","djondb::DjondbConnection", 1, argv[0] )); 
     }
     arg1 = *ptr;
     if (SWIG_IsNewObj(res)) delete ptr;
   }
   ecode2 = SWIG_AsVal_int(argv[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), Ruby_Format_TypeError( "", "int","djondb::Connection", 2, argv[1] ));
+    SWIG_exception_fail(SWIG_ArgError(ecode2), Ruby_Format_TypeError( "", "int","djondb::DjondbConnection", 2, argv[1] ));
   } 
   arg2 = static_cast< int >(val2);
-  result = (djondb::Connection *)new djondb::Connection(arg1,arg2);
+  result = (djondb::DjondbConnection *)new djondb::DjondbConnection(arg1,arg2);
   DATA_PTR(self) = result;
   return self;
 fail:
@@ -12484,14 +12533,14 @@ fail:
 
 #ifdef HAVE_RB_DEFINE_ALLOC_FUNC
 SWIGINTERN VALUE
-_wrap_Connection_allocate(VALUE self) {
+_wrap_DjondbConnection_allocate(VALUE self) {
 #else
   SWIGINTERN VALUE
-  _wrap_Connection_allocate(int argc, VALUE *argv, VALUE self) {
+  _wrap_DjondbConnection_allocate(int argc, VALUE *argv, VALUE self) {
 #endif
     
     
-    VALUE vresult = SWIG_NewClassInstance(self, SWIGTYPE_p_djondb__Connection);
+    VALUE vresult = SWIG_NewClassInstance(self, SWIGTYPE_p_djondb__DjondbConnection);
 #ifndef HAVE_RB_DEFINE_ALLOC_FUNC
     rb_obj_call_init(vresult, argc, argv);
 #endif
@@ -12500,24 +12549,24 @@ _wrap_Connection_allocate(VALUE self) {
   
 
 SWIGINTERN VALUE
-_wrap_new_Connection__SWIG_2(int argc, VALUE *argv, VALUE self) {
-  djondb::Connection *arg1 = 0 ;
+_wrap_new_DjondbConnection__SWIG_2(int argc, VALUE *argv, VALUE self) {
+  djondb::DjondbConnection *arg1 = 0 ;
   void *argp1 ;
   int res1 = 0 ;
-  djondb::Connection *result = 0 ;
+  djondb::DjondbConnection *result = 0 ;
   
   if ((argc < 1) || (argc > 1)) {
     rb_raise(rb_eArgError, "wrong # of arguments(%d for 1)",argc); SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(argv[0], &argp1, SWIGTYPE_p_djondb__Connection,  0 );
+  res1 = SWIG_ConvertPtr(argv[0], &argp1, SWIGTYPE_p_djondb__DjondbConnection,  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::Connection const &","djondb::Connection", 1, argv[0] )); 
+    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::DjondbConnection const &","djondb::DjondbConnection", 1, argv[0] )); 
   }
   if (!argp1) {
-    SWIG_exception_fail(SWIG_ValueError, Ruby_Format_TypeError("invalid null reference ", "djondb::Connection const &","djondb::Connection", 1, argv[0])); 
+    SWIG_exception_fail(SWIG_ValueError, Ruby_Format_TypeError("invalid null reference ", "djondb::DjondbConnection const &","djondb::DjondbConnection", 1, argv[0])); 
   }
-  arg1 = reinterpret_cast< djondb::Connection * >(argp1);
-  result = (djondb::Connection *)new djondb::Connection((djondb::Connection const &)*arg1);
+  arg1 = reinterpret_cast< djondb::DjondbConnection * >(argp1);
+  result = (djondb::DjondbConnection *)new djondb::DjondbConnection((djondb::DjondbConnection const &)*arg1);
   DATA_PTR(self) = result;
   return self;
 fail:
@@ -12525,7 +12574,7 @@ fail:
 }
 
 
-SWIGINTERN VALUE _wrap_new_Connection(int nargs, VALUE *args, VALUE self) {
+SWIGINTERN VALUE _wrap_new_DjondbConnection(int nargs, VALUE *args, VALUE self) {
   int argc;
   VALUE argv[2];
   int ii;
@@ -12538,10 +12587,10 @@ SWIGINTERN VALUE _wrap_new_Connection(int nargs, VALUE *args, VALUE self) {
   if (argc == 1) {
     int _v;
     void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_djondb__Connection, 0);
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_djondb__DjondbConnection, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
-      return _wrap_new_Connection__SWIG_2(nargs, args, self);
+      return _wrap_new_DjondbConnection__SWIG_2(nargs, args, self);
     }
   }
   if (argc == 1) {
@@ -12549,7 +12598,7 @@ SWIGINTERN VALUE _wrap_new_Connection(int nargs, VALUE *args, VALUE self) {
     int res = SWIG_AsPtr_std_string(argv[0], (std::string**)(0));
     _v = SWIG_CheckState(res);
     if (_v) {
-      return _wrap_new_Connection__SWIG_0(nargs, args, self);
+      return _wrap_new_DjondbConnection__SWIG_0(nargs, args, self);
     }
   }
   if (argc == 2) {
@@ -12562,29 +12611,29 @@ SWIGINTERN VALUE _wrap_new_Connection(int nargs, VALUE *args, VALUE self) {
         _v = SWIG_CheckState(res);
       }
       if (_v) {
-        return _wrap_new_Connection__SWIG_1(nargs, args, self);
+        return _wrap_new_DjondbConnection__SWIG_1(nargs, args, self);
       }
     }
   }
   
 fail:
-  Ruby_Format_OverloadedError( argc, 2, "Connection.new", 
-    "    Connection.new(std::string host)\n"
-    "    Connection.new(std::string host, int port)\n"
-    "    Connection.new(djondb::Connection const &orig)\n");
+  Ruby_Format_OverloadedError( argc, 2, "DjondbConnection.new", 
+    "    DjondbConnection.new(std::string host)\n"
+    "    DjondbConnection.new(std::string host, int port)\n"
+    "    DjondbConnection.new(djondb::DjondbConnection const &orig)\n");
   
   return Qnil;
 }
 
 
 SWIGINTERN void
-free_djondb_Connection(djondb::Connection *arg1) {
+free_djondb_DjondbConnection(djondb::DjondbConnection *arg1) {
     delete arg1;
 }
 
 SWIGINTERN VALUE
-_wrap_Connection_open(int argc, VALUE *argv, VALUE self) {
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+_wrap_DjondbConnection_open(int argc, VALUE *argv, VALUE self) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   bool result;
@@ -12593,11 +12642,11 @@ _wrap_Connection_open(int argc, VALUE *argv, VALUE self) {
   if ((argc < 0) || (argc > 0)) {
     rb_raise(rb_eArgError, "wrong # of arguments(%d for 0)",argc); SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__Connection, 0 |  0 );
+  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__DjondbConnection, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::Connection *","open", 1, self )); 
+    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::DjondbConnection *","open", 1, self )); 
   }
-  arg1 = reinterpret_cast< djondb::Connection * >(argp1);
+  arg1 = reinterpret_cast< djondb::DjondbConnection * >(argp1);
   result = (bool)(arg1)->open();
   vresult = SWIG_From_bool(static_cast< bool >(result));
   return vresult;
@@ -12607,19 +12656,19 @@ fail:
 
 
 SWIGINTERN VALUE
-_wrap_Connection_close(int argc, VALUE *argv, VALUE self) {
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+_wrap_DjondbConnection_close(int argc, VALUE *argv, VALUE self) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   
   if ((argc < 0) || (argc > 0)) {
     rb_raise(rb_eArgError, "wrong # of arguments(%d for 0)",argc); SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__Connection, 0 |  0 );
+  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__DjondbConnection, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::Connection *","close", 1, self )); 
+    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::DjondbConnection *","close", 1, self )); 
   }
-  arg1 = reinterpret_cast< djondb::Connection * >(argp1);
+  arg1 = reinterpret_cast< djondb::DjondbConnection * >(argp1);
   (arg1)->close();
   return Qnil;
 fail:
@@ -12628,19 +12677,19 @@ fail:
 
 
 SWIGINTERN VALUE
-_wrap_Connection_internalClose(int argc, VALUE *argv, VALUE self) {
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+_wrap_DjondbConnection_internalClose(int argc, VALUE *argv, VALUE self) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   
   if ((argc < 0) || (argc > 0)) {
     rb_raise(rb_eArgError, "wrong # of arguments(%d for 0)",argc); SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__Connection, 0 |  0 );
+  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__DjondbConnection, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::Connection *","internalClose", 1, self )); 
+    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::DjondbConnection *","internalClose", 1, self )); 
   }
-  arg1 = reinterpret_cast< djondb::Connection * >(argp1);
+  arg1 = reinterpret_cast< djondb::DjondbConnection * >(argp1);
   (arg1)->internalClose();
   return Qnil;
 fail:
@@ -12649,8 +12698,8 @@ fail:
 
 
 SWIGINTERN VALUE
-_wrap_Connection_isOpen(int argc, VALUE *argv, VALUE self) {
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+_wrap_DjondbConnection_isOpen(int argc, VALUE *argv, VALUE self) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   bool result;
@@ -12659,12 +12708,12 @@ _wrap_Connection_isOpen(int argc, VALUE *argv, VALUE self) {
   if ((argc < 0) || (argc > 0)) {
     rb_raise(rb_eArgError, "wrong # of arguments(%d for 0)",argc); SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__Connection, 0 |  0 );
+  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__DjondbConnection, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::Connection const *","isOpen", 1, self )); 
+    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::DjondbConnection const *","isOpen", 1, self )); 
   }
-  arg1 = reinterpret_cast< djondb::Connection * >(argp1);
-  result = (bool)((djondb::Connection const *)arg1)->isOpen();
+  arg1 = reinterpret_cast< djondb::DjondbConnection * >(argp1);
+  result = (bool)((djondb::DjondbConnection const *)arg1)->isOpen();
   vresult = SWIG_From_bool(static_cast< bool >(result));
   return vresult;
 fail:
@@ -12673,8 +12722,8 @@ fail:
 
 
 SWIGINTERN VALUE
-_wrap_Connection_shutdown(int argc, VALUE *argv, VALUE self) {
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+_wrap_DjondbConnection_shutdown(int argc, VALUE *argv, VALUE self) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   bool result;
@@ -12683,12 +12732,12 @@ _wrap_Connection_shutdown(int argc, VALUE *argv, VALUE self) {
   if ((argc < 0) || (argc > 0)) {
     rb_raise(rb_eArgError, "wrong # of arguments(%d for 0)",argc); SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__Connection, 0 |  0 );
+  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__DjondbConnection, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::Connection const *","shutdown", 1, self )); 
+    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::DjondbConnection const *","shutdown", 1, self )); 
   }
-  arg1 = reinterpret_cast< djondb::Connection * >(argp1);
-  result = (bool)((djondb::Connection const *)arg1)->shutdown();
+  arg1 = reinterpret_cast< djondb::DjondbConnection * >(argp1);
+  result = (bool)((djondb::DjondbConnection const *)arg1)->shutdown();
   vresult = SWIG_From_bool(static_cast< bool >(result));
   return vresult;
 fail:
@@ -12698,17 +12747,17 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::Connection.insert
+  Document-method: Djondb::DjondbConnection.insert
 
   call-seq:
     insert(db, ns, json) -> bool
     insert(db, ns, obj) -> bool
 
-Insert one or more new elements in the Connection.
+Insert one or more new elements in the DjondbConnection.
 */
 SWIGINTERN VALUE
-_wrap_Connection_insert__SWIG_0(int argc, VALUE *argv, VALUE self) {
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+_wrap_DjondbConnection_insert__SWIG_0(int argc, VALUE *argv, VALUE self) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
   std::string *arg4 = 0 ;
@@ -12723,11 +12772,11 @@ _wrap_Connection_insert__SWIG_0(int argc, VALUE *argv, VALUE self) {
   if ((argc < 3) || (argc > 3)) {
     rb_raise(rb_eArgError, "wrong # of arguments(%d for 3)",argc); SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__Connection, 0 |  0 );
+  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__DjondbConnection, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::Connection *","insert", 1, self )); 
+    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::DjondbConnection *","insert", 1, self )); 
   }
-  arg1 = reinterpret_cast< djondb::Connection * >(argp1);
+  arg1 = reinterpret_cast< djondb::DjondbConnection * >(argp1);
   {
     std::string *ptr = (std::string *)0;
     res2 = SWIG_AsPtr_std_string(argv[0], &ptr);
@@ -12776,8 +12825,8 @@ fail:
 
 
 SWIGINTERN VALUE
-_wrap_Connection_insert__SWIG_1(int argc, VALUE *argv, VALUE self) {
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+_wrap_DjondbConnection_insert__SWIG_1(int argc, VALUE *argv, VALUE self) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
   BSONObj *arg4 = 0 ;
@@ -12793,11 +12842,11 @@ _wrap_Connection_insert__SWIG_1(int argc, VALUE *argv, VALUE self) {
   if ((argc < 3) || (argc > 3)) {
     rb_raise(rb_eArgError, "wrong # of arguments(%d for 3)",argc); SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__Connection, 0 |  0 );
+  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__DjondbConnection, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::Connection *","insert", 1, self )); 
+    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::DjondbConnection *","insert", 1, self )); 
   }
-  arg1 = reinterpret_cast< djondb::Connection * >(argp1);
+  arg1 = reinterpret_cast< djondb::DjondbConnection * >(argp1);
   {
     std::string *ptr = (std::string *)0;
     res2 = SWIG_AsPtr_std_string(argv[0], &ptr);
@@ -12840,7 +12889,7 @@ fail:
 }
 
 
-SWIGINTERN VALUE _wrap_Connection_insert(int nargs, VALUE *args, VALUE self) {
+SWIGINTERN VALUE _wrap_DjondbConnection_insert(int nargs, VALUE *args, VALUE self) {
   int argc;
   VALUE argv[5];
   int ii;
@@ -12854,7 +12903,7 @@ SWIGINTERN VALUE _wrap_Connection_insert(int nargs, VALUE *args, VALUE self) {
   if (argc == 4) {
     int _v;
     void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_djondb__Connection, 0);
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_djondb__DjondbConnection, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
       int res = SWIG_AsPtr_std_string(argv[1], (std::string**)(0));
@@ -12867,7 +12916,7 @@ SWIGINTERN VALUE _wrap_Connection_insert(int nargs, VALUE *args, VALUE self) {
           int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_BSONObj, 0);
           _v = SWIG_CheckState(res);
           if (_v) {
-            return _wrap_Connection_insert__SWIG_1(nargs, args, self);
+            return _wrap_DjondbConnection_insert__SWIG_1(nargs, args, self);
           }
         }
       }
@@ -12876,7 +12925,7 @@ SWIGINTERN VALUE _wrap_Connection_insert(int nargs, VALUE *args, VALUE self) {
   if (argc == 4) {
     int _v;
     void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_djondb__Connection, 0);
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_djondb__DjondbConnection, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
       int res = SWIG_AsPtr_std_string(argv[1], (std::string**)(0));
@@ -12888,7 +12937,7 @@ SWIGINTERN VALUE _wrap_Connection_insert(int nargs, VALUE *args, VALUE self) {
           int res = SWIG_AsPtr_std_string(argv[3], (std::string**)(0));
           _v = SWIG_CheckState(res);
           if (_v) {
-            return _wrap_Connection_insert__SWIG_0(nargs, args, self);
+            return _wrap_DjondbConnection_insert__SWIG_0(nargs, args, self);
           }
         }
       }
@@ -12896,17 +12945,17 @@ SWIGINTERN VALUE _wrap_Connection_insert(int nargs, VALUE *args, VALUE self) {
   }
   
 fail:
-  Ruby_Format_OverloadedError( argc, 5, "Connection.insert", 
-    "    bool Connection.insert(std::string const &db, std::string const &ns, std::string const &json)\n"
-    "    bool Connection.insert(std::string const &db, std::string const &ns, BSONObj const &obj)\n");
+  Ruby_Format_OverloadedError( argc, 5, "DjondbConnection.insert", 
+    "    bool DjondbConnection.insert(std::string const &db, std::string const &ns, std::string const &json)\n"
+    "    bool DjondbConnection.insert(std::string const &db, std::string const &ns, BSONObj const &obj)\n");
   
   return Qnil;
 }
 
 
 SWIGINTERN VALUE
-_wrap_Connection_findByKey__SWIG_0(int argc, VALUE *argv, VALUE self) {
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+_wrap_DjondbConnection_findByKey__SWIG_0(int argc, VALUE *argv, VALUE self) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
   std::string *arg4 = 0 ;
@@ -12923,11 +12972,11 @@ _wrap_Connection_findByKey__SWIG_0(int argc, VALUE *argv, VALUE self) {
   if ((argc < 4) || (argc > 4)) {
     rb_raise(rb_eArgError, "wrong # of arguments(%d for 4)",argc); SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__Connection, 0 |  0 );
+  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__DjondbConnection, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::Connection *","findByKey", 1, self )); 
+    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::DjondbConnection *","findByKey", 1, self )); 
   }
-  arg1 = reinterpret_cast< djondb::Connection * >(argp1);
+  arg1 = reinterpret_cast< djondb::DjondbConnection * >(argp1);
   {
     std::string *ptr = (std::string *)0;
     res2 = SWIG_AsPtr_std_string(argv[0], &ptr);
@@ -12989,8 +13038,8 @@ fail:
 
 
 SWIGINTERN VALUE
-_wrap_Connection_findByKey__SWIG_1(int argc, VALUE *argv, VALUE self) {
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+_wrap_DjondbConnection_findByKey__SWIG_1(int argc, VALUE *argv, VALUE self) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
   std::string *arg4 = 0 ;
@@ -13005,11 +13054,11 @@ _wrap_Connection_findByKey__SWIG_1(int argc, VALUE *argv, VALUE self) {
   if ((argc < 3) || (argc > 3)) {
     rb_raise(rb_eArgError, "wrong # of arguments(%d for 3)",argc); SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__Connection, 0 |  0 );
+  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__DjondbConnection, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::Connection *","findByKey", 1, self )); 
+    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::DjondbConnection *","findByKey", 1, self )); 
   }
-  arg1 = reinterpret_cast< djondb::Connection * >(argp1);
+  arg1 = reinterpret_cast< djondb::DjondbConnection * >(argp1);
   {
     std::string *ptr = (std::string *)0;
     res2 = SWIG_AsPtr_std_string(argv[0], &ptr);
@@ -13057,7 +13106,7 @@ fail:
 }
 
 
-SWIGINTERN VALUE _wrap_Connection_findByKey(int nargs, VALUE *args, VALUE self) {
+SWIGINTERN VALUE _wrap_DjondbConnection_findByKey(int nargs, VALUE *args, VALUE self) {
   int argc;
   VALUE argv[6];
   int ii;
@@ -13071,7 +13120,7 @@ SWIGINTERN VALUE _wrap_Connection_findByKey(int nargs, VALUE *args, VALUE self) 
   if (argc == 4) {
     int _v;
     void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_djondb__Connection, 0);
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_djondb__DjondbConnection, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
       int res = SWIG_AsPtr_std_string(argv[1], (std::string**)(0));
@@ -13083,7 +13132,7 @@ SWIGINTERN VALUE _wrap_Connection_findByKey(int nargs, VALUE *args, VALUE self) 
           int res = SWIG_AsPtr_std_string(argv[3], (std::string**)(0));
           _v = SWIG_CheckState(res);
           if (_v) {
-            return _wrap_Connection_findByKey__SWIG_1(nargs, args, self);
+            return _wrap_DjondbConnection_findByKey__SWIG_1(nargs, args, self);
           }
         }
       }
@@ -13092,7 +13141,7 @@ SWIGINTERN VALUE _wrap_Connection_findByKey(int nargs, VALUE *args, VALUE self) 
   if (argc == 5) {
     int _v;
     void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_djondb__Connection, 0);
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_djondb__DjondbConnection, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
       int res = SWIG_AsPtr_std_string(argv[1], (std::string**)(0));
@@ -13107,7 +13156,7 @@ SWIGINTERN VALUE _wrap_Connection_findByKey(int nargs, VALUE *args, VALUE self) 
             int res = SWIG_AsPtr_std_string(argv[4], (std::string**)(0));
             _v = SWIG_CheckState(res);
             if (_v) {
-              return _wrap_Connection_findByKey__SWIG_0(nargs, args, self);
+              return _wrap_DjondbConnection_findByKey__SWIG_0(nargs, args, self);
             }
           }
         }
@@ -13116,9 +13165,9 @@ SWIGINTERN VALUE _wrap_Connection_findByKey(int nargs, VALUE *args, VALUE self) 
   }
   
 fail:
-  Ruby_Format_OverloadedError( argc, 6, "Connection.findByKey", 
-    "    BSONObj * Connection.findByKey(std::string const &db, std::string const &ns, std::string const &select, std::string const &id)\n"
-    "    BSONObj * Connection.findByKey(std::string const &db, std::string const &ns, std::string const &id)\n");
+  Ruby_Format_OverloadedError( argc, 6, "DjondbConnection.findByKey", 
+    "    BSONObj * DjondbConnection.findByKey(std::string const &db, std::string const &ns, std::string const &select, std::string const &id)\n"
+    "    BSONObj * DjondbConnection.findByKey(std::string const &db, std::string const &ns, std::string const &id)\n");
   
   return Qnil;
 }
@@ -13126,7 +13175,7 @@ fail:
 
 
 /*
-  Document-method: Djonwrapper::Connection.find
+  Document-method: Djondb::DjondbConnection.find
 
   call-seq:
     find(db, ns, select, filter) -> BSONObjVectorPtr
@@ -13135,8 +13184,8 @@ fail:
 Find an element in the class.
 */
 SWIGINTERN VALUE
-_wrap_Connection_find__SWIG_0(int argc, VALUE *argv, VALUE self) {
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+_wrap_DjondbConnection_find__SWIG_0(int argc, VALUE *argv, VALUE self) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
   std::string *arg4 = 0 ;
@@ -13153,11 +13202,11 @@ _wrap_Connection_find__SWIG_0(int argc, VALUE *argv, VALUE self) {
   if ((argc < 4) || (argc > 4)) {
     rb_raise(rb_eArgError, "wrong # of arguments(%d for 4)",argc); SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__Connection, 0 |  0 );
+  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__DjondbConnection, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::Connection *","find", 1, self )); 
+    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::DjondbConnection *","find", 1, self )); 
   }
-  arg1 = reinterpret_cast< djondb::Connection * >(argp1);
+  arg1 = reinterpret_cast< djondb::DjondbConnection * >(argp1);
   {
     std::string *ptr = (std::string *)0;
     res2 = SWIG_AsPtr_std_string(argv[0], &ptr);
@@ -13225,8 +13274,8 @@ fail:
 
 
 SWIGINTERN VALUE
-_wrap_Connection_find__SWIG_1(int argc, VALUE *argv, VALUE self) {
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+_wrap_DjondbConnection_find__SWIG_1(int argc, VALUE *argv, VALUE self) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
   std::string *arg4 = 0 ;
@@ -13241,11 +13290,11 @@ _wrap_Connection_find__SWIG_1(int argc, VALUE *argv, VALUE self) {
   if ((argc < 3) || (argc > 3)) {
     rb_raise(rb_eArgError, "wrong # of arguments(%d for 3)",argc); SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__Connection, 0 |  0 );
+  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__DjondbConnection, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::Connection *","find", 1, self )); 
+    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::DjondbConnection *","find", 1, self )); 
   }
-  arg1 = reinterpret_cast< djondb::Connection * >(argp1);
+  arg1 = reinterpret_cast< djondb::DjondbConnection * >(argp1);
   {
     std::string *ptr = (std::string *)0;
     res2 = SWIG_AsPtr_std_string(argv[0], &ptr);
@@ -13299,7 +13348,7 @@ fail:
 }
 
 
-SWIGINTERN VALUE _wrap_Connection_find(int nargs, VALUE *args, VALUE self) {
+SWIGINTERN VALUE _wrap_DjondbConnection_find(int nargs, VALUE *args, VALUE self) {
   int argc;
   VALUE argv[6];
   int ii;
@@ -13313,7 +13362,7 @@ SWIGINTERN VALUE _wrap_Connection_find(int nargs, VALUE *args, VALUE self) {
   if (argc == 4) {
     int _v;
     void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_djondb__Connection, 0);
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_djondb__DjondbConnection, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
       int res = SWIG_AsPtr_std_string(argv[1], (std::string**)(0));
@@ -13325,7 +13374,7 @@ SWIGINTERN VALUE _wrap_Connection_find(int nargs, VALUE *args, VALUE self) {
           int res = SWIG_AsPtr_std_string(argv[3], (std::string**)(0));
           _v = SWIG_CheckState(res);
           if (_v) {
-            return _wrap_Connection_find__SWIG_1(nargs, args, self);
+            return _wrap_DjondbConnection_find__SWIG_1(nargs, args, self);
           }
         }
       }
@@ -13334,7 +13383,7 @@ SWIGINTERN VALUE _wrap_Connection_find(int nargs, VALUE *args, VALUE self) {
   if (argc == 5) {
     int _v;
     void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_djondb__Connection, 0);
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_djondb__DjondbConnection, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
       int res = SWIG_AsPtr_std_string(argv[1], (std::string**)(0));
@@ -13349,7 +13398,7 @@ SWIGINTERN VALUE _wrap_Connection_find(int nargs, VALUE *args, VALUE self) {
             int res = SWIG_AsPtr_std_string(argv[4], (std::string**)(0));
             _v = SWIG_CheckState(res);
             if (_v) {
-              return _wrap_Connection_find__SWIG_0(nargs, args, self);
+              return _wrap_DjondbConnection_find__SWIG_0(nargs, args, self);
             }
           }
         }
@@ -13358,17 +13407,17 @@ SWIGINTERN VALUE _wrap_Connection_find(int nargs, VALUE *args, VALUE self) {
   }
   
 fail:
-  Ruby_Format_OverloadedError( argc, 6, "Connection.find", 
-    "    std::vector< BSONObj *,std::allocator< BSONObj * > > * Connection.find(std::string const &db, std::string const &ns, std::string const &select, std::string const &filter)\n"
-    "    std::vector< BSONObj *,std::allocator< BSONObj * > > * Connection.find(std::string const &db, std::string const &ns, std::string const &filter)\n");
+  Ruby_Format_OverloadedError( argc, 6, "DjondbConnection.find", 
+    "    std::vector< BSONObj *,std::allocator< BSONObj * > > * DjondbConnection.find(std::string const &db, std::string const &ns, std::string const &select, std::string const &filter)\n"
+    "    std::vector< BSONObj *,std::allocator< BSONObj * > > * DjondbConnection.find(std::string const &db, std::string const &ns, std::string const &filter)\n");
   
   return Qnil;
 }
 
 
 SWIGINTERN VALUE
-_wrap_Connection_update__SWIG_0(int argc, VALUE *argv, VALUE self) {
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+_wrap_DjondbConnection_update__SWIG_0(int argc, VALUE *argv, VALUE self) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
   std::string *arg4 = 0 ;
@@ -13383,11 +13432,11 @@ _wrap_Connection_update__SWIG_0(int argc, VALUE *argv, VALUE self) {
   if ((argc < 3) || (argc > 3)) {
     rb_raise(rb_eArgError, "wrong # of arguments(%d for 3)",argc); SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__Connection, 0 |  0 );
+  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__DjondbConnection, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::Connection *","update", 1, self )); 
+    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::DjondbConnection *","update", 1, self )); 
   }
-  arg1 = reinterpret_cast< djondb::Connection * >(argp1);
+  arg1 = reinterpret_cast< djondb::DjondbConnection * >(argp1);
   {
     std::string *ptr = (std::string *)0;
     res2 = SWIG_AsPtr_std_string(argv[0], &ptr);
@@ -13436,8 +13485,8 @@ fail:
 
 
 SWIGINTERN VALUE
-_wrap_Connection_update__SWIG_1(int argc, VALUE *argv, VALUE self) {
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+_wrap_DjondbConnection_update__SWIG_1(int argc, VALUE *argv, VALUE self) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
   BSONObj *arg4 = 0 ;
@@ -13453,11 +13502,11 @@ _wrap_Connection_update__SWIG_1(int argc, VALUE *argv, VALUE self) {
   if ((argc < 3) || (argc > 3)) {
     rb_raise(rb_eArgError, "wrong # of arguments(%d for 3)",argc); SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__Connection, 0 |  0 );
+  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__DjondbConnection, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::Connection *","update", 1, self )); 
+    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::DjondbConnection *","update", 1, self )); 
   }
-  arg1 = reinterpret_cast< djondb::Connection * >(argp1);
+  arg1 = reinterpret_cast< djondb::DjondbConnection * >(argp1);
   {
     std::string *ptr = (std::string *)0;
     res2 = SWIG_AsPtr_std_string(argv[0], &ptr);
@@ -13500,7 +13549,7 @@ fail:
 }
 
 
-SWIGINTERN VALUE _wrap_Connection_update(int nargs, VALUE *args, VALUE self) {
+SWIGINTERN VALUE _wrap_DjondbConnection_update(int nargs, VALUE *args, VALUE self) {
   int argc;
   VALUE argv[5];
   int ii;
@@ -13514,7 +13563,7 @@ SWIGINTERN VALUE _wrap_Connection_update(int nargs, VALUE *args, VALUE self) {
   if (argc == 4) {
     int _v;
     void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_djondb__Connection, 0);
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_djondb__DjondbConnection, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
       int res = SWIG_AsPtr_std_string(argv[1], (std::string**)(0));
@@ -13527,7 +13576,7 @@ SWIGINTERN VALUE _wrap_Connection_update(int nargs, VALUE *args, VALUE self) {
           int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_BSONObj, 0);
           _v = SWIG_CheckState(res);
           if (_v) {
-            return _wrap_Connection_update__SWIG_1(nargs, args, self);
+            return _wrap_DjondbConnection_update__SWIG_1(nargs, args, self);
           }
         }
       }
@@ -13536,7 +13585,7 @@ SWIGINTERN VALUE _wrap_Connection_update(int nargs, VALUE *args, VALUE self) {
   if (argc == 4) {
     int _v;
     void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_djondb__Connection, 0);
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_djondb__DjondbConnection, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
       int res = SWIG_AsPtr_std_string(argv[1], (std::string**)(0));
@@ -13548,7 +13597,7 @@ SWIGINTERN VALUE _wrap_Connection_update(int nargs, VALUE *args, VALUE self) {
           int res = SWIG_AsPtr_std_string(argv[3], (std::string**)(0));
           _v = SWIG_CheckState(res);
           if (_v) {
-            return _wrap_Connection_update__SWIG_0(nargs, args, self);
+            return _wrap_DjondbConnection_update__SWIG_0(nargs, args, self);
           }
         }
       }
@@ -13556,17 +13605,17 @@ SWIGINTERN VALUE _wrap_Connection_update(int nargs, VALUE *args, VALUE self) {
   }
   
 fail:
-  Ruby_Format_OverloadedError( argc, 5, "Connection.update", 
-    "    bool Connection.update(std::string const &db, std::string const &ns, std::string const &json)\n"
-    "    bool Connection.update(std::string const &db, std::string const &ns, BSONObj const &bson)\n");
+  Ruby_Format_OverloadedError( argc, 5, "DjondbConnection.update", 
+    "    bool DjondbConnection.update(std::string const &db, std::string const &ns, std::string const &json)\n"
+    "    bool DjondbConnection.update(std::string const &db, std::string const &ns, BSONObj const &bson)\n");
   
   return Qnil;
 }
 
 
 SWIGINTERN VALUE
-_wrap_Connection_dropNamespace(int argc, VALUE *argv, VALUE self) {
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+_wrap_DjondbConnection_dropNamespace(int argc, VALUE *argv, VALUE self) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
   void *argp1 = 0 ;
@@ -13579,11 +13628,11 @@ _wrap_Connection_dropNamespace(int argc, VALUE *argv, VALUE self) {
   if ((argc < 2) || (argc > 2)) {
     rb_raise(rb_eArgError, "wrong # of arguments(%d for 2)",argc); SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__Connection, 0 |  0 );
+  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__DjondbConnection, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::Connection *","dropNamespace", 1, self )); 
+    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::DjondbConnection *","dropNamespace", 1, self )); 
   }
-  arg1 = reinterpret_cast< djondb::Connection * >(argp1);
+  arg1 = reinterpret_cast< djondb::DjondbConnection * >(argp1);
   {
     std::string *ptr = (std::string *)0;
     res2 = SWIG_AsPtr_std_string(argv[0], &ptr);
@@ -13619,8 +13668,8 @@ fail:
 
 
 SWIGINTERN VALUE
-_wrap_Connection_dbs(int argc, VALUE *argv, VALUE self) {
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+_wrap_DjondbConnection_dbs(int argc, VALUE *argv, VALUE self) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   std::vector< std::string,std::allocator< std::string > > *result = 0 ;
@@ -13629,12 +13678,12 @@ _wrap_Connection_dbs(int argc, VALUE *argv, VALUE self) {
   if ((argc < 0) || (argc > 0)) {
     rb_raise(rb_eArgError, "wrong # of arguments(%d for 0)",argc); SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__Connection, 0 |  0 );
+  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__DjondbConnection, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::Connection const *","dbs", 1, self )); 
+    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::DjondbConnection const *","dbs", 1, self )); 
   }
-  arg1 = reinterpret_cast< djondb::Connection * >(argp1);
-  result = (std::vector< std::string,std::allocator< std::string > > *)((djondb::Connection const *)arg1)->dbs();
+  arg1 = reinterpret_cast< djondb::DjondbConnection * >(argp1);
+  result = (std::vector< std::string,std::allocator< std::string > > *)((djondb::DjondbConnection const *)arg1)->dbs();
   vresult = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_std__vectorT_std__string_std__allocatorT_std__string_t_t, 0 |  0 );
   return vresult;
 fail:
@@ -13643,8 +13692,8 @@ fail:
 
 
 SWIGINTERN VALUE
-_wrap_Connection_namespaces(int argc, VALUE *argv, VALUE self) {
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+_wrap_DjondbConnection_namespaces(int argc, VALUE *argv, VALUE self) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   std::string *arg2 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -13655,11 +13704,11 @@ _wrap_Connection_namespaces(int argc, VALUE *argv, VALUE self) {
   if ((argc < 1) || (argc > 1)) {
     rb_raise(rb_eArgError, "wrong # of arguments(%d for 1)",argc); SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__Connection, 0 |  0 );
+  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__DjondbConnection, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::Connection const *","namespaces", 1, self )); 
+    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::DjondbConnection const *","namespaces", 1, self )); 
   }
-  arg1 = reinterpret_cast< djondb::Connection * >(argp1);
+  arg1 = reinterpret_cast< djondb::DjondbConnection * >(argp1);
   {
     std::string *ptr = (std::string *)0;
     res2 = SWIG_AsPtr_std_string(argv[0], &ptr);
@@ -13671,7 +13720,7 @@ _wrap_Connection_namespaces(int argc, VALUE *argv, VALUE self) {
     }
     arg2 = ptr;
   }
-  result = (std::vector< std::string,std::allocator< std::string > > *)((djondb::Connection const *)arg1)->namespaces((std::string const &)*arg2);
+  result = (std::vector< std::string,std::allocator< std::string > > *)((djondb::DjondbConnection const *)arg1)->namespaces((std::string const &)*arg2);
   vresult = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_std__vectorT_std__string_std__allocatorT_std__string_t_t, 0 |  0 );
   if (SWIG_IsNewObj(res2)) delete arg2;
   return vresult;
@@ -13682,8 +13731,8 @@ fail:
 
 
 SWIGINTERN VALUE
-_wrap_Connection_host(int argc, VALUE *argv, VALUE self) {
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+_wrap_DjondbConnection_host(int argc, VALUE *argv, VALUE self) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   std::string result;
@@ -13692,12 +13741,12 @@ _wrap_Connection_host(int argc, VALUE *argv, VALUE self) {
   if ((argc < 0) || (argc > 0)) {
     rb_raise(rb_eArgError, "wrong # of arguments(%d for 0)",argc); SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__Connection, 0 |  0 );
+  res1 = SWIG_ConvertPtr(self, &argp1,SWIGTYPE_p_djondb__DjondbConnection, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::Connection const *","host", 1, self )); 
+    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::DjondbConnection const *","host", 1, self )); 
   }
-  arg1 = reinterpret_cast< djondb::Connection * >(argp1);
-  result = ((djondb::Connection const *)arg1)->host();
+  arg1 = reinterpret_cast< djondb::DjondbConnection * >(argp1);
+  result = ((djondb::DjondbConnection const *)arg1)->host();
   vresult = SWIG_From_std_string(static_cast< std::string >(result));
   return vresult;
 fail:
@@ -13710,7 +13759,7 @@ swig_class SwigClassConnectionReference;
 SWIGINTERN VALUE
 _wrap_ConnectionReference__connection_set(int argc, VALUE *argv, VALUE self) {
   djondb::ConnectionReference *arg1 = (djondb::ConnectionReference *) 0 ;
-  djondb::Connection *arg2 = (djondb::Connection *) 0 ;
+  djondb::DjondbConnection *arg2 = (djondb::DjondbConnection *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -13724,11 +13773,11 @@ _wrap_ConnectionReference__connection_set(int argc, VALUE *argv, VALUE self) {
     SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::ConnectionReference *","_connection", 1, self )); 
   }
   arg1 = reinterpret_cast< djondb::ConnectionReference * >(argp1);
-  res2 = SWIG_ConvertPtr(argv[0], &argp2,SWIGTYPE_p_djondb__Connection, SWIG_POINTER_DISOWN |  0 );
+  res2 = SWIG_ConvertPtr(argv[0], &argp2,SWIGTYPE_p_djondb__DjondbConnection, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), Ruby_Format_TypeError( "", "djondb::Connection *","_connection", 2, argv[0] )); 
+    SWIG_exception_fail(SWIG_ArgError(res2), Ruby_Format_TypeError( "", "djondb::DjondbConnection *","_connection", 2, argv[0] )); 
   }
-  arg2 = reinterpret_cast< djondb::Connection * >(argp2);
+  arg2 = reinterpret_cast< djondb::DjondbConnection * >(argp2);
   if (arg1) (arg1)->_connection = arg2;
   return Qnil;
 fail:
@@ -13741,7 +13790,7 @@ _wrap_ConnectionReference__connection_get(int argc, VALUE *argv, VALUE self) {
   djondb::ConnectionReference *arg1 = (djondb::ConnectionReference *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  djondb::Connection *result = 0 ;
+  djondb::DjondbConnection *result = 0 ;
   VALUE vresult = Qnil;
   
   if ((argc < 0) || (argc > 0)) {
@@ -13752,8 +13801,8 @@ _wrap_ConnectionReference__connection_get(int argc, VALUE *argv, VALUE self) {
     SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::ConnectionReference *","_connection", 1, self )); 
   }
   arg1 = reinterpret_cast< djondb::ConnectionReference * >(argp1);
-  result = (djondb::Connection *) ((arg1)->_connection);
-  vresult = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_djondb__Connection, 0 |  0 );
+  result = (djondb::DjondbConnection *) ((arg1)->_connection);
+  vresult = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_djondb__DjondbConnection, 0 |  0 );
   return vresult;
 fail:
   return Qnil;
@@ -13850,18 +13899,18 @@ free_djondb_ConnectionReference(djondb::ConnectionReference *arg1) {
     delete arg1;
 }
 
-swig_class SwigClassConnectionManager;
+swig_class SwigClassDjondbConnectionManager;
 
 #ifdef HAVE_RB_DEFINE_ALLOC_FUNC
 SWIGINTERN VALUE
-_wrap_ConnectionManager_allocate(VALUE self) {
+_wrap_DjondbConnectionManager_allocate(VALUE self) {
 #else
   SWIGINTERN VALUE
-  _wrap_ConnectionManager_allocate(int argc, VALUE *argv, VALUE self) {
+  _wrap_DjondbConnectionManager_allocate(int argc, VALUE *argv, VALUE self) {
 #endif
     
     
-    VALUE vresult = SWIG_NewClassInstance(self, SWIGTYPE_p_djondb__ConnectionManager);
+    VALUE vresult = SWIG_NewClassInstance(self, SWIGTYPE_p_djondb__DjondbConnectionManager);
 #ifndef HAVE_RB_DEFINE_ALLOC_FUNC
     rb_obj_call_init(vresult, argc, argv);
 #endif
@@ -13870,13 +13919,13 @@ _wrap_ConnectionManager_allocate(VALUE self) {
   
 
 SWIGINTERN VALUE
-_wrap_new_ConnectionManager(int argc, VALUE *argv, VALUE self) {
-  djondb::ConnectionManager *result = 0 ;
+_wrap_new_DjondbConnectionManager(int argc, VALUE *argv, VALUE self) {
+  djondb::DjondbConnectionManager *result = 0 ;
   
   if ((argc < 0) || (argc > 0)) {
     rb_raise(rb_eArgError, "wrong # of arguments(%d for 0)",argc); SWIG_fail;
   }
-  result = (djondb::ConnectionManager *)new djondb::ConnectionManager();
+  result = (djondb::DjondbConnectionManager *)new djondb::DjondbConnectionManager();
   DATA_PTR(self) = result;
   return self;
 fail:
@@ -13885,14 +13934,14 @@ fail:
 
 
 SWIGINTERN void
-free_djondb_ConnectionManager(djondb::ConnectionManager *arg1) {
+free_djondb_DjondbConnectionManager(djondb::DjondbConnectionManager *arg1) {
     delete arg1;
 }
 
 SWIGINTERN VALUE
-_wrap_ConnectionManager_getConnection__SWIG_0(int argc, VALUE *argv, VALUE self) {
+_wrap_DjondbConnectionManager_getConnection__SWIG_0(int argc, VALUE *argv, VALUE self) {
   std::string arg1 ;
-  djondb::Connection *result = 0 ;
+  djondb::DjondbConnection *result = 0 ;
   VALUE vresult = Qnil;
   
   if ((argc < 1) || (argc > 1)) {
@@ -13902,13 +13951,13 @@ _wrap_ConnectionManager_getConnection__SWIG_0(int argc, VALUE *argv, VALUE self)
     std::string *ptr = (std::string *)0;
     int res = SWIG_AsPtr_std_string(argv[0], &ptr);
     if (!SWIG_IsOK(res) || !ptr) {
-      SWIG_exception_fail(SWIG_ArgError((ptr ? res : SWIG_TypeError)), Ruby_Format_TypeError( "", "std::string","djondb::ConnectionManager::getConnection", 1, argv[0] )); 
+      SWIG_exception_fail(SWIG_ArgError((ptr ? res : SWIG_TypeError)), Ruby_Format_TypeError( "", "std::string","djondb::DjondbConnectionManager::getConnection", 1, argv[0] )); 
     }
     arg1 = *ptr;
     if (SWIG_IsNewObj(res)) delete ptr;
   }
-  result = (djondb::Connection *)djondb::ConnectionManager::getConnection(arg1);
-  vresult = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_djondb__Connection, 0 |  0 );
+  result = (djondb::DjondbConnection *)djondb::DjondbConnectionManager::getConnection(arg1);
+  vresult = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_djondb__DjondbConnection, 0 |  0 );
   return vresult;
 fail:
   return Qnil;
@@ -13916,12 +13965,12 @@ fail:
 
 
 SWIGINTERN VALUE
-_wrap_ConnectionManager_getConnection__SWIG_1(int argc, VALUE *argv, VALUE self) {
+_wrap_DjondbConnectionManager_getConnection__SWIG_1(int argc, VALUE *argv, VALUE self) {
   std::string arg1 ;
   int arg2 ;
   int val2 ;
   int ecode2 = 0 ;
-  djondb::Connection *result = 0 ;
+  djondb::DjondbConnection *result = 0 ;
   VALUE vresult = Qnil;
   
   if ((argc < 2) || (argc > 2)) {
@@ -13931,25 +13980,25 @@ _wrap_ConnectionManager_getConnection__SWIG_1(int argc, VALUE *argv, VALUE self)
     std::string *ptr = (std::string *)0;
     int res = SWIG_AsPtr_std_string(argv[0], &ptr);
     if (!SWIG_IsOK(res) || !ptr) {
-      SWIG_exception_fail(SWIG_ArgError((ptr ? res : SWIG_TypeError)), Ruby_Format_TypeError( "", "std::string","djondb::ConnectionManager::getConnection", 1, argv[0] )); 
+      SWIG_exception_fail(SWIG_ArgError((ptr ? res : SWIG_TypeError)), Ruby_Format_TypeError( "", "std::string","djondb::DjondbConnectionManager::getConnection", 1, argv[0] )); 
     }
     arg1 = *ptr;
     if (SWIG_IsNewObj(res)) delete ptr;
   }
   ecode2 = SWIG_AsVal_int(argv[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), Ruby_Format_TypeError( "", "int","djondb::ConnectionManager::getConnection", 2, argv[1] ));
+    SWIG_exception_fail(SWIG_ArgError(ecode2), Ruby_Format_TypeError( "", "int","djondb::DjondbConnectionManager::getConnection", 2, argv[1] ));
   } 
   arg2 = static_cast< int >(val2);
-  result = (djondb::Connection *)djondb::ConnectionManager::getConnection(arg1,arg2);
-  vresult = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_djondb__Connection, 0 |  0 );
+  result = (djondb::DjondbConnection *)djondb::DjondbConnectionManager::getConnection(arg1,arg2);
+  vresult = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_djondb__DjondbConnection, 0 |  0 );
   return vresult;
 fail:
   return Qnil;
 }
 
 
-SWIGINTERN VALUE _wrap_ConnectionManager_getConnection(int nargs, VALUE *args, VALUE self) {
+SWIGINTERN VALUE _wrap_DjondbConnectionManager_getConnection(int nargs, VALUE *args, VALUE self) {
   int argc;
   VALUE argv[2];
   int ii;
@@ -13964,7 +14013,7 @@ SWIGINTERN VALUE _wrap_ConnectionManager_getConnection(int nargs, VALUE *args, V
     int res = SWIG_AsPtr_std_string(argv[0], (std::string**)(0));
     _v = SWIG_CheckState(res);
     if (_v) {
-      return _wrap_ConnectionManager_getConnection__SWIG_0(nargs, args, self);
+      return _wrap_DjondbConnectionManager_getConnection__SWIG_0(nargs, args, self);
     }
   }
   if (argc == 2) {
@@ -13977,35 +14026,35 @@ SWIGINTERN VALUE _wrap_ConnectionManager_getConnection(int nargs, VALUE *args, V
         _v = SWIG_CheckState(res);
       }
       if (_v) {
-        return _wrap_ConnectionManager_getConnection__SWIG_1(nargs, args, self);
+        return _wrap_DjondbConnectionManager_getConnection__SWIG_1(nargs, args, self);
       }
     }
   }
   
 fail:
-  Ruby_Format_OverloadedError( argc, 2, "ConnectionManager.getConnection", 
-    "    djondb::Connection * ConnectionManager.getConnection(std::string host)\n"
-    "    djondb::Connection * ConnectionManager.getConnection(std::string host, int port)\n");
+  Ruby_Format_OverloadedError( argc, 2, "DjondbConnectionManager.getConnection", 
+    "    djondb::DjondbConnection * DjondbConnectionManager.getConnection(std::string host)\n"
+    "    djondb::DjondbConnection * DjondbConnectionManager.getConnection(std::string host, int port)\n");
   
   return Qnil;
 }
 
 
 SWIGINTERN VALUE
-_wrap_ConnectionManager_releaseConnection(int argc, VALUE *argv, VALUE self) {
-  djondb::Connection *arg1 = (djondb::Connection *) 0 ;
+_wrap_DjondbConnectionManager_releaseConnection(int argc, VALUE *argv, VALUE self) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   
   if ((argc < 1) || (argc > 1)) {
     rb_raise(rb_eArgError, "wrong # of arguments(%d for 1)",argc); SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(argv[0], &argp1,SWIGTYPE_p_djondb__Connection, 0 |  0 );
+  res1 = SWIG_ConvertPtr(argv[0], &argp1,SWIGTYPE_p_djondb__DjondbConnection, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::Connection *","djondb::ConnectionManager::releaseConnection", 1, argv[0] )); 
+    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "djondb::DjondbConnection *","djondb::DjondbConnectionManager::releaseConnection", 1, argv[0] )); 
   }
-  arg1 = reinterpret_cast< djondb::Connection * >(argp1);
-  djondb::ConnectionManager::releaseConnection(arg1);
+  arg1 = reinterpret_cast< djondb::DjondbConnection * >(argp1);
+  djondb::DjondbConnectionManager::releaseConnection(arg1);
   return Qnil;
 fail:
   return Qnil;
@@ -14023,6 +14072,7 @@ static void *_p_ParseExceptionTo_p_std__exception(void *x, int *SWIGUNUSEDPARM(n
 }
 static swig_type_info _swigt__p_BSONArrayObj = {"_p_BSONArrayObj", "BSONArrayObj *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_BSONContent = {"_p_BSONContent", "BSONContent *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_BSONException = {"_p_BSONException", "BSONException *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_BSONObj = {"_p_BSONObj", "std::vector< BSONObj * >::value_type|BSONObj *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_BSONParser = {"_p_BSONParser", "BSONParser *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_BSONTYPE = {"_p_BSONTYPE", "BSONTYPE *", 0, 0, (void*)0, 0};
@@ -14033,13 +14083,10 @@ static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_const_iterator = {"_p_const_iterator", "const_iterator *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_const_reference = {"_p_const_reference", "const_reference *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_difference_type = {"_p_difference_type", "difference_type *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_djondb__Connection = {"_p_djondb__Connection", "djondb::Connection *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_djondb__ConnectionManager = {"_p_djondb__ConnectionManager", "djondb::ConnectionManager *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_djondb__ConnectionReference = {"_p_djondb__ConnectionReference", "djondb::ConnectionReference *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_double = {"_p_double", "double *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_int = {"_p_int", "int *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_djondb__DjondbConnection = {"_p_djondb__DjondbConnection", "djondb::DjondbConnection *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_djondb__DjondbConnectionManager = {"_p_djondb__DjondbConnectionManager", "djondb::DjondbConnectionManager *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iterator = {"_p_iterator", "iterator *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_long = {"_p_long", "long *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_void = {"_p_p_void", "void **|VALUE *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_reference = {"_p_reference", "reference *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_size_type = {"_p_size_type", "size_type *", 0, 0, (void*)0, 0};
@@ -14059,6 +14106,7 @@ static swig_type_info _swigt__p_void = {"_p_void", "VALUE|void *", 0, 0, (void*)
 static swig_type_info *swig_type_initial[] = {
   &_swigt__p_BSONArrayObj,
   &_swigt__p_BSONContent,
+  &_swigt__p_BSONException,
   &_swigt__p_BSONObj,
   &_swigt__p_BSONParser,
   &_swigt__p_BSONTYPE,
@@ -14069,13 +14117,10 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_const_iterator,
   &_swigt__p_const_reference,
   &_swigt__p_difference_type,
-  &_swigt__p_djondb__Connection,
-  &_swigt__p_djondb__ConnectionManager,
   &_swigt__p_djondb__ConnectionReference,
-  &_swigt__p_double,
-  &_swigt__p_int,
+  &_swigt__p_djondb__DjondbConnection,
+  &_swigt__p_djondb__DjondbConnectionManager,
   &_swigt__p_iterator,
-  &_swigt__p_long,
   &_swigt__p_p_void,
   &_swigt__p_reference,
   &_swigt__p_size_type,
@@ -14095,6 +14140,7 @@ static swig_type_info *swig_type_initial[] = {
 
 static swig_cast_info _swigc__p_BSONArrayObj[] = {  {&_swigt__p_BSONArrayObj, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_BSONContent[] = {  {&_swigt__p_BSONContent, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_BSONException[] = {  {&_swigt__p_BSONException, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_BSONObj[] = {  {&_swigt__p_BSONObj, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_BSONParser[] = {  {&_swigt__p_BSONParser, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_BSONTYPE[] = {  {&_swigt__p_BSONTYPE, 0, 0, 0},{0, 0, 0, 0}};
@@ -14105,13 +14151,10 @@ static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0,
 static swig_cast_info _swigc__p_const_iterator[] = {  {&_swigt__p_const_iterator, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_const_reference[] = {  {&_swigt__p_const_reference, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_difference_type[] = {  {&_swigt__p_difference_type, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_djondb__Connection[] = {  {&_swigt__p_djondb__Connection, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_djondb__ConnectionManager[] = {  {&_swigt__p_djondb__ConnectionManager, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_djondb__ConnectionReference[] = {  {&_swigt__p_djondb__ConnectionReference, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_double[] = {  {&_swigt__p_double, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_int[] = {  {&_swigt__p_int, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_djondb__DjondbConnection[] = {  {&_swigt__p_djondb__DjondbConnection, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_djondb__DjondbConnectionManager[] = {  {&_swigt__p_djondb__DjondbConnectionManager, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iterator[] = {  {&_swigt__p_iterator, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_long[] = {  {&_swigt__p_long, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_void[] = {  {&_swigt__p_p_void, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_reference[] = {  {&_swigt__p_reference, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_size_type[] = {  {&_swigt__p_size_type, 0, 0, 0},{0, 0, 0, 0}};
@@ -14131,6 +14174,7 @@ static swig_cast_info _swigc__p_void[] = {  {&_swigt__p_void, 0, 0, 0},{0, 0, 0,
 static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_BSONArrayObj,
   _swigc__p_BSONContent,
+  _swigc__p_BSONException,
   _swigc__p_BSONObj,
   _swigc__p_BSONParser,
   _swigc__p_BSONTYPE,
@@ -14141,13 +14185,10 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_const_iterator,
   _swigc__p_const_reference,
   _swigc__p_difference_type,
-  _swigc__p_djondb__Connection,
-  _swigc__p_djondb__ConnectionManager,
   _swigc__p_djondb__ConnectionReference,
-  _swigc__p_double,
-  _swigc__p_int,
+  _swigc__p_djondb__DjondbConnection,
+  _swigc__p_djondb__DjondbConnectionManager,
   _swigc__p_iterator,
-  _swigc__p_long,
   _swigc__p_p_void,
   _swigc__p_reference,
   _swigc__p_size_type,
@@ -14411,11 +14452,11 @@ SWIG_PropagateClientData(void) {
 #ifdef __cplusplus
 extern "C"
 #endif
-SWIGEXPORT void Init_djonwrapper(void) {
+SWIGEXPORT void Init_djondb(void) {
   size_t i;
   
   SWIG_InitRuntime();
-  mDjonwrapper = rb_define_module("Djonwrapper");
+  mDjondb = rb_define_module("Djondb");
   
   SWIG_InitializeModule(0);
   for (i = 0; i < swig_module.size; i++) {
@@ -14424,7 +14465,7 @@ SWIGEXPORT void Init_djonwrapper(void) {
   
   SWIG_RubyInitializeTrackings();
   
-  SwigClassGC_VALUE.klass = rb_define_class_under(mDjonwrapper, "GC_VALUE", rb_cObject);
+  SwigClassGC_VALUE.klass = rb_define_class_under(mDjondb, "GC_VALUE", rb_cObject);
   SWIG_TypeClientData(SWIGTYPE_p_swig__GC_VALUE, (void *) &SwigClassGC_VALUE);
   rb_undef_alloc_func(SwigClassGC_VALUE.klass);
   rb_define_method(SwigClassGC_VALUE.klass, "inspect", VALUEFUNC(_wrap_GC_VALUE_inspect), -1);
@@ -14435,7 +14476,7 @@ SWIGEXPORT void Init_djonwrapper(void) {
   swig::GC_VALUE::initialize();
   
   
-  SwigClassConstIterator.klass = rb_define_class_under(mDjonwrapper, "ConstIterator", rb_cObject);
+  SwigClassConstIterator.klass = rb_define_class_under(mDjondb, "ConstIterator", rb_cObject);
   SWIG_TypeClientData(SWIGTYPE_p_swig__ConstIterator, (void *) &SwigClassConstIterator);
   rb_undef_alloc_func(SwigClassConstIterator.klass);
   rb_define_method(SwigClassConstIterator.klass, "value", VALUEFUNC(_wrap_ConstIterator_value), -1);
@@ -14451,7 +14492,7 @@ SWIGEXPORT void Init_djonwrapper(void) {
   SwigClassConstIterator.destroy = (void (*)(void *)) free_swig_ConstIterator;
   SwigClassConstIterator.trackObjects = 0;
   
-  SwigClassIterator.klass = rb_define_class_under(mDjonwrapper, "Iterator", ((swig_class *) SWIGTYPE_p_swig__ConstIterator->clientdata)->klass);
+  SwigClassIterator.klass = rb_define_class_under(mDjondb, "Iterator", ((swig_class *) SWIGTYPE_p_swig__ConstIterator->clientdata)->klass);
   SWIG_TypeClientData(SWIGTYPE_p_swig__Iterator, (void *) &SwigClassIterator);
   rb_undef_alloc_func(SwigClassIterator.klass);
   rb_define_method(SwigClassIterator.klass, "value=", VALUEFUNC(_wrap_Iterator_valuee___), -1);
@@ -14467,7 +14508,7 @@ SWIGEXPORT void Init_djonwrapper(void) {
   SwigClassIterator.destroy = (void (*)(void *)) free_swig_Iterator;
   SwigClassIterator.trackObjects = 0;
   
-  SwigClassBSONObjVectorPtr.klass = rb_define_class_under(mDjonwrapper, "BSONObjVectorPtr", rb_cObject);
+  SwigClassBSONObjVectorPtr.klass = rb_define_class_under(mDjondb, "BSONObjVectorPtr", rb_cObject);
   SWIG_TypeClientData(SWIGTYPE_p_std__vectorT_BSONObj_p_std__allocatorT_BSONObj_p_t_t, (void *) &SwigClassBSONObjVectorPtr);
   rb_define_alloc_func(SwigClassBSONObjVectorPtr.klass, _wrap_BSONObjVectorPtr_allocate);
   rb_define_method(SwigClassBSONObjVectorPtr.klass, "initialize", VALUEFUNC(_wrap_new_BSONObjVectorPtr), -1);
@@ -14512,7 +14553,7 @@ SWIGEXPORT void Init_djonwrapper(void) {
   SwigClassBSONObjVectorPtr.destroy = (void (*)(void *)) free_std_vector_Sl_BSONObj_Sm__Sg_;
   SwigClassBSONObjVectorPtr.trackObjects = 0;
   
-  SwigClassStringVector.klass = rb_define_class_under(mDjonwrapper, "StringVector", rb_cObject);
+  SwigClassStringVector.klass = rb_define_class_under(mDjondb, "StringVector", rb_cObject);
   SWIG_TypeClientData(SWIGTYPE_p_std__vectorT_std__string_std__allocatorT_std__string_t_t, (void *) &SwigClassStringVector);
   rb_include_module(SwigClassStringVector.klass, rb_eval_string("Enumerable"));
   rb_define_alloc_func(SwigClassStringVector.klass, _wrap_StringVector_allocate);
@@ -14560,7 +14601,7 @@ SWIGEXPORT void Init_djonwrapper(void) {
   SwigClassStringVector.destroy = (void (*)(void *)) free_std_vector_Sl_std_string_Sg_;
   SwigClassStringVector.trackObjects = 0;
   
-  SwigClassBSONArrayObj.klass = rb_define_class_under(mDjonwrapper, "BSONArrayObj", rb_cObject);
+  SwigClassBSONArrayObj.klass = rb_define_class_under(mDjondb, "BSONArrayObj", rb_cObject);
   SWIG_TypeClientData(SWIGTYPE_p_BSONArrayObj, (void *) &SwigClassBSONArrayObj);
   rb_define_alloc_func(SwigClassBSONArrayObj.klass, _wrap_BSONArrayObj_allocate);
   rb_define_method(SwigClassBSONArrayObj.klass, "initialize", VALUEFUNC(_wrap_new_BSONArrayObj), -1);
@@ -14575,7 +14616,7 @@ SWIGEXPORT void Init_djonwrapper(void) {
   SwigClassBSONArrayObj.destroy = (void (*)(void *)) free_BSONArrayObj;
   SwigClassBSONArrayObj.trackObjects = 0;
   
-  SwigClassBSONObj.klass = rb_define_class_under(mDjonwrapper, "BSONObj", rb_cObject);
+  SwigClassBSONObj.klass = rb_define_class_under(mDjondb, "BSONObj", rb_cObject);
   SWIG_TypeClientData(SWIGTYPE_p_BSONObj, (void *) &SwigClassBSONObj);
   rb_define_alloc_func(SwigClassBSONObj.klass, _wrap_BSONObj_allocate);
   rb_define_method(SwigClassBSONObj.klass, "initialize", VALUEFUNC(_wrap_new_BSONObj), -1);
@@ -14602,7 +14643,7 @@ SWIGEXPORT void Init_djonwrapper(void) {
   SwigClassBSONObj.destroy = (void (*)(void *)) free_BSONObj;
   SwigClassBSONObj.trackObjects = 0;
   
-  SwigClassBSONParser.klass = rb_define_class_under(mDjonwrapper, "BSONParser", rb_cObject);
+  SwigClassBSONParser.klass = rb_define_class_under(mDjondb, "BSONParser", rb_cObject);
   SWIG_TypeClientData(SWIGTYPE_p_BSONParser, (void *) &SwigClassBSONParser);
   rb_define_alloc_func(SwigClassBSONParser.klass, _wrap_BSONParser_allocate);
   rb_define_method(SwigClassBSONParser.klass, "initialize", VALUEFUNC(_wrap_new_BSONParser), -1);
@@ -14611,26 +14652,26 @@ SWIGEXPORT void Init_djonwrapper(void) {
   SwigClassBSONParser.mark = 0;
   SwigClassBSONParser.destroy = (void (*)(void *)) free_BSONParser;
   SwigClassBSONParser.trackObjects = 0;
-  rb_define_const(mDjonwrapper, "FO_NONE", SWIG_From_int(static_cast< int >(FO_NONE)));
-  rb_define_const(mDjonwrapper, "FO_TOKEN", SWIG_From_int(static_cast< int >(FO_TOKEN)));
-  rb_define_const(mDjonwrapper, "FO_AND", SWIG_From_int(static_cast< int >(FO_AND)));
-  rb_define_const(mDjonwrapper, "FO_OR", SWIG_From_int(static_cast< int >(FO_OR)));
-  rb_define_const(mDjonwrapper, "FO_EQUALS", SWIG_From_int(static_cast< int >(FO_EQUALS)));
-  rb_define_const(mDjonwrapper, "FO_NOT_EQUALS", SWIG_From_int(static_cast< int >(FO_NOT_EQUALS)));
-  rb_define_const(mDjonwrapper, "FO_PARENTESIS_OPEN", SWIG_From_int(static_cast< int >(FO_PARENTESIS_OPEN)));
-  rb_define_const(mDjonwrapper, "FO_PARENTESIS_CLOSE", SWIG_From_int(static_cast< int >(FO_PARENTESIS_CLOSE)));
-  rb_define_const(mDjonwrapper, "FO_NOT", SWIG_From_int(static_cast< int >(FO_NOT)));
-  rb_define_const(mDjonwrapper, "FO_LESSTHAN", SWIG_From_int(static_cast< int >(FO_LESSTHAN)));
-  rb_define_const(mDjonwrapper, "FO_LESSEQUALTHAN", SWIG_From_int(static_cast< int >(FO_LESSEQUALTHAN)));
-  rb_define_const(mDjonwrapper, "FO_GREATERTHAN", SWIG_From_int(static_cast< int >(FO_GREATERTHAN)));
-  rb_define_const(mDjonwrapper, "FO_GREATEREQUALTHAN", SWIG_From_int(static_cast< int >(FO_GREATEREQUALTHAN)));
-  rb_define_const(mDjonwrapper, "ET_CONSTANT", SWIG_From_int(static_cast< int >(ET_CONSTANT)));
-  rb_define_const(mDjonwrapper, "ET_SIMPLE", SWIG_From_int(static_cast< int >(ET_SIMPLE)));
-  rb_define_const(mDjonwrapper, "ET_BINARY", SWIG_From_int(static_cast< int >(ET_BINARY)));
-  rb_define_const(mDjonwrapper, "ET_UNARY", SWIG_From_int(static_cast< int >(ET_UNARY)));
-  rb_define_module_function(mDjonwrapper, "parseFilterOperator", VALUEFUNC(_wrap_parseFilterOperator), -1);
+  rb_define_const(mDjondb, "FO_NONE", SWIG_From_int(static_cast< int >(FO_NONE)));
+  rb_define_const(mDjondb, "FO_TOKEN", SWIG_From_int(static_cast< int >(FO_TOKEN)));
+  rb_define_const(mDjondb, "FO_AND", SWIG_From_int(static_cast< int >(FO_AND)));
+  rb_define_const(mDjondb, "FO_OR", SWIG_From_int(static_cast< int >(FO_OR)));
+  rb_define_const(mDjondb, "FO_EQUALS", SWIG_From_int(static_cast< int >(FO_EQUALS)));
+  rb_define_const(mDjondb, "FO_NOT_EQUALS", SWIG_From_int(static_cast< int >(FO_NOT_EQUALS)));
+  rb_define_const(mDjondb, "FO_PARENTESIS_OPEN", SWIG_From_int(static_cast< int >(FO_PARENTESIS_OPEN)));
+  rb_define_const(mDjondb, "FO_PARENTESIS_CLOSE", SWIG_From_int(static_cast< int >(FO_PARENTESIS_CLOSE)));
+  rb_define_const(mDjondb, "FO_NOT", SWIG_From_int(static_cast< int >(FO_NOT)));
+  rb_define_const(mDjondb, "FO_LESSTHAN", SWIG_From_int(static_cast< int >(FO_LESSTHAN)));
+  rb_define_const(mDjondb, "FO_LESSEQUALTHAN", SWIG_From_int(static_cast< int >(FO_LESSEQUALTHAN)));
+  rb_define_const(mDjondb, "FO_GREATERTHAN", SWIG_From_int(static_cast< int >(FO_GREATERTHAN)));
+  rb_define_const(mDjondb, "FO_GREATEREQUALTHAN", SWIG_From_int(static_cast< int >(FO_GREATEREQUALTHAN)));
+  rb_define_const(mDjondb, "ET_CONSTANT", SWIG_From_int(static_cast< int >(ET_CONSTANT)));
+  rb_define_const(mDjondb, "ET_SIMPLE", SWIG_From_int(static_cast< int >(ET_SIMPLE)));
+  rb_define_const(mDjondb, "ET_BINARY", SWIG_From_int(static_cast< int >(ET_BINARY)));
+  rb_define_const(mDjondb, "ET_UNARY", SWIG_From_int(static_cast< int >(ET_UNARY)));
+  rb_define_module_function(mDjondb, "parseFilterOperator", VALUEFUNC(_wrap_parseFilterOperator), -1);
   
-  SwigClassParseException.klass = rb_define_class_under(mDjonwrapper, "ParseException", rb_eRuntimeError);
+  SwigClassParseException.klass = rb_define_class_under(mDjondb, "ParseException", rb_eRuntimeError);
   SWIG_TypeClientData(SWIGTYPE_p_ParseException, (void *) &SwigClassParseException);
   rb_define_alloc_func(SwigClassParseException.klass, _wrap_ParseException_allocate);
   rb_define_method(SwigClassParseException.klass, "initialize", VALUEFUNC(_wrap_new_ParseException), -1);
@@ -14639,32 +14680,32 @@ SWIGEXPORT void Init_djonwrapper(void) {
   SwigClassParseException.mark = 0;
   SwigClassParseException.destroy = (void (*)(void *)) free_ParseException;
   SwigClassParseException.trackObjects = 0;
-  rb_define_module_function(mDjonwrapper, "bson_splitSelect", VALUEFUNC(_wrap_bson_splitSelect), -1);
-  rb_define_module_function(mDjonwrapper, "bson_subselect", VALUEFUNC(_wrap_bson_subselect), -1);
-  rb_define_const(mDjonwrapper, "SERVER_PORT", SWIG_From_int(static_cast< int >(1243)));
+  rb_define_module_function(mDjondb, "bson_splitSelect", VALUEFUNC(_wrap_bson_splitSelect), -1);
+  rb_define_module_function(mDjondb, "bson_subselect", VALUEFUNC(_wrap_bson_subselect), -1);
+  rb_define_const(mDjondb, "SERVER_PORT", SWIG_From_int(static_cast< int >(1243)));
   
-  SwigClassConnection.klass = rb_define_class_under(mDjonwrapper, "Connection", rb_cObject);
-  SWIG_TypeClientData(SWIGTYPE_p_djondb__Connection, (void *) &SwigClassConnection);
-  rb_define_alloc_func(SwigClassConnection.klass, _wrap_Connection_allocate);
-  rb_define_method(SwigClassConnection.klass, "initialize", VALUEFUNC(_wrap_new_Connection), -1);
-  rb_define_method(SwigClassConnection.klass, "open", VALUEFUNC(_wrap_Connection_open), -1);
-  rb_define_method(SwigClassConnection.klass, "close", VALUEFUNC(_wrap_Connection_close), -1);
-  rb_define_method(SwigClassConnection.klass, "internalClose", VALUEFUNC(_wrap_Connection_internalClose), -1);
-  rb_define_method(SwigClassConnection.klass, "isOpen", VALUEFUNC(_wrap_Connection_isOpen), -1);
-  rb_define_method(SwigClassConnection.klass, "shutdown", VALUEFUNC(_wrap_Connection_shutdown), -1);
-  rb_define_method(SwigClassConnection.klass, "insert", VALUEFUNC(_wrap_Connection_insert), -1);
-  rb_define_method(SwigClassConnection.klass, "findByKey", VALUEFUNC(_wrap_Connection_findByKey), -1);
-  rb_define_method(SwigClassConnection.klass, "find", VALUEFUNC(_wrap_Connection_find), -1);
-  rb_define_method(SwigClassConnection.klass, "update", VALUEFUNC(_wrap_Connection_update), -1);
-  rb_define_method(SwigClassConnection.klass, "dropNamespace", VALUEFUNC(_wrap_Connection_dropNamespace), -1);
-  rb_define_method(SwigClassConnection.klass, "dbs", VALUEFUNC(_wrap_Connection_dbs), -1);
-  rb_define_method(SwigClassConnection.klass, "namespaces", VALUEFUNC(_wrap_Connection_namespaces), -1);
-  rb_define_method(SwigClassConnection.klass, "host", VALUEFUNC(_wrap_Connection_host), -1);
-  SwigClassConnection.mark = 0;
-  SwigClassConnection.destroy = (void (*)(void *)) free_djondb_Connection;
-  SwigClassConnection.trackObjects = 0;
+  SwigClassDjondbConnection.klass = rb_define_class_under(mDjondb, "DjondbConnection", rb_cObject);
+  SWIG_TypeClientData(SWIGTYPE_p_djondb__DjondbConnection, (void *) &SwigClassDjondbConnection);
+  rb_define_alloc_func(SwigClassDjondbConnection.klass, _wrap_DjondbConnection_allocate);
+  rb_define_method(SwigClassDjondbConnection.klass, "initialize", VALUEFUNC(_wrap_new_DjondbConnection), -1);
+  rb_define_method(SwigClassDjondbConnection.klass, "open", VALUEFUNC(_wrap_DjondbConnection_open), -1);
+  rb_define_method(SwigClassDjondbConnection.klass, "close", VALUEFUNC(_wrap_DjondbConnection_close), -1);
+  rb_define_method(SwigClassDjondbConnection.klass, "internalClose", VALUEFUNC(_wrap_DjondbConnection_internalClose), -1);
+  rb_define_method(SwigClassDjondbConnection.klass, "isOpen", VALUEFUNC(_wrap_DjondbConnection_isOpen), -1);
+  rb_define_method(SwigClassDjondbConnection.klass, "shutdown", VALUEFUNC(_wrap_DjondbConnection_shutdown), -1);
+  rb_define_method(SwigClassDjondbConnection.klass, "insert", VALUEFUNC(_wrap_DjondbConnection_insert), -1);
+  rb_define_method(SwigClassDjondbConnection.klass, "findByKey", VALUEFUNC(_wrap_DjondbConnection_findByKey), -1);
+  rb_define_method(SwigClassDjondbConnection.klass, "find", VALUEFUNC(_wrap_DjondbConnection_find), -1);
+  rb_define_method(SwigClassDjondbConnection.klass, "update", VALUEFUNC(_wrap_DjondbConnection_update), -1);
+  rb_define_method(SwigClassDjondbConnection.klass, "dropNamespace", VALUEFUNC(_wrap_DjondbConnection_dropNamespace), -1);
+  rb_define_method(SwigClassDjondbConnection.klass, "dbs", VALUEFUNC(_wrap_DjondbConnection_dbs), -1);
+  rb_define_method(SwigClassDjondbConnection.klass, "namespaces", VALUEFUNC(_wrap_DjondbConnection_namespaces), -1);
+  rb_define_method(SwigClassDjondbConnection.klass, "host", VALUEFUNC(_wrap_DjondbConnection_host), -1);
+  SwigClassDjondbConnection.mark = 0;
+  SwigClassDjondbConnection.destroy = (void (*)(void *)) free_djondb_DjondbConnection;
+  SwigClassDjondbConnection.trackObjects = 0;
   
-  SwigClassConnectionReference.klass = rb_define_class_under(mDjonwrapper, "ConnectionReference", rb_cObject);
+  SwigClassConnectionReference.klass = rb_define_class_under(mDjondb, "ConnectionReference", rb_cObject);
   SWIG_TypeClientData(SWIGTYPE_p_djondb__ConnectionReference, (void *) &SwigClassConnectionReference);
   rb_define_alloc_func(SwigClassConnectionReference.klass, _wrap_ConnectionReference_allocate);
   rb_define_method(SwigClassConnectionReference.klass, "initialize", VALUEFUNC(_wrap_new_ConnectionReference), -1);
@@ -14676,14 +14717,14 @@ SWIGEXPORT void Init_djonwrapper(void) {
   SwigClassConnectionReference.destroy = (void (*)(void *)) free_djondb_ConnectionReference;
   SwigClassConnectionReference.trackObjects = 0;
   
-  SwigClassConnectionManager.klass = rb_define_class_under(mDjonwrapper, "ConnectionManager", rb_cObject);
-  SWIG_TypeClientData(SWIGTYPE_p_djondb__ConnectionManager, (void *) &SwigClassConnectionManager);
-  rb_define_alloc_func(SwigClassConnectionManager.klass, _wrap_ConnectionManager_allocate);
-  rb_define_method(SwigClassConnectionManager.klass, "initialize", VALUEFUNC(_wrap_new_ConnectionManager), -1);
-  rb_define_singleton_method(SwigClassConnectionManager.klass, "getConnection", VALUEFUNC(_wrap_ConnectionManager_getConnection), -1);
-  rb_define_singleton_method(SwigClassConnectionManager.klass, "releaseConnection", VALUEFUNC(_wrap_ConnectionManager_releaseConnection), -1);
-  SwigClassConnectionManager.mark = 0;
-  SwigClassConnectionManager.destroy = (void (*)(void *)) free_djondb_ConnectionManager;
-  SwigClassConnectionManager.trackObjects = 0;
+  SwigClassDjondbConnectionManager.klass = rb_define_class_under(mDjondb, "DjondbConnectionManager", rb_cObject);
+  SWIG_TypeClientData(SWIGTYPE_p_djondb__DjondbConnectionManager, (void *) &SwigClassDjondbConnectionManager);
+  rb_define_alloc_func(SwigClassDjondbConnectionManager.klass, _wrap_DjondbConnectionManager_allocate);
+  rb_define_method(SwigClassDjondbConnectionManager.klass, "initialize", VALUEFUNC(_wrap_new_DjondbConnectionManager), -1);
+  rb_define_singleton_method(SwigClassDjondbConnectionManager.klass, "getConnection", VALUEFUNC(_wrap_DjondbConnectionManager_getConnection), -1);
+  rb_define_singleton_method(SwigClassDjondbConnectionManager.klass, "releaseConnection", VALUEFUNC(_wrap_DjondbConnectionManager_releaseConnection), -1);
+  SwigClassDjondbConnectionManager.mark = 0;
+  SwigClassDjondbConnectionManager.destroy = (void (*)(void *)) free_djondb_DjondbConnectionManager;
+  SwigClassDjondbConnectionManager.trackObjects = 0;
 }
 
