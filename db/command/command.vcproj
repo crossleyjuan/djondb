@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="command"
 	ProjectGUID="{E42648EC-412D-49B3-BE88-A2E54909C8CD}"
 	RootNamespace="command"
@@ -301,6 +301,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\removecommand.h"
+				>
+			</File>
+			<File
 				RelativePath=".\showdbscommand.h"
 				>
 			</File>
@@ -354,6 +358,10 @@
 			</File>
 			<File
 				RelativePath=".\insertcommand.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\removecommand.cpp"
 				>
 			</File>
 			<File

@@ -192,8 +192,12 @@ bool StreamManager::dropNamespace(char* db, char* ns) {
 				FILE_TYPE type = istream->first;
 				std::string file = fileName(std::string(ns), type);
 
+				StreamType* stream = istream->second;
+				stream->close();
 				// drops the file
 				if (remove((filedir + file).c_str()) != 0) {
+					char* error = strerror(errno);
+					perror(error);
 					result = false;
 					break;
 				}

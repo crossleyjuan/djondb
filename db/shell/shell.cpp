@@ -642,6 +642,12 @@ v8::Handle<v8::Value> Load(const v8::Arguments& args) {
 v8::Handle<v8::Value> Quit(const v8::Arguments& args) {
 	// If not arguments are given args[0] will yield undefined which
 	// converts to the integer value 0.
+	if (__djonConnection != NULL) {
+		__djonConnection->close();
+		delete __djonConnection;
+		__djonConnection = 0;
+	}
+
 	int exit_code = args[0]->Int32Value();
 	fflush(stdout);
 	fflush(stderr);
