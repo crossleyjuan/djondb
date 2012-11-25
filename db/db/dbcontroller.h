@@ -53,15 +53,15 @@ class DBController: public Controller
         void shutdown();
 
 
-        BSONObj* insert(char* db, char* ns, BSONObj* bson);
-		  bool dropNamespace(char* db, char* ns);
-        void update(char* db, char* ns, BSONObj* bson);
-        void remove(char* db, char* ns, const std::string& documentId, const std::string& revision);
-        std::vector<BSONObj*>* find(char* db, char* ns, const char* select, const char* filter) throw (ParseException);
-        BSONObj* findFirst(char* db, char* ns, const char* select, const char* filter) throw (ParseException);
-        BSONObj* readBSON(StreamType* stream);
-		  std::vector<std::string>* dbs() const;
-		  std::vector<std::string>* namespaces(const char* db) const;
+        virtual BSONObj* insert(char* db, char* ns, BSONObj* bson);
+		  virtual bool dropNamespace(char* db, char* ns);
+        virtual void update(char* db, char* ns, BSONObj* bson);
+        virtual void remove(char* db, char* ns, const std::string& documentId, const std::string& revision);
+        virtual std::vector<BSONObj*>* find(char* db, char* ns, const char* select, const char* filter) throw (ParseException);
+        virtual BSONObj* findFirst(char* db, char* ns, const char* select, const char* filter) throw (ParseException);
+        virtual BSONObj* readBSON(StreamType* stream);
+		  virtual std::vector<std::string>* dbs() const;
+		  virtual std::vector<std::string>* namespaces(const char* db) const;
 
     private:
 		  Logger* _logger;

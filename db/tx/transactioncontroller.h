@@ -31,6 +31,7 @@
 
 #include "filterdefs.h"
 #include "dbcontroller.h"
+#include "memorystream.h"
 
 #include <string>
 #include <vector>
@@ -87,7 +88,7 @@ class TransactionController: public Controller
 		struct Control {
 			long startPos; // Contains the first valid position to be used on the first logFile
 			long lastValidPos; // this is a reference to the last valid position in the last logFile
-			std::vector<FileInputStream*> logFiles;
+			std::vector<FileInputOutputStream*> logFiles;
 			FileInputOutputStream* currentFile;
 		};	
 

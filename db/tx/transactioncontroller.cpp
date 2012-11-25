@@ -33,7 +33,7 @@
 #include "insertcommand.h"
 #include "dropnamespacecommand.h"
 #include "updatecommand.h"
-#include "deletecommand.h"
+#include "removecommand.h"
 
 TransactionController::TransactionController(DBController* dbcontroller) {
 	_dbcontroller = dbcontroller;
@@ -75,9 +75,9 @@ void TransactionController::loadControlFile() {
 		_control.lastValidPos = 0;
 
 		std::string logfile = (_transactionId == NULL)? "main.tlo": *_transactionId + ".tlo";
-		std::string logFileName = _dataDir + FILESEPARATOR + logFile;
+		std::string logFileName = _dataDir + FILESEPARATOR + logfile;
 		FileInputOutputStream* fios = new FileInputOutputStream(logFileName, "wb+");
-		_control.logFiles.push(fios);
+		_control.logFiles.push_back(fios);
 		_control.currentFile = fios;
 	}
 }
@@ -91,14 +91,14 @@ TransactionController::TransactionController(const TransactionController& orig) 
 
 TransactionController::~TransactionController() {
 	if (_controlFile) delete _controlFile;
-	if (_control._currentFile) delete _control._currentFile;
+	if (_control.currentFile) delete _control.currentFile;
 	if (_transactionId) delete _transactionId;
 }
 
 void TransactionController::writeRegister(MemoryStream* ms) {
 	char* chars = ms->toChars();
 	long len = ms->length();
-	long statusPos = _control->currentFile->currentPos();
+	long statusPos = _control.currentFile->currentPos();
 
 	// _control.currentFile struct
 	// struct {
@@ -125,13 +125,13 @@ void TransactionController::writeRegister(MemoryStream* ms) {
 
 BSONObj* TransactionController::insert(char* db, char* ns, BSONObj* bson) {
 	InsertCommand* cmd = new InsertCommand();
-	cmd->setDb(db);
-	cmd->setNamespace(ns);
-	cmd->setBSON(bson);
+	cmd->setDB(std::string(db));
+	cmd->setNameSpace(std::string(ns));
+	cmd->setBSON(*bson);
 
 	MemoryStream* ms = new MemoryStream();
 	CommandWriter writer(ms);
-	writer->writeCommand(cmd);
+	writer.writeCommand(cmd);
 	ms->flush();
 
 	writeRegister(ms);
@@ -142,12 +142,12 @@ BSONObj* TransactionController::insert(char* db, char* ns, BSONObj* bson) {
 
 bool TransactionController::dropNamespace(char* db, char* ns) {
 	DropnamespaceCommand* cmd = new DropnamespaceCommand();
-	cmd->setDb(db);
-	cmd->setNamespace(ns);
+	cmd->setDB(std::string(db));
+	cmd->setNameSpace(std::string(ns));
 
 	MemoryStream* ms = new MemoryStream();
 	CommandWriter writer(ms);
-	writer->writeCommand(cmd);
+	writer.writeCommand(cmd);
 	ms->flush();
 
 	writeRegister(ms);
@@ -158,13 +158,13 @@ bool TransactionController::dropNamespace(char* db, char* ns) {
 
 void TransactionController::update(char* db, char* ns, BSONObj* bson) {
 	UpdateCommand* cmd = new UpdateCommand();
-	cmd->setDb(db);
-	cmd->setNamespace(ns);
-	cmd->setBSON(bson);
+	cmd->setDB(std::string(db));
+	cmd->setNameSpace(std::string(ns));
+	cmd->setBSON(*bson);
 
 	MemoryStream* ms = new MemoryStream();
 	CommandWriter writer(ms);
-	writer->writeCommand(cmd);
+	writer.writeCommand(cmd);
 	ms->flush();
 
 	writeRegister(ms);

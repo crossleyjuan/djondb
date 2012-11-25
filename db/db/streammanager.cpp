@@ -196,8 +196,6 @@ bool StreamManager::dropNamespace(char* db, char* ns) {
 				stream->close();
 				// drops the file
 				if (remove((filedir + file).c_str()) != 0) {
-					char* error = strerror(errno);
-					perror(error);
 					result = false;
 					break;
 				}
