@@ -2,34 +2,75 @@
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "util", "..\util\util.vcproj", "{C5EB45F0-68D0-426D-A04A-47439917D92F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0F0FE03A-78F3-4B34-9DCE-0CDFF1FB5C40} = {0F0FE03A-78F3-4B34-9DCE-0CDFF1FB5C40}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bson", "..\bson\bson.vcproj", "{669CDCF4-AAAA-4DA1-9A43-E4DA0C3D08D7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C5EB45F0-68D0-426D-A04A-47439917D92F} = {C5EB45F0-68D0-426D-A04A-47439917D92F}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cache", "..\cache\cache.vcproj", "{62FF06CD-7090-4A69-9CAE-21470F09B447}"
+	ProjectSection(ProjectDependencies) = postProject
+		{669CDCF4-AAAA-4DA1-9A43-E4DA0C3D08D7} = {669CDCF4-AAAA-4DA1-9A43-E4DA0C3D08D7}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "filesystem", "..\filesystem\filesystem.vcproj", "{926BE9D3-3A05-40AB-83EA-40F4D940F23C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{62FF06CD-7090-4A69-9CAE-21470F09B447} = {62FF06CD-7090-4A69-9CAE-21470F09B447}
+		{669CDCF4-AAAA-4DA1-9A43-E4DA0C3D08D7} = {669CDCF4-AAAA-4DA1-9A43-E4DA0C3D08D7}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "db", "..\db\db.vcproj", "{ACF2227F-242F-4FB7-B433-58CED3D02A8F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{926BE9D3-3A05-40AB-83EA-40F4D940F23C} = {926BE9D3-3A05-40AB-83EA-40F4D940F23C}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "command", "..\command\command.vcproj", "{E42648EC-412D-49B3-BE88-A2E54909C8CD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{ACF2227F-242F-4FB7-B433-58CED3D02A8F} = {ACF2227F-242F-4FB7-B433-58CED3D02A8F}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "network", "..\network\network.vcproj", "{B80016DF-3BFD-4756-B2C8-7D827DE39A84}"
+	ProjectSection(ProjectDependencies) = postProject
+		{ACF2227F-242F-4FB7-B433-58CED3D02A8F} = {ACF2227F-242F-4FB7-B433-58CED3D02A8F}
+		{E42648EC-412D-49B3-BE88-A2E54909C8CD} = {E42648EC-412D-49B3-BE88-A2E54909C8CD}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "driverbase", "..\driverbase\driverbase.vcproj", "{8D4F581B-05E3-41D3-8EF3-DF77FE97E40B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6CE5F68C-E601-4021-9E44-5A0575BC87D2} = {6CE5F68C-E601-4021-9E44-5A0575BC87D2}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "service", "..\service\service.vcproj", "{565D9B86-9829-4BC3-9D9B-7ADE6A9D2968}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B80016DF-3BFD-4756-B2C8-7D827DE39A84} = {B80016DF-3BFD-4756-B2C8-7D827DE39A84}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "djondb_win", "..\djondb_win\djondb_win.vcproj", "{6CE5F68C-E601-4021-9E44-5A0575BC87D2}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "shell", "..\shell\shell.vcproj", "{486DE774-34B1-48F1-8EDA-6DC7F12E24E6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6CE5F68C-E601-4021-9E44-5A0575BC87D2} = {6CE5F68C-E601-4021-9E44-5A0575BC87D2}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "djonjavadriver", "..\driverbase\drivers\java\native\vs2008\djonjavadriver.vcproj", "{3F4E72FD-F616-4BA5-87C7-D44561004F0E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8D4F581B-05E3-41D3-8EF3-DF77FE97E40B} = {8D4F581B-05E3-41D3-8EF3-DF77FE97E40B}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C", "..\third_party\libantlr3c-3.2\C.vcproj", "{0F0FE03A-78F3-4B34-9DCE-0CDFF1FB5C40}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "djonwrapper", "..\driverbase\drivers\csharp\vs2008\djonwrapper\djonwrapper.vcproj", "{2B37641C-4A5C-41F5-A4E1-034BAB23718A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8D4F581B-05E3-41D3-8EF3-DF77FE97E40B} = {8D4F581B-05E3-41D3-8EF3-DF77FE97E40B}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "csharpdriver", "..\driverbase\drivers\csharp\vs2008\csharpdriver\csharpdriver.csproj", "{C21587E5-9666-46AB-A1A5-892185062A44}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2B37641C-4A5C-41F5-A4E1-034BAB23718A} = {2B37641C-4A5C-41F5-A4E1-034BAB23718A}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
