@@ -1,4 +1,4 @@
-AC_INIT(djondb, 0.120121118, crossleyjuan@gmail.com)
+AC_INIT(djondb, 0.120121125, crossleyjuan@gmail.com)
     AC_CONFIG_AUX_DIR(config)
 #    AC_CONFIG_SRCDIR(src/foobar.cpp)
 

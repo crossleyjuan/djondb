@@ -128,6 +128,12 @@ public class DjondbConnection : IDisposable {
     return ret;
   }
 
+  public bool remove(string db, string ns, string id, string revision) {
+    bool ret = djonwrapperPINVOKE.DjondbConnection_remove(swigCPtr, db, ns, id, revision);
+    if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
   public bool dropNamespace(string db, string ns) {
     bool ret = djonwrapperPINVOKE.DjondbConnection_dropNamespace(swigCPtr, db, ns);
     if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();

@@ -31,14 +31,14 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "{app}\"; Permissions: everyone-modify
 
 [Files]
-Source: "C:\workspace\personal\djondb\db\windows\Release\csharpdriver.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\workspace\personal\djondb\db\windows\Release\djonwrapper.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\workspace\personal\djondb\db\windows\Release\msvcm90.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\workspace\personal\djondb\db\windows\Release\msvcp90.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\workspace\personal\djondb\db\windows\Release\msvcr90.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\workspace\personal\djondb\db\windows\Release\pthreadVC2.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\workspace\personal\djondb\db\windows\djondb.conf"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\workspace\personal\djondb\db\windows\installer\vcredist_x86_vs2010.exe"; DestDir: {tmp}
+Source: "..\Release\csharpdriver.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Release\djonwrapper.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Release\msvcm90.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Release\msvcp90.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Release\msvcr90.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Release\pthreadVC2.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\djondb.conf"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\installer\vcredist_x86_vs2010.exe"; DestDir: {tmp}
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Run]

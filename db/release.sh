@@ -29,5 +29,6 @@ cd driverbase/drivers
 
 ./php.sh $@
 ./java.sh $@
+./csharp.sh $@
 cd nodejs
 npm publish
