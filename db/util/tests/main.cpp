@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include "util.h"
+#include "linkedmap.hpp"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -37,6 +38,7 @@ class TestUtilSuite : public Test::Suite
 			TEST_ADD(TestUtilSuite::testSettings);
 			TEST_ADD(TestUtilSuite::testFileUtils);
 			TEST_ADD(TestUtilSuite::testCircularQueue);
+			TEST_ADD(TestUtilSuite::testLinkedMap);
 		}
 
 	private:
@@ -61,6 +63,35 @@ class TestUtilSuite : public Test::Suite
 			dt2 = DateTime(2011, 3, 1);
 			int diff = dt2.daysTo(dt);
 			TEST_ASSERT(diff == 19);
+		}
+
+		void testLinkedMap() {
+			LinkedMap<int, int> map;
+
+			map.add(1, 10);
+			map.add(0, 11);
+			map.add(3, 12);
+
+			LinkedMap<int, int>::iterator it = map.begin();
+			int i = it->first;
+			TEST_ASSERT(i == 1);
+			it++;
+			i = it->first;
+			TEST_ASSERT(i == 0);
+			it++;
+			i = it->first;
+			TEST_ASSERT(i == 3);
+
+			map.erase(0);
+			
+			it = map.begin();
+			i = it->first;
+			TEST_ASSERT(i == 1);
+			it++;
+			i = it->first;
+			TEST_ASSERT(i == 3);
+			it++;
+			TEST_ASSERT(it == map.end());
 		}
 
 		void testCircularQueue() {

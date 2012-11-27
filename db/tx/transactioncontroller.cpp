@@ -25,18 +25,21 @@
  * =====================================================================================
  */
 #include "transactioncontroller.h"
+#include "controller.h"
 #include "settings.h"
 #include "fileinputoutputstream.h"
 #include "memorystream.h"
 #include "util.h"
+#include "command.h"
 #include "commandwriter.h"
+#include "commandreader.h"
 #include "insertcommand.h"
 #include "dropnamespacecommand.h"
 #include "updatecommand.h"
 #include "removecommand.h"
 
-TransactionController::TransactionController(DBController* dbcontroller) {
-	_dbcontroller = dbcontroller;
+TransactionController::TransactionController(Controller* controller) {
+	_controller = controller;
 	_transactionId = NULL;
 
 	_dataDir = getSetting("DATA_DIR");
@@ -44,8 +47,8 @@ TransactionController::TransactionController(DBController* dbcontroller) {
 	loadControlFile();
 }
 
-TransactionController::TransactionController(DBController* dbcontroller, std::string transactionId) {
-	_dbcontroller = dbcontroller;
+TransactionController::TransactionController(Controller* controller, std::string transactionId) {
+	_controller = controller;
 	_transactionId = new std::string(transactionId);
 
 	_dataDir = getSetting("DATA_DIR");
@@ -83,7 +86,7 @@ void TransactionController::loadControlFile() {
 }
 
 TransactionController::TransactionController(const TransactionController& orig) {
-	this->_dbcontroller = orig._dbcontroller;
+	this->_controller = orig._controller;
 	this->_transactionId = orig._transactionId;
 	_controlFile = orig._controlFile; 
 	_control = orig._control;
@@ -95,90 +98,111 @@ TransactionController::~TransactionController() {
 	if (_transactionId) delete _transactionId;
 }
 
-void TransactionController::writeRegister(MemoryStream* ms) {
-	char* chars = ms->toChars();
-	long len = ms->length();
+void TransactionController::writeCommandToRegister(char* db, char* ns, Command* cmd) {
 	long statusPos = _control.currentFile->currentPos();
 
-	// _control.currentFile struct
-	// struct {
-	//       state      char // Record state DIRTY -> NORMAL
-	//       content    char* // Record content
-	// }	
 	_control.currentFile->writeChar(DIRTY);
-	_control.currentFile->writeChars(chars, len);
+	_control.currentFile->writeChars(db, strlen(db));
+	_control.currentFile->writeChars(ns, strlen(ns));
+	MemoryStream ms;
+	CommandWriter writer(&ms);
+	writer.writeCommand(cmd);
+	// writing the length will allow to jump the command if does not match the db and ns
+	_control.currentFile->writeInt(ms.length());
+	_control.currentFile->writeChars(ms.toChars(), ms.length());
+
 	long lastValidPos = _control.currentFile->currentPos();
 	_control.currentFile->seek(statusPos);
 	_control.currentFile->writeChar(NORMAL);
 
-	// _controlFile struct
-	// struct {
-	//       firstValidPos   long // Contains the first record that is flagged as NORMAL
-	//       lastValidPos    long // Last position that contains a NORMAL record
-	//       active_logs     int  // Number of active logs
-	//       records         char** // Records
-	// }	
 	_controlFile->seek(sizeof(long));
 	_controlFile->writeLong(lastValidPos);
 	_control.lastValidPos = lastValidPos;
 }
 
+Command* TransactionController::readCommandFromRegister(char* db, char* ns) {
+	OPERATION_STATUS status = (OPERATION_STATUS)_control.currentFile->readChar();
+	char* rdb = _control.currentFile->readChars();
+	char* rns = _control.currentFile->readChars();
+
+	Command* result = NULL;
+	int length = _control.currentFile->readInt();
+	if ((strcmp(rdb, db) == 0) && (strcmp(rns, ns) == 0)) {
+		CommandReader reader(_control.currentFile);
+		result = reader.readCommand();
+	} else {
+		_control.currentFile->seek(_control.currentFile->currentPos() + length);
+	}
+	return result;
+}
+
+std::vector<Command*>* TransactionController::findCommands(char* db, char* ns) {
+	std::vector<Command*>* result = new std::vector<Command*>();
+	for (std::vector<FileInputOutputStream*>::iterator i = _control.logFiles.begin(); i != _control.logFiles.end(); i++) {
+		FileInputOutputStream* file = *i;
+		_control.currentFile = file;
+		while (!_control.currentFile->eof()) {
+			Command* cmd = readCommandFromRegister(db, ns);
+			if (cmd != NULL) {
+				result->push_back(cmd);
+			}
+		}
+	}
+	return result;
+}
+
 BSONObj* TransactionController::insert(char* db, char* ns, BSONObj* bson) {
-	InsertCommand* cmd = new InsertCommand();
-	cmd->setDB(std::string(db));
-	cmd->setNameSpace(std::string(ns));
-	cmd->setBSON(*bson);
+	InsertCommand cmd;
+	cmd.setDB(std::string(db));
+	cmd.setNameSpace(std::string(ns));
+	cmd.setBSON(*bson);
 
-	MemoryStream* ms = new MemoryStream();
-	CommandWriter writer(ms);
-	writer.writeCommand(cmd);
-	ms->flush();
+	writeCommandToRegister(db, ns, &cmd);
 
-	writeRegister(ms);
-
-	delete ms;
-	delete cmd;
+	_controller->insert(db, ns, bson);
 }
 
 bool TransactionController::dropNamespace(char* db, char* ns) {
-	DropnamespaceCommand* cmd = new DropnamespaceCommand();
-	cmd->setDB(std::string(db));
-	cmd->setNameSpace(std::string(ns));
+	DropnamespaceCommand cmd;
+	cmd.setDB(std::string(db));
+	cmd.setNameSpace(std::string(ns));
 
-	MemoryStream* ms = new MemoryStream();
-	CommandWriter writer(ms);
-	writer.writeCommand(cmd);
-	ms->flush();
+	writeCommandToRegister(db, ns, &cmd);
 
-	writeRegister(ms);
-
-	delete ms;
-	delete cmd;
+	_controller->dropNamespace(db, ns);
 }
 
 void TransactionController::update(char* db, char* ns, BSONObj* bson) {
-	UpdateCommand* cmd = new UpdateCommand();
-	cmd->setDB(std::string(db));
-	cmd->setNameSpace(std::string(ns));
-	cmd->setBSON(*bson);
+	UpdateCommand cmd;
+	cmd.setDB(std::string(db));
+	cmd.setNameSpace(std::string(ns));
+	cmd.setBSON(*bson);
 
-	MemoryStream* ms = new MemoryStream();
-	CommandWriter writer(ms);
-	writer.writeCommand(cmd);
-	ms->flush();
+	writeCommandToRegister(db, ns, &cmd);
 
-	writeRegister(ms);
-
-	delete ms;
-	delete cmd;
+	_controller->update(db, ns, bson);
 }
 
-void TransactionController::deleteRecord(char* db, char* ns, const std::string& documentId, const std::string& revision) {
-	// Not supported yet
+void TransactionController::remove(char* db, char* ns, const std::string& documentId, const std::string& revision) {
+	RemoveCommand cmd;
+	cmd.setDB(std::string(db));
+	cmd.setNameSpace(std::string(ns));
+	cmd.setId(documentId);
+	cmd.setRevision(revision);
+
+	writeCommandToRegister(db, ns, &cmd);
+
+	_controller->remove(db, ns, documentId, revision);
 }
 
 std::vector<BSONObj*>* TransactionController::find(char* db, char* ns, const char* select, const char* filter) throw (ParseException) {
+	std::vector<Command*> cmds = findCommands(db, ns);
+	std::vector<BSONObj*>* result = new std::vector<BSONObj*>();
+	for (std::vector<Command*>::iterator i = cmds.begin(); i != cmds.end(); i++) {
 
+	}
+
+	std::vector<BSONObj*> result = _controller->find(db, ns, select, filter);
 }
 
 BSONObj* TransactionController::findFirst(char* db, char* ns, const char* select, const char* filter) throw (ParseException) {

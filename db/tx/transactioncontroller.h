@@ -3,7 +3,7 @@
  *
  *       Filename:  transactioncontroller.h
  *
- *    Description: This class work as a front controller and bridge for any dbcontroller
+ *    Description: This class work as a front controller and bridge for any controller
  *                 operation that needs a transaction 
  *
  *        Version:  1.0
@@ -30,14 +30,13 @@
 #define TRANSACTIONCONTROLLER_INCLUDED_H
 
 #include "filterdefs.h"
-#include "dbcontroller.h"
 #include "memorystream.h"
+#include "controller.h"
 
 #include <string>
 #include <vector>
 #include <map>
 
-class DBController;
 class BSONObj;
 class FileInputOutputStream;
 class FileInputStream;
@@ -47,8 +46,8 @@ class Command;
 class TransactionController: public Controller 
 {
 	public:
-		TransactionController(DBController* dbcontroller);
-		TransactionController(DBController* dbcontroller, std::string transactionId);
+		TransactionController(Controller* controller);
+		TransactionController(Controller* controller, std::string transactionId);
 		TransactionController(const TransactionController& orig);
 		~TransactionController();
 
@@ -56,7 +55,7 @@ class TransactionController: public Controller
 		virtual BSONObj* insert(char* db, char* ns, BSONObj* bson);
 		virtual bool dropNamespace(char* db, char* ns);
 		virtual void update(char* db, char* ns, BSONObj* bson);
-		virtual void deleteRecord(char* db, char* ns, const std::string& documentId, const std::string& revision);
+		virtual void remove(char* db, char* ns, const std::string& documentId, const std::string& revision);
 		virtual std::vector<BSONObj*>* find(char* db, char* ns, const char* select, const char* filter) throw (ParseException);
 		virtual BSONObj* findFirst(char* db, char* ns, const char* select, const char* filter) throw (ParseException);
 		virtual BSONObj* readBSON(StreamType* stream);
@@ -64,7 +63,7 @@ class TransactionController: public Controller
 		virtual std::vector<std::string>* namespaces(const char* db) const;
 
 	private:
-		DBController* _dbcontroller;
+		Controller* _controller;
 		std::string* _transactionId;
 		std::string _dataDir;
 
@@ -103,8 +102,9 @@ class TransactionController: public Controller
 
 	private:
 		void checkState();
-		void writeRegister(MemoryStream* ms);
-
+		void writeCommandToRegister(char* db, char* ns, Command* cmd);
+		Command* readCommandFromRegister(char* db, char* ns);
+		std::vector<Command*>* findCommands(char* db, char* ns);
 };
 
 #endif // TRANSACTIONCONTROLLER_INCLUDED_H
