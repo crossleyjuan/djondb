@@ -290,7 +290,7 @@ char* MemoryStream::toChars() {
 		memcpy(result + offset, b, _bufferSize); 
 		offset += _bufferSize;
 	}
-	memcpy(result + offset, _buffer[_maxIndexes - 1], _length - (_bufferSize * _maxIndexes));
+	memcpy(result + offset, _buffer[_maxIndexes - 1], _length - (_bufferSize * (_maxIndexes - 1)));
 
 	return result;
 }

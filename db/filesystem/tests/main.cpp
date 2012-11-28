@@ -81,6 +81,7 @@ class TestFileSystemSuite: public Test::Suite
 		}
 
 		void testMemoryStream() {
+			cout << "\ntestMemoryStream\n" << endl;
 			MemoryStream ms(10);
 			char* text = "test1234567890darn0987654321";
 			ms.writeChars(text, strlen(text));
@@ -89,6 +90,18 @@ class TestFileSystemSuite: public Test::Suite
 			char* res = ms.readChars();
 
 			TEST_ASSERT(strcmp(res, text) == 0);
+			res = ms.toChars();
+
+			MemoryStream ms2;
+			text = "test1234567890darn0987654321";
+			ms2.writeChars(text, strlen(text));
+
+			ms2.seek(0);
+		   res = ms2.readChars();
+
+			TEST_ASSERT(strcmp(res, text) == 0);
+
+			res = ms2.toChars();
 		}
 
 		void testFileInputOutputStreams()

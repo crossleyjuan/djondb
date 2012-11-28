@@ -30,11 +30,14 @@
 #include "fileinputoutputstream.h"
 #include "memorystream.h"
 #include "util.h"
+#include "linkedmap.hpp"
 #include "command.h"
 #include "commandwriter.h"
 #include "commandreader.h"
 #include "insertcommand.h"
 #include "dropnamespacecommand.h"
+#include "filterparser.h"
+#include "expressionresult.h"
 #include "updatecommand.h"
 #include "removecommand.h"
 
@@ -61,7 +64,13 @@ void TransactionController::loadControlFile() {
 	std::string controlFileName = _dataDir + FILESEPARATOR + controlFile;
 	bool existControl = existFile(controlFileName.c_str());
 
-	_controlFile = new FileInputOutputStream(controlFileName.c_str(), "bw+"); 
+	char* flags;
+	if (existControl) {
+		flags = "rb+";
+	} else {
+		flags = "wb+";
+	}
+	_controlFile = new FileInputOutputStream(controlFileName.c_str(), flags); 
 	if (existControl) {
 		_control.startPos 	  = _controlFile->readLong();
 		_control.lastValidPos  = _controlFile->readLong();
@@ -159,7 +168,7 @@ BSONObj* TransactionController::insert(char* db, char* ns, BSONObj* bson) {
 
 	writeCommandToRegister(db, ns, &cmd);
 
-	_controller->insert(db, ns, bson);
+	//_controller->insert(db, ns, bson);
 }
 
 bool TransactionController::dropNamespace(char* db, char* ns) {
@@ -169,7 +178,7 @@ bool TransactionController::dropNamespace(char* db, char* ns) {
 
 	writeCommandToRegister(db, ns, &cmd);
 
-	_controller->dropNamespace(db, ns);
+	//_controller->dropNamespace(db, ns);
 }
 
 void TransactionController::update(char* db, char* ns, BSONObj* bson) {
@@ -180,7 +189,7 @@ void TransactionController::update(char* db, char* ns, BSONObj* bson) {
 
 	writeCommandToRegister(db, ns, &cmd);
 
-	_controller->update(db, ns, bson);
+	//_controller->update(db, ns, bson);
 }
 
 void TransactionController::remove(char* db, char* ns, const std::string& documentId, const std::string& revision) {
@@ -192,28 +201,175 @@ void TransactionController::remove(char* db, char* ns, const std::string& docume
 
 	writeCommandToRegister(db, ns, &cmd);
 
-	_controller->remove(db, ns, documentId, revision);
+	//_controller->remove(db, ns, documentId, revision);
 }
 
 std::vector<BSONObj*>* TransactionController::find(char* db, char* ns, const char* select, const char* filter) throw (ParseException) {
-	std::vector<Command*> cmds = findCommands(db, ns);
+	std::vector<Command*>* cmds = findCommands(db, ns);
 	std::vector<BSONObj*>* result = new std::vector<BSONObj*>();
-	for (std::vector<Command*>::iterator i = cmds.begin(); i != cmds.end(); i++) {
+	LinkedMap<std::string, BSONObj*> map;
 
+	//_controller->find(db, ns, select, filter);
+
+	FilterParser* parser = FilterParser::parse(filter);
+
+	for (std::vector<Command*>::iterator i = cmds->begin(); i != cmds->end(); i++) {
+		Command* cmd = *i;
+		switch (cmd->commandType()) {
+			case INSERT: 
+				{
+					InsertCommand* insert = (InsertCommand*)cmd;
+					BSONObj* bson = insert->bson();
+
+					bool match = false;
+					ExpressionResult* expresult = parser->eval(*bson);
+					if (expresult->type() == ExpressionResult::RT_BOOLEAN) {
+						bool* bres = (bool*)expresult->value();
+						match = *bres;
+					}
+					delete expresult;
+
+					if (match) {
+						map.add(bson->getString("_id"), bson->select(select));
+					}
+					break;
+				};
+			case UPDATE: 
+				{
+					UpdateCommand* update = (UpdateCommand*)cmd;
+					BSONObj* bson = update->bson();
+
+					bool match = false;
+					ExpressionResult* expresult = parser->eval(*bson);
+					if (expresult->type() == ExpressionResult::RT_BOOLEAN) {
+						bool* bres = (bool*)expresult->value();
+						match = *bres;
+					}
+					delete expresult;
+
+					if (match) {
+						map.add(bson->getString("_id"), bson->select(select));
+					}
+					break;
+				};
+			case REMOVE: 
+				{
+					RemoveCommand* remove = (RemoveCommand*)cmd;
+					const std::string* id = remove->id();
+					const std::string* revision = remove->revision();
+					BSONObj* obj = map[*id];
+					if (obj != NULL) {
+						if (obj->getString("_revision").compare(*revision) == 0) {
+							map.erase(*id);
+						} else {
+							// Error?
+						}
+					}
+					break;
+				};
+			case DROPNAMESPACE:
+				{
+					map.clear();
+				};
+		}
 	}
 
-	std::vector<BSONObj*> result = _controller->find(db, ns, select, filter);
+	for (LinkedMap<std::string, BSONObj*>::iterator it = map.begin(); it != map.end(); it++) {
+		result->push_back(it->second);
+	}
+	delete parser;
+	delete cmds;
+
+	return result;
 }
 
 BSONObj* TransactionController::findFirst(char* db, char* ns, const char* select, const char* filter) throw (ParseException) {
+	std::vector<Command*>* cmds = findCommands(db, ns);
+	LinkedMap<std::string, BSONObj*> map;
 
+	//_controller->find(db, ns, select, filter);
+
+	FilterParser* parser = FilterParser::parse(filter);
+
+	for (std::vector<Command*>::iterator i = cmds->begin(); i != cmds->end(); i++) {
+		Command* cmd = *i;
+		switch (cmd->commandType()) {
+			case INSERT: 
+				{
+					InsertCommand* insert = (InsertCommand*)cmd;
+					BSONObj* bson = insert->bson();
+
+					bool match = false;
+					ExpressionResult* expresult = parser->eval(*bson);
+					if (expresult->type() == ExpressionResult::RT_BOOLEAN) {
+						bool* bres = (bool*)expresult->value();
+						match = *bres;
+					}
+					delete expresult;
+
+					if (match) {
+						map.add(bson->getString("_id"), bson->select(select));
+					}
+					break;
+				};
+			case UPDATE: 
+				{
+					UpdateCommand* update = (UpdateCommand*)cmd;
+					BSONObj* bson = update->bson();
+
+					bool match = false;
+					ExpressionResult* expresult = parser->eval(*bson);
+					if (expresult->type() == ExpressionResult::RT_BOOLEAN) {
+						bool* bres = (bool*)expresult->value();
+						match = *bres;
+					}
+					delete expresult;
+
+					if (match) {
+						map.add(bson->getString("_id"), bson->select(select));
+					}
+					break;
+				};
+			case REMOVE: 
+				{
+					RemoveCommand* remove = (RemoveCommand*)cmd;
+					const std::string* id = remove->id();
+					const std::string* revision = remove->revision();
+					BSONObj* obj = map[*id];
+					if (obj != NULL) {
+						if (obj->getString("_revision").compare(*revision) == 0) {
+							map.erase(*id);
+						} else {
+							// Error?
+						}
+					}
+					break;
+				};
+			case DROPNAMESPACE:
+				{
+					map.clear();
+				};
+		}
+	}
+
+	BSONObj* result = NULL;
+	for (LinkedMap<std::string, BSONObj*>::iterator it = map.begin(); it != map.end(); it++) {
+		result = it->second;
+		break;
+	}
+	delete parser;
+	delete cmds;
+
+	return result;
 }
 
 std::vector<std::string>* TransactionController::dbs() const {
-
+	//return _controller->dbs();
+	return NULL;
 }
 
 std::vector<std::string>* TransactionController::namespaces(const char* db) const {
-
+	//return _controller->namespaces(db);
+	return NULL;
 }
 

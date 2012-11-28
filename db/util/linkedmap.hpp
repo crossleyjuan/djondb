@@ -82,8 +82,8 @@ class LinkedMap
 
 		size_type size() const;
 
-		iterator operator[](const K& key);
-		iterator get(const K& key);
+		V operator[](const K& key);
+		V get(const K& key);
 
 	protected:
 
@@ -214,13 +214,17 @@ void LinkedMap<K, V>::add(const K& key, const V& val) {
 }
 
 template <class K, class V>
-typename LinkedMap<K, V>::iterator LinkedMap<K,V>::get(const K& key) {
+V LinkedMap<K,V>::get(const K& key) {
 	typename map<K,V>::iterator i = _elements.find(key);
-	return i;
+	V result = NULL;
+	if (i != _elements.end()) {
+		result = i->second;
+	}
+	return result;
 }
 
 template <class K, class V>
-typename LinkedMap<K, V>::iterator LinkedMap<K,V>::operator [](const K& key) {
+V LinkedMap<K,V>::operator [](const K& key) {
 	return get(key);
 }
 

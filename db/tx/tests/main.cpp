@@ -17,20 +17,11 @@
 // *********************************************************************************************************************
 
 #include <iostream>
-#include <txcontroller.h>
-#include <util.h>
-#include <defs.h>
-#include <ctime>
-#ifndef WINDOWS
-#include <time.h>
-#endif
-#ifdef WINDOWS
-#include <Windows.h>
-#endif
+#include <transactioncontroller.h>
 #include "bson.h"
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
+#include <cpptest.h>
 
 using namespace std;
 
@@ -43,8 +34,17 @@ class TestTXSuite: public Test::Suite
 		}
 
 	private:
-		void testTransaction(BSONObj* o)
+		void testTransaction()
 		{
+			Controller* _controller = NULL;
+			TransactionController* tx = new TransactionController(_controller);
+
+			BSONObj o;
+			o.add("name", "John");
+			tx->insert("db", "txns", &o);
+
+			delete tx;
+
 		}
 
 };
@@ -121,7 +121,6 @@ int main(int argc, char* argv[])
 		Test::HtmlOutput* const html = dynamic_cast<Test::HtmlOutput*>(output.get());
 		if (html)
 			html->generate(cout, true, "MyTest");
-		controller->shutdown();
 	}
 	catch (...)
 	{
