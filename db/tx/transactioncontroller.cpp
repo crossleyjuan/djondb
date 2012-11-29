@@ -71,26 +71,33 @@ void TransactionController::loadControlFile() {
 		flags = "wb+";
 	}
 	_controlFile = new FileInputOutputStream(controlFileName.c_str(), flags); 
+	_controlFile->seek(0);
 	if (existControl) {
 		_control.startPos 	  = _controlFile->readLong();
 		_control.lastValidPos  = _controlFile->readLong();
 
-		while (!_controlFile->eof()) {
+		int files = _controlFile->readInt();
+		for (int i = 0; i < files; i++) {
 			std::string* fileName = _controlFile->readString();
-			FileInputOutputStream* logFile = new FileInputOutputStream(fileName->c_str(), "bw+");
+			std::string logFileName = _dataDir + FILESEPARATOR + *fileName;
+			FileInputOutputStream* logFile = new FileInputOutputStream(logFileName.c_str(), "br+");
 			_control.logFiles.push_back(logFile);
 			_control.currentFile = logFile;
 			delete fileName;
 		}
 	} else {
 		_control.startPos = 0;
+		_controlFile->writeLong(0);
 		_control.lastValidPos = 0;
+		_controlFile->writeLong(0);
 
 		std::string logfile = (_transactionId == NULL)? "main.tlo": *_transactionId + ".tlo";
 		std::string logFileName = _dataDir + FILESEPARATOR + logfile;
 		FileInputOutputStream* fios = new FileInputOutputStream(logFileName, "wb+");
 		_control.logFiles.push_back(fios);
 		_control.currentFile = fios;
+		_controlFile->writeInt(1);
+		_controlFile->writeString(logfile);
 	}
 }
 
@@ -127,6 +134,7 @@ void TransactionController::writeCommandToRegister(char* db, char* ns, Command* 
 	_controlFile->seek(sizeof(long));
 	_controlFile->writeLong(lastValidPos);
 	_control.lastValidPos = lastValidPos;
+	_control.currentFile->flush();
 }
 
 Command* TransactionController::readCommandFromRegister(char* db, char* ns) {
@@ -150,12 +158,15 @@ std::vector<Command*>* TransactionController::findCommands(char* db, char* ns) {
 	for (std::vector<FileInputOutputStream*>::iterator i = _control.logFiles.begin(); i != _control.logFiles.end(); i++) {
 		FileInputOutputStream* file = *i;
 		_control.currentFile = file;
+		int currentPos = _control.currentFile->currentPos();
+		_control.currentFile->seek(0);
 		while (!_control.currentFile->eof()) {
 			Command* cmd = readCommandFromRegister(db, ns);
 			if (cmd != NULL) {
 				result->push_back(cmd);
 			}
 		}
+		_control.currentFile->seek(currentPos);
 	}
 	return result;
 }
@@ -204,9 +215,8 @@ void TransactionController::remove(char* db, char* ns, const std::string& docume
 	//_controller->remove(db, ns, documentId, revision);
 }
 
-std::vector<BSONObj*>* TransactionController::find(char* db, char* ns, const char* select, const char* filter) throw (ParseException) {
+BSONArrayObj* TransactionController::find(char* db, char* ns, const char* select, const char* filter) throw (ParseException) {
 	std::vector<Command*>* cmds = findCommands(db, ns);
-	std::vector<BSONObj*>* result = new std::vector<BSONObj*>();
 	LinkedMap<std::string, BSONObj*> map;
 
 	//_controller->find(db, ns, select, filter);
@@ -274,8 +284,9 @@ std::vector<BSONObj*>* TransactionController::find(char* db, char* ns, const cha
 		}
 	}
 
+	BSONArrayObj* result = new BSONArrayObj();
 	for (LinkedMap<std::string, BSONObj*>::iterator it = map.begin(); it != map.end(); it++) {
-		result->push_back(it->second);
+		result->add(*it->second);
 	}
 	delete parser;
 	delete cmds;

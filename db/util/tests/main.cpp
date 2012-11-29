@@ -66,6 +66,7 @@ class TestUtilSuite : public Test::Suite
 		}
 
 		void testLinkedMap() {
+			cout << "\ntestLinkedMap" << endl;
 			LinkedMap<int, int> map;
 
 			map.add(1, 10);
@@ -92,6 +93,14 @@ class TestUtilSuite : public Test::Suite
 			TEST_ASSERT(i == 3);
 			it++;
 			TEST_ASSERT(it == map.end());
+
+
+			// Test empty map
+			LinkedMap<int, int> map2;
+			TEST_ASSERT(map2.begin() == map2.end());
+
+			LinkedMap<std::string, std::string> map3;
+			TEST_ASSERT(map3.begin() == map3.end());
 		}
 
 		void testCircularQueue() {

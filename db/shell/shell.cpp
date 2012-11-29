@@ -485,22 +485,9 @@ v8::Handle<v8::Value> find(const v8::Arguments& args) {
 		*/
 
 	try {
-		std::vector<BSONObj*>* result = __djonConnection->find(db, ns, select, filter);
+		BSONArrayObj* result = __djonConnection->find(db, ns, select, filter);
 
-		std::stringstream ss;
-		ss << "[";
-		if (result->size() > 0) {
-			for (std::vector<BSONObj*>::const_iterator i = result->begin(); i != result->end(); i++) {
-				BSONObj* obj = *i;
-				if (i != result->begin()) {
-					ss << ", ";
-				}
-				ss << obj->toChar();
-			}
-		}
-		ss << "]";
-
-		std::string sresult = ss.str();
+		std::string sresult(result->toChar());
 
 		delete result;
 		return parseJSON(v8::String::New(sresult.c_str()));

@@ -344,10 +344,10 @@ void DBController::insertIndex(char* db, char* ns, BSONObj* bson, long filePos) 
 	out->writeLong(filePos);
 }
 
-std::vector<BSONObj*>* DBController::find(char* db, char* ns, const char* select, const char* filter) throw(ParseException) {
+BSONArrayObj* DBController::find(char* db, char* ns, const char* select, const char* filter) throw(ParseException) {
 	if (_logger->isDebug()) _logger->debug(2, "DBController::find db: %s, ns: %s, select: %s, filter: %s", db, ns, select, filter);
 
-	std::vector<BSONObj*>* result;
+	BSONArrayObj* result;
 
 	FilterParser* parser = FilterParser::parse(filter);
 
@@ -365,7 +365,7 @@ std::vector<BSONObj*>* DBController::find(char* db, char* ns, const char* select
 		ss << filedir << ns << ".dat";
 
 		std::string filename = ss.str();
-		result = new std::vector<BSONObj*>();
+		result = new BSONArrayObj();
 		FileInputStream* fis = new FileInputStream(filename.c_str(), "rb");
 
 		BSONInputStream* bis = new BSONInputStream(fis);
@@ -377,7 +377,9 @@ std::vector<BSONObj*>* DBController::find(char* db, char* ns, const char* select
 
 			BSONObj* obj = bis->readBSON(select);
 
-			result->push_back(obj);
+			result->add(*obj);
+
+			delete obj;
 		}
 		delete bis;
 		delete fis;
@@ -432,7 +434,7 @@ BSONObj* DBController::findFirst(char* db, char* ns, const char* select, const c
 	return bsonResult;
 }
 
-std::vector<BSONObj*>* DBController::findFullScan(char* db, char* ns, const char* select, FilterParser* parser) throw(ParseException) {
+BSONArrayObj* DBController::findFullScan(char* db, char* ns, const char* select, FilterParser* parser) throw(ParseException) {
 	if (_logger->isDebug()) _logger->debug(2, "DBController::findFullScan with parser db: %s, ns: %s", db, ns);
 	std::string filedir = _dataDir + db;
 	filedir = filedir + FILESEPARATOR;
@@ -443,7 +445,7 @@ std::vector<BSONObj*>* DBController::findFullScan(char* db, char* ns, const char
 	std::string filename = ss.str();
 
 	FileInputStream* fis = new FileInputStream(filename.c_str(), "rb");
-	std::vector<BSONObj*>* result = new std::vector<BSONObj*>();
+	BSONArrayObj* result = new BSONArrayObj();
 
 	BSONInputStream* bis = new BSONInputStream(fis);
 
@@ -459,7 +461,9 @@ std::vector<BSONObj*>* DBController::findFullScan(char* db, char* ns, const char
 			}
 			delete expresult;
 			if (match) {
-				result->push_back(obj->select(select));
+				BSONObj* elem = obj->select(select);
+				result->add(*elem);
+				delete elem;
 			}
 		}
 		delete obj;

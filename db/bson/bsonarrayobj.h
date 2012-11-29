@@ -34,6 +34,7 @@ public:
 	BSONArrayObj();
 	~BSONArrayObj();
 	BSONArrayObj(const BSONArrayObj& orig);
+	BSONArrayObj(const std::vector<BSONObj*>& orig);
 
 	int length() const;
 	void add(const BSONObj& obj);

@@ -23,6 +23,7 @@
 #include <string.h>
 #include <cpptest.h>
 #include <limits.h>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -33,6 +34,7 @@ class TestBSONSuite : public Test::Suite
 		{
 			TEST_ADD(TestBSONSuite::testBigBSON);
 			TEST_ADD(TestBSONSuite::testBSON);
+			TEST_ADD(TestBSONSuite::testBSONArray);
 			TEST_ADD(TestBSONSuite::testEquals);
 			TEST_ADD(TestBSONSuite::testCopyBSON);
 			TEST_ADD(TestBSONSuite::testParserTrivial);
@@ -112,6 +114,24 @@ class TestBSONSuite : public Test::Suite
 			} catch (BSONException e) {
 			}
 			delete obj;
+		}
+
+		void testBSONArray() {
+			cout << "\ntestBSONArray\n" << endl;
+			BSONArrayObj o;
+
+			BSONObj elem;
+			o.add(elem);
+
+			TEST_ASSERT(o.length() == 1);
+
+			std::vector<BSONObj*> array;
+			array.push_back(&elem);
+
+			BSONArrayObj o2(array);
+			TEST_ASSERT(o2.length() == 1);
+			BSONObj* test2 = o2.get(0);
+			TEST_ASSERT(*test2 == elem);
 		}
 
 		void testEquals() {

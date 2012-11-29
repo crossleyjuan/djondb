@@ -106,9 +106,9 @@ class TestDriverBaseSuite: public Test::Suite {
 
 			TEST_ASSERT(result);
 
-			std::vector<BSONObj*>* testresult = conn->find("db", "testdrop.namespace", "*", std::string(""));
+			BSONArrayObj* testresult = conn->find("db", "testdrop.namespace", "*", std::string(""));
 
-			TEST_ASSERT(testresult->size() == 0);
+			TEST_ASSERT(testresult->length() == 0);
 			delete testresult;
 		}
 
@@ -133,8 +133,8 @@ class TestDriverBaseSuite: public Test::Suite {
 
 			conn->insert("test", "ns", obj);
 
-			std::vector<BSONObj*>* res = conn->find("test", "ns", "*", "$'_id' == '" + *id + "'");
-			TEST_ASSERT(res->size() == 1);
+			BSONArrayObj* res = conn->find("test", "ns", "*", "$'_id' == '" + *id + "'");
+			TEST_ASSERT(res->length() == 1);
 			BSONObj* bres = *res->begin();
 			TEST_ASSERT(bres->has("inner"));
 			BSONObj* innerres = bres->getBSON("inner");
@@ -147,8 +147,8 @@ class TestDriverBaseSuite: public Test::Suite {
 			std::string* id2 = uuid();
 			conn->insert("test", "ns", "{ '_id': '" + *id2 + "', 'array': [ { 'x': 'test', 'y': 3},  { 'x': 'test2', 'y': 4}]  }");
 
-			std::vector<BSONObj*>* res2 = conn->find("test", "ns", "*", "$'_id' == '" + *id2 + "'");
-			TEST_ASSERT(res2->size() == 1);
+			BSONArrayObj* res2 = conn->find("test", "ns", "*", "$'_id' == '" + *id2 + "'");
+			TEST_ASSERT(res2->length() == 1);
 			BSONObj* o2 = *res2->begin();
 			TEST_ASSERT(o2 != NULL);
 
@@ -165,12 +165,11 @@ class TestDriverBaseSuite: public Test::Suite {
 			delete customer;
 
 			res2 = conn->find("db", "testcustomer", "*", "$'name' == 'Martin'");
-			TEST_ASSERT(res2->size() == 1);
-			if (res2->size() == 1) {
+			TEST_ASSERT(res2->length() == 1);
+			if (res2->length() == 1) {
 				BSONObj* objCustomer = *res2->begin();
 				int d = objCustomer->getXpath("finantial.salary");
 				TEST_ASSERT(d == 150000);
-				delete objCustomer;
 			}
 			delete res2;
 		}
@@ -314,12 +313,12 @@ class TestDriverBaseSuite: public Test::Suite {
 
 			cout << "\nTestbyfilter" << endl;
 			std::string filter = "";
-			std::vector<BSONObj*>* result = conn->find("db", "test.filter2", "*", filter);			
-			TEST_ASSERT(result->size() > 0);
+			BSONArrayObj* result = conn->find("db", "test.filter2", "*", filter);			
+			TEST_ASSERT(result->length() > 0);
 			filter = "$'name' == 'Test'";
 			delete result;
 			result = conn->find("db", "test.filter2", filter);			
-			TEST_ASSERT(result->size() > 0);
+			TEST_ASSERT(result->length() > 0);
 
 			BSONObj* objR = *result->begin();
 			TEST_ASSERT(objR != NULL);
@@ -330,16 +329,16 @@ class TestDriverBaseSuite: public Test::Suite {
 			cout << "\nobj: " << temp << endl;
 
 			result = conn->find("db", "test.filter2", "*", "$'name' == 'Test'");
-			TEST_ASSERT(result->size() == 1);
+			TEST_ASSERT(result->length() == 1);
 
 			result = conn->find("db", "test.filter2", "$'inner.x' == 1");
-			TEST_ASSERT(result->size() == 1);
+			TEST_ASSERT(result->length() == 1);
 
 			result = conn->find("db", "test.filter2", "*", "$'inner.x' > 0");
-			TEST_ASSERT(result->size() == 1);
+			TEST_ASSERT(result->length() == 1);
 
 			result = conn->find("db", "test.filter2", "$'inner.x' > 1");
-			TEST_ASSERT(result->size() == 0);
+			TEST_ASSERT(result->length() == 0);
 
 			delete objR;
 			delete result;

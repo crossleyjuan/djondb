@@ -33,6 +33,7 @@
 #include "streammanager.h"
 
 class BSONObj;
+class BSONArrayObj;
 using namespace std;
 
 class Controller 
@@ -42,7 +43,7 @@ class Controller
 		virtual bool dropNamespace(char* db, char* ns) = 0;
 		virtual void update(char* db, char* ns, BSONObj* bson) = 0;
 		virtual void remove(char* db, char* ns, const std::string& documentId, const std::string& revision) = 0;
-		virtual std::vector<BSONObj*>* find(char* db, char* ns, const char* select, const char* filter) throw (ParseException) = 0;
+		virtual BSONArrayObj* find(char* db, char* ns, const char* select, const char* filter) throw (ParseException) = 0;
 		virtual BSONObj* findFirst(char* db, char* ns, const char* select, const char* filter) throw (ParseException) = 0;
 		virtual std::vector<std::string>* dbs() const = 0;
 		virtual std::vector<std::string>* namespaces(const char* db) const = 0;

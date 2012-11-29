@@ -45,7 +45,7 @@ class linkediterator:
 			linkediterator(const linkediterator& orig);
 			~linkediterator();
 
-			T* operator->() const;
+			T* operator->();
 			linkediterator& operator++();
 			linkediterator operator++(int);
 
@@ -55,8 +55,6 @@ class linkediterator:
 		private:
 			typename list<K>::iterator _iterKeys;
 			map<K, V> _elements;
-			K _currentKey;
-			V _currentValue;
 	};
 
 template <class K, class V>
@@ -100,23 +98,19 @@ template <class K, class V>
 linkediterator<K, V>::linkediterator(typename list<K>::iterator itkeys, map<K, V> elements) {
 	_iterKeys = itkeys;
 	_elements = elements;
-	_currentKey = *_iterKeys;
-	_currentValue = elements[_currentKey];
 }
 
 template <class K, class V>
 linkediterator<K, V>::linkediterator(const linkediterator& orig) {
 	this->_iterKeys = orig._iterKeys;
 	this->_elements = orig._elements;
-	this->_currentKey = orig._currentKey;
-	this->_currentValue = orig._currentValue;
 }
 
 template <class K, class V>
-typename linkediterator<K, V>::T* linkediterator<K, V>::operator->() const {
+typename linkediterator<K, V>::T* linkediterator<K, V>::operator->() {
 	linkediterator<K, V>::T* r = new T();
-	r->first = _currentKey;
-	r->second = _currentValue;
+	r->first = *_iterKeys;
+	r->second = _elements[r->first];
 
 	return r;
 }
@@ -128,8 +122,6 @@ linkediterator<K, V>::~linkediterator() {
 template <class K, class V>
 linkediterator<K, V>& linkediterator<K, V>::operator++() {
 	_iterKeys++;
-	_currentKey = *_iterKeys;
-	_currentValue = _elements[_currentKey];
 
 	return *this;
 }
@@ -137,20 +129,18 @@ linkediterator<K, V>& linkediterator<K, V>::operator++() {
 template <class K, class V>
 linkediterator<K, V> linkediterator<K, V>::operator++(int) {
 	_iterKeys++;
-	_currentKey = *_iterKeys;
-	_currentValue = _elements[_currentKey];
 
 	return *this;
 }
 
 template <class K, class V>
 bool linkediterator<K, V>::operator==(linkediterator b) const {
-	return (b._currentKey == this->_currentKey);
+	return (b._iterKeys == this->_iterKeys);
 }
 
 template <class K, class V>
 bool linkediterator<K, V>::operator!=(linkediterator b) const {
-	return (b._currentKey != _currentKey);
+	return (b._iterKeys != _iterKeys);
 }
 
 	template <class K, class V>

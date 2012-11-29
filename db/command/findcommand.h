@@ -40,7 +40,7 @@ class FindCommand : public Command
         std::string* _db;
 		  std::string* _filter;
 
-		  std::vector<BSONObj*>* _findresult;
+		  BSONArrayObj* _findresult;
 };
 
 #endif // FINDCOMMAND_H

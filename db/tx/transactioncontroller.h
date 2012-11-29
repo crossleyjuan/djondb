@@ -56,7 +56,7 @@ class TransactionController: public Controller
 		virtual bool dropNamespace(char* db, char* ns);
 		virtual void update(char* db, char* ns, BSONObj* bson);
 		virtual void remove(char* db, char* ns, const std::string& documentId, const std::string& revision);
-		virtual std::vector<BSONObj*>* find(char* db, char* ns, const char* select, const char* filter) throw (ParseException);
+		virtual BSONArrayObj* find(char* db, char* ns, const char* select, const char* filter) throw (ParseException);
 		virtual BSONObj* findFirst(char* db, char* ns, const char* select, const char* filter) throw (ParseException);
 		virtual std::vector<std::string>* dbs() const;
 		virtual std::vector<std::string>* namespaces(const char* db) const;

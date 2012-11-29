@@ -39,9 +39,27 @@ class TestTXSuite: public Test::Suite
 			Controller* _controller = NULL;
 			TransactionController* tx = new TransactionController(_controller);
 
+			tx->dropNamespace("db", "txns");
+
 			BSONObj o;
 			o.add("name", "John");
 			tx->insert("db", "txns", &o);
+
+			BSONArrayObj* res = tx->find("db", "txns", "*", "");
+
+			TEST_ASSERT(res->length() == 1);
+			BSONObj* test1 = *res->begin();
+			TEST_ASSERT(test1->getString("name").compare("John") == 0);
+
+			o.add("name", "Peter");
+
+			delete res;
+
+			res = tx->find("db", "txns", "*", "");
+
+			TEST_ASSERT(res->length() == 1);
+			BSONObj* test2 = *res->begin();
+			TEST_ASSERT(test2->getString("name").compare("Peter") == 0);
 
 			delete tx;
 
