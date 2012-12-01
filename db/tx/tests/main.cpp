@@ -19,6 +19,9 @@
 #include <iostream>
 #include <transactioncontroller.h>
 #include "bson.h"
+#include "util.h"
+#include "command.h"
+#include "insertcommand.h"
 #include <stdlib.h>
 #include <string.h>
 #include <cpptest.h>
@@ -34,6 +37,7 @@ class TestTXSuite: public Test::Suite
 		}
 
 	private:
+
 		void testTransaction()
 		{
 			Controller* _controller = NULL;
@@ -42,6 +46,7 @@ class TestTXSuite: public Test::Suite
 			tx->dropNamespace("db", "txns");
 
 			BSONObj o;
+			o.add("_id", *uuid());
 			o.add("name", "John");
 			tx->insert("db", "txns", &o);
 
@@ -51,7 +56,8 @@ class TestTXSuite: public Test::Suite
 			BSONObj* test1 = *res->begin();
 			TEST_ASSERT(test1->getString("name").compare("John") == 0);
 
-			o.add("name", "Peter");
+			test1->add("name", "Peter");
+			tx->update("db", "txns", test1);
 
 			delete res;
 

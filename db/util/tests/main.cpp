@@ -65,9 +65,17 @@ class TestUtilSuite : public Test::Suite
 			TEST_ASSERT(diff == 19);
 		}
 
+		static bool compare(int i1, int i2) {
+			return i1 == i2;
+		}
+
+		static bool compareString(std::string i1, std::string i2) {
+			return i1.compare(i2) == 0;
+		}
+
 		void testLinkedMap() {
 			cout << "\ntestLinkedMap" << endl;
-			LinkedMap<int, int> map;
+			LinkedMap<int, int> map(TestUtilSuite::compare);
 
 			map.add(1, 10);
 			map.add(0, 11);
@@ -96,11 +104,29 @@ class TestUtilSuite : public Test::Suite
 
 
 			// Test empty map
-			LinkedMap<int, int> map2;
+			LinkedMap<int, int> map2(TestUtilSuite::compare);
 			TEST_ASSERT(map2.begin() == map2.end());
 
-			LinkedMap<std::string, std::string> map3;
+			LinkedMap<std::string, std::string> map3(TestUtilSuite::compareString);
 			TEST_ASSERT(map3.begin() == map3.end());
+
+
+			//Test unique elements
+			LinkedMap<std::string, std::string> map4(TestUtilSuite::compareString);
+			map4.add(std::string("test"), "test");
+			map4.add(std::string("test2"), "test2");
+			map4.add(std::string("test"), "ass");
+
+			TEST_ASSERT(map4.size() == 2);
+			TEST_ASSERT(map4["test"].compare(std::string("ass")) == 0);
+			LinkedMap<std::string, std::string>::iterator it4 = map4.begin();
+			TEST_ASSERT(it4->first.compare(std::string("test")) == 0);
+			TEST_ASSERT(it4->second.compare("ass") == 0);
+			it4++;
+			TEST_ASSERT(it4->first.compare("test2") == 0);
+			TEST_ASSERT(it4->second.compare("test2") == 0);
+			it4++;
+			TEST_ASSERT(it4 == map4.end());
 		}
 
 		void testCircularQueue() {

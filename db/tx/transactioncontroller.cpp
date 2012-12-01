@@ -31,7 +31,6 @@
 #include "memorystream.h"
 #include "util.h"
 #include "linkedmap.hpp"
-#include "command.h"
 #include "commandwriter.h"
 #include "commandreader.h"
 #include "insertcommand.h"
@@ -80,7 +79,7 @@ void TransactionController::loadControlFile() {
 		for (int i = 0; i < files; i++) {
 			std::string* fileName = _controlFile->readString();
 			std::string logFileName = _dataDir + FILESEPARATOR + *fileName;
-			FileInputOutputStream* logFile = new FileInputOutputStream(logFileName.c_str(), "br+");
+			FileInputOutputStream* logFile = new FileInputOutputStream(logFileName, "rb+");
 			_control.logFiles.push_back(logFile);
 			_control.currentFile = logFile;
 			delete fileName;
@@ -109,9 +108,13 @@ TransactionController::TransactionController(const TransactionController& orig) 
 }
 
 TransactionController::~TransactionController() {
+	_controlFile->close();
+	_control.currentFile->close();
 	if (_controlFile) delete _controlFile;
 	if (_control.currentFile) delete _control.currentFile;
 	if (_transactionId) delete _transactionId;
+
+
 }
 
 void TransactionController::writeCommandToRegister(char* db, char* ns, Command* cmd) {
@@ -127,10 +130,15 @@ void TransactionController::writeCommandToRegister(char* db, char* ns, Command* 
 	_control.currentFile->writeInt(ms.length());
 	_control.currentFile->writeChars(ms.toChars(), ms.length());
 
-	long lastValidPos = _control.currentFile->currentPos();
+	long endFile = _control.currentFile->currentPos();
+
+	long lastValidPos = statusPos; // the pos of the last valid record //flag is the start
+
 	_control.currentFile->seek(statusPos);
 	_control.currentFile->writeChar(NORMAL);
+	_control.currentFile->seek(endFile);
 
+	// jumps the "startpos" to the "lastpos"
 	_controlFile->seek(sizeof(long));
 	_controlFile->writeLong(lastValidPos);
 	_control.lastValidPos = lastValidPos;
@@ -145,7 +153,9 @@ Command* TransactionController::readCommandFromRegister(char* db, char* ns) {
 	Command* result = NULL;
 	int length = _control.currentFile->readInt();
 	if ((strcmp(rdb, db) == 0) && (strcmp(rns, ns) == 0)) {
-		CommandReader reader(_control.currentFile);
+		char* stream = _control.currentFile->readChars();
+		MemoryStream ms(stream, length);
+		CommandReader reader(&ms);
 		result = reader.readCommand();
 	} else {
 		_control.currentFile->seek(_control.currentFile->currentPos() + length);
@@ -153,8 +163,8 @@ Command* TransactionController::readCommandFromRegister(char* db, char* ns) {
 	return result;
 }
 
-std::vector<Command*>* TransactionController::findCommands(char* db, char* ns) {
-	std::vector<Command*>* result = new std::vector<Command*>();
+std::list<Command*>* TransactionController::findCommands(char* db, char* ns) {
+	std::list<Command*>* result = new std::list<Command*>();
 	for (std::vector<FileInputOutputStream*>::iterator i = _control.logFiles.begin(); i != _control.logFiles.end(); i++) {
 		FileInputOutputStream* file = *i;
 		_control.currentFile = file;
@@ -215,15 +225,19 @@ void TransactionController::remove(char* db, char* ns, const std::string& docume
 	//_controller->remove(db, ns, documentId, revision);
 }
 
+bool compareStrings(std::string s1, std::string s2) {
+	return s1.compare(s2) == 0;
+}
+
 BSONArrayObj* TransactionController::find(char* db, char* ns, const char* select, const char* filter) throw (ParseException) {
-	std::vector<Command*>* cmds = findCommands(db, ns);
-	LinkedMap<std::string, BSONObj*> map;
+	std::list<Command*>* cmds = findCommands(db, ns);
+	LinkedMap<std::string, BSONObj*> map(compareStrings);
 
 	//_controller->find(db, ns, select, filter);
 
 	FilterParser* parser = FilterParser::parse(filter);
 
-	for (std::vector<Command*>::iterator i = cmds->begin(); i != cmds->end(); i++) {
+	for (std::list<Command*>::iterator i = cmds->begin(); i != cmds->end(); i++) {
 		Command* cmd = *i;
 		switch (cmd->commandType()) {
 			case INSERT: 
@@ -242,8 +256,8 @@ BSONArrayObj* TransactionController::find(char* db, char* ns, const char* select
 					if (match) {
 						map.add(bson->getString("_id"), bson->select(select));
 					}
-					break;
 				};
+				break;
 			case UPDATE: 
 				{
 					UpdateCommand* update = (UpdateCommand*)cmd;
@@ -260,8 +274,8 @@ BSONArrayObj* TransactionController::find(char* db, char* ns, const char* select
 					if (match) {
 						map.add(bson->getString("_id"), bson->select(select));
 					}
-					break;
 				};
+				break;
 			case REMOVE: 
 				{
 					RemoveCommand* remove = (RemoveCommand*)cmd;
@@ -275,12 +289,13 @@ BSONArrayObj* TransactionController::find(char* db, char* ns, const char* select
 							// Error?
 						}
 					}
-					break;
 				};
+				break;
 			case DROPNAMESPACE:
 				{
 					map.clear();
 				};
+				break;
 		}
 	}
 
@@ -295,14 +310,14 @@ BSONArrayObj* TransactionController::find(char* db, char* ns, const char* select
 }
 
 BSONObj* TransactionController::findFirst(char* db, char* ns, const char* select, const char* filter) throw (ParseException) {
-	std::vector<Command*>* cmds = findCommands(db, ns);
-	LinkedMap<std::string, BSONObj*> map;
+	std::list<Command*>* cmds = findCommands(db, ns);
+	LinkedMap<std::string, BSONObj*> map(compareStrings);
 
 	//_controller->find(db, ns, select, filter);
 
 	FilterParser* parser = FilterParser::parse(filter);
 
-	for (std::vector<Command*>::iterator i = cmds->begin(); i != cmds->end(); i++) {
+	for (std::list<Command*>::iterator i = cmds->begin(); i != cmds->end(); i++) {
 		Command* cmd = *i;
 		switch (cmd->commandType()) {
 			case INSERT: 
@@ -321,8 +336,8 @@ BSONObj* TransactionController::findFirst(char* db, char* ns, const char* select
 					if (match) {
 						map.add(bson->getString("_id"), bson->select(select));
 					}
-					break;
 				};
+				break;
 			case UPDATE: 
 				{
 					UpdateCommand* update = (UpdateCommand*)cmd;
@@ -339,8 +354,8 @@ BSONObj* TransactionController::findFirst(char* db, char* ns, const char* select
 					if (match) {
 						map.add(bson->getString("_id"), bson->select(select));
 					}
-					break;
 				};
+				break;
 			case REMOVE: 
 				{
 					RemoveCommand* remove = (RemoveCommand*)cmd;
@@ -354,12 +369,13 @@ BSONObj* TransactionController::findFirst(char* db, char* ns, const char* select
 							// Error?
 						}
 					}
-					break;
 				};
+				break;
 			case DROPNAMESPACE:
 				{
 					map.clear();
 				};
+				break;
 		}
 	}
 

@@ -32,7 +32,7 @@ FileInputOutputStream::FileInputOutputStream(const std::string& fileName, const 
 
     // Position the cursor at the end of the file
 	 if (_pFile == NULL) {
-		 log->error("Error opening the file: %s. Error: %s", fileName.c_str(), strerror(errno));
+		 log->error("Error opening the file: %s. Error: %d:%s", fileName.c_str(), errno, strerror(errno));
 		 exit(1);
 	 }
     fseek(_pFile, 0, SEEK_END);

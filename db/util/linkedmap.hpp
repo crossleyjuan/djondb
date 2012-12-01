@@ -63,7 +63,7 @@ class LinkedMap
 	private:
 
 	public:
-		LinkedMap();
+		LinkedMap(bool (*keyComparator)(K, K));
 		virtual ~LinkedMap();
 
 		void add(const K& key, const V& val);
@@ -144,8 +144,9 @@ bool linkediterator<K, V>::operator!=(linkediterator b) const {
 }
 
 	template <class K, class V>
-LinkedMap<K, V>::LinkedMap()
+LinkedMap<K, V>::LinkedMap(bool (*keyComparator)(K, K))
 {
+	_keyComparator = keyComparator;
 }
 
 	template <class K, class V>
@@ -199,6 +200,18 @@ void LinkedMap<K, V>::erase(const K& key)
 
 template <class K, class V>
 void LinkedMap<K, V>::add(const K& key, const V& val) {
+	typename std::map<K, V>::iterator itelements = _elements.find(key);
+	if (itelements != _elements.end()) {
+		_elements.erase(itelements);
+		// Remove the previous element to be replaced by the new one
+		for (typename std::list<K>::iterator itk = _keys.begin(); itk != _keys.end(); itk++) {
+			K testKey = *itk;
+			if (_keyComparator(key, testKey)) {
+				_keys.erase(itk);
+				break;
+			}
+		}
+	}
 	_keys.push_back(key);
 	_elements.insert(pair<K, V> (key, val));
 }

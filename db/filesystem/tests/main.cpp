@@ -102,6 +102,16 @@ class TestFileSystemSuite: public Test::Suite
 			TEST_ASSERT(strcmp(res, text) == 0);
 
 			res = ms2.toChars();
+
+
+			// Test reading a previous byte array
+			MemoryStream output;
+			char* hello = "Test hello world";
+			output.writeChars(hello, strlen(hello));
+			char* stream = output.toChars();
+			MemoryStream ms3(stream, output.length());
+			char* testGreeting = ms3.readChars();
+			TEST_ASSERT(strcmp(testGreeting, hello) == 0); 
 		}
 
 		void testFileInputOutputStreams()

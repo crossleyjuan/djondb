@@ -39,6 +39,18 @@ MemoryStream::MemoryStream() {
 	 allocate(_bufferSize);
 }
 
+MemoryStream::MemoryStream(char* b, int len) {
+    _open = true;
+	 _currentBuffer = NULL;
+	 _currentIndex = -1;
+	 _buffer = NULL;
+	 _length = 0;
+	 _bufferSize = MEMORY_BUFFER_SIZE;
+	 allocate(_bufferSize);
+	 write(b, len);
+	 seek(0);
+}
+
 MemoryStream::MemoryStream(long bufferSize) {
     _open = true;
 	 _currentBuffer = NULL;

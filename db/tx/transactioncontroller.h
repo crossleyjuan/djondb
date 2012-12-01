@@ -34,7 +34,7 @@
 #include "controller.h"
 
 #include <string>
-#include <vector>
+#include <list>
 #include <map>
 
 class BSONObj;
@@ -93,17 +93,17 @@ class TransactionController: public Controller
 		Control _control;
 
 		enum TRANSACTION_OPER {
-			INSERT,
-			DROPNAMESPACE,
-			UPDATE,
-			DELETERECORD
+			TXO_INSERT,
+			TXO_DROPNAMESPACE,
+			TXO_UPDATE,
+			TXO_DELETERECORD
 		};
 
 	private:
 		void checkState();
 		void writeCommandToRegister(char* db, char* ns, Command* cmd);
 		Command* readCommandFromRegister(char* db, char* ns);
-		std::vector<Command*>* findCommands(char* db, char* ns);
+		std::list<Command*>* findCommands(char* db, char* ns);
 };
 
 #endif // TRANSACTIONCONTROLLER_INCLUDED_H

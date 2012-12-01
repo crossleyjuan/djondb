@@ -12,6 +12,7 @@ class MemoryStream: public InputStream, public OutputStream
     public:
         MemoryStream(const MemoryStream& other);
         MemoryStream();
+        MemoryStream(char* b, int len);
         MemoryStream(long bufferSize);
         virtual ~MemoryStream();
 
