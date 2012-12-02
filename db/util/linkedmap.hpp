@@ -36,25 +36,24 @@ template <class K, class V>
 class linkediterator: 
 	std::iterator< std::forward_iterator_tag, K > {
 		public:
-			struct T {
-				K first;
-				V second;
-			};
 
 			linkediterator(typename list<K>::iterator itkeys, map<K, V> elements);
-			linkediterator(const linkediterator& orig);
+			linkediterator(const linkediterator<K, V>& orig);
 			~linkediterator();
 
-			T* operator->();
+			const linkediterator* operator->();
 			linkediterator& operator++();
 			linkediterator operator++(int);
 
 			bool operator==(linkediterator b) const;
 			bool operator!=(linkediterator b) const;
 
+			K first;
+			V second;
 		private:
 			typename list<K>::iterator _iterKeys;
 			map<K, V> _elements;
+
 	};
 
 template <class K, class V>
@@ -101,22 +100,35 @@ linkediterator<K, V>::linkediterator(typename list<K>::iterator itkeys, map<K, V
 }
 
 template <class K, class V>
-linkediterator<K, V>::linkediterator(const linkediterator& orig) {
+linkediterator<K, V>::linkediterator(const linkediterator<K,V>& orig) {
 	this->_iterKeys = orig._iterKeys;
 	this->_elements = orig._elements;
 }
 
 template <class K, class V>
-typename linkediterator<K, V>::T* linkediterator<K, V>::operator->() {
-	linkediterator<K, V>::T* r = new T();
-	r->first = *_iterKeys;
-	r->second = _elements[r->first];
-
-	return r;
+const linkediterator<K, V>* linkediterator<K, V>::operator->() {
+	first = *_iterKeys;
+	second = _elements[first];
+	return this;
 }
+/*
+template <class K, class V>
+const typename linkediterator<K, V>::T* linkediterator<K, V>::operator->() {
+	_currentElement->first = *_iterKeys;
+	_currentElement->second = _elements[_currentElement->first];
+
+	return _currentElement;
+}
+*/
 
 template <class K, class V>
 linkediterator<K, V>::~linkediterator() {
+	/*
+	if (_currentElement != NULL) {
+		delete _currentElement;
+		_currentElement = NULL;
+	}
+	*/
 }
 
 template <class K, class V>

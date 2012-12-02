@@ -204,19 +204,21 @@ bool compareInsensitive(const char* text1, const char* text2) {
 	return boost::iequals(std::string(text1), std::string(text2));
 }
 
-char* trim(char* str, int len) {
+void trim(char* dest, char* str) {
+	memset(dest, 0, strlen(str));
 	int pos = 0;
+	int len = strlen(str);
 	// removes the first spaces
 	while (str[pos] == ' ') {
 		pos++;
 	}
 
-	char* result = strcpy(str + pos, len - pos);
+	strncpy(dest, &str[pos], len - pos);
 	// Removes the spaces at the end
-	pos = strlen(result) - 1;
-	while (result[pos] == ' ') {
-		result[pos] = 0;
+	pos = strlen(dest) - 1;
+	while (dest[pos] == ' ') {
+		dest[pos] = 0;
 		pos--;
 	}
-	return result;
 }
+

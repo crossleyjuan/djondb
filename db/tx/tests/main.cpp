@@ -17,7 +17,8 @@
 // *********************************************************************************************************************
 
 #include <iostream>
-#include <transactioncontroller.h>
+#include "transactioncontroller.h"
+#include "controllertest.h"
 #include "bson.h"
 #include "util.h"
 #include "command.h"
@@ -40,7 +41,7 @@ class TestTXSuite: public Test::Suite
 
 		void testTransaction()
 		{
-			Controller* _controller = NULL;
+			Controller* _controller = new DummyController();
 			TransactionController* tx = new TransactionController(_controller);
 
 			tx->dropNamespace("db", "txns");
@@ -68,7 +69,7 @@ class TestTXSuite: public Test::Suite
 			TEST_ASSERT(test2->getString("name").compare("Peter") == 0);
 
 			delete tx;
-
+			delete _controller;
 		}
 
 };

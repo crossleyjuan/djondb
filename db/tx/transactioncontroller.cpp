@@ -28,17 +28,14 @@
 #include "controller.h"
 #include "settings.h"
 #include "fileinputoutputstream.h"
+#include "bsonoutputstream.h"
+#include "bsoninputstream.h"
 #include "memorystream.h"
 #include "util.h"
 #include "linkedmap.hpp"
-#include "commandwriter.h"
-#include "commandreader.h"
-#include "insertcommand.h"
-#include "dropnamespacecommand.h"
 #include "filterparser.h"
 #include "expressionresult.h"
-#include "updatecommand.h"
-#include "removecommand.h"
+#include <stdlib.h>
 
 TransactionController::TransactionController(Controller* controller) {
 	_controller = controller;
@@ -117,18 +114,40 @@ TransactionController::~TransactionController() {
 
 }
 
-void TransactionController::writeCommandToRegister(char* db, char* ns, Command* cmd) {
+void TransactionController::writeOperationToRegister(char* db, char* ns, const TransactionOperation& operation) {
 	long statusPos = _control.currentFile->currentPos();
 
 	_control.currentFile->writeChar(DIRTY);
 	_control.currentFile->writeChars(db, strlen(db));
 	_control.currentFile->writeChars(ns, strlen(ns));
 	MemoryStream ms;
-	CommandWriter writer(&ms);
-	writer.writeCommand(cmd);
+	ms.writeInt(operation.code);
+	BSONOutputStream bos(&ms);
+	int code = operation.code;
+	switch (code) {
+		case TXO_INSERT: 
+		case TXO_UPDATE: {
+								  BsonOper* bsonOper = (BsonOper*)operation.operation;
+								  bos.writeBSON(*bsonOper->bson);
+							  };
+							  break;
+		case TXO_DROPNAMESPACE:
+							  // Nothing needs to be done
+							  break;
+		case TXO_REMOVE:
+							  {
+								  RemoveOper* removeOper = (RemoveOper*)operation.operation;
+								  ms.writeString(removeOper->key);
+								  ms.writeString(removeOper->revision);
+								  // Nothing needs to be done
+							  };
+							  break;
+	};
 	// writing the length will allow to jump the command if does not match the db and ns
 	_control.currentFile->writeInt(ms.length());
-	_control.currentFile->writeChars(ms.toChars(), ms.length());
+	char* chrs = ms.toChars();
+	_control.currentFile->writeChars(chrs, ms.length());
+	free(chrs);
 
 	long endFile = _control.currentFile->currentPos();
 
@@ -145,35 +164,64 @@ void TransactionController::writeCommandToRegister(char* db, char* ns, Command* 
 	_control.currentFile->flush();
 }
 
-Command* TransactionController::readCommandFromRegister(char* db, char* ns) {
+TransactionController::TransactionOperation* TransactionController::readOperationFromRegister(char* db, char* ns) {
 	OPERATION_STATUS status = (OPERATION_STATUS)_control.currentFile->readChar();
 	char* rdb = _control.currentFile->readChars();
 	char* rns = _control.currentFile->readChars();
 
-	Command* result = NULL;
+	TransactionOperation* result = NULL;
 	int length = _control.currentFile->readInt();
 	if ((strcmp(rdb, db) == 0) && (strcmp(rns, ns) == 0)) {
 		char* stream = _control.currentFile->readChars();
 		MemoryStream ms(stream, length);
-		CommandReader reader(&ms);
-		result = reader.readCommand();
+		TRANSACTION_OPER code = (TRANSACTION_OPER)ms.readInt();
+		BSONInputStream bis(&ms);
+
+		result = new TransactionOperation();
+		result->code = code;
+		result->operation = NULL;
+		switch (code) {
+			case TXO_INSERT: 
+			case TXO_UPDATE: {
+									  BsonOper* bsonOper = new BsonOper();
+									  bsonOper->bson = bis.readBSON();
+									  result->operation = bsonOper;
+									  break;
+								  };
+			case TXO_DROPNAMESPACE:
+								  {
+									  break;
+								  };
+			case TXO_REMOVE:
+								  {
+									  RemoveOper* removeOper = new RemoveOper();
+									  std::string* key = ms.readString();
+									  removeOper->key = *key;
+									  delete key;
+									  std::string* revision = ms.readString();
+									  removeOper->revision = *revision;
+									  delete revision;
+									  result->operation = removeOper;
+									  break;
+								  };
+		};
 	} else {
 		_control.currentFile->seek(_control.currentFile->currentPos() + length);
 	}
 	return result;
 }
 
-std::list<Command*>* TransactionController::findCommands(char* db, char* ns) {
-	std::list<Command*>* result = new std::list<Command*>();
+std::list<TransactionController::TransactionOperation*>* TransactionController::findOperations(char* db, char* ns) {
+	std::list<TransactionOperation*>* result = new std::list<TransactionOperation*>();
 	for (std::vector<FileInputOutputStream*>::iterator i = _control.logFiles.begin(); i != _control.logFiles.end(); i++) {
 		FileInputOutputStream* file = *i;
 		_control.currentFile = file;
 		int currentPos = _control.currentFile->currentPos();
 		_control.currentFile->seek(0);
 		while (!_control.currentFile->eof()) {
-			Command* cmd = readCommandFromRegister(db, ns);
-			if (cmd != NULL) {
-				result->push_back(cmd);
+			TransactionOperation* operation = readOperationFromRegister(db, ns);
+			if (operation != NULL) {
+				result->push_back(operation);
 			}
 		}
 		_control.currentFile->seek(currentPos);
@@ -182,47 +230,49 @@ std::list<Command*>* TransactionController::findCommands(char* db, char* ns) {
 }
 
 BSONObj* TransactionController::insert(char* db, char* ns, BSONObj* bson) {
-	InsertCommand cmd;
-	cmd.setDB(std::string(db));
-	cmd.setNameSpace(std::string(ns));
-	cmd.setBSON(*bson);
+	TransactionOperation oper;
+	oper.code = TXO_INSERT;
+	BsonOper* insertOper = new BsonOper();
+	insertOper->bson = new BSONObj(*bson); 
+	oper.operation = insertOper;
 
-	writeCommandToRegister(db, ns, &cmd);
+	writeOperationToRegister(db, ns, oper);
 
-	//_controller->insert(db, ns, bson);
+	_controller->insert(db, ns, bson);
 }
 
 bool TransactionController::dropNamespace(char* db, char* ns) {
-	DropnamespaceCommand cmd;
-	cmd.setDB(std::string(db));
-	cmd.setNameSpace(std::string(ns));
+	TransactionOperation oper;
+	oper.code = TXO_DROPNAMESPACE;
+	oper.operation = NULL;
 
-	writeCommandToRegister(db, ns, &cmd);
+	writeOperationToRegister(db, ns, oper);
 
-	//_controller->dropNamespace(db, ns);
+	_controller->dropNamespace(db, ns);
 }
 
 void TransactionController::update(char* db, char* ns, BSONObj* bson) {
-	UpdateCommand cmd;
-	cmd.setDB(std::string(db));
-	cmd.setNameSpace(std::string(ns));
-	cmd.setBSON(*bson);
+	TransactionOperation oper;
+	oper.code = TXO_UPDATE;
+	BsonOper* bsonOper = new BsonOper();
+	bsonOper->bson = new BSONObj(*bson); 
+	oper.operation = bsonOper;
 
-	writeCommandToRegister(db, ns, &cmd);
+	writeOperationToRegister(db, ns, oper);
 
-	//_controller->update(db, ns, bson);
+	_controller->update(db, ns, bson);
 }
 
 void TransactionController::remove(char* db, char* ns, const std::string& documentId, const std::string& revision) {
-	RemoveCommand cmd;
-	cmd.setDB(std::string(db));
-	cmd.setNameSpace(std::string(ns));
-	cmd.setId(documentId);
-	cmd.setRevision(revision);
+	TransactionOperation oper;
+	oper.code = TXO_REMOVE;
+	RemoveOper* removeOper = new RemoveOper();
+	removeOper->key = std::string(documentId);
+	removeOper->revision = std::string(revision);
 
-	writeCommandToRegister(db, ns, &cmd);
+	writeOperationToRegister(db, ns, oper);
 
-	//_controller->remove(db, ns, documentId, revision);
+	_controller->remove(db, ns, documentId, revision);
 }
 
 bool compareStrings(std::string s1, std::string s2) {
@@ -230,20 +280,26 @@ bool compareStrings(std::string s1, std::string s2) {
 }
 
 BSONArrayObj* TransactionController::find(char* db, char* ns, const char* select, const char* filter) throw (ParseException) {
-	std::list<Command*>* cmds = findCommands(db, ns);
+	std::list<TransactionOperation*>* operations = findOperations(db, ns);
 	LinkedMap<std::string, BSONObj*> map(compareStrings);
 
-	//_controller->find(db, ns, select, filter);
+	BSONArrayObj* origList = _controller->find(db, ns, select, filter);
+	if (origList != NULL) {
+		for (BSONArrayObj::iterator itOrig = origList->begin(); itOrig != origList->end(); itOrig++) {
+			BSONObj* obj = *itOrig;
+			map.add(obj->getString("_id"), obj);
+		}
+	}
 
 	FilterParser* parser = FilterParser::parse(filter);
 
-	for (std::list<Command*>::iterator i = cmds->begin(); i != cmds->end(); i++) {
-		Command* cmd = *i;
-		switch (cmd->commandType()) {
-			case INSERT: 
+	for (std::list<TransactionOperation*>::iterator i = operations->begin(); i != operations->end(); i++) {
+		TransactionOperation* operation = *i;
+		switch (operation->code) {
+			case TXO_INSERT: 
 				{
-					InsertCommand* insert = (InsertCommand*)cmd;
-					BSONObj* bson = insert->bson();
+					BsonOper* insert = (BsonOper*)operation->operation;
+					BSONObj* bson = insert->bson;
 
 					bool match = false;
 					ExpressionResult* expresult = parser->eval(*bson);
@@ -258,10 +314,10 @@ BSONArrayObj* TransactionController::find(char* db, char* ns, const char* select
 					}
 				};
 				break;
-			case UPDATE: 
+			case TXO_UPDATE: 
 				{
-					UpdateCommand* update = (UpdateCommand*)cmd;
-					BSONObj* bson = update->bson();
+					BsonOper* update = (BsonOper*)operation->operation;
+					BSONObj* bson = update->bson;
 
 					bool match = false;
 					ExpressionResult* expresult = parser->eval(*bson);
@@ -276,22 +332,22 @@ BSONArrayObj* TransactionController::find(char* db, char* ns, const char* select
 					}
 				};
 				break;
-			case REMOVE: 
+			case TXO_REMOVE: 
 				{
-					RemoveCommand* remove = (RemoveCommand*)cmd;
-					const std::string* id = remove->id();
-					const std::string* revision = remove->revision();
-					BSONObj* obj = map[*id];
+					RemoveOper* remove = (RemoveOper*)operation->operation;
+					const std::string id = remove->key;
+					const std::string revision = remove->revision;
+					BSONObj* obj = map[id];
 					if (obj != NULL) {
-						if (obj->getString("_revision").compare(*revision) == 0) {
-							map.erase(*id);
+						if (obj->getString("_revision").compare(revision) == 0) {
+							map.erase(id);
 						} else {
 							// Error?
 						}
 					}
 				};
 				break;
-			case DROPNAMESPACE:
+			case TXO_DROPNAMESPACE:
 				{
 					map.clear();
 				};
@@ -304,99 +360,32 @@ BSONArrayObj* TransactionController::find(char* db, char* ns, const char* select
 		result->add(*it->second);
 	}
 	delete parser;
-	delete cmds;
+	delete operations;
+	delete origList;
 
 	return result;
 }
 
 BSONObj* TransactionController::findFirst(char* db, char* ns, const char* select, const char* filter) throw (ParseException) {
-	std::list<Command*>* cmds = findCommands(db, ns);
-	LinkedMap<std::string, BSONObj*> map(compareStrings);
-
-	//_controller->find(db, ns, select, filter);
-
-	FilterParser* parser = FilterParser::parse(filter);
-
-	for (std::list<Command*>::iterator i = cmds->begin(); i != cmds->end(); i++) {
-		Command* cmd = *i;
-		switch (cmd->commandType()) {
-			case INSERT: 
-				{
-					InsertCommand* insert = (InsertCommand*)cmd;
-					BSONObj* bson = insert->bson();
-
-					bool match = false;
-					ExpressionResult* expresult = parser->eval(*bson);
-					if (expresult->type() == ExpressionResult::RT_BOOLEAN) {
-						bool* bres = (bool*)expresult->value();
-						match = *bres;
-					}
-					delete expresult;
-
-					if (match) {
-						map.add(bson->getString("_id"), bson->select(select));
-					}
-				};
-				break;
-			case UPDATE: 
-				{
-					UpdateCommand* update = (UpdateCommand*)cmd;
-					BSONObj* bson = update->bson();
-
-					bool match = false;
-					ExpressionResult* expresult = parser->eval(*bson);
-					if (expresult->type() == ExpressionResult::RT_BOOLEAN) {
-						bool* bres = (bool*)expresult->value();
-						match = *bres;
-					}
-					delete expresult;
-
-					if (match) {
-						map.add(bson->getString("_id"), bson->select(select));
-					}
-				};
-				break;
-			case REMOVE: 
-				{
-					RemoveCommand* remove = (RemoveCommand*)cmd;
-					const std::string* id = remove->id();
-					const std::string* revision = remove->revision();
-					BSONObj* obj = map[*id];
-					if (obj != NULL) {
-						if (obj->getString("_revision").compare(*revision) == 0) {
-							map.erase(*id);
-						} else {
-							// Error?
-						}
-					}
-				};
-				break;
-			case DROPNAMESPACE:
-				{
-					map.clear();
-				};
-				break;
-		}
-	}
+	BSONArrayObj* fullList = find(db, ns, select, filter);
 
 	BSONObj* result = NULL;
-	for (LinkedMap<std::string, BSONObj*>::iterator it = map.begin(); it != map.end(); it++) {
-		result = it->second;
-		break;
+	if (fullList != NULL) {
+		for (BSONArrayObj::iterator it = fullList->begin(); it != fullList->end(); it++) {
+			result = *it;
+			break;
+		}
+		delete fullList;
 	}
-	delete parser;
-	delete cmds;
 
 	return result;
 }
 
 std::vector<std::string>* TransactionController::dbs() const {
-	//return _controller->dbs();
-	return NULL;
+	return _controller->dbs();
 }
 
 std::vector<std::string>* TransactionController::namespaces(const char* db) const {
-	//return _controller->namespaces(db);
-	return NULL;
+	return _controller->namespaces(db);
 }
 

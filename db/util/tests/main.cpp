@@ -274,8 +274,10 @@ class TestUtilSuite : public Test::Suite
 
 			char* untrimmed = " Hello";
 			char* trimExpected = "Hello";
-			char* result = trim(untrimmed, strlen(untrimmed));
+			char* result = (char*)malloc(strlen(untrimmed));
+			trim(result, untrimmed);
 			TEST_ASSERT(strcmp(trimExpected, result) == 0);
+			free(result);
 		}
 
 		void testUUID()

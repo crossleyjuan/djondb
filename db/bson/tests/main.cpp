@@ -520,6 +520,7 @@ class TestBSONSuite : public Test::Suite
 			subresult = bson_subselect(selectsimple, "test2");
 			expected = "$\"inner\", $\"inner2\", $\"inner2.testii\"";
 			TEST_ASSERT(strcmp(subresult, expected) == 0);
+			free(subresult);
 		}
 
 		void testBSONSelect() {
@@ -544,6 +545,8 @@ class TestBSONSuite : public Test::Suite
 			TEST_ASSERT(*result == *expected);
 
 			delete obj;
+			delete expected;
+			delete result;
 		}
 };
 

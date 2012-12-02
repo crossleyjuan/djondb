@@ -21,6 +21,7 @@
 #include <string.h>
 #include <vector>
 #include <stdlib.h>
+#include <stdio.h>
 
 
 std::set<std::string> bson_splitSelect(const char* select) {
@@ -29,7 +30,9 @@ std::set<std::string> bson_splitSelect(const char* select) {
 	std::set<std::string> result;
 	for (std::vector<std::string>::const_iterator i = elements.begin(); i != elements.end(); i++) {
 		std::string s = *i;
-		char* cs = trim(const_cast<char*>(s.c_str()), s.length());
+		char* cs = (char*)malloc(s.length());
+		const char* totrim = s.c_str();
+		trim(cs, const_cast<char*>(totrim));
 		if (startsWith(cs, "$")) {
 			s = std::string(std::string(cs), 2, strlen(cs) - 3);
 		} else {
@@ -40,6 +43,7 @@ std::set<std::string> bson_splitSelect(const char* select) {
 			s = s.substr(0, dotPos);
 		}
 		result.insert(s);
+		free(cs);
 	}
 
 	return result;
@@ -56,17 +60,17 @@ char* bson_subselect(const char* select, const char* name) {
 	bool first = true;
 	for (std::vector<std::string>::const_iterator i = elements.begin(); i != elements.end(); i++) {
 		std::string selement = *i;
-		char* element = const_cast<char*>(selement.c_str());
-		element = trim(element, strlen(element));
+		char* element = (char*)malloc(selement.length());
+		trim(element, const_cast<char*>(selement.c_str()));
 		if (startsWith(element, "$")) {
 			// Remvoes the $" " from the element
-			element = strcpy(element, 2, strlen(element) - 3);
-			if (startsWith(element, startXpath.c_str())) {
+			char* xpath = strcpy(element, 2, strlen(element) - 3);
+			if (startsWith(xpath, startXpath.c_str())) {
 				if (!first) {
 					memcpy(result + pos, ", ", 2);
 					pos += 2;
 				}
-				char* suffix = strcpy(element, lenStartXpath, strlen(element) - lenStartXpath);
+				char* suffix = strcpy(xpath, lenStartXpath, strlen(xpath) - lenStartXpath);
 				memcpy(result + pos, "$\"", 2);
 				pos+=2;
 				memcpy(result + pos, suffix, strlen(suffix));
@@ -76,7 +80,9 @@ char* bson_subselect(const char* select, const char* name) {
 				first = false;
 				free(suffix);
 			}
+			free(xpath);
 		}
+		free(element);
 	}
 	return result;
 }

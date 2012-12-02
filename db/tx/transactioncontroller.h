@@ -93,17 +93,33 @@ class TransactionController: public Controller
 		Control _control;
 
 		enum TRANSACTION_OPER {
-			TXO_INSERT,
+			TXO_UNDEFINED,
 			TXO_DROPNAMESPACE,
+			TXO_INSERT,
 			TXO_UPDATE,
-			TXO_DELETERECORD
+			TXO_REMOVE
 		};
+
+		struct BsonOper {
+			BSONObj* bson;
+		};
+
+		struct RemoveOper {
+			std::string key;
+			std::string revision;
+		};
+
+		struct TransactionOperation {
+			TRANSACTION_OPER code;
+			void* operation; // Oper Structs
+		};
+
 
 	private:
 		void checkState();
-		void writeCommandToRegister(char* db, char* ns, Command* cmd);
-		Command* readCommandFromRegister(char* db, char* ns);
-		std::list<Command*>* findCommands(char* db, char* ns);
+		void writeOperationToRegister(char* db, char* ns, const TransactionOperation& operation);
+		TransactionOperation* readOperationFromRegister(char* db, char* ns);
+		std::list<TransactionOperation*>* findOperations(char* db, char* ns);
 };
 
 #endif // TRANSACTIONCONTROLLER_INCLUDED_H
