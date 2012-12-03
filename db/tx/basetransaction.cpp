@@ -1,7 +1,7 @@
 /*
  * =====================================================================================
  *
- *       Filename:  transactioncontroller.cpp
+ *       Filename:  basetransaction.cpp
  *
  *    Description:  
  *
@@ -24,7 +24,7 @@
  * this program will be open sourced and all its derivated work will be too.
  * =====================================================================================
  */
-#include "transactioncontroller.h"
+#include "basetransaction.h"
 #include "controller.h"
 #include "settings.h"
 #include "fileinputoutputstream.h"
@@ -37,7 +37,7 @@
 #include "expressionresult.h"
 #include <stdlib.h>
 
-TransactionController::TransactionController(Controller* controller) {
+BaseTransaction::BaseTransaction(Controller* controller) {
 	_controller = controller;
 	_transactionId = NULL;
 
@@ -46,7 +46,7 @@ TransactionController::TransactionController(Controller* controller) {
 	loadControlFile();
 }
 
-TransactionController::TransactionController(Controller* controller, std::string transactionId) {
+BaseTransaction::BaseTransaction(Controller* controller, std::string transactionId) {
 	_controller = controller;
 	_transactionId = new std::string(transactionId);
 
@@ -55,7 +55,7 @@ TransactionController::TransactionController(Controller* controller, std::string
 	loadControlFile();
 }
 
-void TransactionController::loadControlFile() {
+void BaseTransaction::loadControlFile() {
 	std::string controlFile = (_transactionId == NULL)? "main.trc": *_transactionId + ".trc";
 	std::string controlFileName = _dataDir + FILESEPARATOR + controlFile;
 	bool existControl = existFile(controlFileName.c_str());
@@ -97,24 +97,22 @@ void TransactionController::loadControlFile() {
 	}
 }
 
-TransactionController::TransactionController(const TransactionController& orig) {
+BaseTransaction::BaseTransaction(const BaseTransaction& orig) {
 	this->_controller = orig._controller;
 	this->_transactionId = orig._transactionId;
 	_controlFile = orig._controlFile; 
 	_control = orig._control;
 }
 
-TransactionController::~TransactionController() {
+BaseTransaction::~BaseTransaction() {
 	_controlFile->close();
 	_control.currentFile->close();
 	if (_controlFile) delete _controlFile;
 	if (_control.currentFile) delete _control.currentFile;
 	if (_transactionId) delete _transactionId;
-
-
 }
 
-void TransactionController::writeOperationToRegister(char* db, char* ns, const TransactionOperation& operation) {
+void BaseTransaction::writeOperationToRegister(char* db, char* ns, const TransactionOperation& operation) {
 	long statusPos = _control.currentFile->currentPos();
 
 	_control.currentFile->writeChar(DIRTY);
@@ -164,7 +162,7 @@ void TransactionController::writeOperationToRegister(char* db, char* ns, const T
 	_control.currentFile->flush();
 }
 
-TransactionController::TransactionOperation* TransactionController::readOperationFromRegister(char* db, char* ns) {
+BaseTransaction::TransactionOperation* BaseTransaction::readOperationFromRegister(char* db, char* ns) {
 	OPERATION_STATUS status = (OPERATION_STATUS)_control.currentFile->readChar();
 	char* rdb = _control.currentFile->readChars();
 	char* rns = _control.currentFile->readChars();
@@ -211,7 +209,7 @@ TransactionController::TransactionOperation* TransactionController::readOperatio
 	return result;
 }
 
-std::list<TransactionController::TransactionOperation*>* TransactionController::findOperations(char* db, char* ns) {
+std::list<BaseTransaction::TransactionOperation*>* BaseTransaction::findOperations(char* db, char* ns) {
 	std::list<TransactionOperation*>* result = new std::list<TransactionOperation*>();
 	for (std::vector<FileInputOutputStream*>::iterator i = _control.logFiles.begin(); i != _control.logFiles.end(); i++) {
 		FileInputOutputStream* file = *i;
@@ -229,7 +227,7 @@ std::list<TransactionController::TransactionOperation*>* TransactionController::
 	return result;
 }
 
-BSONObj* TransactionController::insert(char* db, char* ns, BSONObj* bson) {
+BSONObj* BaseTransaction::insert(char* db, char* ns, BSONObj* bson) {
 	TransactionOperation oper;
 	oper.code = TXO_INSERT;
 	BsonOper* insertOper = new BsonOper();
@@ -241,7 +239,7 @@ BSONObj* TransactionController::insert(char* db, char* ns, BSONObj* bson) {
 	_controller->insert(db, ns, bson);
 }
 
-bool TransactionController::dropNamespace(char* db, char* ns) {
+bool BaseTransaction::dropNamespace(char* db, char* ns) {
 	TransactionOperation oper;
 	oper.code = TXO_DROPNAMESPACE;
 	oper.operation = NULL;
@@ -251,7 +249,7 @@ bool TransactionController::dropNamespace(char* db, char* ns) {
 	_controller->dropNamespace(db, ns);
 }
 
-void TransactionController::update(char* db, char* ns, BSONObj* bson) {
+void BaseTransaction::update(char* db, char* ns, BSONObj* bson) {
 	TransactionOperation oper;
 	oper.code = TXO_UPDATE;
 	BsonOper* bsonOper = new BsonOper();
@@ -263,7 +261,7 @@ void TransactionController::update(char* db, char* ns, BSONObj* bson) {
 	_controller->update(db, ns, bson);
 }
 
-void TransactionController::remove(char* db, char* ns, const std::string& documentId, const std::string& revision) {
+void BaseTransaction::remove(char* db, char* ns, const std::string& documentId, const std::string& revision) {
 	TransactionOperation oper;
 	oper.code = TXO_REMOVE;
 	RemoveOper* removeOper = new RemoveOper();
@@ -279,7 +277,7 @@ bool compareStrings(std::string s1, std::string s2) {
 	return s1.compare(s2) == 0;
 }
 
-BSONArrayObj* TransactionController::find(char* db, char* ns, const char* select, const char* filter) throw (ParseException) {
+BSONArrayObj* BaseTransaction::find(char* db, char* ns, const char* select, const char* filter) throw (ParseException) {
 	std::list<TransactionOperation*>* operations = findOperations(db, ns);
 	LinkedMap<std::string, BSONObj*> map(compareStrings);
 
@@ -366,7 +364,7 @@ BSONArrayObj* TransactionController::find(char* db, char* ns, const char* select
 	return result;
 }
 
-BSONObj* TransactionController::findFirst(char* db, char* ns, const char* select, const char* filter) throw (ParseException) {
+BSONObj* BaseTransaction::findFirst(char* db, char* ns, const char* select, const char* filter) throw (ParseException) {
 	BSONArrayObj* fullList = find(db, ns, select, filter);
 
 	BSONObj* result = NULL;
@@ -381,11 +379,11 @@ BSONObj* TransactionController::findFirst(char* db, char* ns, const char* select
 	return result;
 }
 
-std::vector<std::string>* TransactionController::dbs() const {
+std::vector<std::string>* BaseTransaction::dbs() const {
 	return _controller->dbs();
 }
 
-std::vector<std::string>* TransactionController::namespaces(const char* db) const {
+std::vector<std::string>* BaseTransaction::namespaces(const char* db) const {
 	return _controller->namespaces(db);
 }
 

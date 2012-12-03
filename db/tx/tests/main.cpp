@@ -17,7 +17,7 @@
 // *********************************************************************************************************************
 
 #include <iostream>
-#include "transactioncontroller.h"
+#include "basetransaction.h"
 #include "controllertest.h"
 #include "bson.h"
 #include "util.h"
@@ -42,7 +42,7 @@ class TestTXSuite: public Test::Suite
 		void testTransaction()
 		{
 			Controller* _controller = new DummyController();
-			TransactionController* tx = new TransactionController(_controller);
+			BaseTransaction* tx = new BaseTransaction(_controller);
 
 			tx->dropNamespace("db", "txns");
 

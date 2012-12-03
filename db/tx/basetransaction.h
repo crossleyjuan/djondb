@@ -26,8 +26,8 @@
  * =====================================================================================
  */
 
-#ifndef TRANSACTIONCONTROLLER_INCLUDED_H
-#define TRANSACTIONCONTROLLER_INCLUDED_H
+#ifndef BASECONTROLLER_INCLUDED_H
+#define BASECONTROLLER_INCLUDED_H
 
 #include "filterdefs.h"
 #include "memorystream.h"
@@ -43,13 +43,13 @@ class FileInputStream;
 class FileOutputStream;
 class Command;
 
-class TransactionController: public Controller 
+class BaseTransaction: public Controller 
 {
 	public:
-		TransactionController(Controller* controller);
-		TransactionController(Controller* controller, std::string transactionId);
-		TransactionController(const TransactionController& orig);
-		~TransactionController();
+		BaseTransaction(Controller* controller);
+		BaseTransaction(Controller* controller, std::string transactionId);
+		BaseTransaction(const BaseTransaction& orig);
+		~BaseTransaction();
 
 		void loadControlFile();
 		virtual BSONObj* insert(char* db, char* ns, BSONObj* bson);
@@ -61,7 +61,7 @@ class TransactionController: public Controller
 		virtual std::vector<std::string>* dbs() const;
 		virtual std::vector<std::string>* namespaces(const char* db) const;
 
-	private:
+	protected:
 		Controller* _controller;
 		std::string* _transactionId;
 		std::string _dataDir;
@@ -122,4 +122,4 @@ class TransactionController: public Controller
 		std::list<TransactionOperation*>* findOperations(char* db, char* ns);
 };
 
-#endif // TRANSACTIONCONTROLLER_INCLUDED_H
+#endif // BASECONTROLLER_INCLUDED_H
