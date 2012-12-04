@@ -1,11 +1,11 @@
 @echo off
 call setenv.bat
 
-rem cd %PATH_SRC_STARTUP%\driverbase\drivers
-rem call update.bat
+cd %PATH_SRC_STARTUP%\driverbase\drivers
+call update.bat
 
-rem cd %PATH_SRC_STARTUP%
-rem %PATH_MSBUILD%\msbuild %PATH_SRC_STARTUP%\windows\djondb_vs2008.sln /t:Rebuild /p:Configuration=Release /p:Platform=Win32
+cd %PATH_SRC_STARTUP%
+%PATH_MSBUILD%\msbuild %PATH_SRC_STARTUP%\windows\djondb_vs2008.sln /t:Rebuild /p:Configuration=Release /p:Platform=Win32
 
 cd %PATH_SRC_STARTUP%\driverbase\drivers\java\java
 call "%ANT_PATH%\bin\ant"
