@@ -27,8 +27,8 @@
 #include "settings.h"
 #include <map>
 #include <stdlib.h>
-#include "fileutil.h"
-#include "stringfunctions.h" 
+#include "util.h"
+#include <string.h>
 #include <map>
 
 std::map<std::string, std::string> __settingsValues;
@@ -44,15 +44,19 @@ void readSettings() {
 
 	std::vector<std::string> lines = splitLines(content);
 	for (std::vector<std::string>::const_iterator i = lines.begin(); i != lines.end(); i++) {
-		std::string line = *i;
+		std::string sline = *i;
+		const char* line = sline.c_str();
+		char* trimmedLine = cmalloc(sline.length() + 1);
+		trim(trimmedLine, const_cast<char*>(line));
 		// omit the parameter if the line is commented
-		if (!startsWith(line.c_str(), (char*)"#")) {
-			std::vector<std::string> vals = split(line, "=");
+		if (!startsWith(trimmedLine, (char*)"#")) {
+			std::vector<std::string> vals = split(trimmedLine, "=");
 			std::string key = vals[0];
 			std::string value = vals[1];
 
 			__settingsValues.insert(std::pair<std::string, std::string>(key, value));
 		}
+		free(trimmedLine);
 	}
 	__settingsLoaded = true;
 	free(ccont);

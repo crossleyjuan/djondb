@@ -205,7 +205,7 @@ bool compareInsensitive(const char* text1, const char* text2) {
 }
 
 void trim(char* dest, char* str) {
-	memset(dest, 0, strlen(str));
+	memset(dest, 0, strlen(str) + 1);
 	int pos = 0;
 	int len = strlen(str);
 	// removes the first spaces

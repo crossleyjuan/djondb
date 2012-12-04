@@ -274,7 +274,7 @@ class TestUtilSuite : public Test::Suite
 
 			char* untrimmed = " Hello";
 			char* trimExpected = "Hello";
-			char* result = (char*)malloc(strlen(untrimmed));
+			char* result = cmalloc(strlen(untrimmed) + 1);
 			trim(result, untrimmed);
 			TEST_ASSERT(strcmp(trimExpected, result) == 0);
 			free(result);

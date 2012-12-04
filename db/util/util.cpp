@@ -137,6 +137,12 @@ void* mmalloc(size_t size) {
     return p;
 }
 
+char* cmalloc(size_t size) {
+	char* c = (char*)mmalloc(size);
+	memset(c, 0, size);
+	return c;
+}
+
 Version getCurrentVersion() {
     return getVersion(PACKAGE_VERSION);
 }

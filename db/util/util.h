@@ -48,6 +48,7 @@ Version getVersion(const char* version);
 * Memory functions
 ***********************************************************************/
 void* mmalloc(size_t size);
+char* cmalloc(size_t size);
 
 /***********************************************************************/
 
