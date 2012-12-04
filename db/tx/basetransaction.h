@@ -32,6 +32,7 @@
 #include "filterdefs.h"
 #include "memorystream.h"
 #include "controller.h"
+#include "transactiondefs.h"
 
 #include <string>
 #include <list>
@@ -65,23 +66,12 @@ class BaseTransaction: public Controller
 		Controller* _controller;
 		std::string* _transactionId;
 		std::string _dataDir;
+		bool _mainTransactionLog;
 
 		// This contains all the NORMAL records
 		std::map<std::string, std::map<std::string, std::vector<BSONObj*> > > _elements;
 
 		FileInputOutputStream* _controlFile;
-
-		enum OPERATION_STATUS {
-			DIRTY, // in writing process, it's not trustable yet
-			NORMAL, // the record it's ok and it's trustable
-			REMOVED, // rollbacked or any other state, should not be used
-			DONE // Moved to the main data repository, ready to be dropped.
-		};
-
-		struct Operation {
-			OPERATION_STATUS status;
-			Command* command;	
-		};
 
 		struct Control {
 			long startPos; // Contains the first valid position to be used on the first logFile
@@ -91,28 +81,6 @@ class BaseTransaction: public Controller
 		};	
 
 		Control _control;
-
-		enum TRANSACTION_OPER {
-			TXO_UNDEFINED,
-			TXO_DROPNAMESPACE,
-			TXO_INSERT,
-			TXO_UPDATE,
-			TXO_REMOVE
-		};
-
-		struct BsonOper {
-			BSONObj* bson;
-		};
-
-		struct RemoveOper {
-			std::string key;
-			std::string revision;
-		};
-
-		struct TransactionOperation {
-			TRANSACTION_OPER code;
-			void* operation; // Oper Structs
-		};
 
 
 	private:

@@ -38,6 +38,7 @@
 #include <stdlib.h>
 
 BaseTransaction::BaseTransaction(Controller* controller) {
+	_mainTransactionLog = true;
 	_controller = controller;
 	_transactionId = NULL;
 
@@ -47,6 +48,7 @@ BaseTransaction::BaseTransaction(Controller* controller) {
 }
 
 BaseTransaction::BaseTransaction(Controller* controller, std::string transactionId) {
+	_mainTransactionLog = false;
 	_controller = controller;
 	_transactionId = new std::string(transactionId);
 
@@ -56,7 +58,7 @@ BaseTransaction::BaseTransaction(Controller* controller, std::string transaction
 }
 
 void BaseTransaction::loadControlFile() {
-	std::string controlFile = (_transactionId == NULL)? "main.trc": *_transactionId + ".trc";
+	std::string controlFile = _mainTransactionLog ? "main.trc": *_transactionId + ".trc";
 	std::string controlFileName = _dataDir + FILESEPARATOR + controlFile;
 	bool existControl = existFile(controlFileName.c_str());
 
@@ -115,7 +117,7 @@ BaseTransaction::~BaseTransaction() {
 void BaseTransaction::writeOperationToRegister(char* db, char* ns, const TransactionOperation& operation) {
 	long statusPos = _control.currentFile->currentPos();
 
-	_control.currentFile->writeChar(DIRTY);
+	_control.currentFile->writeChar(TXOS_DIRTY); // it's not a valid state yet, cannot be used
 	_control.currentFile->writeChars(db, strlen(db));
 	_control.currentFile->writeChars(ns, strlen(ns));
 	MemoryStream ms;
@@ -152,7 +154,7 @@ void BaseTransaction::writeOperationToRegister(char* db, char* ns, const Transac
 	long lastValidPos = statusPos; // the pos of the last valid record //flag is the start
 
 	_control.currentFile->seek(statusPos);
-	_control.currentFile->writeChar(NORMAL);
+	_control.currentFile->writeChar(TXOS_NORMAL); // Now the operation is ready to be used
 	_control.currentFile->seek(endFile);
 
 	// jumps the "startpos" to the "lastpos"
@@ -162,13 +164,16 @@ void BaseTransaction::writeOperationToRegister(char* db, char* ns, const Transac
 	_control.currentFile->flush();
 }
 
-BaseTransaction::TransactionOperation* BaseTransaction::readOperationFromRegister(char* db, char* ns) {
+TransactionOperation* BaseTransaction::readOperationFromRegister(char* db, char* ns) {
 	OPERATION_STATUS status = (OPERATION_STATUS)_control.currentFile->readChar();
 	char* rdb = _control.currentFile->readChars();
 	char* rns = _control.currentFile->readChars();
 
 	TransactionOperation* result = NULL;
 	int length = _control.currentFile->readInt();
+	if (!(status && TXOS_NORMAL)) {
+		goto jumpoperation;
+	};
 	if ((strcmp(rdb, db) == 0) && (strcmp(rns, ns) == 0)) {
 		char* stream = _control.currentFile->readChars();
 		MemoryStream ms(stream, length);
@@ -176,6 +181,7 @@ BaseTransaction::TransactionOperation* BaseTransaction::readOperationFromRegiste
 		BSONInputStream bis(&ms);
 
 		result = new TransactionOperation();
+		result->status = status;
 		result->code = code;
 		result->operation = NULL;
 		switch (code) {
@@ -204,12 +210,13 @@ BaseTransaction::TransactionOperation* BaseTransaction::readOperationFromRegiste
 								  };
 		};
 	} else {
+jumpoperation:
 		_control.currentFile->seek(_control.currentFile->currentPos() + length);
 	}
 	return result;
 }
 
-std::list<BaseTransaction::TransactionOperation*>* BaseTransaction::findOperations(char* db, char* ns) {
+std::list<TransactionOperation*>* BaseTransaction::findOperations(char* db, char* ns) {
 	std::list<TransactionOperation*>* result = new std::list<TransactionOperation*>();
 	for (std::vector<FileInputOutputStream*>::iterator i = _control.logFiles.begin(); i != _control.logFiles.end(); i++) {
 		FileInputOutputStream* file = *i;

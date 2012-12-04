@@ -1,12 +1,13 @@
 /*
  * =====================================================================================
  *
- *       Filename:  transactiondefs.h
+ *       Filename:  transactioncontroller.h
  *
- *    Description:  
+ *    Description:  This header defines the transaction controller, its main function
+ *                  is the coordination of other nodes
  *
  *        Version:  1.0
- *        Created:  09/27/2012 11:14:26 PM
+ *        Created:  12/03/2012 10:20:32 PM
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -24,47 +25,18 @@
  * this program will be open sourced and all its derivated work will be too.
  * =====================================================================================
  */ 
-#ifndef TRANSACTIONDEFS_INCLUDED_H
-#define TRANSACTIONDEFS_INCLUDED_H 
+#ifndef TRANSACTIONCONTROLLER_INCLUDED_H
+#define TRANSACTIONCONTROLLER_INCLUDED_H 
 
-enum OPERATION_STATUS {
-	TXOS_UNDEFINED = 0,  // Not selected yet
+#include "transactiondefs.h"
 
-	// RECORD STATUS
-	TXOS_DIRTY = 1, // in writing process, it's not trustable yet
-	TXOS_NORMAL = 2, // the record it's ok and it's trustable
-	TXOS_REMOVED = 4,  // rollbacked or any other state, should not be used
-	TXOS_DONE = 8, // Moved to the main data repository, ready to be dropped.
+class TransactionController {
 
-	/// SYNC ELEMENTS
-	TXOS_NOT_SYNC = 16, // Not sync yet
-	TXOS_SYNC = 32, // This record is in sync with other nodes
-	TXOS_RESERVED_SYNC1 = 64, // Flag reserved for other sync status
-	TXOS_RESERVED_SYNC2 = 128, // Flag reserved for other sync status
+	public:
+		bool notifyNodes(TransactionOperation* operation);
+		bool receiveNotification(TransactionOperation* operation);
+
+	private:
 };
 
-enum TRANSACTION_OPER {
-	TXO_UNDEFINED,
-	TXO_DROPNAMESPACE,
-	TXO_INSERT,
-	TXO_UPDATE,
-	TXO_REMOVE
-};
-
-struct BsonOper {
-	BSONObj* bson;
-};
-
-struct RemoveOper {
-	std::string key;
-	std::string revision;
-};
-
-struct TransactionOperation {
-	TRANSACTION_OPER code;
-	OPERATION_STATUS status;
-	void* operation; // Oper Structs
-};
-
-
-#endif /* TRANSACTIONDEFS_INCLUDED_H */
+#endif /* TRANSACTIONCONTROLLER_INCLUDED_H */
