@@ -22,11 +22,12 @@ fi
 swig2.0 -c++ -python -outdir output -o output/djonpythondriver.cpp driver-python.i
 
 cp setup.py output/
+cp MANIFEST.in output/
 
 cd output
 python setup.py register
-python setup.py build_ext --inplace
-python setup.py bdist_dumb upload
-python setup.py bdist upload
+#python setup.py build_ext --inplace
 python setup.py sdist upload
+#python setup.py bdist_dumb upload
+#python setup.py bdist_dumb upload
 

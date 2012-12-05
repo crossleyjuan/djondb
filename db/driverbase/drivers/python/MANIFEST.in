@@ -1,2 +1,2 @@
-include include
-recursive-include *.h
+include *.h
+recursive-include include *.h *.py
