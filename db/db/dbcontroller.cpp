@@ -139,7 +139,9 @@ void DBController::initialize(std::string dataDir) {
 					}
 					long indexPos = stream->readLong();
 					long posData = stream->readLong();
-					impl->add(*obj, obj->getString("_id"), posData, indexPos);
+					if (obj->has("_id")) {
+						impl->add(*obj, obj->getString("_id"), posData, indexPos);
+					}
 					delete obj;
 				}
 				stream->seek(currentPos);

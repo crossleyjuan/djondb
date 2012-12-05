@@ -21,4 +21,11 @@ setup (name = 'pydjondb',
 		description = """Python driver for djondb""",
 		ext_modules = [pydjondb_module],
 		py_modules = ["pydjondb"],
+		url = "http://djondb.com",
+		classifiers= [
+			"License :: Public Domain",
+			"Topic :: Database",
+			"Intended Audience :: Developers",
+			"Topic :: Software Development"
+			]
 		)
