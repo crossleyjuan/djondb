@@ -27,6 +27,8 @@
 #ifndef TRANSACTIONDEFS_INCLUDED_H
 #define TRANSACTIONDEFS_INCLUDED_H 
 
+class BSONObj;
+
 enum OPERATION_STATUS {
 	TXOS_UNDEFINED = 0,  // Not selected yet
 
@@ -63,6 +65,8 @@ struct RemoveOper {
 struct TransactionOperation {
 	TRANSACTION_OPER code;
 	OPERATION_STATUS status;
+	std::string* db;
+	std::string* ns;
 	void* operation; // Oper Structs
 };
 

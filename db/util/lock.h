@@ -1,13 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  nodenotifier.h
+ *       Filename:  lock.h
  *
- *    Description:  This defines the header of Node Notifiers, which will send notifications
- *                  to other nodes about new TransactionOperations
+ *    Description:  Lock Header
  *
  *        Version:  1.0
- *        Created:  12/03/2012 11:15:42 PM
+ *        Created:  12/05/2012 10:29:42 PM
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -25,45 +24,28 @@
  * this program will be open sourced and all its derivated work will be too.
  * =====================================================================================
  */ 
-#ifndef NODENOTIFIER_INCLUDED_H
-#define NODENOTIFIER_INCLUDED_H 
+#ifndef LOCK_INCLUDED_H
+#define LOCK_INCLUDED_H 
+#include <pthread.h>
 
-#include "networkoutputstream.h"
-#include "networkinputstream.h"
-#include "util.h"
-#include "lock.h"
-#include <queue>
-#include <list>
-
-class TransactionOperation;
-
-class NodeNotifier {
+class Lock {
 	public:
-		NodeNotifier();
-		// This is defined to prevent copy
-		NodeNotifier(const NodeNotifier& orig);
-		NodeNotifier& operator=(const NodeNotifier& rhs);
+		Lock();
 
-		virtual ~NodeNotifier();
+		// This will prevent any unwanted copy or assignment
+		Lock(const Lock& orig);
+		Lock& operator=(const Lock& rhs);
+		virtual ~Lock();
 
-		void sendNotification(TransactionOperation* oper);
-		void addNode(std::string host, int port = 2314);
-		void start();
-		void stop();
+		void lock();
+		void unlock();
 
+		void wait();
+		void notify();
 	private:
-		static void* sprocess(void*);
-		void process();
-		void sendTransactionOperation(TransactionOperation* operation);
+		pthread_mutex_t _mutex;
+		pthread_cond_t  _cond;
 
-	private:
-		Thread* _thread;
-		Lock* _lock;
-		int _state; // 0 Stopped
-		            // 1 Running
-						// 2 Stop initiated
-
-		std::list<NetworkOutputStream*> _nodes;
-		std::queue<TransactionOperation*> _operations;
 };
-#endif /* NODENOTIFIER_INCLUDED_H */
+
+#endif /* LOCK_INCLUDED_H */

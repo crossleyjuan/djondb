@@ -11,7 +11,8 @@ AM_CPPFLAGS += $(all_includes)
 lib_LTLIBRARIES = libdjon-tx.la
 
 libdjon_tx_la_LDFLAGS = -static# -fPIC
-libdjon_tx_la_SOURCES = basetransaction.cpp 
+libdjon_tx_la_SOURCES = basetransaction.cpp \
+								nodenotifier.cpp
 
 TESTS = test-tx
 check_PROGRAMS = test-tx

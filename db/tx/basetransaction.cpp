@@ -122,6 +122,8 @@ void BaseTransaction::writeOperationToRegister(char* db, char* ns, const Transac
 	_control.currentFile->writeChars(ns, strlen(ns));
 	MemoryStream ms;
 	ms.writeInt(operation.code);
+	ms.writeString(db);
+	ms.writeString(ns);
 	BSONOutputStream bos(&ms);
 	int code = operation.code;
 	switch (code) {
@@ -183,6 +185,8 @@ TransactionOperation* BaseTransaction::readOperationFromRegister(char* db, char*
 		result = new TransactionOperation();
 		result->status = status;
 		result->code = code;
+		result->db = ms.readString();
+		result->ns = ms.readString();
 		result->operation = NULL;
 		switch (code) {
 			case TXO_INSERT: 
@@ -237,13 +241,16 @@ std::list<TransactionOperation*>* BaseTransaction::findOperations(char* db, char
 BSONObj* BaseTransaction::insert(char* db, char* ns, BSONObj* bson) {
 	TransactionOperation oper;
 	oper.code = TXO_INSERT;
+	oper.db = new std::string(db);
+	oper.ns = new std::string(ns);
 	BsonOper* insertOper = new BsonOper();
 	insertOper->bson = new BSONObj(*bson); 
 	oper.operation = insertOper;
 
 	writeOperationToRegister(db, ns, oper);
 
-	_controller->insert(db, ns, bson);
+	delete oper.db;
+	delete oper.ns;
 }
 
 bool BaseTransaction::dropNamespace(char* db, char* ns) {
@@ -253,31 +260,38 @@ bool BaseTransaction::dropNamespace(char* db, char* ns) {
 
 	writeOperationToRegister(db, ns, oper);
 
-	_controller->dropNamespace(db, ns);
+	delete oper.db;
+	delete oper.ns;
 }
 
 void BaseTransaction::update(char* db, char* ns, BSONObj* bson) {
 	TransactionOperation oper;
 	oper.code = TXO_UPDATE;
+	oper.db = new std::string(db);
+	oper.ns = new std::string(ns);
 	BsonOper* bsonOper = new BsonOper();
 	bsonOper->bson = new BSONObj(*bson); 
 	oper.operation = bsonOper;
 
 	writeOperationToRegister(db, ns, oper);
 
-	_controller->update(db, ns, bson);
+	delete oper.db;
+	delete oper.ns;
 }
 
 void BaseTransaction::remove(char* db, char* ns, const std::string& documentId, const std::string& revision) {
 	TransactionOperation oper;
 	oper.code = TXO_REMOVE;
+	oper.db = new std::string(db);
+	oper.ns = new std::string(ns);
 	RemoveOper* removeOper = new RemoveOper();
 	removeOper->key = std::string(documentId);
 	removeOper->revision = std::string(revision);
 
 	writeOperationToRegister(db, ns, oper);
 
-	_controller->remove(db, ns, documentId, revision);
+	delete oper.db;
+	delete oper.ns;
 }
 
 bool compareStrings(std::string s1, std::string s2) {
