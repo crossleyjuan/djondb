@@ -62,12 +62,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "djonjavadriver", "..\driver
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C", "..\third_party\libantlr3c-3.2\C.vcproj", "{0F0FE03A-78F3-4B34-9DCE-0CDFF1FB5C40}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "djonwrapper", "..\driverbase\drivers\csharp\vs2008\djonwrapper\djonwrapper.vcproj", "{2B37641C-4A5C-41F5-A4E1-034BAB23718A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "djonwrapper", "..\driverbase\drivers\csharp\native\djonwrapper.vcproj", "{2B37641C-4A5C-41F5-A4E1-034BAB23718A}"
 	ProjectSection(ProjectDependencies) = postProject
 		{8D4F581B-05E3-41D3-8EF3-DF77FE97E40B} = {8D4F581B-05E3-41D3-8EF3-DF77FE97E40B}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "csharpdriver", "..\driverbase\drivers\csharp\vs2008\csharpdriver\csharpdriver.csproj", "{C21587E5-9666-46AB-A1A5-892185062A44}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "csharpdriver", "..\driverbase\drivers\csharp\csharp\csharpdriver.csproj", "{C21587E5-9666-46AB-A1A5-892185062A44}"
 	ProjectSection(ProjectDependencies) = postProject
 		{2B37641C-4A5C-41F5-A4E1-034BAB23718A} = {2B37641C-4A5C-41F5-A4E1-034BAB23718A}
 	EndProjectSection
