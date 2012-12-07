@@ -51,15 +51,15 @@ void FileOutputStream::writeShortInt (short int v)
 }
 
 /* Write 4 bytes in the output (little endian order) */
-void FileOutputStream::writeInt (int v)
+void FileOutputStream::writeInt (__int32 v)
 {
-	writeData<int>(v);
+	writeData<__int32>(v);
 }
 
 /* Write 4 bytes in the output (little endian order) */
-void FileOutputStream::writeLong (long v)
+void FileOutputStream::writeLong (__int64 v)
 {
-	writeData<long>(v);
+	writeData<__int64>(v);
 }
 
 /* Write 8 bytes in the output (little endian order) */
@@ -80,22 +80,22 @@ void FileOutputStream::writeDoubleIEEE (double v)
 	fwrite(&v, 1, sizeof(v), _pFile);
 }
 
-void FileOutputStream::writeChars(const char *text, int len) {
+void FileOutputStream::writeChars(const char *text, __int32 len) {
 	writeInt(len);
 	fwrite(text, 1, len, _pFile);
 }
 
 void FileOutputStream::writeString(const std::string& text) {
 	const char* c = text.c_str();
-	int l = strlen(c);
+	__int32 l = strlen(c);
 	writeChars(c, l);
 }
 
-long FileOutputStream::crc32(int pos) {
+__int64 FileOutputStream::crc32(__int32 pos) {
 	fflush(_pFile);
-	long originalPos = currentPos();
+	__int64 originalPos = currentPos();
 	fseek(_pFile, 0, SEEK_END);
-	int bufferSize = currentPos();
+	__int64 bufferSize = currentPos();
 	bufferSize -= pos;
 	seek(pos);
 
@@ -105,7 +105,7 @@ long FileOutputStream::crc32(int pos) {
 
 	boost::crc_32_type crc;
 	crc.process_bytes(buffer, bufferSize);
-	long result = crc.checksum();
+	__int64 result = crc.checksum();
 	std::cout << "CRC: Output" << result << std::endl;
 
 	// back to the original position
@@ -114,12 +114,12 @@ long FileOutputStream::crc32(int pos) {
 	return result;
 }
 
-void FileOutputStream::seek(long i) {
+void FileOutputStream::seek(__int64 i) {
 	fflush(_pFile);
 	fseek (_pFile, i, SEEK_SET);
 }
 
-long FileOutputStream::currentPos() const {
+__int64 FileOutputStream::currentPos() const {
 	return ftell(_pFile);
 }
 

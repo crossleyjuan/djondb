@@ -17,20 +17,18 @@ class BSONObj
         BSONObj(const BSONObj& orig);
         virtual ~BSONObj();
 //        void add(char*, void*);
-        void add(std::string, int);
+        void add(std::string, __int32);
         void add(std::string, double);
-        void add(std::string, long int);
-        void add(std::string, __LONG64);
+        void add(std::string, __int64);
         void add(std::string, std::string);
         void add(std::string, const BSONObj&);
         void add(std::string, const BSONArrayObj&);
 
         bool has(std::string) const;
 
-        int getInt(std::string) const throw(BSONException);
+        __int32 getInt(std::string) const throw(BSONException);
         double getDouble(std::string) const throw(BSONException);
-        long int getLong(std::string) const throw(BSONException);
-        __LONG64 getLong64(std::string) const throw(BSONException);
+        __int64 getLong(std::string) const throw(BSONException);
         std::string getString(std::string) const throw(BSONException);
         BSONObj* getBSON(std::string) const throw(BSONException);
         BSONArrayObj* getBSONArray(std::string) const throw(BSONException);
@@ -51,7 +49,7 @@ class BSONObj
 
         const_iterator begin() const;
         const_iterator end() const;
-        int length() const;
+        __int32 length() const;
 
 		  bool operator ==(const BSONObj& obj) const;
 		  bool operator !=(const BSONObj& obj) const;

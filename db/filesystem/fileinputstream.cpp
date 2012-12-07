@@ -51,20 +51,14 @@ short int FileInputStream::readShortInt () {
 }
 
 /* Reads 4 bytes in the input (little endian order) */
-int FileInputStream::readInt () {
-	int result = readData<int>();
+__int32 FileInputStream::readInt () {
+	__int32 result = readData<__int32>();
 	return result;
 }
 
 /* Reads 4 bytes in the input (little endian order) */
-long FileInputStream::readLong () {
-	return readData<long>();
-}
-
-/* Reads 4 bytes in the input (little endian order) */
-__LONG64 FileInputStream::readLong64 () {
-	__LONG64 result = readData<__LONG64>();
-	return result;
+__int64 FileInputStream::readLong () {
+	return readData<__int64>();
 }
 
 /* Reads a 4 byte float in the input */
@@ -83,7 +77,7 @@ double FileInputStream::readDoubleIEEE () {
 
 /* Read a chars */
 char* FileInputStream::readChars() {
-	int len = readInt();
+	__int32 len = readInt();
 	char* res = readChars(len);
 	return res;
 }
@@ -99,7 +93,7 @@ const std::string FileInputStream::fileName() const {
 	return _fileName;
 }
 
-char* FileInputStream::readChars(int length) {
+char* FileInputStream::readChars(__int32 length) {
 	char* res = (char*)malloc(length+1);
 	memset(res, 0, length+1);
 	fread(res, 1, length, _pFile);
@@ -110,7 +104,7 @@ const char* FileInputStream::readFull() {
 	fseek(_pFile, 0, SEEK_SET);
 	std::stringstream ss;
 	char buffer[1024];
-	int readed = 0;
+	__int32 readed = 0;
 	while (!feof(_pFile)) {
 		memset(buffer, 0, 1024);
 		readed = fread(buffer, 1, 1023, _pFile);
@@ -124,7 +118,7 @@ bool FileInputStream::eof() {
 	if (_pFile == NULL) {
 		return true;
 	}
-	long pos = currentPos();
+	__int64 pos = currentPos();
 	// Force reading the last char to check the feof flag
 	readChar();
 	bool res = feof(_pFile);
@@ -133,18 +127,18 @@ bool FileInputStream::eof() {
 	return res;
 }
 
-long FileInputStream::currentPos() const {
+__int64 FileInputStream::currentPos() const {
 	return ftell(_pFile);
 }
 
-void FileInputStream::seek(long i) {
+void FileInputStream::seek(__int64 i) {
 	fseek(_pFile, i, SEEK_SET);
 }
 
-long FileInputStream::crc32() {
-	long pos = currentPos();
+__int64 FileInputStream::crc32() {
+	__int64 pos = currentPos();
 	fseek(_pFile, 0, SEEK_END);
-	int bufferSize = currentPos();
+	__int64 bufferSize = currentPos();
 	bufferSize -= pos;
 	seek(pos);
 
@@ -154,7 +148,7 @@ long FileInputStream::crc32() {
 
 	boost::crc_32_type crc;
 	crc.process_bytes(buffer, bufferSize);
-	long result = crc.checksum();
+	__int64 result = crc.checksum();
 
 	// back to the original position
 	seek(pos);

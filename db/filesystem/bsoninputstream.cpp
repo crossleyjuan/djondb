@@ -50,14 +50,14 @@ BSONObj* BSONInputStream::readBSON(const char* select) const {
 		columns = bson_splitSelect(select);
 	}
 	BSONObj* obj = new BSONObj();
-	int elements = _inputStream->readLong();
+	__int64 elements = _inputStream->readLong();
 	if (log->isDebug()) log->debug("BSONInputStream::readBSON elements: %d", elements);
 	BSONInputStream* bis;
 
-	for (int x = 0; x < elements; x++) {
+	for (__int32 x = 0; x < elements; x++) {
 		std::auto_ptr<string> key(_inputStream->readString());
 
-		int type = _inputStream->readLong();
+		__int64 type = _inputStream->readLong();
 		void* data = NULL;
 		BSONObj* inner;
 		bool include = false;
@@ -81,7 +81,7 @@ BSONObj* BSONInputStream::readBSON(const char* select) const {
 									 break;
 								 }
 			case INT_TYPE: {
-									int i = _inputStream->readInt();
+									__int32 i = _inputStream->readInt();
 									if (include) {
 										obj->add(*key.get(), i);
 									}
@@ -90,20 +90,11 @@ BSONObj* BSONInputStream::readBSON(const char* select) const {
 #endif
 									break;
 								}
-			case LONG_TYPE: {
-									 long l = _inputStream->readLong();
+			case LONG_TYPE:
+			case LONG64_TYPE: {
+									 __int64 l = _inputStream->readLong();
 #ifdef DEBUG
 									 if (log->isDebug()) log->debug("BSONInputStream::readBSON key: %s, value: %d", key->c_str(), l);
-#endif
-									 if (include) {
-										 obj->add(*key.get(), l);
-									 }
-									 break;
-								 }
-			case LONG64_TYPE: {
-									 __LONG64 l = _inputStream->readLong64();
-#ifdef DEBUG
-									 if (log->isDebug()) log->debug("BSONInputStream::readBSON key: %s, value: %lld", key->c_str(), l);
 #endif
 									 if (include) {
 										 obj->add(*key.get(), l);
@@ -173,13 +164,13 @@ BSONArrayObj* BSONInputStream::readBSONInnerArray(const char* select) const {
 #ifdef DEBUG
 	if (_log->isDebug()) _log->debug(3, "BSONInputStream::readBSONInnerArray");
 #endif
-	int elements = _inputStream->readLong();
+	__int64 elements = _inputStream->readLong();
 #ifdef DEBUG
 	if (_log->isDebug()) _log->debug(3, "elements read: %d", elements);
 #endif
 	BSONArrayObj* result = new BSONArrayObj();
 
-	for (int x= 0; x < elements; x++) {
+	for (__int32 x= 0; x < elements; x++) {
 		BSONObj* obj = readBSON(select);
 #ifdef DEBUG
 		if (_log->isDebug()) _log->debug(3, "obj: %s", obj->toChar());
@@ -199,13 +190,13 @@ std::vector<BSONObj*>* BSONInputStream::readBSONArray(const char* select) const 
 #ifdef DEBUG
 	if (_log->isDebug()) _log->debug(3, "BSONInputStream::readBSONArray");
 #endif
-	int elements = _inputStream->readLong();
+	__int64 elements = _inputStream->readLong();
 #ifdef DEBUG
 	if (_log->isDebug()) _log->debug(3, "elements read: %d", elements);
 #endif
 	std::vector<BSONObj*>* result = new std::vector<BSONObj*>();
 
-	for (int x= 0; x < elements; x++) {
+	for (__int32 x= 0; x < elements; x++) {
 		BSONObj* obj = readBSON(select);
 #ifdef DEBUG
 		if (_log->isDebug()) _log->debug(3, "obj: %s", obj->toChar());

@@ -1,3 +1,6 @@
+#ifndef FILESYSTEM_DEFS_H_INCLUDED
+#define FILESYSTEM_DEFS_H_INCLUDED
+
 #include <string>
 #include <map>
 #include <vector>
@@ -18,4 +21,5 @@ public:
     }
 };
 
+#endif
 

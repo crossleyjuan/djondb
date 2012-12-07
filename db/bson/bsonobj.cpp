@@ -58,8 +58,8 @@ BSONObj::~BSONObj()
 	}
 	*/
 
-void BSONObj::add(std::string key, int val) {
-	int* internalValue = new int();
+void BSONObj::add(std::string key, __int32 val) {
+	__int32* internalValue = new __int32();
 	*internalValue = val;
 	fillContent(key, INT_TYPE, internalValue);
 }
@@ -70,14 +70,8 @@ void BSONObj::add(std::string key, double val) {
 	fillContent(key, DOUBLE_TYPE, internalValue);
 }
 
-void BSONObj::add(std::string key, __LONG64 val) {
-	__LONG64* internalValue = new __LONG64();
-	*internalValue = val;
-	fillContent(key, LONG64_TYPE, internalValue);
-}
-
-void BSONObj::add(std::string key, long val) {
-	long* internalValue = new long();
+void BSONObj::add(std::string key, __int64 val) {
+	__int64* internalValue = new __int64();
 	*internalValue = val;
 	fillContent(key, LONG_TYPE, internalValue);
 }
@@ -109,7 +103,7 @@ char* BSONObj::toChar() {
 	char* result = (char*)malloc(MAX_BSONOBJ_BUFFER);
 	memset(result, 0, MAX_BSONOBJ_BUFFER);
 
-	int pos = 0;
+	__int32 pos = 0;
 	result[0] = '{';
 	pos += 1;
 
@@ -140,13 +134,10 @@ char* BSONObj::toChar() {
 					free(chr);
 					break;
 			case INT_TYPE: 
-					sprintf(result + pos, "%d", *((int*)content->_element));
+					sprintf(result + pos, "%d", *((__int32*)content->_element));
 					break;
 			case LONG_TYPE:
-					sprintf(result + pos, "%ld", *((long*)content->_element));
-					break;
-			case LONG64_TYPE:
-					sprintf(result + pos, "%lld", *((__LONG64*)content->_element));
+					sprintf(result + pos, "%ld", *((__int64*)content->_element));
 					break;
 			case DOUBLE_TYPE:
 					sprintf(result + pos, "%f", *((double*)content->_element));
@@ -163,7 +154,7 @@ char* BSONObj::toChar() {
 	result[pos+1] = 0;
 	pos++;
 
-	int len = strlen(result);
+	__int32 len = strlen(result);
 
 	// Saves the value to cache the calculated value
 	_cBSON = result;
@@ -174,10 +165,10 @@ char* BSONObj::toChar() {
 	return cresult;
 }
 
-int BSONObj::getInt(std::string key) const throw(BSONException) {
+__int32 BSONObj::getInt(std::string key) const throw(BSONException) {
 	BSONContent* content = getContent(key);
 	if ((content != NULL) && (content->type() == INT_TYPE)) {
-		int* res = (int*)content->_element;
+		__int32* res = (__int32*)content->_element;
 		return *res;
 	} else {
 		throw BSONException(format("key not found %s", key.c_str()).c_str());
@@ -194,20 +185,10 @@ double BSONObj::getDouble(std::string key) const throw(BSONException) {
 	}
 }
 
-__LONG64 BSONObj::getLong64(std::string key) const throw(BSONException) {
-	BSONContent* content = getContent(key);
-	if ((content != NULL) && (content->type() == LONG64_TYPE)) {
-		__LONG64* res = (__LONG64*)content->_element;
-		return *res;
-	} else {
-		throw BSONException(format("key not found %s", key.c_str()).c_str());
-	}
-}
-
-long int BSONObj::getLong(std::string key) const throw(BSONException) {
+__int64 BSONObj::getLong(std::string key) const throw(BSONException) {
 	BSONContent* content = getContent(key);
 	if ((content != NULL) && (content->type() == LONG_TYPE)) {
-		long int* res = (long int*)content->_element;
+		__int64* res = (__int64*)content->_element;
 		return *res;
 	} else {
 		throw BSONException(format("key not found %s", key.c_str()).c_str());
@@ -278,7 +259,7 @@ BSONObj::const_iterator BSONObj::end() const {
 	return _elements.end();
 }
 
-int BSONObj::length() const {
+__int32 BSONObj::length() const {
 	return _elements.size();
 }
 
@@ -342,7 +323,7 @@ BSONContent BSONObj::get(std::string key) const throw(BSONException) {
 }
 
 BSONContent BSONObj::getXpath(const std::string& xpath) const {
-	int posDot = xpath.find('.');
+	__int32 posDot = xpath.find('.');
 	if (posDot == string::npos) {
 		BSONContent* result = getContent(xpath);
 		if (result != NULL) {
@@ -461,13 +442,13 @@ BSONObj* BSONObj::select(const char* sel) const {
 					}
 				case INT_TYPE: 
 					{
-						int val = *origContent;
+						__int32 val = *origContent;
 						result->add(key, val);
 						break;
 					}
 				case LONG_TYPE:
 					{
-						long val = *origContent;
+						__int64 val = *origContent;
 						result->add(key, val);
 						break;
 					}

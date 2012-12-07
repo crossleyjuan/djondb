@@ -142,12 +142,6 @@ void MemoryStream::writeLong (long v)
 	writeData<long>(v);
 }
 
-/* Write 8 bytes in the output (little endian order) */
-void MemoryStream::writeLong64 (long long v)
-{
-	writeData<long long>(v);
-}
-
 /* Write a 4 byte float in the output */
 void MemoryStream::writeFloatIEEE (float v)
 {
@@ -213,11 +207,6 @@ int MemoryStream::readInt () {
 /* Reads 4 bytes in the input (little endian order) */
 long MemoryStream::readLong () {
 	return readData<long>();
-}
-
-/* Reads 4 bytes in the input (little endian order) */
-long long MemoryStream::readLong64 () {
-	return readData<long long>();
 }
 
 /* Reads a 4 byte float in the input */

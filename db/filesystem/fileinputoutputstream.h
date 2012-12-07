@@ -18,18 +18,16 @@ class FileInputOutputStream: public InputStream, public OutputStream
         /* Reads 2 bytes in the input (little endian order) */
         virtual short int readShortInt ();
         /* Reads 4 bytes in the input (little endian order) */
-        virtual int readInt ();
-        /* Reads 4 bytes in the input (little endian order) */
-        virtual long readLong ();
+        virtual __int32 readInt ();
         /* Reads 8 bytes in the input (little endian order) */
-        virtual __LONG64 readLong64 ();
+        virtual __int64 readLong ();
         /* Reads a 4 byte float in the input */
         virtual float readFloatIEEE ();
         /* Reads a 8 byte double in the input */
         virtual double readDoubleIEEE ();
         /* Read a chars */
         virtual char* readChars();
-        virtual char* readChars(int length);
+        virtual char* readChars(__int32 length);
         virtual const char* readFull();
 
         virtual std::string* readString();
@@ -38,21 +36,19 @@ class FileInputOutputStream: public InputStream, public OutputStream
         /* Write 2 bytes in the output (little endian order) */
         virtual void writeShortInt (short int v);
         /* Write 4 bytes in the output (little endian order) */
-        virtual void writeInt (int v);
+        virtual void writeInt (__int32 v);
         /* Write 4 bytes in the output (little endian order) */
-        virtual void writeLong (long v);
-        /* Write 8 bytes in the output (little endian order) */
-        virtual void writeLong64 (__LONG64 v);
+        virtual void writeLong (__int64 v);
         /* Write a 4 byte float in the output */
         virtual void writeFloatIEEE (float v);
         /* Write a 8 byte double in the output */
         virtual void writeDoubleIEEE (double v);
         /* Write a char */
-        virtual void writeChars(const char* text, int len);
+        virtual void writeChars(const char* text, __int32 len);
         virtual void writeString(const std::string& text);
 
-        virtual void seek(long);
-        virtual long currentPos() const;
+        virtual void seek(__int64);
+        virtual __int64 currentPos() const;
 
         virtual const std::string fileName() const;
         virtual bool eof();

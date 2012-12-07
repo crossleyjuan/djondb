@@ -17,8 +17,6 @@ public:
     virtual int readInt () = 0;
     /* Reads 4 bytes in the input (little endian order) */
     virtual long readLong () = 0;
-    /* Reads 8 bytes in the input (little endian order) */
-    virtual __LONG64 readLong64 () = 0;
     /* Reads a 4 byte float in the input */
     virtual float readFloatIEEE () = 0;
     /* Reads a 8 byte double in the input */

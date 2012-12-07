@@ -58,23 +58,16 @@ void FileInputOutputStream::writeShortInt (short int v)
 }
 
 /* Write 4 bytes in the output (little endian order) */
-void FileInputOutputStream::writeInt (int v)
+void FileInputOutputStream::writeInt (__int32 v)
 {
-	writeData<int>(v);
+	writeData<__int32>(v);
 }
 
 /* Write 4 bytes in the output (little endian order) */
-void FileInputOutputStream::writeLong (long v)
+void FileInputOutputStream::writeLong (__int64 v)
 {
-	writeData<long>(v);
+	writeData<__int64>(v);
 }
-
-/* Write 8 bytes in the output (little endian order) */
-void FileInputOutputStream::writeLong64 (__LONG64 v)
-{
-	writeData<__LONG64>(v);
-}
-
 
 /* Write a 4 byte float in the output */
 void FileInputOutputStream::writeFloatIEEE (float v)
@@ -88,23 +81,23 @@ void FileInputOutputStream::writeDoubleIEEE (double v)
     fwrite(&v, 1, sizeof(v), _pFile);
 }
 
-void FileInputOutputStream::writeChars(const char *text, int len) {
+void FileInputOutputStream::writeChars(const char *text, __int32 len) {
     writeInt(len);
     fwrite(text, 1, len, _pFile);
 }
 
 void FileInputOutputStream::writeString(const std::string& text) {
     const char* c = text.c_str();
-    int l = strlen(c);
+    __int32 l = strlen(c);
     writeChars(c, l);
 }
 
-void FileInputOutputStream::seek(long i) {
+void FileInputOutputStream::seek(__int64 i) {
     fflush(_pFile);
     fseek (_pFile, i, SEEK_SET);
 }
 
-long FileInputOutputStream::currentPos() const {
+__int64 FileInputOutputStream::currentPos() const {
     return ftell(_pFile);
 }
 
@@ -133,7 +126,7 @@ unsigned char FileInputOutputStream::readChar() {
 
 /* Reads 2 bytes in the input (little endian order) */
 short int FileInputOutputStream::readShortInt () {
-	int v = readData<short int>();
+	__int32 v = readData<short int>();
 	return v;
 	/*
     int v = readChar() | readChar() << 8;
@@ -142,20 +135,14 @@ short int FileInputOutputStream::readShortInt () {
 }
 
 /* Reads 4 bytes in the input (little endian order) */
-int FileInputOutputStream::readInt () {
-	int v = readData<int>();
+__int32 FileInputOutputStream::readInt () {
+	__int32 v = readData<__int32>();
 	return v;
 }
 
 /* Reads 4 bytes in the input (little endian order) */
-long FileInputOutputStream::readLong () {
-	return readData<long>();
-}
-
-/* Reads 8 bytes in the input (little endian order) */
-__LONG64 FileInputOutputStream::readLong64 () {
-	__LONG64 result = readData<__LONG64>();
-	return result;
+__int64 FileInputOutputStream::readLong () {
+	return readData<__int64>();
 }
 
 /* Reads a 4 byte float in the input */
@@ -174,7 +161,7 @@ double FileInputOutputStream::readDoubleIEEE () {
 
 /* Read a chars */
 char* FileInputOutputStream::readChars() {
-    int len = readInt();
+    __int32 len = readInt();
     char* res = readChars(len);
     return res;
 }
@@ -186,7 +173,7 @@ std::string* FileInputOutputStream::readString() {
     return res;
 }
 
-char* FileInputOutputStream::readChars(int length) {
+char* FileInputOutputStream::readChars(__int32 length) {
     char* res = (char*)malloc(length+1);
     memset(res, 0, length+1);
     fread(res, 1, length, _pFile);
@@ -197,7 +184,7 @@ const char* FileInputOutputStream::readFull() {
     fseek(_pFile, 0, SEEK_SET);
     std::stringstream ss;
     char buffer[1024];
-    int readed = 0;
+    __int32 readed = 0;
     while (!feof(_pFile)) {
         memset(buffer, 0, 1024);
         readed = fread(buffer, 1, 1023, _pFile);
@@ -211,7 +198,7 @@ bool FileInputOutputStream::eof() {
     if (_pFile == NULL) {
         return true;
     }
-    long pos = currentPos();
+    __int64 pos = currentPos();
     // Force reading the last char to check the feof flag
     readChar();
     bool res = feof(_pFile);
