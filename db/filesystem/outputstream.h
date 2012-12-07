@@ -27,10 +27,8 @@ public:
 	 void writeData(T data) {
 		 unsigned char* v = (unsigned char*)&data;
 		 int size = sizeof(T);
-		 //printf("\nwriting: %x\n", data);
 		 for (int i = 0; i < size; i++) {
 			 unsigned char c = v[i];
-			 //printf("c: %x ", (int)c);
 			 writeChar(c);
 		 }
 	 }

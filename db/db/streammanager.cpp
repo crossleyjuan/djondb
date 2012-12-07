@@ -100,14 +100,12 @@ StreamType* StreamManager::open(std::string db, std::string ns, FILE_TYPE type) 
 	}
 	std::string file = fileName(ns, type);
 	std::string streamfile = concatStrings(filedir, file);
-	char* flags ="ab+";
-	/*
+	char* flags;
 	if (existFile(streamfile.c_str())) {
 		flags = "rb+";
 	} else {
 		flags = "wb+";
 	}
-	*/
 	StreamType* output;
   	output = new StreamType(streamfile, flags);
 	if (streams) {

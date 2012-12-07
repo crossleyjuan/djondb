@@ -36,9 +36,8 @@ public:
 		 T result = 0;
 		 unsigned char* v = (unsigned char*)&result;
 		 int size = sizeof(T);
-		 for (int i = size; i > 0; i--) {
-			 v[i - 1] = readChar() & UCHAR_MAX;
-			 //printf("v[%d]: %x ", i, v[i]);
+		 for (int i = 0; i < size; i++) {
+			 v[i] = readChar() & UCHAR_MAX;
 		 }
 		 T clear = 0;
 		 for (int i = 0; i < size; i++) {
