@@ -92,22 +92,18 @@ __int32 NetworkInputStream::readInt () {
 	__int32 v = readData<__int32>(); 
 
 	if (_logger->isDebug()) _logger->debug(3, "int: %d", v);
-	if (_logger->isDebug()) _logger->debug(3, "~NetworkInputStream::readLong");
+	if (_logger->isDebug()) _logger->debug(3, "~NetworkInputStream::readInt");
 	return v;
 }
 
 /* Reads 4 bytes in the input (little endian order) */
 __int64 NetworkInputStream::readLong () {
-#ifdef _64BITS
-	return (__int64)readLong64();
-#else
-	return (__int64)readInt();
-#endif
-}
+	if (_logger->isDebug()) _logger->debug(3, "NetworkInputStream::readLong");
+	__int64 v = readData<__int64>(); 
 
-/* Reads 4 bytes in the input (little endian order) */
-__LONG64 NetworkInputStream::readLong64 () {
-	return readData<__LONG64>();
+	if (_logger->isDebug()) _logger->debug(3, "long: %d", v);
+	if (_logger->isDebug()) _logger->debug(3, "~NetworkInputStream::readLong");
+	return v;
 }
 
 /* Reads a 4 byte float in the input */
@@ -198,7 +194,7 @@ int NetworkInputStream::available() {
 	//    return nbytes;
 }
 
-int NetworkInputStream::readBufferData(void* data, int len) {
+int NetworkInputStream::readBufferData(void* data, __int32 len) {
 	if (checkStatus() < 0) {
 		return -1;
 	}

@@ -264,8 +264,8 @@ class TestDriverBaseSuite: public Test::Suite {
 			std::string* guid = uuid();
 			test.add("_id", *guid);
 			test.add("int", 1);
-			test.add("long", 10L);
-			test.add("longmax", LONG_MAX);
+			test.add("long", (__int64) 10L);
+			test.add("longmax",(__int64) LONG_MAX);
 			test.add("char", "testing");
 
 			conn->insert("db", "driver.test", test);

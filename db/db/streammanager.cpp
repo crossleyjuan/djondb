@@ -147,8 +147,8 @@ bool StreamManager::close(char* db, char* ns) {
 	return true;
 }
 
-void StreamManager::saveDatabases() {
-	if (_logger->isDebug()) _logger->debug(2, "StreamManager::saveDatabases");
+void StreamManager::closeDatabases() {
+	if (_logger->isDebug()) _logger->debug(2, "StreamManager::closeDatabases");
 
 	std::auto_ptr<FileOutputStream> fos(new FileOutputStream(const_cast<char*>( (_dataDir + "djondb.dat").c_str()), "wb"));
 	for (std::map<std::string, std::map<std::string, SpacesType>* >::iterator idb = _spaces.begin(); idb != _spaces.end(); idb++) {
@@ -170,6 +170,28 @@ void StreamManager::saveDatabases() {
 			delete space.streams;
 		}
 		delete spaces;
+	}
+	fos->close();
+}
+
+void StreamManager::saveDatabases() {
+	if (_logger->isDebug()) _logger->debug(2, "StreamManager::saveDatabases");
+
+	std::auto_ptr<FileOutputStream> fos(new FileOutputStream(const_cast<char*>( (_dataDir + "djondb.dat").c_str()), "wb"));
+	for (std::map<std::string, std::map<std::string, SpacesType>* >::iterator idb = _spaces.begin(); idb != _spaces.end(); idb++) {
+		std::string db = idb->first;
+		std::map<std::string, SpacesType>* spaces = idb->second;
+		for (std::map<std::string, SpacesType>::iterator i = spaces->begin(); i != spaces->end(); i++) {
+			SpacesType space = i->second;
+			std::string ns = space.ns;
+			fos->writeString(db);
+			fos->writeString(ns);
+			fos->writeInt(space.streams->size());
+			for (std::map<FILE_TYPE, StreamType*>::iterator istream = space.streams->begin(); istream != space.streams->end(); istream++) {
+				FILE_TYPE type = istream->first;
+				fos->writeInt(static_cast<int>(type));
+			}
+		}
 	}
 	fos->close();
 }

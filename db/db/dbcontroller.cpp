@@ -52,7 +52,7 @@ DBController::~DBController()
 
 void DBController::shutdown() {
 	if (_logger->isInfo()) _logger->info("DBController shutting down");
-	StreamManager::getStreamManager()->saveDatabases();
+	StreamManager::getStreamManager()->closeDatabases();
 	clearCache();
 }
 

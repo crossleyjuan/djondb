@@ -21,10 +21,8 @@ class NetworkInputStream : public InputStream
         virtual short int readShortInt ();
         /* Reads 4 bytes in the input (little endian order) */
         virtual __int32 readInt ();
-        /* Reads 4 bytes in the input (little endian order) */
-        virtual __int64 readLong ();
         /* Reads 8 bytes in the input (little endian order) */
-        virtual __LONG64 readLong64 ();
+        virtual __int64 readLong ();
         /* Reads a 4 byte float in the input */
         virtual float readFloatIEEE ();
         /* Reads a 8 byte double in the input */
@@ -53,7 +51,7 @@ class NetworkInputStream : public InputStream
 
     private:
         int checkStatus();
-        int readBufferData(void *buffer, int len);
+        int readBufferData(void *buffer, __int32 len);
         int fillBuffer(int timeout);
 };
 

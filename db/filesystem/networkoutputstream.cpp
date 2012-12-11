@@ -23,6 +23,7 @@
 #include <iostream>
 #include <stdio.h>
 #include "util.h"
+#include <errno.h>
 #include <assert.h>
 #include <limits.h>
 #ifndef _WIN32
@@ -133,10 +134,16 @@ void NetworkOutputStream::writeChars(const char *text, __int32 len) {
 			}
 			pos += size;
 			int sent = 0;
+			int retries = 0;
 			while (sent < size) {
 				sent += send(_socket, &buffer[sent], size - sent, __sendFlags_networkoutput);
-				assert(sent > 0);
-				//            sent += write(_socket, &buffer[sent], size - sent);
+				retries++;
+				if (sent < 0) {
+					_logger->error("NetworkOutputStream error sending stream. Error: %d, Description: %s", errno, strerror(errno));
+				}
+				if ((sent <= 0) && (retries > 1000)) {
+					assert(sent > 0);
+				}
 			}
 		}
 	}
