@@ -131,15 +131,15 @@ void MemoryStream::writeShortInt (short int v)
 }
 
 /* Write 4 bytes in the output (little endian order) */
-void MemoryStream::writeInt (int v)
+void MemoryStream::writeInt (__int32 v)
 {
-	writeData<int>(v);
+	writeData<__int32>(v);
 }
 
 /* Write 4 bytes in the output (little endian order) */
-void MemoryStream::writeLong (long v)
+void MemoryStream::writeLong (__int64 v)
 {
-	writeData<long>(v);
+	writeData<__int64>(v);
 }
 
 /* Write a 4 byte float in the output */
@@ -198,15 +198,15 @@ short int MemoryStream::readShortInt () {
 }
 
 /* Reads 4 bytes in the input (little endian order) */
-int MemoryStream::readInt () {
-	int v = readData<int>();
+__int32 MemoryStream::readInt () {
+	__int32 v = readData<__int32>();
 
 	return v;
 }
 
 /* Reads 4 bytes in the input (little endian order) */
-long MemoryStream::readLong () {
-	return readData<long>();
+__int64 MemoryStream::readLong () {
+	return readData<__int64>();
 }
 
 /* Reads a 4 byte float in the input */
@@ -225,7 +225,7 @@ double MemoryStream::readDoubleIEEE () {
 
 /* Read a chars */
 char* MemoryStream::readChars() {
-	int len = readInt();
+	__int32 len = readInt();
 	char* res = readChars(len);
 	return res;
 }

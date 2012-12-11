@@ -149,17 +149,17 @@ constant_expr returns [BaseExpression* val]
 	{
 		 // tries the maximum allowed value, then downsize it to the correct type
 #ifdef WINDOWS
-		__LONG64 d = _atoi64((char*)(NUMBER8->getText(NUMBER8))->chars);
+		__int64 d = (__int64)_atoi64((char*)$NUMBER.text->chars);
 #else
-      __LONG64 d = atoll((char*)(NUMBER8->getText(NUMBER8))->chars);
+      __int64 d = atoll((char*)$NUMBER.text->chars);
 #endif
 	    if (d < INT_MAX) {
-	          $val = new ConstantExpression((int)d);
+	          $val = new ConstantExpression((__int32)d);
 	    } else if (d < LONG_MAX)  {
-	          $val = new ConstantExpression((long)d);
+	          $val = new ConstantExpression((__int64)d);
 	    } else {
-	         if (abs((long long)d) == d) {
-	                $val = new ConstantExpression((long long)d);
+	         if (abs((__int64)d) == d) {
+	                $val = new ConstantExpression((__int64)d);
 	         } else {
 	               $val = new ConstantExpression(d);
                                    }

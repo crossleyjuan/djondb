@@ -87,9 +87,9 @@ short int NetworkInputStream::readShortInt () {
 }
 
 /* Reads 4 bytes in the input (little endian order) */
-int NetworkInputStream::readInt () {
+__int32 NetworkInputStream::readInt () {
 	if (_logger->isDebug()) _logger->debug(3, "NetworkInputStream::readInt");
-	int v = readData<int>(); 
+	__int32 v = readData<__int32>(); 
 
 	if (_logger->isDebug()) _logger->debug(3, "int: %d", v);
 	if (_logger->isDebug()) _logger->debug(3, "~NetworkInputStream::readLong");
@@ -97,11 +97,11 @@ int NetworkInputStream::readInt () {
 }
 
 /* Reads 4 bytes in the input (little endian order) */
-long NetworkInputStream::readLong () {
+__int64 NetworkInputStream::readLong () {
 #ifdef _64BITS
-	return (long)readLong64();
+	return (__int64)readLong64();
 #else
-	return (long)readInt();
+	return (__int64)readInt();
 #endif
 }
 
@@ -127,7 +127,7 @@ double NetworkInputStream::readDoubleIEEE () {
 /* Read a chars */
 char* NetworkInputStream::readChars() {
 	if (_logger->isDebug()) _logger->debug(3, "NetworkInputStream::readChars");
-	int len = readLong();
+	__int32 len = readInt();
 	char* res;
 	if (len > 0) {
 		res = readChars(len);
@@ -150,7 +150,7 @@ std::string* NetworkInputStream::readString() {
 	return res;
 }
 
-char* NetworkInputStream::readChars(int length) {
+char* NetworkInputStream::readChars(__int32 length) {
 	char* res = (char*)malloc((length+1) * sizeof(char));
 	memset(res, 0, length+1);
 	int readed = readBufferData(res, length);

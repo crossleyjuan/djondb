@@ -14,9 +14,9 @@ public:
 
     virtual unsigned char readChar() = 0;
     /* Reads 2 bytes in the input (little endian order) */
-    virtual int readInt () = 0;
+    virtual __int32 readInt () = 0;
     /* Reads 4 bytes in the input (little endian order) */
-    virtual long readLong () = 0;
+    virtual __int64 readLong () = 0;
     /* Reads a 4 byte float in the input */
     virtual float readFloatIEEE () = 0;
     /* Reads a 8 byte double in the input */

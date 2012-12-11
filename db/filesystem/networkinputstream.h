@@ -20,9 +20,9 @@ class NetworkInputStream : public InputStream
         /* Reads 2 bytes in the input (little endian order) */
         virtual short int readShortInt ();
         /* Reads 4 bytes in the input (little endian order) */
-        virtual int readInt ();
+        virtual __int32 readInt ();
         /* Reads 4 bytes in the input (little endian order) */
-        virtual long readLong ();
+        virtual __int64 readLong ();
         /* Reads 8 bytes in the input (little endian order) */
         virtual __LONG64 readLong64 ();
         /* Reads a 4 byte float in the input */
@@ -31,7 +31,7 @@ class NetworkInputStream : public InputStream
         virtual double readDoubleIEEE ();
         /* Read a chars */
         virtual char* readChars();
-        virtual char* readChars(int length);
+        virtual char* readChars(__int32 length);
 
         virtual void closeStream();
         bool eof();

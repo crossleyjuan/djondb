@@ -85,27 +85,17 @@ void NetworkOutputStream::writeShortInt (short int v)
 }
 
 /* Write 4 bytes in the output (little endian order) */
-void NetworkOutputStream::writeInt (int v)
+void NetworkOutputStream::writeInt (__int32 v)
 {
 	if (_logger->isDebug()) _logger->debug(3, "NetworkOutputStream::writeInt, int: %d", v);
-	writeData<int>(v);
+	writeData<__int32>(v);
 	if (_logger->isDebug()) _logger->debug(3, "~NetworkOutputStream::writeInt");
 }
 
-/* Write 4 bytes in the output (little endian order) */
-void NetworkOutputStream::writeLong (long v)
-{
-#ifdef _64BITS
-	writeLong64((__LONG64)v);
-#else
-	writeInt((int)v);
-#endif
-}
-
 /* Write 8 bytes in the output (little endian order) */
-void NetworkOutputStream::writeLong64 (__LONG64 v)
+void NetworkOutputStream::writeLong (__int64 v)
 {
-	writeData<__LONG64>(v);
+	writeData<__int64>(v);
 }
 
 /* Write a 4 byte float in the output */
@@ -123,11 +113,11 @@ void NetworkOutputStream::writeDoubleIEEE (double v)
 
 }
 
-void NetworkOutputStream::writeChars(const char *text, int len) {
+void NetworkOutputStream::writeChars(const char *text, __int32 len) {
 	assert(text != NULL);
 
 	if (_logger->isDebug()) _logger->debug(3, "NetworkOutputStream::writeChars, chars: %s, len: %d", text, len);
-	writeLong(len);
+	writeInt(len);
 	if (len > 0) {
 		char buffer[1024];
 		int pos = 0;
