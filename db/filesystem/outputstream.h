@@ -13,8 +13,6 @@ public:
     virtual void writeInt (int v) = 0;
     /* Write 4 bytes in the output (little endian order) */
     virtual void writeLong (long v) = 0;
-    /* Write 8 bytes in the output (little endian order) */
-    virtual void writeLong64 (__LONG64 v) = 0;
     /* Write a 4 byte float in the output */
     virtual void writeFloatIEEE (float v) = 0;
     /* Write a 8 byte double in the output */
@@ -27,10 +25,8 @@ public:
 	 void writeData(T data) {
 		 unsigned char* v = (unsigned char*)&data;
 		 int size = sizeof(T);
-		 //printf("\nwriting: %x\n", data);
 		 for (int i = 0; i < size; i++) {
 			 unsigned char c = v[i];
-			 //printf("c: %x ", (int)c);
 			 writeChar(c);
 		 }
 	 }

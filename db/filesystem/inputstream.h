@@ -17,8 +17,6 @@ public:
     virtual int readInt () = 0;
     /* Reads 4 bytes in the input (little endian order) */
     virtual long readLong () = 0;
-    /* Reads 8 bytes in the input (little endian order) */
-    virtual __LONG64 readLong64 () = 0;
     /* Reads a 4 byte float in the input */
     virtual float readFloatIEEE () = 0;
     /* Reads a 8 byte double in the input */
@@ -36,9 +34,8 @@ public:
 		 T result = 0;
 		 unsigned char* v = (unsigned char*)&result;
 		 int size = sizeof(T);
-		 for (int i = size; i > 0; i--) {
-			 v[i - 1] = readChar() & UCHAR_MAX;
-			 //printf("v[%d]: %x ", i, v[i]);
+		 for (int i = 0; i < size; i++) {
+			 v[i] = readChar() & UCHAR_MAX;
 		 }
 		 T clear = 0;
 		 for (int i = 0; i < size; i++) {

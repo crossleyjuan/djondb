@@ -54,13 +54,11 @@ void BSONOutputStream::writeBSON(const BSONObj& bson) {
 					 writeBSON(*inner); 
                 break;
             case INT_TYPE:
-                _outputStream->writeInt(*((int*)cont->_element));
+                _outputStream->writeInt(*((__int32*)cont->_element));
                 break;
             case LONG_TYPE:
-                _outputStream->writeLong(*((long*)cont->_element));
-                break;
             case LONG64_TYPE:
-                _outputStream->writeLong64(*((__LONG64*)cont->_element));
+                _outputStream->writeLong(*((__int64*)cont->_element));
                 break;
             case DOUBLE_TYPE:
                 _outputStream->writeDoubleIEEE(*((double*)cont->_element));
@@ -89,9 +87,9 @@ void BSONOutputStream::writeBSON(const BSONObj& bson) {
 void BSONOutputStream::writeBSONArray(const BSONArrayObj* array) {
 	Logger* log = getLogger(NULL);
 	if (log->isDebug()) log->debug("BSONOutputStream::writeBSONArray elements: %d", array->length());
-	int length = array->length();
+	__int32 length = array->length();
 	_outputStream->writeLong(length);
-	for (int x = 0; x < length; x++) {
+	for (__int32 x = 0; x < length; x++) {
 		BSONObj* obj = array->get(x);
 		writeBSON(*obj);
 	}

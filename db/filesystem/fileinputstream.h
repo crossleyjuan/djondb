@@ -16,22 +16,20 @@ public:
     /* Reads 2 bytes in the input (little endian order) */
     virtual short int readShortInt ();
     /* Reads 4 bytes in the input (little endian order) */
-    virtual int readInt ();
+    virtual __int32 readInt ();
     /* Reads 4 bytes in the input (little endian order) */
-    virtual long readLong ();
-    /* Reads 8 bytes in the input (little endian order) */
-    virtual __LONG64 readLong64 ();
+    virtual __int64 readLong ();
     /* Reads a 4 byte float in the input */
     virtual float readFloatIEEE ();
     /* Reads a 8 byte double in the input */
     virtual double readDoubleIEEE ();
     /* Read a chars */
     virtual char* readChars();
-    virtual char* readChars(int length);
+    virtual char* readChars(__int32 length);
     virtual const char* readFull();
-    virtual long currentPos() const;
-    virtual void seek(long i);
-    virtual long crc32();
+    virtual __int64 currentPos() const;
+    virtual void seek(__int64 i);
+    virtual __int64 crc32();
 
     virtual std::string* readString();
     virtual const std::string fileName() const;

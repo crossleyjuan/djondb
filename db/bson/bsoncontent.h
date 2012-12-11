@@ -26,9 +26,8 @@ class BSONContent {
 
 		  bool operator ==(const BSONContent& content);
 		  bool operator !=(const BSONContent& content);
-		  operator int();
-		  operator long();
-		  operator __LONG64();
+		  operator __int32();
+		  operator __int64();
 		  operator double();
 		  operator std::string();
 		  operator BSONObj();

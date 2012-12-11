@@ -1,6 +1,8 @@
 #ifndef DEFS_H_INCLUDED
 #define DEFS_H_INCLUDED
 
+#include <stdlib.h>
+
 #if (defined _WIN32 | _WIN64)
 #define WINDOWS
 #endif
@@ -27,11 +29,14 @@
 #define _32BITS
 #endif
 
-#ifndef WINDOWS
-#define __LONG64 long long
-#else
-#define __LONG64 __int64
-#endif
+// typedefs
+//
+typedef int8_t            __int8;
+typedef int16_t           __int16;
+typedef int32_t           __int32;                
+typedef int64_t           __int64;
+typedef int64_t           __LONG64;
+
 
 // #define TESTING
 

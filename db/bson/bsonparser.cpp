@@ -26,7 +26,7 @@
 
 struct BSONStruct {
 	char* name;
-	int type;
+	__int32 type;
 	void* value; struct BSONStruct* next;
 };
 
@@ -60,15 +60,15 @@ BSONObj* convertStruct(struct BSONStruct* param) {
 	BSONStruct* head = s;
 	while (s != NULL) {
 		std::string name(s->name);
-		int type = s->type;
+		__int32 type = s->type;
 		void* value = s->value;
-		int* val;
+		__int32* val;
 		float* val2;
 		char* val3;
 		BSONObj* inner;
 		switch (type) {
 			case 1:
-				val = (int*)value;
+				val = (__int32*)value;
 				obj->add(name, *val);
 				break;
 			case 2:
@@ -91,19 +91,19 @@ BSONObj* convertStruct(struct BSONStruct* param) {
 	return obj;
 }
 
-BSONObj* BSONParser::parseBSON(const char* c, int& pos) throw(BSONException) {
+BSONObj* BSONParser::parseBSON(const char* c, __int32& pos) throw(BSONException) {
 	BSONObj* res = new BSONObj();
-	int state = 0; // 0 - nothing, 1 - name, 2- value
-	int lenBuffer = strlen(c);
+	__int32 state = 0; // 0 - nothing, 1 - name, 2- value
+	__int32 lenBuffer = strlen(c);
 	char* buffer = (char*)malloc(lenBuffer);
 	char* name = NULL;
 	void* value = NULL;
-	int len = 0;
+	__int32 len = 0;
 	BSONTYPE type;
-	int stringOpen = 0; // 0 - closed
+	__int32 stringOpen = 0; // 0 - closed
 	// 1 - Single quote opened
 	// 2 - Double quote opened	
-	int x;
+	__int32 x;
 	for (x= pos; x < strlen(c); x++) {
 		if (c[x] == '{') {
 			if (state == 2) {
@@ -133,12 +133,12 @@ BSONObj* BSONParser::parseBSON(const char* c, int& pos) throw(BSONException) {
 				memset(buffer, 0, lenBuffer);
 				switch (type) {
 					case INT_TYPE:{
-										  int iVal = atoi((char*)value);
+										  __int32 iVal = atoi((char*)value);
 										  res->add(name, iVal);
 										  break;
 									  }
 					case LONG_TYPE: {
-												long lVal = atol((char*)value);
+												__int64 lVal = atol((char*)value);
 												res->add(name, lVal);
 												break;
 											}
@@ -149,9 +149,9 @@ BSONObj* BSONParser::parseBSON(const char* c, int& pos) throw(BSONException) {
 												__LONG64 lVal = atoll((char*)value);
 #endif
 												if (lVal <= INT_MAX) {
-													res->add(name, (int)lVal);
+													res->add(name, (__int32)lVal);
 												} else if (lVal <= LONG_MAX) {
-													res->add(name, (long)lVal);
+													res->add(name, (__int64)lVal);
 												} else {
 													res->add(name, lVal);
 												}
@@ -212,7 +212,7 @@ BSONObj* BSONParser::parseBSON(const char* c, int& pos) throw(BSONException) {
 				char stringChar = c[x];
 				bool escaped = false;
 				x++;
-				int startPos = x;
+				__int32 startPos = x;
 				while ((x < strlen(c)) && ((c[x] != stringChar) || (escaped))) {
 					if (c[x] == '\\') {
 						escaped = true;
@@ -253,11 +253,11 @@ BSONObj* BSONParser::parseBSON(const char* c, int& pos) throw(BSONException) {
 }
 
 BSONArrayObj* BSONParser::parseArray(const std::string& sbson) {
-	int pos = 0;
+	__int32 pos = 0;
 	return parseArray(sbson.c_str(), pos);
 }
 
-BSONArrayObj* BSONParser::parseArray(const char* chrs, int& pos) {
+BSONArrayObj* BSONParser::parseArray(const char* chrs, __int32& pos) {
 	BSONArrayObj* result = NULL;
 	while (chrs[pos] == ' ') {
 		pos++;
