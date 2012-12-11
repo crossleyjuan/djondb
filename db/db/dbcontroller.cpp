@@ -101,6 +101,7 @@ void DBController::initialize(std::string dataDir) {
 	}
 
 	StreamManager::getStreamManager()->setDataDir(_dataDir);
+	StreamManager::getStreamManager()->setInitializing(true);
 
 	std::auto_ptr<FileInputStream> fis(new FileInputStream((_dataDir + "djondb.dat").c_str(), "rb"));
 	while (!fis->eof()) {
@@ -149,6 +150,7 @@ void DBController::initialize(std::string dataDir) {
 		}
 	}
 	fis->close();
+	StreamManager::getStreamManager()->setInitializing(false);
 }
 
 long DBController::checkStructure(BSONObj* obj) {
@@ -234,17 +236,11 @@ void DBController::update(char* db, char* ns, BSONObj* obj) {
 	if (_logger->isDebug()) _logger->debug(2, "DBController::update ns: %s, bson: %s", ns, obj->toChar());
 	StreamType* streamData = StreamManager::getStreamManager()->open(std::string(db), std::string(ns), DATA_FTYPE);
 
-	//    long crcStructure = checkStructure(obj);
-
-	//    char* text = obj->toChar();
-	//    streamData->writeChars(text, strlen(text));
-	//    free(text);
-	//
 	Index* index = findIndex(db, ns, obj);
 
 	long currentPos = streamData->currentPos();
 
-	// Moves to the last record
+	// Moves to the record to update
 	streamData->seek(index->posData);
 
 	BSONObj* previous = readBSON(streamData);
@@ -253,6 +249,7 @@ void DBController::update(char* db, char* ns, BSONObj* obj) {
 	streamData->seek(index->posData);
 	writeBSON(streamData, previous);
 
+	// Back to the end of the stream
 	streamData->seek(currentPos);
 
 	updateIndex(db, ns, index, streamData->currentPos());

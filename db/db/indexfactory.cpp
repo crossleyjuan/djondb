@@ -136,7 +136,7 @@ IndexAlgorithm* IndexFactory::index(const char* db, const char* ns, const std::s
 }
 
 IndexAlgorithm* IndexFactory::index(const char* db, const char* ns, const std::set<std::string>& keys) {
-	listByDbType::iterator itIndexesByDB = _indexes.find(db);
+	listByDbType::iterator itIndexesByDB = _indexes.find(std::string(db));
 	listByNSTypePtr indexesByNs;
 	if (itIndexesByDB == _indexes.end()) {
 		indexesByNs = new listByNSType();

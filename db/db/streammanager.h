@@ -48,6 +48,8 @@ class StreamManager {
 		bool dropNamespace(char* db, char* ns);
 		void setDataDir(const std::string& dataDir);
 
+		void setInitializing(bool initializing);
+
 	private:
 		bool close(char* db, char* ns);
 	private:
@@ -58,5 +60,6 @@ class StreamManager {
 
 		static StreamManager* _manager;
 		Logger* _logger;
+		bool _initializing;
 };
 

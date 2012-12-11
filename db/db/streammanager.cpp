@@ -32,6 +32,7 @@ StreamManager* StreamManager::getStreamManager() {
 
 StreamManager::StreamManager() {
 	_logger = getLogger(NULL);
+	_initializing = false;
 }
 
 StreamManager::~StreamManager() {
@@ -116,6 +117,10 @@ StreamType* StreamManager::open(std::string db, std::string ns, FILE_TYPE type) 
 		space.streams = new map<FILE_TYPE, StreamType*>();
 		space.streams->insert(pair<FILE_TYPE, StreamType*>(type, output));
 		spaces->insert(pair<std::string, SpacesType>(ns, space));
+	}
+
+	if (!_initializing) {
+		saveDatabases();
 	}
 
 	return output;
@@ -219,6 +224,10 @@ std::vector<std::string>* StreamManager::dbs() const {
 		result->push_back(db);
 	}
 	return result;
+}
+
+void StreamManager::setInitializing(bool initializing) {
+	_initializing = initializing;
 }
 
 std::vector<std::string>* StreamManager::namespaces(const char* db) const {
