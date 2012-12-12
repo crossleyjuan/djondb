@@ -27,26 +27,29 @@ public:
     bool eof();
     virtual bool isClosed() = 0;
 
+	 virtual void seek(__int64) = 0;
+	 virtual __int64 currentPos() const = 0;
+
 	 virtual std::string* readString() = 0;
 
 	 template <typename T>
-	 T readData() {
-		 T result = 0;
-		 unsigned char* v = (unsigned char*)&result;
-		 int size = sizeof(T);
-		 for (int i = 0; i < size; i++) {
-			 v[i] = readChar() & UCHAR_MAX;
+		 T readData() {
+			 T result = 0;
+			 unsigned char* v = (unsigned char*)&result;
+			 int size = sizeof(T);
+			 for (int i = 0; i < size; i++) {
+				 v[i] = readChar() & UCHAR_MAX;
+			 }
+			 T clear = 0;
+			 for (int i = 0; i < size; i++) {
+				 clear = clear << 8;
+				 clear = clear | 0xFF;
+			 }
+			 //printf("\nresult before add: %x\n", result);
+			 result = result & clear;
+			 //printf("result after add: %x\n", result);
+			 return result;
 		 }
-		 T clear = 0;
-		 for (int i = 0; i < size; i++) {
-			 clear = clear << 8;
-			 clear = clear | 0xFF;
-		 }
-		 //printf("\nresult before add: %x\n", result);
-		 result = result & clear;
-		 //printf("result after add: %x\n", result);
-		 return result;
-	 }
 };
 
 #endif // INPUTSTREAM_H

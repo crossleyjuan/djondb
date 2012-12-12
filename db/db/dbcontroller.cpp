@@ -446,8 +446,25 @@ std::vector<BSONObj*>* DBController::findFullScan(char* db, char* ns, const char
 
 	BSONInputStream* bis = new BSONInputStream(fis);
 
+	std::set<std::string> tokens = parser->xpathTokens();
+	std::string filterSelect;
+	if (tokens.size() > 0) {
+		// this will reserve enough space to concat the filter tokens
+		filterSelect.reserve(tokens.size() * 100);
+		filterSelect.append("$'_status'");
+		for (std::set<std::string>::iterator i = tokens.begin(); i != tokens.end(); i++) {
+			std::string token = *i;
+			filterSelect.append(", ");
+			filterSelect.append("$'");
+			filterSelect.append(token);
+			filterSelect.append("'");
+		}
+	} else {
+		filterSelect = "*";
+	}
+
 	while (!fis->eof()) {
-		BSONObj* obj = bis->readBSON();
+		BSONObj* obj = bis->readBSON(filterSelect.c_str());
 		// Only "active" Records
 		if (obj->getInt("_status") == 1) {
 			bool match = false;

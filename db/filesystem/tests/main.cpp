@@ -81,6 +81,7 @@ class TestFileSystemSuite: public Test::Suite
 		}
 
 		void testMemoryStream() {
+			cout << "\ntestMemoryStream\n" << endl;
 			MemoryStream ms(10);
 			char* text = "test1234567890darn0987654321";
 			ms.writeChars(text, strlen(text));
@@ -89,6 +90,18 @@ class TestFileSystemSuite: public Test::Suite
 			char* res = ms.readChars();
 
 			TEST_ASSERT(strcmp(res, text) == 0);
+
+			MemoryStream ms2;
+			ms2.writeInt(1);
+			ms2.writeInt(2);
+			int pos = ms2.currentPos();
+			TEST_ASSERT(pos == sizeof(__int32) * 2);
+			ms2.seek(4);
+			pos = ms2.currentPos();
+			TEST_ASSERT(pos == sizeof(__int32));
+			ms2.readInt();
+			pos = ms2.currentPos();
+			TEST_ASSERT(pos == sizeof(__int32) * 2);
 		}
 
 		void testFileInputOutputStreams()
@@ -111,8 +124,8 @@ class TestFileSystemSuite: public Test::Suite
 			TEST_ASSERT(strcmp(text, "Hello World!") == 0);
 			int i1 = streamo.readShortInt();
 			TEST_ASSERT(i1 == 2);
-			long l = streamo.readLong();
-			TEST_ASSERT(l == 200000);
+			__int64 l = streamo.readLong();
+			TEST_ASSERT(l == 200000L);
 			char* tchar = streamo.readChars();
 			TEST_ASSERT(strcmp(test, tchar) == 0);
 			free(test);
@@ -129,8 +142,8 @@ class TestFileSystemSuite: public Test::Suite
 			obj->add("int", INT_MAX);
 			obj->add("string", std::string("test"));
 			obj->add("char*", (char*)"char*");
-			obj->add("long", 100000000L);
-			obj->add("long64", LLONG_MAX);
+			obj->add("long", (__int64)100000000L);
+			obj->add("long64", (__int64)LLONG_MAX);
 			obj->add("double", 1.1);
 
 			bsonOut->writeBSON(*obj);
@@ -155,7 +168,7 @@ class TestFileSystemSuite: public Test::Suite
 			TEST_ASSERT(obj->getLong("long") == 100000000L);
 
 			TEST_ASSERT(obj->has("long64"));
-			TEST_ASSERT(obj->getLong64("long64") == LLONG_MAX);
+			TEST_ASSERT(obj->getLong("long64") == LLONG_MAX);
 
 			TEST_ASSERT(obj->has("double"));
 			TEST_ASSERT(obj->getDouble("double") == 1.1);
@@ -165,6 +178,7 @@ class TestFileSystemSuite: public Test::Suite
 		}
 
 		void testBSONSelect() {
+			cout << "\ntestBSONSelect\n" << endl;
 			std::auto_ptr<BSONObj> objTest(BSONParser::parse("{age: 1, name: 'John', salary: 3500.25, simplerel: {test: 'inner value', test2: 'inner value2', test3: 3, test4: 3.5}, rel1: [{innertext: 'inner text', test2: 'text2'}, {innertext: 'inner text', test2: 'text333'}, {innertext: 'inner text', test2: 'text4'}, {innertext: 'inner text'} ] }"));
 			MemoryStream ms;
 			BSONOutputStream bos(&ms);
@@ -256,16 +270,16 @@ class TestFileSystemSuite: public Test::Suite
 			obj->add("int", 1);
 			obj->add("string", std::string("test"));
 			obj->add("char*", (char*)"char*");
-			obj->add("long", 1L);
-			obj->add("long64", 10000000000000L);
+			obj->add("long", (__int64)1L);
+			obj->add("long64", (__int64)10000000000000L);
 			obj->add("double", 1.1);
 
 			BSONObj inner;
 			inner.add("int", 1);
 			inner.add("string", std::string("test"));
 			inner.add("char*", (char*)"char*");
-			inner.add("long", 1L);
-			inner.add("long64", 10000000000000L);
+			inner.add("long", (__int64)1L);
+			inner.add("long64", (__int64)10000000000000L);
 			inner.add("double", 1.1);
 
 			obj->add("inner", inner);
@@ -291,9 +305,6 @@ class TestFileSystemSuite: public Test::Suite
 			TEST_ASSERT(obj->has("long"));
 			TEST_ASSERT(obj->getLong("long") == 1L);
 
-			TEST_ASSERT(obj->has("long64"));
-			TEST_ASSERT(obj->getLong64("long64") == 10000000000000L);
-
 			TEST_ASSERT(obj->has("double"));
 			TEST_ASSERT(obj->getDouble("double") == 1.1);
 
@@ -311,7 +322,7 @@ class TestFileSystemSuite: public Test::Suite
 			TEST_ASSERT(innerTest->getLong("long") == 1L);
 
 			TEST_ASSERT(innerTest->has("long64"));
-			TEST_ASSERT(innerTest->getLong64("long64") == 10000000000000L);
+			TEST_ASSERT(innerTest->getLong("long64") == 10000000000000L);
 
 			TEST_ASSERT(innerTest->has("double"));
 			TEST_ASSERT(innerTest->getDouble("double") == 1.1);

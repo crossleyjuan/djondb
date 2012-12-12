@@ -4,6 +4,7 @@
 #include "inputstream.h"
 #include "util.h"
 #include <string>
+#include <assert.h>
 
 class NetworkInputStream : public InputStream
 {
@@ -37,22 +38,32 @@ class NetworkInputStream : public InputStream
         int waitAvailable(int timeout = 10);
         bool isClosed();
 
-        virtual std::string* readString();
-        int setNonblocking();
+		  virtual void seek(__int64) {
+			  // Unsupported methods in network interfaces
+			  assert(false);
+		  };
 
-        char* _buffer;
-        int _bufferPos;
-        int _bufferSize;
-    protected:
-    private:
-        int _socket;
-        bool _open;
+		  virtual __int64 currentPos() const {
+			  // Unsupported methods in network interfaces
+			  assert(false);
+		  };
+
+		  virtual std::string* readString();
+		  int setNonblocking();
+
+		  char* _buffer;
+		  int _bufferPos;
+		  int _bufferSize;
+	 protected:
+	 private:
+		  int _socket;
+		  bool _open;
 		  Logger* _logger;
 
-    private:
-        int checkStatus();
-        int readBufferData(void *buffer, __int32 len);
-        int fillBuffer(int timeout);
+	 private:
+		  int checkStatus();
+		  int readBufferData(void *buffer, __int32 len);
+		  int fillBuffer(int timeout);
 };
 
 #endif // NETWORKINPUTSTREAM_H

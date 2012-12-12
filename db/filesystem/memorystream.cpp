@@ -169,9 +169,9 @@ void MemoryStream::seek(long i) {
 	if (i > _length) {
 		i = _length;
 	}
-	_currentIndex = i % _bufferSize;
+	_currentIndex = (int)i / (int)_bufferSize;
 	_currentBuffer = _buffer[_currentIndex];
-	_currentBufferPos = i - (_currentIndex * _bufferSize);
+	_currentBufferPos = i % _bufferSize;
 }
 
 long MemoryStream::currentPos() const {

@@ -336,7 +336,11 @@ FilterParser* FilterParser::parse(const std::string& expression) throw(ParseExce
 	filterparser->setTokens(xpathTokens);
 
 	return filterparser;
-	}
+}
+
+std::set<std::string> FilterParser::xpathTokens() {
+	return _xpathTokens;
+}
 
 
 
