@@ -21,6 +21,7 @@
 #include "util.h"
 #include "fileinputoutputstream.h"
 #include "fileinputstream.h"
+#include "mmapinputstream.h"
 #include "fileoutputstream.h"
 
 #include "bsonoutputstream.h"
@@ -441,7 +442,8 @@ std::vector<BSONObj*>* DBController::findFullScan(char* db, char* ns, const char
 
 	std::string filename = ss.str();
 
-	FileInputStream* fis = new FileInputStream(filename.c_str(), "rb");
+	//FileInputStream* fis = new FileInputStream(filename.c_str(), "rb");
+	MMapInputStream* fis = new MMapInputStream(filename.c_str(), "rb");
 	std::vector<BSONObj*>* result = new std::vector<BSONObj*>();
 
 	BSONInputStream* bis = new BSONInputStream(fis);
@@ -464,7 +466,7 @@ std::vector<BSONObj*>* DBController::findFullScan(char* db, char* ns, const char
 	}
 
 	while (!fis->eof()) {
-		BSONObj* obj = bis->readBSON(filterSelect.c_str());
+		BSONObj* obj = bis->readBSON("*");
 		// Only "active" Records
 		if (obj->getInt("_status") == 1) {
 			bool match = false;

@@ -51,6 +51,9 @@ BSONObj* BSONInputStream::readBSON(const char* select) const {
 	}
 	BSONObj* obj = new BSONObj();
 	__int64 elements = _inputStream->readLong();
+	if (elements == 0) {
+		cout << "Error" << endl;
+	}
 	if (log->isDebug()) log->debug("BSONInputStream::readBSON elements: %d", elements);
 	BSONInputStream* bis;
 

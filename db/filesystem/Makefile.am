@@ -15,6 +15,7 @@ libdjon_filesystem_la_SOURCES = bsoninputstream.cpp \
 										  bsonoutputstream.cpp \
 										  fileinputoutputstream.cpp \
 										  fileinputstream.cpp \
+										  mmapinputstream.cpp \
 										  fileoutputstream.cpp \
 										  networkinputstream.cpp \
 										  networkoutputstream.cpp \
@@ -28,6 +29,12 @@ if !MAC
 endif
 test_filesystem_SOURCES = tests/main.cpp
 
+bin_PROGRAMS = testfile
+testfile_LDADD = libdjon-filesystem.la $(top_builddir)/bson/libdjon-bson.la $(top_builddir)/util/libdjon-util.la -lpthread -lcpptest
+if !MAC
+   testfile_LDADD += -lrt -luuid 
+endif
+testfile_SOURCES = tests/testfile.cpp
 
 djon_filesystem_libincludedir = $(libdir)/djon-filesystem-1.0/include
 #nodist_djon_filesystem_libinclude_HEADERS = config.h

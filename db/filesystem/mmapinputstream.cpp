@@ -16,7 +16,7 @@
 // this program will be open sourced and all its derivated work will be too.
 // *********************************************************************************************************************
 
-#include "fileinputstream.h"
+#include "mmapinputstream.h"
 
 #include "util.h" 
 #include <stdlib.h>
@@ -27,150 +27,153 @@
 #include <boost/crc.hpp>
 #include <limits.h>
 
-FileInputStream::FileInputStream(const char* fileName, const char* flags)
+#include <sys/mman.h>
+#include <sys/uio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <assert.h>
+
+MMapInputStream::MMapInputStream(const char* fileName, const char* flags)
 {
-    _pFile = fopen(fileName, flags);
-	 setvbuf (_pFile, NULL , _IOFBF , 1024*4 ); // large buffer
-    _fileName = fileName;
-    _open = true;
+	_pFile = ::open(fileName, O_RDONLY);
+	_fileName = fileName;
+	_open = true;
+	_len = fileSize(fileName);
+	_pos = 0;
+	bool shared = false;
+	bool advise = true;
+#ifdef __linux__
+	_addr = reinterpret_cast<char *>(mmap(NULL, _len, PROT_READ, MAP_FILE | (shared?MAP_SHARED:MAP_PRIVATE) | MAP_POPULATE , _pFile, 0));
+#else
+	_addr = reinterpret_cast<char *>(mmap(NULL, _len, PROT_READ, MAP_FILE | (shared?MAP_SHARED:MAP_PRIVATE), _pFile, 0));
+#endif
+	_initaddr = _addr;    
+	if (_addr == MAP_FAILED) {
+		assert(false);
+	}
+	if(advise)
+		if(madvise(_addr,_len,MADV_SEQUENTIAL|MADV_WILLNEED)!=0)  {
+			assert(false);
+			cerr<<" Couldn't set hints"<<endl; 
+		}
+	close();
 }
 
-FileInputStream::~FileInputStream() {
-    close();
+MMapInputStream::~MMapInputStream() {
 }
 
-unsigned char FileInputStream::readChar() {
-    unsigned char v;
-    fread(&v, 1, 1, _pFile);
-    return v;
+unsigned char MMapInputStream::readChar() {
+	unsigned char v;
+	v = *_addr;
+	_addr++;
+	_pos++;
+	return v;
 }
 
 /* Reads 2 bytes in the input (little endian order) */
-short int FileInputStream::readShortInt () {
+short int MMapInputStream::readShortInt () {
 	short int result = readData<short int>();
 	return result;
 }
 
 /* Reads 4 bytes in the input (little endian order) */
-__int32 FileInputStream::readInt () {
+__int32 MMapInputStream::readInt () {
 	__int32 result = readData<__int32>();
 	return result;
 }
 
 /* Reads 4 bytes in the input (little endian order) */
-__int64 FileInputStream::readLong () {
+__int64 MMapInputStream::readLong () {
 	return readData<__int64>();
 }
 
 /* Reads a 4 byte float in the input */
-float FileInputStream::readFloatIEEE () {
+float MMapInputStream::readFloatIEEE () {
 	float f;
-	fread(&f, 1, sizeof(f), _pFile);
+	read((char*)&f, sizeof(f));
 	return f;
 }
 
 /* Reads a 8 byte double in the input */
-double FileInputStream::readDoubleIEEE () {
+double MMapInputStream::readDoubleIEEE () {
 	double d;
-	fread(&d, 1, sizeof(d), _pFile);
+	read((char*)&d, sizeof(d));
 	return d;
 }
 
 /* Read a chars */
-char* FileInputStream::readChars() {
+char* MMapInputStream::readChars() {
 	__int32 len = readInt();
 	char* res = readChars(len);
 	return res;
 }
 
-std::string* FileInputStream::readString() {
+std::string* MMapInputStream::readString() {
 	char* c = readChars();
 	std::string* res = new std::string(c);
 	free(c);
 	return res;
 }
 
-const std::string FileInputStream::fileName() const {
+const std::string MMapInputStream::fileName() const {
 	return _fileName;
 }
 
-void FileInputStream::readChars(__int32 length, char* res) {
+void MMapInputStream::readChars(__int32 length, char* res) {
 	memset(res, 0, length+1);
-	fread(res, 1, length, _pFile);
+	read(res, length);
 }
 
-char* FileInputStream::readChars(__int32 length) {
+char* MMapInputStream::readChars(__int32 length) {
 	char* res = (char*)malloc(length+1);
 	memset(res, 0, length+1);
-	fread(res, 1, length, _pFile);
+	read(res, length);
 	return res;
 }
 
-const char* FileInputStream::readFull() {
-	fseek(_pFile, 0, SEEK_SET);
+const char* MMapInputStream::readFull() {
+	_addr = _initaddr;
 	std::stringstream ss;
 	char buffer[1024];
 	__int32 readed = 0;
-	while (!feof(_pFile)) {
-		memset(buffer, 0, 1024);
-		readed = fread(buffer, 1, 1023, _pFile);
-		ss << buffer;
-	}
-	std::string str = ss.str();
-	return strdup(str.c_str());
+	throw "unsupported yet";
+	return NULL;
 }
 
-bool FileInputStream::eof() {
-	if (_pFile == NULL) {
+void MMapInputStream::read(char* dest, int len) {
+	memcpy(dest, _addr, len);
+	_addr += len;
+	_pos += len;
+}
+
+bool MMapInputStream::eof() {
+	if (_pos >= _len) {
 		return true;
 	}
-	__int64 pos = currentPos();
-	// Force reading the last char to check the feof flag
-	readChar();
-	bool res = feof(_pFile);
-	// Back to the original position
-	seek(pos);
-	return res;
+	return false;
 }
 
-__int64 FileInputStream::currentPos() const {
-	return ftell(_pFile);
+__int64 MMapInputStream::currentPos() const {
+	return _pos;
 }
 
-void FileInputStream::seek(__int64 i) {
-	fseek(_pFile, i, SEEK_SET);
+void MMapInputStream::seek(__int64 i) {
+	_addr = _initaddr + i;
+	_pos = i;
 }
 
-__int64 FileInputStream::crc32() {
-	__int64 pos = currentPos();
-	fseek(_pFile, 0, SEEK_END);
-	__int64 bufferSize = currentPos();
-	bufferSize -= pos;
-	seek(pos);
-
-	char* buffer = (char*)malloc(bufferSize+1);
-	memset(buffer, 0, bufferSize + 1);
-	fread(buffer, 1, bufferSize, _pFile);
-
-	boost::crc_32_type crc;
-	crc.process_bytes(buffer, bufferSize);
-	__int64 result = crc.checksum();
-
-	// back to the original position
-	seek(pos);
-
-	free(buffer);
-	return result;
+__int64 MMapInputStream::crc32() {
+	return 0;
 }
 
-void FileInputStream::close() {
-	if (_pFile) {
-		fclose(_pFile);
+void MMapInputStream::close() {
+	if (_pFile > 0) {
+		::close(_pFile);
 		_pFile = 0;
 		_open = false;
 	}
 }
 
-bool FileInputStream::isClosed() {
+bool MMapInputStream::isClosed() {
 	return !_open;
 }

@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include <fileinputstream.h>
+#include <mmapinputstream.h>
 #include <fileoutputstream.h>
 #include <fileinputoutputstream.h>
 #include <memorystream.h>
@@ -38,6 +39,7 @@ class TestFileSystemSuite: public Test::Suite
 		TestFileSystemSuite()
 		{
 			TEST_ADD(TestFileSystemSuite::testFileStreams);
+			TEST_ADD(TestFileSystemSuite::testMMap);
 			TEST_ADD(TestFileSystemSuite::testFileInputOutputStreams);
 			TEST_ADD(TestFileSystemSuite::testBSONStreams);
 			TEST_ADD(TestFileSystemSuite::testBSONStreamsComplex);
@@ -63,6 +65,39 @@ class TestFileSystemSuite: public Test::Suite
 			streamo.close();
 
 			FileInputStream streami("test.txt", "rb");
+			char* text = streami.readChars();
+			TEST_ASSERT(strcmp(text, "Hello World!") == 0);
+			int i1 = streami.readShortInt();
+			TEST_ASSERT(i1 == 2);
+			int si1 = streami.readShortInt();
+			TEST_ASSERT(si1 == 127);
+			int i2 = streami.readInt();
+			TEST_ASSERT(i2 == 200000);
+			long l = streami.readLong();
+			TEST_ASSERT(l == LONG_MAX);
+
+			//char* tchar = streami.readChars();
+			//TEST_ASSERT(strcmp(test, tchar) == 0);
+			streami.close();
+			free(test);
+		}
+
+		void testMMap()
+		{
+			cout << "\ntestMMap\n" << endl;
+			FileOutputStream streamo("test.txt", "wb");
+			char* test = (char*)malloc(200001);
+			memset(test, 0, 200001);
+			memset(test, 'a', 200000);
+			streamo.writeChars("Hello World!", 12);
+			streamo.writeShortInt(2);
+			streamo.writeShortInt(127);
+			streamo.writeInt(200000);
+			streamo.writeLong(LONG_MAX);
+			//streamo.writeChars(test, strlen(test));
+			streamo.close();
+
+			MMapInputStream streami("test.txt", "rb");
 			char* text = streami.readChars();
 			TEST_ASSERT(strcmp(text, "Hello World!") == 0);
 			int i1 = streami.readShortInt();

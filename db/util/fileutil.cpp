@@ -223,3 +223,12 @@ bool makeDir(const char* dir) {
 	delete logger;
 	return true;
 }
+
+__int64 fileSize(const char* file) {
+	struct stat st;
+
+	if (stat(file, &st) == 0)
+		return st.st_size;
+
+	return -1;
+}

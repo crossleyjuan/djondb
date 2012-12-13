@@ -1,16 +1,16 @@
-#ifndef FILEINPUTSTREAM_H
-#define FILEINPUTSTREAM_H
+#ifndef MMAPINPUTSTREAM_H
+#define MMAPINPUTSTREAM_H
 
 #include "inputstream.h"
 #include <istream>
 #include <iostream>
 #include <stdio.h>
 
-class FileInputStream: public InputStream
+class MMapInputStream: public InputStream
 {
 public:
-    FileInputStream(const char* fileName, const char* flags);
-    virtual ~FileInputStream();
+    MMapInputStream(const char* fileName, const char* flags);
+    virtual ~MMapInputStream();
 
     virtual unsigned char readChar();
     /* Reads 2 bytes in the input (little endian order) */
@@ -40,9 +40,16 @@ public:
 
     virtual bool isClosed();
 private:
-    FILE* _pFile;
+	 void read(char* dest, int len);
+
+private:
+    int _pFile;
+	 char* _initaddr;
+	 char* _addr;
+	 int _pos;
+	 int _len;
     std::string _fileName;
     bool _open;
 };
 
-#endif // FILEINPUTSTREAM_H
+#endif // MMAPINPUTSTREAM_H
