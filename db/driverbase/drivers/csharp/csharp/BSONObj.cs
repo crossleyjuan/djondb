@@ -48,8 +48,8 @@ public class BSONObj : IDisposable {
     if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public void add(string arg0, int arg1) {
-    djonwrapperPINVOKE.BSONObj_add__SWIG_0(swigCPtr, arg0, arg1);
+  public void add(string arg0, SWIGTYPE_p___int32 arg1) {
+    djonwrapperPINVOKE.BSONObj_add__SWIG_0(swigCPtr, arg0, SWIGTYPE_p___int32.getCPtr(arg1));
     if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
   }
 
@@ -58,23 +58,23 @@ public class BSONObj : IDisposable {
     if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public void add(string arg0, SWIGTYPE_p___LONG64 arg1) {
-    djonwrapperPINVOKE.BSONObj_add__SWIG_3(swigCPtr, arg0, SWIGTYPE_p___LONG64.getCPtr(arg1));
+  public void add(string arg0, SWIGTYPE_p___int64 arg1) {
+    djonwrapperPINVOKE.BSONObj_add__SWIG_2(swigCPtr, arg0, SWIGTYPE_p___int64.getCPtr(arg1));
     if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void add(string arg0, string arg1) {
-    djonwrapperPINVOKE.BSONObj_add__SWIG_4(swigCPtr, arg0, arg1);
+    djonwrapperPINVOKE.BSONObj_add__SWIG_3(swigCPtr, arg0, arg1);
     if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void add(string arg0, BSONObj arg1) {
-    djonwrapperPINVOKE.BSONObj_add__SWIG_5(swigCPtr, arg0, BSONObj.getCPtr(arg1));
+    djonwrapperPINVOKE.BSONObj_add__SWIG_4(swigCPtr, arg0, BSONObj.getCPtr(arg1));
     if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void add(string arg0, BSONArrayObj arg1) {
-    djonwrapperPINVOKE.BSONObj_add__SWIG_6(swigCPtr, arg0, BSONArrayObj.getCPtr(arg1));
+    djonwrapperPINVOKE.BSONObj_add__SWIG_5(swigCPtr, arg0, BSONArrayObj.getCPtr(arg1));
     if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
   }
 
@@ -84,8 +84,8 @@ public class BSONObj : IDisposable {
     return ret;
   }
 
-  public int getInt(string arg0) {
-    int ret = djonwrapperPINVOKE.BSONObj_getInt(swigCPtr, arg0);
+  public SWIGTYPE_p___int32 getInt(string arg0) {
+    SWIGTYPE_p___int32 ret = new SWIGTYPE_p___int32(djonwrapperPINVOKE.BSONObj_getInt(swigCPtr, arg0), true);
     if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
@@ -96,14 +96,8 @@ public class BSONObj : IDisposable {
     return ret;
   }
 
-  public int getLong(string arg0) {
-    int ret = djonwrapperPINVOKE.BSONObj_getLong(swigCPtr, arg0);
-    if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
-
-  public SWIGTYPE_p___LONG64 getLong64(string arg0) {
-    SWIGTYPE_p___LONG64 ret = new SWIGTYPE_p___LONG64(djonwrapperPINVOKE.BSONObj_getLong64(swigCPtr, arg0), true);
+  public SWIGTYPE_p___int64 getLong(string arg0) {
+    SWIGTYPE_p___int64 ret = new SWIGTYPE_p___int64(djonwrapperPINVOKE.BSONObj_getLong(swigCPtr, arg0), true);
     if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
@@ -181,8 +175,8 @@ public class BSONObj : IDisposable {
     return ret;
   }
 
-  public int length() {
-    int ret = djonwrapperPINVOKE.BSONObj_length(swigCPtr);
+  public SWIGTYPE_p___int32 length() {
+    SWIGTYPE_p___int32 ret = new SWIGTYPE_p___int32(djonwrapperPINVOKE.BSONObj_length(swigCPtr), true);
     return ret;
   }
 

@@ -352,10 +352,6 @@ class BSONObj {
 		return BSONObj_getLong($this->_cPtr,$arg1);
 	}
 
-	function getLong64($arg1) {
-		return BSONObj_getLong64($this->_cPtr,$arg1);
-	}
-
 	function getString($arg1) {
 		return BSONObj_getString($this->_cPtr,$arg1);
 	}
