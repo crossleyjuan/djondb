@@ -29,20 +29,22 @@
 
 FileInputStream::FileInputStream(const char* fileName, const char* flags)
 {
-    _pFile = fopen(fileName, flags);
-	 setvbuf (_pFile, NULL , _IOFBF , 1024*4 ); // large buffer
-    _fileName = fileName;
-    _open = true;
+	_pFile = fopen(fileName, flags);
+	if (_pFile) {
+		setvbuf (_pFile, NULL , _IOFBF , 1024*4 ); // large buffer
+	}
+	_fileName = fileName;
+	_open = true;
 }
 
 FileInputStream::~FileInputStream() {
-    close();
+	close();
 }
 
 unsigned char FileInputStream::readChar() {
-    unsigned char v;
-    fread(&v, 1, 1, _pFile);
-    return v;
+	unsigned char v;
+	fread(&v, 1, 1, _pFile);
+	return v;
 }
 
 /* Reads 2 bytes in the input (little endian order) */
