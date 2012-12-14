@@ -46,6 +46,7 @@ class NetworkInputStream : public InputStream
 		  virtual __int64 currentPos() const {
 			  // Unsupported methods in network interfaces
 			  assert(false);
+			  return 0;
 		  };
 
 		  virtual std::string* readString();
