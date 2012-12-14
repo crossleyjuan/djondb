@@ -94,7 +94,7 @@ __int64 FileInputOutputStream::read(char* buffer, __int32 len) {
 
 void FileInputOutputStream::write(char* buffer, __int32 len) {
 #ifndef WINDOWS
-	readed = fwrite(buffer, 1, len, _pFile);
+	fwrite(buffer, 1, len, _pFile);
 #else
 	DWORD numberOfBytesWritten;
 	WriteFile(_pFile, buffer, len, &numberOfBytesWritten, NULL);
