@@ -42,7 +42,7 @@ FileInputStream::FileInputStream(const char* fileName, const char* flags)
 			FILE_SHARE_READ,        // do not share
 			NULL,                   // default security
 			OPEN_EXISTING,             // create new file only
-			FILE_ATTRIBUTE_NORMAL,  // normal file
+			FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS,  // normal file
 			NULL);                  // no attr. template
 	} else {
 		_pFile = CreateFile(fileName,                // name of the write
@@ -50,20 +50,19 @@ FileInputStream::FileInputStream(const char* fileName, const char* flags)
 			FILE_SHARE_READ,        // do not share
 			NULL,                   // default security
 			CREATE_NEW,             // create new file only
-			FILE_ATTRIBUTE_NORMAL,  // normal file
+			FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS,  // normal file
                        NULL);                  // no attr. template
 	}
     if (_pFile == INVALID_HANDLE_VALUE) 
     { 
 		assert(false);
     }
-#endif
-    _fileName = fileName;
-    _open = true;
+	_fileName = fileName;
+	_open = true;
 }
 
 FileInputStream::~FileInputStream() {
-    close();
+	close();
 }
 
 __int64 FileInputStream::read(char* buffer, __int32 len) {
@@ -88,9 +87,9 @@ __int64 FileInputStream::read(char* buffer, __int32 len) {
 }
 
 unsigned char FileInputStream::readChar() {
-    unsigned char v;
+	unsigned char v;
 	read((char*)&v, 1);
-    return v;
+	return v;
 }
 
 /* Reads 2 bytes in the input (little endian order) */
