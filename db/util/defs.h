@@ -31,11 +31,14 @@
 
 // typedefs
 //
+#ifndef WINDOWS
 typedef int8_t            __int8;
 typedef int16_t           __int16;
 typedef int32_t           __int32;                
 typedef int64_t           __int64;
-typedef int64_t           __LONG64;
+#endif
+typedef __int64           __LONG64;
+
 
 
 // #define TESTING

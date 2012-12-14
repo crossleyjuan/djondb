@@ -49,7 +49,7 @@ class MemoryStream: public InputStream, public OutputStream
         virtual void writeString(const std::string& text);
 
         virtual void seek(long);
-        virtual long currentPos() const;
+        virtual __int64 currentPos() const;
 
         virtual bool eof();
         virtual void close();

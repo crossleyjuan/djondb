@@ -6,6 +6,10 @@
 #include <iostream>
 #include <stdio.h>
 
+#ifdef WINDOWS
+#include <windows.h>
+#endif
+
 class MMapInputStream: public InputStream
 {
 public:
@@ -43,7 +47,11 @@ private:
 	 void read(char* dest, int len);
 
 private:
+#ifndef WINDOWS
     int _pFile;
+#else
+    HANDLE _pFile;
+#endif
 	 char* _initaddr;
 	 char* _addr;
 	 int _pos;

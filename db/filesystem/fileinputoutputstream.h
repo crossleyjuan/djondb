@@ -58,9 +58,18 @@ class FileInputOutputStream: public InputStream, public OutputStream
 
         virtual bool isClosed();
 
+	private:
+		void write(char* buffer, int len);
+		__int64 read(char* buffer, __int32 len); 
+
     private:
         std::string _fileName;
-        FILE* _pFile;
+#ifndef WINDOWS
+		FILE* _pFile;
+#else
+		HANDLE _pFile;
+		bool _eof;
+#endif
         bool _open;
 };
 

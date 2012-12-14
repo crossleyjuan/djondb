@@ -27,22 +27,26 @@
 #include <boost/crc.hpp>
 #include <limits.h>
 
+#ifndef WINDOWS
 #include <sys/mman.h>
 #include <sys/uio.h>
 #include <unistd.h>
 #include <fcntl.h>
+#else
+#endif
 #include <assert.h>
 
 MMapInputStream::MMapInputStream(const char* fileName, const char* flags)
 {
-	_pFile = ::open(fileName, O_RDONLY);
 	_fileName = fileName;
 	_open = true;
-	_len = fileSize(fileName);
 	_pos = 0;
+#ifndef WINDOWS
+	_pFile = ::open(fileName, O_RDONLY);
+	_len = fileSize(fileName);
 	bool shared = false;
 	bool advise = true;
-#ifdef __linux__
+#ifdef LINUX
 	_addr = reinterpret_cast<char *>(mmap(NULL, _len, PROT_READ, MAP_FILE | (shared?MAP_SHARED:MAP_PRIVATE) | MAP_POPULATE , _pFile, 0));
 #else
 	_addr = reinterpret_cast<char *>(mmap(NULL, _len, PROT_READ, MAP_FILE | (shared?MAP_SHARED:MAP_PRIVATE), _pFile, 0));
@@ -57,6 +61,76 @@ MMapInputStream::MMapInputStream(const char* fileName, const char* flags)
 			cerr<<" Couldn't set hints"<<endl; 
 		}
 	close();
+#else
+	// Create the test file. Open it "Create Always" to overwrite any
+	// existing file. The data is re-created below
+	_pFile = CreateFile(fileName,
+		GENERIC_READ,
+		FILE_SHARE_READ | FILE_SHARE_WRITE,
+		NULL,
+		OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL,
+		NULL);
+
+	if (_pFile == INVALID_HANDLE_VALUE)
+	{
+		DWORD error = GetLastError();
+
+		assert(false);
+	}
+
+	SYSTEM_INFO SysInfo;  // system information; used to get granularity
+	// Get the system allocation granularity.
+	GetSystemInfo(&SysInfo);
+	DWORD dwSysGran = SysInfo.dwAllocationGranularity;
+
+	// Now calculate a few variables. Calculate the file offsets as
+	// 64-bit values, and then get the low-order 32 bits for the
+	// function calls.
+
+	// To calculate where to start the file mapping, round down the
+	// offset of the data into the file to the nearest multiple of the
+	// system allocation granularity.
+	DWORD dwFileMapStart; // where to start the file map view
+	dwFileMapStart = (0 / dwSysGran) * dwSysGran;
+
+	_len = GetFileSize(_pFile,  NULL);
+
+	// Create a file mapping object for the file
+	// Note that it is a good idea to ensure the file size is not zero
+	HANDLE hMapFile = CreateFileMapping( _pFile,          // current file handle
+		NULL,           // default security
+		PAGE_READONLY, // read/write permission
+		0,              // size of mapping object, high
+		0,  // size of mapping object, low
+		NULL);          // name of mapping object
+
+	if (hMapFile == NULL)
+	{
+		assert(false);
+	}
+
+	// Map the view and test the results.
+	LPVOID lpMapAddress = MapViewOfFile(hMapFile,            // handle to
+		// mapping object
+		FILE_MAP_READ, // read/write
+		0,                   // high-order 32
+		// bits of file
+		// offset
+		0,      // low-order 32
+		// bits of file
+		// offset
+		_len);      // number of bytes
+	// to map
+	if (lpMapAddress == NULL)
+	{
+		assert(false);
+	}
+
+	// Calculate the pointer to the data.
+	_addr = (char*)lpMapAddress;
+	_initaddr = _addr;
+#endif
 }
 
 MMapInputStream::~MMapInputStream() {
@@ -168,8 +242,12 @@ __int64 MMapInputStream::crc32() {
 
 void MMapInputStream::close() {
 	if (_pFile > 0) {
+#ifndef WINDOWS
 		::close(_pFile);
 		_pFile = 0;
+#else
+		CloseHandle(_pFile);
+#endif
 		_open = false;
 	}
 }

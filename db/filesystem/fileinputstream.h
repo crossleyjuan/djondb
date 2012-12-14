@@ -40,7 +40,15 @@ public:
 
     virtual bool isClosed();
 private:
-    FILE* _pFile;
+	__int64 read(char* buffer, __int32 len); 
+
+private:
+#ifndef WINDOWS
+	FILE* _pFile;
+#else
+	HANDLE _pFile;
+	bool _eof;
+#endif
     std::string _fileName;
     bool _open;
 };

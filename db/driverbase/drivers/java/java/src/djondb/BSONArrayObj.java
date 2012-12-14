@@ -43,16 +43,16 @@ public class BSONArrayObj {
     this(djonwrapperJNI.new_BSONArrayObj__SWIG_1(BSONArrayObj.getCPtr(orig), orig), true);
   }
 
-  public int length() {
-    return djonwrapperJNI.BSONArrayObj_length(swigCPtr, this);
+  public SWIGTYPE_p___int32 length() {
+    return new SWIGTYPE_p___int32(djonwrapperJNI.BSONArrayObj_length(swigCPtr, this), true);
   }
 
   public void add(BSONObj obj) {
     djonwrapperJNI.BSONArrayObj_add(swigCPtr, this, BSONObj.getCPtr(obj), obj);
   }
 
-  public BSONObj get(int index) {
-    long cPtr = djonwrapperJNI.BSONArrayObj_get(swigCPtr, this, index);
+  public BSONObj get(SWIGTYPE_p___int32 index) {
+    long cPtr = djonwrapperJNI.BSONArrayObj_get(swigCPtr, this, SWIGTYPE_p___int32.getCPtr(index));
     return (cPtr == 0) ? null : new BSONObj(cPtr, false);
   }
 
