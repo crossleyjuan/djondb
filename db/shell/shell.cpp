@@ -828,6 +828,9 @@ void RunShell(v8::Handle<v8::Context> context) {
 				ss.str("");
 				lastCmd = cmd;
 				_commands.push_back(std::string(cmd));
+				if ((strcmp(cmd, "exit\n") == 0) || (strcmp(cmd, "quit\n") == 0)) {
+					cmd = "quit();";
+				}
 				ExecuteString(v8::String::New(cmd), name, true, true);
 			}
 		}

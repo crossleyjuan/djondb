@@ -40,8 +40,10 @@ void readSettings() {
 #else
 	char* ccont = readFile("djondb.conf");
 #endif
-	std::string content(ccont);
-
+	std::string content;
+	if (ccont != NULL) {
+		content = std::string(ccont);
+	}
 	std::vector<std::string> lines = splitLines(content);
 	for (std::vector<std::string>::const_iterator i = lines.begin(); i != lines.end(); i++) {
 		std::string line = *i;
@@ -68,7 +70,7 @@ std::string getSetting(std::string key) {
 	if (it != __settingsValues.end()) {
 		return it->second;
 	} else {
-		return "";
+		return std::string();
 	}
 }
 

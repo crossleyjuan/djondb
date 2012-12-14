@@ -64,7 +64,7 @@ class FileInputOutputStream: public InputStream, public OutputStream
 
     private:
         std::string _fileName;
-#ifndef WINDOWS
+#ifndef A
 		FILE* _pFile;
 #else
 		HANDLE _pFile;

@@ -30,9 +30,11 @@
 
 FileInputStream::FileInputStream(const char* fileName, const char* flags)
 {
-#ifndef WINDOWS
+#ifndef A
     _pFile = fopen(fileName, flags);
-	 setvbuf (_pFile, NULL , _IOFBF , 1024*4 ); // large buffer
+	if (_pFile != NULL) {
+		setvbuf (_pFile, NULL , _IOFBF , 1024*4 ); // large buffer
+	}
 #else
 	if (existFile(fileName)) {
 		_pFile = CreateFile(fileName,                // name of the write
@@ -40,7 +42,7 @@ FileInputStream::FileInputStream(const char* fileName, const char* flags)
 			FILE_SHARE_READ,        // do not share
 			NULL,                   // default security
 			OPEN_EXISTING,             // create new file only
-			FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS,  // normal file
+			FILE_ATTRIBUTE_NORMAL,  // normal file
 			NULL);                  // no attr. template
 	} else {
 		_pFile = CreateFile(fileName,                // name of the write
@@ -48,7 +50,7 @@ FileInputStream::FileInputStream(const char* fileName, const char* flags)
 			FILE_SHARE_READ,        // do not share
 			NULL,                   // default security
 			CREATE_NEW,             // create new file only
-			FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS,  // normal file
+			FILE_ATTRIBUTE_NORMAL,  // normal file
                        NULL);                  // no attr. template
 	}
     if (_pFile == INVALID_HANDLE_VALUE) 
@@ -66,7 +68,7 @@ FileInputStream::~FileInputStream() {
 
 __int64 FileInputStream::read(char* buffer, __int32 len) {
 	int readed = 0;
-#ifndef WINDOWS
+#ifndef A
 	readed = fread(buffer, 1, len, _pFile);
 #else
 	DWORD dwreaded = 0;
@@ -173,7 +175,7 @@ bool FileInputStream::eof() {
 	__int64 pos = currentPos();
 	// Force reading the last char to check the feof flag
 	readChar();
-#ifndef WINDOWS
+#ifndef A
 	bool res = feof(_pFile);
 #else
 	bool res = _eof;
@@ -184,7 +186,7 @@ bool FileInputStream::eof() {
 }
 
 __int64 FileInputStream::currentPos() const {
-#ifndef WINDOWS
+#ifndef A
 	return ftell(_pFile);
 #else
 	LARGE_INTEGER liOffset = {0};
@@ -201,7 +203,7 @@ __int64 FileInputStream::currentPos() const {
 }
 
 void FileInputStream::seek(__int64 i) {
-#ifndef WINDOWS
+#ifndef A
 	fseek(_pFile, i, SEEK_SET);
 #else
 	LARGE_INTEGER liOffset = {0};
@@ -219,7 +221,7 @@ void FileInputStream::seek(__int64 i) {
 
 __int64 FileInputStream::crc32() {
 	__int64 pos = currentPos();
-#ifndef WINDOWS
+#ifndef A
 	fseek(_pFile, 0, SEEK_END);
 #else
 	SetFilePointer(_pFile, 0, NULL, FILE_END);
@@ -244,8 +246,8 @@ __int64 FileInputStream::crc32() {
 }
 
 void FileInputStream::close() {
-	if (_open) {
-#ifndef WINDOWS
+	if (_open && _pFile) {
+#ifndef A
 		fclose(_pFile);
 		_pFile = 0;
 #else

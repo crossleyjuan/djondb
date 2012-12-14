@@ -78,7 +78,7 @@ void DBController::initialize() {
 	if ((dataDir.length() > 0) && !endsWith(dataDir.c_str(), FILESEPARATOR)) {
 		dataDir = dataDir + FILESEPARATOR;
 	} else {
-		dataDir = "";
+		dataDir = std::string("\0");
 	}
 
 	initialize(dataDir);

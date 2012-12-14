@@ -29,7 +29,7 @@
 
 FileInputOutputStream::FileInputOutputStream(const std::string& fileName, const char* flags) {
 	Logger* log = getLogger(NULL);
-#ifndef WINDOWS
+#ifndef A
     _pFile = fopen(fileName.c_str(), flags);
 	 setvbuf (_pFile, NULL , _IOFBF , 1024*4 ); // large buffer
     fseek(_pFile, 0, SEEK_END);
@@ -40,7 +40,7 @@ FileInputOutputStream::FileInputOutputStream(const std::string& fileName, const 
 			FILE_SHARE_READ | FILE_SHARE_WRITE,        // do not share
 			NULL,                   // default security
 			OPEN_EXISTING,             // create new file only
-			FILE_ATTRIBUTE_NORMAL,  // normal file
+			FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS  | FILE_FLAG_NO_BUFFERING,  // normal file
 			NULL);                  // no attr. template
 	} else {
 		_pFile = CreateFile(fileName.c_str(),                // name of the write
@@ -48,7 +48,7 @@ FileInputOutputStream::FileInputOutputStream(const std::string& fileName, const 
 			FILE_SHARE_READ | FILE_SHARE_WRITE,        // do not share
 			NULL,                   // default security
 			CREATE_NEW,             // create new file only
-			FILE_ATTRIBUTE_NORMAL,  // normal file
+			FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS  | FILE_FLAG_NO_BUFFERING,  // normal file
                        NULL);                  // no attr. template
 	}
     if (_pFile == INVALID_HANDLE_VALUE) 
@@ -77,7 +77,7 @@ FileInputOutputStream::~FileInputOutputStream() {
 
 __int64 FileInputOutputStream::read(char* buffer, __int32 len) {
 	int readed = 0;
-#ifndef WINDOWS
+#ifndef A
 	readed = fread(buffer, 1, len, _pFile);
 #else
 	DWORD dwreaded = 0;
@@ -93,8 +93,8 @@ __int64 FileInputOutputStream::read(char* buffer, __int32 len) {
 }
 
 void FileInputOutputStream::write(char* buffer, __int32 len) {
-#ifndef WINDOWS
-	readed = fwrite(buffer, 1, len, _pFile);
+#ifndef A
+	fwrite(buffer, 1, len, _pFile);
 #else
 	DWORD numberOfBytesWritten;
 	WriteFile(_pFile, buffer, len, &numberOfBytesWritten, NULL);
@@ -150,7 +150,7 @@ void FileInputOutputStream::writeString(const std::string& text) {
 }
 
 void FileInputOutputStream::seek(__int64 i) {
-#ifndef WINDOWS
+#ifndef A
     fflush(_pFile);
 	fseek(_pFile, i, SEEK_SET);
 #else
@@ -169,7 +169,7 @@ void FileInputOutputStream::seek(__int64 i) {
 }
 
 __int64 FileInputOutputStream::currentPos() const {
-#ifndef WINDOWS
+#ifndef A
 	return ftell(_pFile);
 #else
 	LARGE_INTEGER liOffset = {0};
@@ -188,7 +188,7 @@ __int64 FileInputOutputStream::currentPos() const {
 void FileInputOutputStream::close() {
     if (_pFile) {
         flush();
-#ifndef WINDOWS
+#ifndef A
         fclose(_pFile);
         _pFile = 0;
 #else
@@ -199,7 +199,7 @@ void FileInputOutputStream::close() {
 }
 
 void FileInputOutputStream::flush() {
-#ifndef WINDOWS
+#ifndef A
     fflush(_pFile);
 #else
 	FlushFileBuffers(_pFile);
@@ -293,7 +293,7 @@ bool FileInputOutputStream::eof() {
 	__int64 pos = currentPos();
 	// Force reading the last char to check the feof flag
 	readChar();
-#ifndef WINDOWS
+#ifndef A
 	bool res = feof(_pFile);
 #else
 	bool res = _eof;

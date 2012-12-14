@@ -43,7 +43,7 @@ private:
 	__int64 read(char* buffer, __int32 len); 
 
 private:
-#ifndef WINDOWS
+#ifndef A
 	FILE* _pFile;
 #else
 	HANDLE _pFile;
