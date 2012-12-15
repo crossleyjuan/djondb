@@ -54,8 +54,8 @@ private:
 #endif
 	 char* _initaddr;
 	 char* _addr;
-	 int _pos;
-	 int _len;
+	 __int64 _pos;
+	 __int64 _len;
     std::string _fileName;
     bool _open;
 };

@@ -53,10 +53,10 @@ FileInputStream::FileInputStream(const char* fileName, const char* flags)
 			FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS,  // normal file
                        NULL);                  // no attr. template
 	}
-    if (_pFile == INVALID_HANDLE_VALUE) 
-    { 
+    if (_pFile == INVALID_HANDLE_VALUE) { 
 		assert(false);
     }
+#endif
 	_fileName = fileName;
 	_open = true;
 }

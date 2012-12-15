@@ -230,9 +230,14 @@ bool makeDir(const char* dir) {
 
 __int64 fileSize(const char* file) {
 	struct stat st;
+	Logger* log = getLogger(NULL);
 
+	__int64 ret = -1;
 	if (stat(file, &st) == 0)
-		return st.st_size;
+		ret = st.st_size;
+	else 
+		log->error("Error getting the file: %s size: %d", file, errno); 
 
-	return -1;
+	delete log;
+	return ret;
 }

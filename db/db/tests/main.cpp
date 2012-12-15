@@ -104,7 +104,7 @@ class TestDBSuite: public Test::Suite
 			TEST_ADD(TestDBSuite::testFindsByTextFilter);
 			TEST_ADD(TestDBSuite::testFindPartial);
 			TEST_ADD(TestDBSuite::testUpdate);
-			TEST_ADD(TestDBSuite::testDelete);
+			TEST_ADD(TestDBSuite::testRemove);
 			TEST_ADD(TestDBSuite::testDropnamespace);
 			TEST_ADD(TestDBSuite::testDbs);
 			TEST_ADD(TestDBSuite::testNamespaces);
@@ -216,8 +216,8 @@ class TestDBSuite: public Test::Suite
 
 		}
 
-		void testDelete() {
-			cout << "\ntestDelete" << endl;
+		void testRemove() {
+			cout << "\ntestRemove" << endl;
 
 			controller->dropNamespace("dbdelete", "ns");
 			BSONObj obj;
@@ -281,7 +281,7 @@ class TestDBSuite: public Test::Suite
 				obj.add("age", 35);
 				obj.add("state", 1);
 				obj.add("name", "John");
-				obj.add("llong", LLONG_MAX);
+				obj.add("llong", (__int64)LLONG_MAX);
 
 				FilterParser* parser = NULL;
 				ExpressionResult* result = NULL;

@@ -16,6 +16,8 @@
  * =====================================================================================
  */
 #include "streammanager.h"
+#include "dbfilestream.h"
+#include "fileinputoutputstream.h"
 #include "fileoutputstream.h"
 #include <stdlib.h>
 #include <memory>
@@ -107,8 +109,9 @@ StreamType* StreamManager::open(std::string db, std::string ns, FILE_TYPE type) 
 	} else {
 		flags = "wb+";
 	}
+	FileInputOutputStream* fios = new FileInputOutputStream(streamfile, flags);
 	StreamType* output;
-  	output = new StreamType(streamfile, flags);
+  	output = new StreamType(fios);
 	if (streams) {
 		streams->insert(pair<FILE_TYPE, StreamType*>(type, output));
 	} else {
