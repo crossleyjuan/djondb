@@ -60,7 +60,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "djonjavadriver", "..\driver
 		{8D4F581B-05E3-41D3-8EF3-DF77FE97E40B} = {8D4F581B-05E3-41D3-8EF3-DF77FE97E40B}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C", "..\third_party\libantlr3c-3.2\C.vcproj", "{0F0FE03A-78F3-4B34-9DCE-0CDFF1FB5C40}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C", "..\third_party\libantlr3c-3.2\antlr.vcproj", "{0F0FE03A-78F3-4B34-9DCE-0CDFF1FB5C40}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "djonwrapper", "..\driverbase\drivers\csharp\native\djonwrapper.vcproj", "{2B37641C-4A5C-41F5-A4E1-034BAB23718A}"
 	ProjectSection(ProjectDependencies) = postProject

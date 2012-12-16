@@ -19,6 +19,8 @@
 #include "dbfilestream.h"
 #include "fileinputoutputstream.h"
 #include "fileoutputstream.h"
+#include "bsoninputstream.h"
+#include "bsonoutputstream.h"
 #ifdef WINDOWS
 #include "fileinputstreamw32.h"
 #endif
@@ -72,44 +74,46 @@ std::string StreamManager::fileName(std::string ns, FILE_TYPE type) const {
 StreamType* migrate20121216(StreamType* stream) {
 #ifdef WINDOWS
 	stream->close();
-	chat* fileName = stream->fileName();
+	char* fileName = const_cast<char*>(stream->fileName().c_str());
 	FileInputStreamW32* winStream = new FileInputStreamW32(fileName, "rb+");
 	std::string tempDir = getTempDir();
 	std::stringstream sfile;
 	sfile << tempDir;
-	if (!endsWith(tempDir, FILESEPARATOR)) {
+	if (!endsWith(tempDir.c_str(), FILESEPARATOR)) {
 		sfile << FILESEPARATOR;
 	}
 	sfile << "tempdb";
 	FILE_TYPE fileType;
-	if (endsWith(stream->fileName(), ".dat")) {
+	if (endsWith(stream->fileName().c_str(), ".dat")) {
 		// Data file
 		fileType = DATA_FTYPE;
 		sfile << ".dat";
-	} else if (endsWith(stream->fileName(), ".idx")) {
+	} else if (endsWith(stream->fileName().c_str(), ".idx")) {
 		fileType = INDEX_FTYPE;
 		sfile << ".idx";
 	}
 
 	std::string tempFileName = sfile.str();
-	FileOutputStream* fos = new FileOutputStream(tempFileName);
+	FileOutputStream* fos = new FileOutputStream(const_cast<char*>(tempFileName.c_str()), "wb+");
 
 	fos->writeChars("djondb_dat", 10);
-	fos->writeChars((std::string)Version("0.120121216"));
+	std::string sversion = Version("0.120121216");
+	fos->writeChars(sversion.c_str(), sversion.length());
 	BSONOutputStream bos(fos);
 	BSONInputStream bis(winStream);
 
 	stream->seek(0);
 	while (!stream->eof()) {
 		BSONObj* obj = bis.readBSON();
-		bos.writeBSON(obj);
+		bos.writeBSON(*obj);
+		delete obj;
 	}
 
 	fos->close();
 	delete fos;
 
-	removeFile(stream->fileName());
-	rename(tempFileName, winStream->fileName());
+	removeFile(stream->fileName().c_str());
+	rename(tempFileName.c_str(), winStream->fileName().c_str());
 
 	FileInputOutputStream* fios = new FileInputOutputStream(stream->fileName(), "rb+");
 	StreamType* result = new StreamType(fios);

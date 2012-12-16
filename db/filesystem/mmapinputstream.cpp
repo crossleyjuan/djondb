@@ -67,6 +67,7 @@ MMapInputStream::MMapInputStream(const char* fileName, const char* flags)
 				exit(1);
 			}
 		close();
+	}
 #else
 		// Create the test file. Open it "Create Always" to overwrite any
 		// existing file. The data is re-created below
@@ -138,7 +139,6 @@ MMapInputStream::MMapInputStream(const char* fileName, const char* flags)
 		_initaddr = _addr;
 #endif
 		_open = true;
-	}
 }
 
 MMapInputStream::~MMapInputStream() {

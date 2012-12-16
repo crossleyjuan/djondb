@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="filesystem"
 	ProjectGUID="{926BE9D3-3A05-40AB-83EA-40F4D940F23C}"
 	RootNamespace="filesystem"
@@ -293,7 +293,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\fileinputstreamw32.h"
+				>
+			</File>
+			<File
 				RelativePath=".\fileoutputstream.h"
+				>
+			</File>
+			<File
+				RelativePath=".\inputoutputstream.h"
 				>
 			</File>
 			<File
@@ -346,6 +354,10 @@
 			</File>
 			<File
 				RelativePath=".\fileinputstream.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\fileinputstreamw32.cpp"
 				>
 			</File>
 			<File
