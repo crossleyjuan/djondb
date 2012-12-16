@@ -53,6 +53,8 @@ class StreamManager {
 
 	private:
 		bool close(char* db, char* ns);
+		StreamType* checkVersion(StreamType* stream);
+
 	private:
 		std::map<std::string, std::map<std::string, SpacesType>* > _spaces;
 		std::string fileName(std::string ns, FILE_TYPE type) const;

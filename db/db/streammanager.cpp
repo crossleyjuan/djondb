@@ -19,6 +19,9 @@
 #include "dbfilestream.h"
 #include "fileinputoutputstream.h"
 #include "fileoutputstream.h"
+#ifdef WINDOWS
+#include "fileinputstreamw32.h"
+#endif
 #include <stdlib.h>
 #include <memory>
 #include <cstring>
@@ -66,6 +69,66 @@ std::string StreamManager::fileName(std::string ns, FILE_TYPE type) const {
 	return result;
 }
 
+StreamType* migrate20121216(StreamType* stream) {
+#ifdef WINDOWS
+	stream->close();
+	chat* fileName = stream->fileName();
+	FileInputStreamW32* winStream = new FileInputStreamW32(fileName, "rb+");
+	std::string tempDir = getTempDir();
+	std::stringstream sfile;
+	sfile << tempDir;
+	if (!endsWith(tempDir, FILESEPARATOR)) {
+		sfile << FILESEPARATOR;
+	}
+	sfile << "tempdb";
+	FILE_TYPE fileType;
+	if (endsWith(stream->fileName(), ".dat")) {
+		// Data file
+		fileType = DATA_FTYPE;
+		sfile << ".dat";
+	} else if (endsWith(stream->fileName(), ".idx")) {
+		fileType = INDEX_FTYPE;
+		sfile << ".idx";
+	}
+
+	std::string tempFileName = sfile.str();
+	FileOutputStream* fos = new FileOutputStream(tempFileName);
+
+	fos->writeChars("djondb_dat", 10);
+	fos->writeChars((std::string)Version("0.120121216"));
+	BSONOutputStream bos(fos);
+	BSONInputStream bis(winStream);
+
+	stream->seek(0);
+	while (!stream->eof()) {
+		BSONObj* obj = bis.readBSON();
+		bos.writeBSON(obj);
+	}
+
+	fos->close();
+	delete fos;
+
+	removeFile(stream->fileName());
+	rename(tempFileName, winStream->fileName());
+
+	FileInputOutputStream* fios = new FileInputOutputStream(stream->fileName(), "rb+");
+	StreamType* result = new StreamType(fios);
+	stream->close();
+	delete stream;
+	return result;
+#else
+	return stream;
+#endif
+}
+
+StreamType* StreamManager::checkVersion(StreamType* stream) {
+	StreamType* result = stream;
+	if (*stream->version() < Version("0.120121216")) {
+		stream = migrate20121216(stream);
+	}
+	return stream;
+}
+
 StreamType* StreamManager::open(std::string db, std::string ns, FILE_TYPE type) {
 	std::auto_ptr<Logger> log(getLogger(NULL));
 	StreamType* stream = NULL;
@@ -111,7 +174,8 @@ StreamType* StreamManager::open(std::string db, std::string ns, FILE_TYPE type) 
 	}
 	FileInputOutputStream* fios = new FileInputOutputStream(streamfile, flags);
 	StreamType* output;
-  	output = new StreamType(fios);
+	output = new StreamType(fios);
+	output = checkVersion(output);
 	if (streams) {
 		streams->insert(pair<FILE_TYPE, StreamType*>(type, output));
 	} else {

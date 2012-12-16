@@ -32,7 +32,7 @@ DBFileStream::DBFileStream(InputOutputStream* stream) {
 	_versionOffset = 0;
 	std::string mark = stream->readChars(10);
 	// check if the file is marked as versioned file (0.1 version does not have this mark)
-	if (mark.compare("1234") == 0) {
+	if (mark.compare("djondb_dat") == 0) {
 		char* version = stream->readChars(11);
 		_dbVersion = new Version(version);
 	} else {
@@ -163,4 +163,8 @@ bool DBFileStream::eof() {
 
 bool DBFileStream::isClosed() {
 	return _stream->isClosed();
+}
+
+Version* DBFileStream::version() const {
+	return _dbVersion;
 }
