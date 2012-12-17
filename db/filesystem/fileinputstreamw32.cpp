@@ -46,13 +46,13 @@ unsigned char FileInputStreamW32::readChar() {
 
 /* Reads 2 bytes in the input (little endian order) */
 short int FileInputStreamW32::readShortInt () {
-	short int result = readData<short int>();
+	short int result = readDataTmp<short int>();
 	return result;
 }
 
 /* Reads 4 bytes in the input (little endian order) */
 __int32 FileInputStreamW32::readInt () {
-	__int32 result = readData<__int32>();
+	int result = readDataTmp<int>();
 	return result;
 }
 
@@ -60,7 +60,12 @@ __int32 FileInputStreamW32::readInt () {
 __int64 FileInputStreamW32::readLong () {
 	// This is the only required change to migrate the databases in windows
 	// version 0.120121125 or older
-	return readData<__int32>();
+	return readDataTmp<long>();
+}
+
+/* Reads 16 bytes in the input (little endian order) */
+__int64 FileInputStreamW32::readLong64() {
+	return readDataTmp<__int64>();
 }
 
 /* Reads a 4 byte float in the input */

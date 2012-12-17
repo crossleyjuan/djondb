@@ -19,8 +19,10 @@ class DBFileStream: public InputOutputStream
         virtual short int readShortInt ();
         /* Reads 4 bytes in the input (little endian order) */
         virtual __int32 readInt ();
-        /* Reads 8 bytes in the input (little endian order) */
+        /* Reads 16 bytes in the input (little endian order) */
         virtual __int64 readLong ();
+        /* Reads 16 bytes in the input (little endian order) */
+        virtual __int64 readLong64();
         /* Reads a 4 byte float in the input */
         virtual float readFloatIEEE ();
         /* Reads a 8 byte double in the input */

@@ -383,6 +383,9 @@ BSONObj* DBController::findFirst(char* db, char* ns, const char* select, const c
 
 	std::string filename = ss.str();
 
+	// Execute open on streammanager, just to check that the file was alrady opened
+	StreamManager::getStreamManager()->open(db, ns, DATA_FTYPE);
+
 	MMapInputStream* fis = new MMapInputStream(filename.c_str(), "rb");
 	std::vector<BSONObj*> result;
 
@@ -426,6 +429,8 @@ std::vector<BSONObj*>* DBController::findFullScan(char* db, char* ns, const char
 
 	std::string filename = ss.str();
 
+	// Execute open on streammanager, just to check that the file was alrady opened
+	StreamManager::getStreamManager()->open(db, ns, DATA_FTYPE);
 	//FileInputStream* fis = new FileInputStream(filename.c_str(), "rb");
 	MMapInputStream* fis = new MMapInputStream(filename.c_str(), "rb");
 	std::vector<BSONObj*>* result = new std::vector<BSONObj*>();

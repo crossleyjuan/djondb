@@ -30,11 +30,13 @@
 DBFileStream::DBFileStream(InputOutputStream* stream) {
 	_stream = stream;
 	_versionOffset = 0;
-	std::string mark = stream->readChars(10);
+	stream->seek(0);
+	char* mark = stream->readChars();
 	// check if the file is marked as versioned file (0.1 version does not have this mark)
-	if (mark.compare("djondb_dat") == 0) {
-		char* version = stream->readChars(11);
+	if (strcmp(mark, "djondb_dat") == 0) {
+		char* version = stream->readChars();
 		_dbVersion = new Version(version);
+		_versionOffset = stream->currentPos();
 	} else {
 		_dbVersion = new Version("0.1");
 		stream->seek(0);
@@ -128,6 +130,11 @@ __int32 DBFileStream::readInt () {
 /* Reads 4 bytes in the input (little endian order) */
 __int64 DBFileStream::readLong () {
 	return _stream->readLong();
+}
+
+/* Reads 4 bytes in the input (little endian order) */
+__int64 DBFileStream::readLong64() {
+	return _stream->readLong64();
 }
 
 /* Reads a 4 byte float in the input */

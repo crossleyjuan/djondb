@@ -74,8 +74,8 @@ std::string StreamManager::fileName(std::string ns, FILE_TYPE type) const {
 StreamType* migrate20121216(StreamType* stream) {
 #ifdef WINDOWS
 	stream->close();
-	char* fileName = const_cast<char*>(stream->fileName().c_str());
-	FileInputStreamW32* winStream = new FileInputStreamW32(fileName, "rb+");
+	std::string fileName = stream->fileName();
+	FileInputStreamW32* winStream = new FileInputStreamW32(fileName.c_str(), "rb+");
 	std::string tempDir = getTempDir();
 	std::stringstream sfile;
 	sfile << tempDir;
@@ -84,11 +84,11 @@ StreamType* migrate20121216(StreamType* stream) {
 	}
 	sfile << "tempdb";
 	FILE_TYPE fileType;
-	if (endsWith(stream->fileName().c_str(), ".dat")) {
+	if (endsWith(fileName.c_str(), ".dat")) {
 		// Data file
 		fileType = DATA_FTYPE;
 		sfile << ".dat";
-	} else if (endsWith(stream->fileName().c_str(), ".idx")) {
+	} else if (endsWith(fileName.c_str(), ".idx")) {
 		fileType = INDEX_FTYPE;
 		sfile << ".idx";
 	}
@@ -102,20 +102,27 @@ StreamType* migrate20121216(StreamType* stream) {
 	BSONOutputStream bos(fos);
 	BSONInputStream bis(winStream);
 
-	stream->seek(0);
-	while (!stream->eof()) {
+	winStream->seek(0);
+	while (!winStream->eof()) {
 		BSONObj* obj = bis.readBSON();
 		bos.writeBSON(*obj);
 		delete obj;
+		if (fileType == INDEX_FTYPE) {
+			__int64 iCurrentPos = winStream->readLong();
+			fos->writeLong(iCurrentPos);
+			__int64 iFilePos = winStream->readLong();
+			fos->writeLong(iFilePos);
+		}
 	}
 
 	fos->close();
 	delete fos;
+	winStream->close();
 
-	removeFile(stream->fileName().c_str());
-	rename(tempFileName.c_str(), winStream->fileName().c_str());
+	removeFile(fileName.c_str());
+	rename(tempFileName.c_str(), fileName.c_str());
 
-	FileInputOutputStream* fios = new FileInputOutputStream(stream->fileName(), "rb+");
+	FileInputOutputStream* fios = new FileInputOutputStream(fileName, "rb+");
 	StreamType* result = new StreamType(fios);
 	stream->close();
 	delete stream;

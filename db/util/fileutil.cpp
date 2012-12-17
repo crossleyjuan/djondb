@@ -188,7 +188,8 @@ bool checkFileCreation(const char* dir) {
 
 bool removeFile(const char* file) {
 	if (remove(file) != 0) {
-		setLastError(errno, strerror(errno));
+		const char* error = strerror(errno);
+		setLastError(errno, error);
 		return false;
 	} else {
 		return true;
