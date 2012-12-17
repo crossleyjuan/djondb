@@ -2,6 +2,7 @@
 #define FILEINPUTOUTPUTSTREAM_H
 
 #include "inputoutputstream.h"
+#include "defs.h"
 #include <string>
 
 using namespace std;
@@ -14,7 +15,7 @@ class FileInputOutputStream: public InputOutputStream {
 
         virtual unsigned char readChar();
         /* Reads 2 bytes in the input (little endian order) */
-        virtual short int readShortInt ();
+        virtual __int16 readShortInt ();
         /* Reads 4 bytes in the input (little endian order) */
         virtual __int32 readInt ();
         /* Reads 8 bytes in the input (little endian order) */
@@ -34,7 +35,7 @@ class FileInputOutputStream: public InputOutputStream {
 
         virtual void writeChar (unsigned char v);
         /* Write 2 bytes in the output (little endian order) */
-        virtual void writeShortInt (short int v);
+        virtual void writeShortInt (__int16 v);
         /* Write 4 bytes in the output (little endian order) */
         virtual void writeInt (__int32 v);
         /* Write 4 bytes in the output (little endian order) */
@@ -47,7 +48,7 @@ class FileInputOutputStream: public InputOutputStream {
         virtual void writeChars(const char* text, __int32 len);
         virtual void writeString(const std::string& text);
 
-        virtual void seek(__int64);
+		virtual void seek(__int64 pos, SEEK_DIRECTION direction = FROMSTART_SEEK);
         virtual __int64 currentPos() const;
 
         virtual const std::string fileName() const;

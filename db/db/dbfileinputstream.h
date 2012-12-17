@@ -1,5 +1,5 @@
-#ifndef DBFILESTREAM_H
-#define DBFILESTREAM_H
+#ifndef DBFileInputStream_H
+#define DBFileInputStream_H
 
 #include "inputoutputstream.h"
 #include "util.h"
@@ -7,16 +7,17 @@
 
 using namespace std;
 
-class DBFileStream: public InputOutputStream
+class DBFileInputStream: public InputStream
 {
     public:
-        DBFileStream(const DBFileStream& other);
-        DBFileStream(InputOutputStream* stream);
-        virtual ~DBFileStream();
+        DBFileInputStream(const DBFileInputStream& other);
+        DBFileInputStream(InputStream* stream, char* fileName);
+        DBFileInputStream(InputStream* stream);
+        virtual ~DBFileInputStream();
 
         virtual unsigned char readChar();
         /* Reads 2 bytes in the input (little endian order) */
-        virtual __int16 readShortInt ();
+        virtual short int readShortInt ();
         /* Reads 4 bytes in the input (little endian order) */
         virtual __int32 readInt ();
         /* Reads 16 bytes in the input (little endian order) */
@@ -30,24 +31,8 @@ class DBFileStream: public InputOutputStream
         /* Read a chars */
         virtual char* readChars();
         virtual char* readChars(__int32 length);
-        virtual const char* readFull();
 
         virtual std::string* readString();
-
-        virtual void writeChar (unsigned char v);
-        /* Write 2 bytes in the output (little endian order) */
-        virtual void writeShortInt (__int16 v);
-        /* Write 4 bytes in the output (little endian order) */
-        virtual void writeInt (__int32 v);
-        /* Write 4 bytes in the output (little endian order) */
-        virtual void writeLong (__int64 v);
-        /* Write a 4 byte float in the output */
-        virtual void writeFloatIEEE (float v);
-        /* Write a 8 byte double in the output */
-        virtual void writeDoubleIEEE (double v);
-        /* Write a char */
-        virtual void writeChars(const char* text, __int32 len);
-        virtual void writeString(const std::string& text);
 
 		virtual void seek(__int64 pos, SEEK_DIRECTION direction = FROMSTART_SEEK);
         virtual __int64 currentPos() const;
@@ -56,16 +41,15 @@ class DBFileStream: public InputOutputStream
         virtual bool eof();
         virtual void close();
 
-        virtual void flush();
-
         virtual bool isClosed();
 
-		  Version* version() const;
+		Version* version() const;
 
 	 private:
-		  InputOutputStream* _stream;
+		  InputStream* _stream;
 		  __int32 _versionOffset;
 		  Version* _dbVersion;
+		  char* _fileName;
 };
 
-#endif // DBFILESTREAM_H
+#endif // DBFileInputStream_H

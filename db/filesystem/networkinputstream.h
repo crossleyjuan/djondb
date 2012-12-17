@@ -19,7 +19,7 @@ class NetworkInputStream : public InputStream
     public:
         virtual unsigned char readChar();
         /* Reads 2 bytes in the input (little endian order) */
-        virtual short int readShortInt ();
+        virtual __int16 readShortInt ();
         /* Reads 4 bytes in the input (little endian order) */
         virtual __int32 readInt ();
         /* Reads 8 bytes in the input (little endian order) */
@@ -34,13 +34,13 @@ class NetworkInputStream : public InputStream
         virtual char* readChars();
         virtual char* readChars(__int32 length);
 
-        virtual void closeStream();
-        bool eof();
+        virtual void close();
+        virtual bool eof();
         int available();
         int waitAvailable(int timeout = 10);
         bool isClosed();
 
-		  virtual void seek(__int64) {
+		virtual void seek(__int64 pos, SEEK_DIRECTION direction = FROMSTART_SEEK) {
 			  // Unsupported methods in network interfaces
 			  assert(false);
 		  };

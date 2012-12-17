@@ -17,7 +17,7 @@ class MemoryStream: public InputStream, public OutputStream
 
         virtual unsigned char readChar();
         /* Reads 2 bytes in the input (little endian order) */
-        virtual short int readShortInt ();
+        virtual __int16 readShortInt ();
         /* Reads 4 bytes in the input (little endian order) */
         virtual __int32 readInt ();
         /* Reads 4 bytes in the input (little endian order) */
@@ -37,7 +37,7 @@ class MemoryStream: public InputStream, public OutputStream
 
         virtual void writeChar (unsigned char v);
         /* Write 2 bytes in the output (little endian order) */
-        virtual void writeShortInt (short int v);
+        virtual void writeShortInt (__int16 v);
         /* Write 4 bytes in the output (little endian order) */
         virtual void writeInt (__int32 v);
         /* Write 4 bytes in the output (little endian order) */
@@ -50,7 +50,7 @@ class MemoryStream: public InputStream, public OutputStream
         virtual void writeChars(const char* text, int len);
         virtual void writeString(const std::string& text);
 
-        virtual void seek(long);
+		virtual void seek(__int64 pos, SEEK_DIRECTION direction = FROMSTART_SEEK);
         virtual __int64 currentPos() const;
 
         virtual bool eof();

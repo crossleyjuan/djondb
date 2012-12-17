@@ -27,6 +27,7 @@
 #include <boost/crc.hpp>
 #include <limits.h>
 #include <errno.h>
+#include <assert.h>
 
 #ifndef WINDOWS
 #include <sys/mman.h>
@@ -153,8 +154,8 @@ unsigned char MMapInputStream::readChar() {
 }
 
 /* Reads 2 bytes in the input (little endian order) */
-short int MMapInputStream::readShortInt () {
-	short int result = readData<short int>();
+__int16 MMapInputStream::readShortInt () {
+	__int16 result = readData<__int16>();
 	return result;
 }
 
@@ -244,9 +245,16 @@ __int64 MMapInputStream::currentPos() const {
 	return _pos;
 }
 
-void MMapInputStream::seek(__int64 i) {
-	_addr = _initaddr + i;
-	_pos = i;
+void MMapInputStream::seek(__int64 i, SEEK_DIRECTION direction) {
+	Logger* log = getLogger(NULL);
+	if (direction == FROMSTART_SEEK) {
+		_addr = _initaddr + i;
+		_pos = i;
+	} else {
+		log->error(std::string("Unsupported direction in Memory Mapped Files")); 
+		assert(false);
+	}
+	delete log;
 }
 
 __int64 MMapInputStream::crc32() {

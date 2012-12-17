@@ -125,9 +125,9 @@ void MemoryStream::writeChar (unsigned char v)
 }
 
 /* Write 2 bytes in the output (little endian order) */
-void MemoryStream::writeShortInt (short int v)
+void MemoryStream::writeShortInt (__int16 v)
 {
-	writeData<short int>(v);
+	writeData<__int16>(v);
 }
 
 /* Write 4 bytes in the output (little endian order) */
@@ -165,13 +165,19 @@ void MemoryStream::writeString(const std::string& text) {
 	writeChars(c, l);
 }
 
-void MemoryStream::seek(long i) {
-	if (i > _length) {
-		i = _length;
+void MemoryStream::seek(__int64 i, SEEK_DIRECTION direction) {
+	if (direction == FROMSTART_SEEK) {
+		if (i > _length) {
+			i = _length;
+		}
+		_currentIndex = (int)i / (int)_bufferSize;
+		_currentBuffer = _buffer[_currentIndex];
+		_currentBufferPos = i % _bufferSize;
+	} else {
+		_currentIndex = _maxIndexes * _bufferSize;
+		_currentBuffer = _buffer[_currentIndex];
+		_currentBufferPos = _length - (_length % _bufferSize);
 	}
-	_currentIndex = (int)i / (int)_bufferSize;
-	_currentBuffer = _buffer[_currentIndex];
-	_currentBufferPos = i % _bufferSize;
 }
 
 __int64 MemoryStream::currentPos() const {
@@ -192,8 +198,8 @@ unsigned char MemoryStream::readChar() {
 }
 
 /* Reads 2 bytes in the input (little endian order) */
-short int MemoryStream::readShortInt () {
-	short int v = readData<short int>();
+__int16 MemoryStream::readShortInt () {
+	__int16 v = readData<__int16>();
 	return v;
 }
 

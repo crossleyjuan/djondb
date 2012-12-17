@@ -2,6 +2,7 @@
 #define INPUTSTREAM_H
 
 #include "util.h"
+#include "defs.h"
 #include <istream>
 #include <iostream>
 #include <stdio.h>
@@ -13,6 +14,8 @@ public:
     InputStream() {};
 
     virtual unsigned char readChar() = 0;
+    /* Reads 2 bytes in the input (little endian order) */
+    virtual __int16 readShortInt () = 0;
     /* Reads 2 bytes in the input (little endian order) */
     virtual __int32 readInt () = 0;
     /* Reads 4 bytes in the input (little endian order) */
@@ -26,10 +29,13 @@ public:
     /* Read a chars */
     virtual char* readChars() = 0;
     virtual char* readChars(int length) = 0;
-    bool eof();
+    virtual bool eof() = 0;
     virtual bool isClosed() = 0;
 
-	 virtual void seek(__int64) = 0;
+    virtual void close() = 0;
+
+	virtual void seek(__int64 pos, SEEK_DIRECTION direction = FROMSTART_SEEK) = 0;
+
 	 virtual __int64 currentPos() const = 0;
 
 	 virtual std::string* readString() = 0;

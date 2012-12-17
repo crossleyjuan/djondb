@@ -78,10 +78,10 @@ void NetworkOutputStream::writeChar (unsigned char v)
 }
 
 /* Write 2 bytes in the output (little endian order) */
-void NetworkOutputStream::writeShortInt (short int v)
+void NetworkOutputStream::writeShortInt (__int16 v)
 {
 	if (_logger->isDebug()) _logger->debug(3, "NetworkOutputStream::writeShortInt, short: %d", v);
-	writeData<short int>(v);
+	writeData<__int16>(v);
 	if (_logger->isDebug()) _logger->debug(3, "~NetworkOutputStream::writeInt");
 }
 

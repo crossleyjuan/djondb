@@ -19,6 +19,7 @@
 #include "fileinputoutputstream.h"
 
 #include "util.h"
+#include "defs.h"
 #include <string.h>
 #include <boost/crc.hpp>
 #include <stdlib.h>
@@ -109,9 +110,9 @@ void FileInputOutputStream::writeChar (unsigned char v)
 }
 
 /* Write 2 bytes in the output (little endian order) */
-void FileInputOutputStream::writeShortInt (short int v)
+void FileInputOutputStream::writeShortInt (__int16 v)
 {
-	writeData<short int>(v);
+	writeData<__int16>(v);
 }
 
 /* Write 4 bytes in the output (little endian order) */
@@ -149,10 +150,14 @@ void FileInputOutputStream::writeString(const std::string& text) {
     writeChars(c, l);
 }
 
-void FileInputOutputStream::seek(__int64 i) {
+void FileInputOutputStream::seek(__int64 i, SEEK_DIRECTION direction) {
 #ifndef A
     fflush(_pFile);
-	fseek(_pFile, i, SEEK_SET);
+	if (direction == FROMSTART_SEEK) {
+		fseek(_pFile, i, SEEK_SET);
+	} else {
+		fseek(_pFile, i, SEEK_END);
+	}
 #else
 	flush();
 	LARGE_INTEGER liOffset = {0};
@@ -217,8 +222,8 @@ unsigned char FileInputOutputStream::readChar() {
 }
 
 /* Reads 2 bytes in the input (little endian order) */
-short int FileInputOutputStream::readShortInt () {
-	__int32 v = readData<short int>();
+__int16 FileInputOutputStream::readShortInt () {
+	__int32 v = readData<__int16>();
 	return v;
 	/*
     int v = readChar() | readChar() << 8;

@@ -98,7 +98,7 @@ void DjondbConnection::close() {
 
 void DjondbConnection::internalClose() {
 	if (_open) {
-		_inputStream->closeStream();
+		_inputStream->close();
 		_outputStream->closeStream();
 		if (_inputStream)   {
 			delete (_inputStream);

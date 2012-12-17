@@ -6,8 +6,6 @@
 #include "service.h"
 #include <windows.h>
 
-bool __stopRunning;
-
 /**************************************************************************
 Function: signal_handler
 
@@ -30,7 +28,6 @@ BOOL WINAPI signal_handler(DWORD dwCtrlType) {
 		case CTRL_BREAK_EVENT:
 		case CTRL_CLOSE_EVENT:
 			service_shutdown();
-			__stopRunning = true;
 			result = TRUE;
 			break;
 		default:
@@ -42,7 +39,6 @@ BOOL WINAPI signal_handler(DWORD dwCtrlType) {
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	__stopRunning = false;
 	Logger* log = getLogger(NULL);
 	log->info("djondbd version %s is starting up.", VERSION);
 	service_startup();
@@ -54,7 +50,7 @@ int _tmain(int argc, _TCHAR* argv[])
     ::SetConsoleCtrlHandler(signal_handler, TRUE);
 
 	while(true) {
-		if (__stopRunning) {
+		if (!service_running()) {
 			break;
 		}
 		Thread::sleep(5000);

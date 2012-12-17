@@ -6,6 +6,10 @@
 #include <vector>
 
 using namespace std;
+enum SEEK_DIRECTION {
+	FROMSTART_SEEK,
+	FROMEND_SEEK
+};
 
 class StreamException : public exception {
 private:

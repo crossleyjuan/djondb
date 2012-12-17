@@ -23,6 +23,7 @@
 #include "fileinputstream.h"
 #include "mmapinputstream.h"
 #include "fileoutputstream.h"
+#include "dbfileinputstream.h"
 
 #include "bsonoutputstream.h"
 #include "bsoninputstream.h"
@@ -432,10 +433,11 @@ std::vector<BSONObj*>* DBController::findFullScan(char* db, char* ns, const char
 	// Execute open on streammanager, just to check that the file was alrady opened
 	StreamManager::getStreamManager()->open(db, ns, DATA_FTYPE);
 	//FileInputStream* fis = new FileInputStream(filename.c_str(), "rb");
-	MMapInputStream* fis = new MMapInputStream(filename.c_str(), "rb");
+	MMapInputStream* mmis = new MMapInputStream(filename.c_str(), "rb");
+	DBFileInputStream* dbStream = new DBFileInputStream(mmis);
 	std::vector<BSONObj*>* result = new std::vector<BSONObj*>();
 
-	BSONInputStream* bis = new BSONInputStream(fis);
+	BSONInputStream* bis = new BSONInputStream(dbStream);
 
 	std::set<std::string> tokens = parser->xpathTokens();
 	std::string filterSelect;
@@ -454,7 +456,7 @@ std::vector<BSONObj*>* DBController::findFullScan(char* db, char* ns, const char
 		filterSelect = "*";
 	}
 
-	while (!fis->eof()) {
+	while (!dbStream->eof()) {
 		BSONObj* obj = bis->readBSON("*");
 		// Only "active" Records
 		if (obj->getInt("_status") == 1) {
@@ -474,7 +476,7 @@ std::vector<BSONObj*>* DBController::findFullScan(char* db, char* ns, const char
 
 	delete parser;
 	delete bis;
-	delete fis;
+	delete mmis;
 
 	return result;
 }

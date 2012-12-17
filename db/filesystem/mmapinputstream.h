@@ -18,7 +18,7 @@ public:
 
     virtual unsigned char readChar();
     /* Reads 2 bytes in the input (little endian order) */
-    virtual short int readShortInt ();
+    virtual __int16 readShortInt ();
     /* Reads 4 bytes in the input (little endian order) */
     virtual __int32 readInt ();
     /* Reads 4 bytes in the input (little endian order) */
@@ -35,7 +35,7 @@ public:
     virtual void readChars(__int32 length, char* res);
     virtual const char* readFull();
     virtual __int64 currentPos() const;
-    virtual void seek(__int64 i);
+	virtual void seek(__int64 pos, SEEK_DIRECTION direction = FROMSTART_SEEK);
     virtual __int64 crc32();
 
     virtual std::string* readString();

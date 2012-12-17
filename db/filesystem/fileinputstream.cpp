@@ -94,8 +94,8 @@ unsigned char FileInputStream::readChar() {
 }
 
 /* Reads 2 bytes in the input (little endian order) */
-short int FileInputStream::readShortInt () {
-	short int result = readData<short int>();
+__int16 FileInputStream::readShortInt () {
+	__int16 result = readData<__int16>();
 	return result;
 }
 
@@ -207,9 +207,13 @@ __int64 FileInputStream::currentPos() const {
 #endif
 }
 
-void FileInputStream::seek(__int64 i) {
+void FileInputStream::seek(__int64 i, SEEK_DIRECTION direction) {
 #ifndef A
-	fseek(_pFile, i, SEEK_SET);
+	if (direction == FROMSTART_SEEK) {
+		fseek(_pFile, i, SEEK_SET);
+	} else {
+		fseek(_pFile, i, SEEK_END);
+	}
 #else
 	LARGE_INTEGER liOffset = {0};
 	liOffset.QuadPart = i;

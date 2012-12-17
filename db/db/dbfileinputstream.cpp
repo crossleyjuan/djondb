@@ -16,7 +16,7 @@
 // this program will be open sourced and all its derivated work will be too.
 // *********************************************************************************************************************
 
-#include "dbfilestream.h"
+#include "dbfileinputstream.h"
 
 #include "util.h"
 #include <string.h>
@@ -27,8 +27,9 @@
 #include <limits.h>
 #include <assert.h>
 
-DBFileStream::DBFileStream(InputOutputStream* stream) {
+DBFileInputStream::DBFileInputStream(InputStream* stream) {
 	_stream = stream;
+	_fileName = NULL;
 	_versionOffset = 0;
 	stream->seek(0);
 	char* mark = stream->readChars();
@@ -39,60 +40,33 @@ DBFileStream::DBFileStream(InputOutputStream* stream) {
 		_versionOffset = stream->currentPos();
 	} else {
 		_dbVersion = new Version("0.1");
+		stream->seek(0);
 	}
-	seek(0, FROMEND_SEEK);
 }
 
-DBFileStream::~DBFileStream() {
+DBFileInputStream::DBFileInputStream(InputStream* stream, char* fileName) {
+	_stream = stream;
+	_fileName = fileName;
+	_versionOffset = 0;
+	stream->seek(0);
+	char* mark = stream->readChars();
+	// check if the file is marked as versioned file (0.1 version does not have this mark)
+	if (strcmp(mark, "djondb_dat") == 0) {
+		char* version = stream->readChars();
+		_dbVersion = new Version(version);
+		_versionOffset = stream->currentPos();
+	} else {
+		_dbVersion = new Version("0.1");
+		stream->seek(0);
+	}
+}
+
+DBFileInputStream::~DBFileInputStream() {
 	delete _stream;
 	delete _dbVersion;
 }
 
-/* Write 1 byte in the output */
-void DBFileStream::writeChar (unsigned char v)
-{
-	_stream->writeChar(v);
-}
-
-/* Write 2 bytes in the output (little endian order) */
-void DBFileStream::writeShortInt (__int16 v)
-{
-	_stream->writeShortInt(v);
-}
-
-/* Write 4 bytes in the output (little endian order) */
-void DBFileStream::writeInt (__int32 v)
-{
-	_stream->writeInt(v);
-}
-
-/* Write 4 bytes in the output (little endian order) */
-void DBFileStream::writeLong (__int64 v)
-{
-	_stream->writeLong(v);
-}
-
-/* Write a 4 byte float in the output */
-void DBFileStream::writeFloatIEEE (float v)
-{
-	_stream->writeFloatIEEE(v);
-}
-
-/* Write a 8 byte double in the output */
-void DBFileStream::writeDoubleIEEE (double v)
-{
-	_stream->writeDoubleIEEE(v);
-}
-
-void DBFileStream::writeChars(const char *text, __int32 len) {
-	_stream->writeChars(text, len);
-}
-
-void DBFileStream::writeString(const std::string& text) {
-	_stream->writeString(text);
-}
-
-void DBFileStream::seek(__int64 i, SEEK_DIRECTION direction) {
+void DBFileInputStream::seek(__int64 i, SEEK_DIRECTION direction) {
 	if (direction == FROMSTART_SEEK) {
 		_stream->seek(_versionOffset + i, direction);
 	} else {
@@ -100,82 +74,74 @@ void DBFileStream::seek(__int64 i, SEEK_DIRECTION direction) {
 	}
 }
 
-__int64 DBFileStream::currentPos() const {
+__int64 DBFileInputStream::currentPos() const {
 	__int64 pos = _stream->currentPos();
 	return pos - _versionOffset;
 }
 
-void DBFileStream::close() {
+void DBFileInputStream::close() {
 	_stream->close();
 }
 
-void DBFileStream::flush() {
-	_stream->flush();
+const std::string DBFileInputStream::fileName() const {
+	return _fileName;
 }
 
-const std::string DBFileStream::fileName() const {
-	return _stream->fileName();
-}
-
-unsigned char DBFileStream::readChar() {
+unsigned char DBFileInputStream::readChar() {
 	return _stream->readChar();
 }
 
 /* Reads 2 bytes in the input (little endian order) */
-__int16 DBFileStream::readShortInt () {
+__int16 DBFileInputStream::readShortInt () {
 	return _stream->readShortInt();
 }
 
 /* Reads 4 bytes in the input (little endian order) */
-__int32 DBFileStream::readInt () {
+__int32 DBFileInputStream::readInt () {
 	return _stream->readInt();
 }
 
 /* Reads 4 bytes in the input (little endian order) */
-__int64 DBFileStream::readLong () {
+__int64 DBFileInputStream::readLong () {
 	return _stream->readLong();
 }
 
 /* Reads 4 bytes in the input (little endian order) */
-__int64 DBFileStream::readLong64() {
+__int64 DBFileInputStream::readLong64() {
 	return _stream->readLong64();
 }
 
 /* Reads a 4 byte float in the input */
-float DBFileStream::readFloatIEEE () {
+float DBFileInputStream::readFloatIEEE () {
 	return _stream->readFloatIEEE();
 }
 
 /* Reads a 8 byte double in the input */
-double DBFileStream::readDoubleIEEE () {
+double DBFileInputStream::readDoubleIEEE () {
 	return _stream->readDoubleIEEE();
 }
 
 /* Read a chars */
-char* DBFileStream::readChars() {
+char* DBFileInputStream::readChars() {
 	return _stream->readChars();
 }
 
-std::string* DBFileStream::readString() {
+std::string* DBFileInputStream::readString() {
 	return _stream->readString();
 }
 
-char* DBFileStream::readChars(__int32 length) {
+char* DBFileInputStream::readChars(__int32 length) {
 	return _stream->readChars(length);
 }
 
-const char* DBFileStream::readFull() {
-	return _stream->readFull();
-}
-
-bool DBFileStream::eof() {
+bool DBFileInputStream::eof() {
 	return _stream->eof();
 }
 
-bool DBFileStream::isClosed() {
+bool DBFileInputStream::isClosed() {
 	return _stream->isClosed();
 }
 
-Version* DBFileStream::version() const {
+Version* DBFileInputStream::version() const {
 	return _dbVersion;
 }

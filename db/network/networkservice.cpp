@@ -92,6 +92,7 @@ void NetworkService::start() { //throw (NetworkException*) {
 
 	__dbController = new DBController();
 	__dbController->initialize();
+	setRunning(true);
 	m_thread = new Thread(&startSocketListener);
 	m_thread->start(this);
 

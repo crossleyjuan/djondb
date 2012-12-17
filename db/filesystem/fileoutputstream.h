@@ -2,6 +2,7 @@
 #define FILEOUTPUTSTREAM_H
 
 #include "outputstream.h"
+#include "defs.h"
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,7 +17,7 @@ class FileOutputStream: public OutputStream
     public:
         virtual void writeChar (unsigned char v);
         /* Write 2 bytes in the output (little endian order) */
-        virtual void writeShortInt (short int v);
+        virtual void writeShortInt (__int16 v);
         /* Write 4 bytes in the output (little endian order) */
         virtual void writeInt (__int32 v);
         /* Write 4 bytes in the output (little endian order) */
@@ -31,7 +32,7 @@ class FileOutputStream: public OutputStream
         virtual void writeChars(const char* text, __int32 len);
         virtual void writeString(const std::string& text);
 
-        virtual void seek(__int64);
+		virtual void seek(__int64 pos, SEEK_DIRECTION direction = FROMSTART_SEEK);
         virtual __int64 currentPos() const;
 
         virtual __int64 crc32(__int32 pos);

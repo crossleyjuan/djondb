@@ -29,6 +29,7 @@
 
 #include "inputstream.h"
 #include "outputstream.h"
+#include "defs.h"
 #include <string>
 
 using namespace std;
@@ -38,7 +39,7 @@ class InputOutputStream: public InputStream, public OutputStream
     public:
         virtual unsigned char readChar() = 0;
         /* Reads 2 bytes in the input (little endian order) */
-        virtual short int readShortInt () = 0;
+        virtual __int16 readShortInt () = 0;
         /* Reads 4 bytes in the input (little endian order) */
         virtual __int32 readInt () = 0;
         /* Reads 8 bytes in the input (little endian order) */
@@ -58,7 +59,7 @@ class InputOutputStream: public InputStream, public OutputStream
 
         virtual void writeChar (unsigned char v) = 0;
         /* Write 2 bytes in the output (little endian order) */
-        virtual void writeShortInt (short int v) = 0;
+        virtual void writeShortInt (__int16 v) = 0;
         /* Write 4 bytes in the output (little endian order) */
         virtual void writeInt (__int32 v) = 0;
         /* Write 4 bytes in the output (little endian order) */
@@ -71,7 +72,7 @@ class InputOutputStream: public InputStream, public OutputStream
         virtual void writeChars(const char* text, __int32 len) = 0;
         virtual void writeString(const std::string& text) = 0;
 
-        virtual void seek(__int64) = 0;
+		virtual void seek(__int64 pos, SEEK_DIRECTION direction = FROMSTART_SEEK) = 0;
         virtual __int64 currentPos() const = 0;
 
         virtual const std::string fileName() const = 0;

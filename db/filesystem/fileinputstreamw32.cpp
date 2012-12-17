@@ -45,8 +45,8 @@ unsigned char FileInputStreamW32::readChar() {
 }
 
 /* Reads 2 bytes in the input (little endian order) */
-short int FileInputStreamW32::readShortInt () {
-	short int result = readDataTmp<short int>();
+__int16 FileInputStreamW32::readShortInt () {
+	__int16 result = readDataTmp<__int16>();
 	return result;
 }
 
@@ -138,8 +138,12 @@ __int64 FileInputStreamW32::currentPos() const {
 	return ftell(_pFile);
 }
 
-void FileInputStreamW32::seek(__int64 i) {
-	fseek(_pFile, i, SEEK_SET);
+void FileInputStreamW32::seek(__int64 i, SEEK_DIRECTION direction) {
+	if (direction == FROMSTART_SEEK) {
+		fseek(_pFile, i, SEEK_SET);
+	} else {
+		fseek(_pFile, i, SEEK_END);
+	}
 }
 
 __int64 FileInputStreamW32::crc32() {

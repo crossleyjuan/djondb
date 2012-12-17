@@ -79,9 +79,9 @@ unsigned char NetworkInputStream::readChar() {
 }
 
 /* Reads 2 bytes in the input (little endian order) */
-short int NetworkInputStream::readShortInt () {
+__int16 NetworkInputStream::readShortInt () {
 	if (_logger->isDebug()) _logger->debug(3, "NetworkInputStream::readShortInt");
-	short int result = readData<short int>();
+	__int16 result = readData<__int16>();
 	if (_logger->isDebug()) _logger->debug(3, "~NetworkInputStream::readInt");
 	return result;
 }
@@ -163,7 +163,7 @@ bool NetworkInputStream::eof() {
 	return false;
 }
 
-void NetworkInputStream::closeStream() {
+void NetworkInputStream::close() {
 #ifdef _WIN32
 	::closesocket(_socket);
 #else
@@ -182,7 +182,7 @@ int NetworkInputStream::checkStatus() {
 	if (_open) {
 		int res = waitAvailable(2000);
 		if (res < 0) {
-			closeStream();
+			close();
 		}
 		return res;
 	}
@@ -296,7 +296,7 @@ int NetworkInputStream::fillBuffer(int timeout) {
 	}
 	delete log;
 	if (error) {
-		closeStream();
+		close();
 		return -1;
 	}
 	return 0;
