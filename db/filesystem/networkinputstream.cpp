@@ -167,7 +167,7 @@ void NetworkInputStream::close() {
 #ifdef _WIN32
 	::closesocket(_socket);
 #else
-	close(_socket);
+	::close(_socket);
 #endif
 	_open = false;
 }

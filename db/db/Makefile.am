@@ -22,6 +22,7 @@ libdjon_db_la_SOURCES = bplusindex.cpp \
 								expressionresult.cpp \
 								binaryexpression.cpp \
 								dbfilestream.cpp \
+								dbfileinputstream.cpp \
 								filterdefs.cpp \
 								filter_expressionLexer.cpp \
 								filter_expressionParser.cpp \

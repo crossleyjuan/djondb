@@ -21,9 +21,7 @@
 #include "fileoutputstream.h"
 #include "bsoninputstream.h"
 #include "bsonoutputstream.h"
-#ifdef WINDOWS
 #include "fileinputstreamw32.h"
-#endif
 #include <stdlib.h>
 #include <memory>
 #include <cstring>
@@ -72,10 +70,9 @@ std::string StreamManager::fileName(std::string ns, FILE_TYPE type) const {
 }
 
 StreamType* migrate20121216(StreamType* stream) {
-#ifdef WINDOWS
 	stream->close();
 	std::string fileName = stream->fileName();
-	FileInputStreamW32* winStream = new FileInputStreamW32(fileName.c_str(), "rb+");
+	FileInputStreamW32* origStream = new FileInputStreamW32(fileName.c_str(), "rb+");
 	std::string tempDir = getTempDir();
 	std::stringstream sfile;
 	sfile << tempDir;
@@ -100,24 +97,24 @@ StreamType* migrate20121216(StreamType* stream) {
 	std::string sversion = Version("0.120121216");
 	fos->writeChars(sversion.c_str(), sversion.length());
 	BSONOutputStream bos(fos);
-	BSONInputStream bis(winStream);
+	BSONInputStream bis(origStream);
 
-	winStream->seek(0);
-	while (!winStream->eof()) {
+	origStream->seek(0);
+	while (!origStream->eof()) {
 		BSONObj* obj = bis.readBSON();
 		bos.writeBSON(*obj);
 		delete obj;
 		if (fileType == INDEX_FTYPE) {
-			__int64 iCurrentPos = winStream->readLong();
+			__int64 iCurrentPos = origStream->readLong();
 			fos->writeLong(iCurrentPos);
-			__int64 iFilePos = winStream->readLong();
+			__int64 iFilePos = origStream->readLong();
 			fos->writeLong(iFilePos);
 		}
 	}
 
 	fos->close();
 	delete fos;
-	winStream->close();
+	origStream->close();
 
 	removeFile(fileName.c_str());
 	rename(tempFileName.c_str(), fileName.c_str());
@@ -127,9 +124,6 @@ StreamType* migrate20121216(StreamType* stream) {
 	stream->close();
 	delete stream;
 	return result;
-#else
-	return stream;
-#endif
 }
 
 StreamType* StreamManager::checkVersion(StreamType* stream) {
