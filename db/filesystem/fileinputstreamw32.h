@@ -1,16 +1,16 @@
-#ifndef FILEINPUTSTREAM_H
-#define FILEINPUTSTREAM_H
+#ifndef FILEINPUTSTREAMW32_H
+#define FILEINPUTSTREAMW32_H
 
 #include "inputstream.h"
 #include <istream>
 #include <iostream>
 #include <stdio.h>
 
-class FileInputStream: public InputStream
+class FileInputStreamW32: public InputStream
 {
 public:
-    FileInputStream(const char* fileName, const char* flags);
-    virtual ~FileInputStream();
+    FileInputStreamW32(const char* fileName, const char* flags);
+    virtual ~FileInputStreamW32();
 
     virtual unsigned char readChar();
     /* Reads 2 bytes in the input (little endian order) */
@@ -28,7 +28,6 @@ public:
     /* Read a chars */
     virtual char* readChars();
     virtual char* readChars(__int32 length);
-    virtual void readChars(__int32 length, char* res);
     virtual const char* readFull();
     virtual __int64 currentPos() const;
     virtual void seek(__int64 i);
@@ -41,18 +40,28 @@ public:
     virtual void close();
 
     virtual bool isClosed();
+	 template <typename T>
+		 T readDataTmp() {
+			 T result = 0;
+			 unsigned char* v = (unsigned char*)&result;
+			 int size = sizeof(T);
+			 for (int i = size; i > 0; i--) {
+				 v[size-i] = readChar() & UCHAR_MAX;
+			 }
+			 T clear = 0;
+			 for (int i = 0; i < size; i++) {
+				 clear = clear << 8;
+				 clear = clear | 0xFF;
+			 }
+			 //printf("\nresult before add: %x\n", result);
+			 result = result & clear;
+			 //printf("result after add: %x\n", result);
+			 return result;
+		 }
 private:
-	__int64 read(char* buffer, __int32 len); 
-
-private:
-#ifndef A
-	FILE* _pFile;
-#else
-	HANDLE _pFile;
-	bool _eof;
-#endif
+    FILE* _pFile;
     std::string _fileName;
     bool _open;
 };
 
-#endif // FILEINPUTSTREAM_H
+#endif // FILEINPUTSTREAMw32_H

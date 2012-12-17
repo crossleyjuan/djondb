@@ -96,10 +96,22 @@ BSONObj* BSONInputStream::readBSON(const char* select) const {
 									}
 									break;
 								}
-			case LONG_TYPE:
-			case LONG64_TYPE: {
+			case LONG_TYPE: {
 										if (include) {
 											__int64 l = _inputStream->readLong();
+#ifdef DEBUG
+											if (log->isDebug()) log->debug("BSONInputStream::readBSON key: %s, value: %d", key->c_str(), l);
+#endif
+											obj->add(*key.get(), l);
+										} else {
+											// Jumps to the next pos
+											_inputStream->seek(_inputStream->currentPos() + sizeof(__int64));
+										}
+										break;
+									}
+			case LONG64_TYPE: {
+										if (include) {
+											__int64 l = _inputStream->readLong64();
 #ifdef DEBUG
 											if (log->isDebug()) log->debug("BSONInputStream::readBSON key: %s, value: %d", key->c_str(), l);
 #endif

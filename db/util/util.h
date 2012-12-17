@@ -39,7 +39,7 @@ std::string* uuid();
 
 bool makedir(const char* path);
 std::string* getHomeDir();
-std::string* getTempDir();
+std::string getTempDir();
 
 Version getCurrentVersion();
 Version getVersion(const char* version);

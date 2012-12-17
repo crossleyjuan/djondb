@@ -1,26 +1,28 @@
-#ifndef FILEINPUTOUTPUTSTREAM_H
-#define FILEINPUTOUTPUTSTREAM_H
+#ifndef DBFILESTREAM_H
+#define DBFILESTREAM_H
 
 #include "inputoutputstream.h"
+#include "util.h"
 #include <string>
 
 using namespace std;
 
-class FileInputOutputStream: public InputOutputStream {
+class DBFileStream: public InputOutputStream
+{
     public:
-        FileInputOutputStream(const FileInputOutputStream& other);
-        FileInputOutputStream(const std::string& fileName, const char* flags);
-        virtual ~FileInputOutputStream();
+        DBFileStream(const DBFileStream& other);
+        DBFileStream(InputOutputStream* stream);
+        virtual ~DBFileStream();
 
         virtual unsigned char readChar();
         /* Reads 2 bytes in the input (little endian order) */
         virtual short int readShortInt ();
         /* Reads 4 bytes in the input (little endian order) */
         virtual __int32 readInt ();
-        /* Reads 8 bytes in the input (little endian order) */
+        /* Reads 16 bytes in the input (little endian order) */
         virtual __int64 readLong ();
-		/* Reads a 16 byte long in the input */
-		virtual __int64 readLong64();
+        /* Reads 16 bytes in the input (little endian order) */
+        virtual __int64 readLong64();
         /* Reads a 4 byte float in the input */
         virtual float readFloatIEEE ();
         /* Reads a 8 byte double in the input */
@@ -58,19 +60,12 @@ class FileInputOutputStream: public InputOutputStream {
 
         virtual bool isClosed();
 
-	private:
-		void write(char* buffer, int len);
-		__int64 read(char* buffer, __int32 len); 
+		  Version* version() const;
 
-    private:
-        std::string _fileName;
-#ifndef A
-		FILE* _pFile;
-#else
-		HANDLE _pFile;
-		bool _eof;
-#endif
-        bool _open;
+	 private:
+		  InputOutputStream* _stream;
+		  __int32 _versionOffset;
+		  Version* _dbVersion;
 };
 
-#endif // FILEINPUTOUTPUTSTREAM_H
+#endif // DBFILESTREAM_H

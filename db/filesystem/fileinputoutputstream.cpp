@@ -237,6 +237,11 @@ __int64 FileInputOutputStream::readLong () {
 	return readData<__int64>();
 }
 
+/* Reads 4 bytes in the input (little endian order) */
+__int64 FileInputOutputStream::readLong64() {
+	return readData<__int64>();
+}
+
 /* Reads a 4 byte float in the input */
 float FileInputOutputStream::readFloatIEEE () {
     float f;

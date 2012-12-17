@@ -16,7 +16,14 @@
  * =====================================================================================
  */
 #include "streammanager.h"
+#include "dbfilestream.h"
+#include "fileinputoutputstream.h"
 #include "fileoutputstream.h"
+#include "bsoninputstream.h"
+#include "bsonoutputstream.h"
+#ifdef WINDOWS
+#include "fileinputstreamw32.h"
+#endif
 #include <stdlib.h>
 #include <memory>
 #include <cstring>
@@ -64,6 +71,75 @@ std::string StreamManager::fileName(std::string ns, FILE_TYPE type) const {
 	return result;
 }
 
+StreamType* migrate20121216(StreamType* stream) {
+#ifdef WINDOWS
+	stream->close();
+	std::string fileName = stream->fileName();
+	FileInputStreamW32* winStream = new FileInputStreamW32(fileName.c_str(), "rb+");
+	std::string tempDir = getTempDir();
+	std::stringstream sfile;
+	sfile << tempDir;
+	if (!endsWith(tempDir.c_str(), FILESEPARATOR)) {
+		sfile << FILESEPARATOR;
+	}
+	sfile << "tempdb";
+	FILE_TYPE fileType;
+	if (endsWith(fileName.c_str(), ".dat")) {
+		// Data file
+		fileType = DATA_FTYPE;
+		sfile << ".dat";
+	} else if (endsWith(fileName.c_str(), ".idx")) {
+		fileType = INDEX_FTYPE;
+		sfile << ".idx";
+	}
+
+	std::string tempFileName = sfile.str();
+	FileOutputStream* fos = new FileOutputStream(const_cast<char*>(tempFileName.c_str()), "wb+");
+
+	fos->writeChars("djondb_dat", 10);
+	std::string sversion = Version("0.120121216");
+	fos->writeChars(sversion.c_str(), sversion.length());
+	BSONOutputStream bos(fos);
+	BSONInputStream bis(winStream);
+
+	winStream->seek(0);
+	while (!winStream->eof()) {
+		BSONObj* obj = bis.readBSON();
+		bos.writeBSON(*obj);
+		delete obj;
+		if (fileType == INDEX_FTYPE) {
+			__int64 iCurrentPos = winStream->readLong();
+			fos->writeLong(iCurrentPos);
+			__int64 iFilePos = winStream->readLong();
+			fos->writeLong(iFilePos);
+		}
+	}
+
+	fos->close();
+	delete fos;
+	winStream->close();
+
+	removeFile(fileName.c_str());
+	rename(tempFileName.c_str(), fileName.c_str());
+
+	FileInputOutputStream* fios = new FileInputOutputStream(fileName, "rb+");
+	StreamType* result = new StreamType(fios);
+	stream->close();
+	delete stream;
+	return result;
+#else
+	return stream;
+#endif
+}
+
+StreamType* StreamManager::checkVersion(StreamType* stream) {
+	StreamType* result = stream;
+	if (*stream->version() < Version("0.120121216")) {
+		stream = migrate20121216(stream);
+	}
+	return stream;
+}
+
 StreamType* StreamManager::open(std::string db, std::string ns, FILE_TYPE type) {
 	std::auto_ptr<Logger> log(getLogger(NULL));
 	StreamType* stream = NULL;
@@ -107,8 +183,10 @@ StreamType* StreamManager::open(std::string db, std::string ns, FILE_TYPE type) 
 	} else {
 		flags = "wb+";
 	}
+	FileInputOutputStream* fios = new FileInputOutputStream(streamfile, flags);
 	StreamType* output;
-  	output = new StreamType(streamfile, flags);
+	output = new StreamType(fios);
+	output = checkVersion(output);
 	if (streams) {
 		streams->insert(pair<FILE_TYPE, StreamType*>(type, output));
 	} else {

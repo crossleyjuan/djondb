@@ -24,6 +24,8 @@ class NetworkInputStream : public InputStream
         virtual __int32 readInt ();
         /* Reads 8 bytes in the input (little endian order) */
         virtual __int64 readLong ();
+		/* Reads a 16 byte long in the input */
+		virtual __int64 readLong64();
         /* Reads a 4 byte float in the input */
         virtual float readFloatIEEE ();
         /* Reads a 8 byte double in the input */

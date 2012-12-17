@@ -52,7 +52,6 @@ FileInputStream::FileInputStream(const char* fileName, const char* flags)
 			CREATE_NEW,             // create new file only
 			FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS,  // normal file
                        NULL);                  // no attr. template
-	}
     if (_pFile == INVALID_HANDLE_VALUE) 
     { 
 		cout << "Invalid handle" << endl;
@@ -108,6 +107,11 @@ __int32 FileInputStream::readInt () {
 
 /* Reads 4 bytes in the input (little endian order) */
 __int64 FileInputStream::readLong () {
+	return readData<__int64>();
+}
+
+/* Reads 16 bytes in the input (little endian order) */
+__int64 FileInputStream::readLong64() {
 	return readData<__int64>();
 }
 

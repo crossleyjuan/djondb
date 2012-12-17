@@ -117,16 +117,6 @@ void DBController::initialize(std::string dataDir) {
 				long currentPos = stream->currentPos();
 				stream->seek(0);
 
-
-				std::string mark = stream->readChars(10);
-				// check if the file is marked as versioned version (0.1 version does not have this mark)
-				Version dbversion("0.1");
-				if (mark.compare("1234") == 0) {
-					char* version = stream->readChars(11);
-					dbversion = Version(version);
-				} else {
-					stream->seek(0);
-				}
 				IndexAlgorithm* impl = NULL;
 				while (!stream->eof()) {
 					BSONObj* obj = readBSON(stream);
@@ -268,12 +258,6 @@ void DBController::remove(char* db, char* ns, const std::string& documentId, con
 	if (_logger->isDebug()) _logger->debug(2, "DBController::update db: %s, ns: %s, documentId: %s, revision: %s", db, ns, documentId.c_str(), revision.c_str());
 	StreamType* streamData = StreamManager::getStreamManager()->open(std::string(db), std::string(ns), DATA_FTYPE);
 
-	//    long crcStructure = checkStructure(obj);
-
-	//    char* text = obj->toChar();
-	//    streamData->writeChars(text, strlen(text));
-	//    free(text);
-
 	IndexAlgorithm* impl = IndexFactory::indexFactory.index(db, ns, "_id");
 
 	BSONObj indexBSON;
@@ -399,7 +383,10 @@ BSONObj* DBController::findFirst(char* db, char* ns, const char* select, const c
 
 	std::string filename = ss.str();
 
-	FileInputStream* fis = new FileInputStream(filename.c_str(), "rb");
+	// Execute open on streammanager, just to check that the file was alrady opened
+	StreamManager::getStreamManager()->open(db, ns, DATA_FTYPE);
+
+	MMapInputStream* fis = new MMapInputStream(filename.c_str(), "rb");
 	std::vector<BSONObj*> result;
 
 	BSONInputStream* bis = new BSONInputStream(fis);
@@ -442,6 +429,8 @@ std::vector<BSONObj*>* DBController::findFullScan(char* db, char* ns, const char
 
 	std::string filename = ss.str();
 
+	// Execute open on streammanager, just to check that the file was alrady opened
+	StreamManager::getStreamManager()->open(db, ns, DATA_FTYPE);
 	//FileInputStream* fis = new FileInputStream(filename.c_str(), "rb");
 	MMapInputStream* fis = new MMapInputStream(filename.c_str(), "rb");
 	std::vector<BSONObj*>* result = new std::vector<BSONObj*>();

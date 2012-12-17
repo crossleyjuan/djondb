@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="db"
 	ProjectGUID="{ACF2227F-242F-4FB7-B433-58CED3D02A8F}"
 	RootNamespace="db"
@@ -293,6 +293,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\dbfilestream.h"
+				>
+			</File>
+			<File
 				RelativePath=".\expressionresult.h"
 				>
 			</File>
@@ -362,6 +366,10 @@
 			</File>
 			<File
 				RelativePath=".\dbcontroller.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbfilestream.cpp"
 				>
 			</File>
 			<File

@@ -15,6 +15,7 @@ libdjon_filesystem_la_SOURCES = bsoninputstream.cpp \
 										  bsonoutputstream.cpp \
 										  fileinputoutputstream.cpp \
 										  fileinputstream.cpp \
+										  fileinputstreamw32.cpp \
 										  mmapinputstream.cpp \
 										  fileoutputstream.cpp \
 										  networkinputstream.cpp \

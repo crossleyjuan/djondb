@@ -106,6 +106,11 @@ __int64 NetworkInputStream::readLong () {
 	return v;
 }
 
+/* Reads 16 bytes in the input (little endian order) */
+__int64 NetworkInputStream::readLong64() {
+	return readData<__int64>();
+}
+
 /* Reads a 4 byte float in the input */
 float NetworkInputStream::readFloatIEEE () {
 	float f;

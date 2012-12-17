@@ -23,6 +23,8 @@ public:
     virtual __int32 readInt ();
     /* Reads 4 bytes in the input (little endian order) */
     virtual __int64 readLong ();
+    /* Reads a 16 byte long in the input */
+    virtual __int64 readLong64();
     /* Reads a 4 byte float in the input */
     virtual float readFloatIEEE ();
     /* Reads a 8 byte double in the input */
@@ -54,8 +56,8 @@ private:
 #endif
 	 char* _initaddr;
 	 char* _addr;
-	 int _pos;
-	 int _len;
+	 __int64 _pos;
+	 __int64 _len;
     std::string _fileName;
     bool _open;
 };
