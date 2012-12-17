@@ -38,10 +38,12 @@ DBFileInputStream::DBFileInputStream(InputStream* stream) {
 		char* version = stream->readChars();
 		_dbVersion = new Version(version);
 		_versionOffset = stream->currentPos();
+		free(version);
 	} else {
 		_dbVersion = new Version("0.1");
 		stream->seek(0);
 	}
+	free(mark);
 }
 
 DBFileInputStream::DBFileInputStream(InputStream* stream, char* fileName) {
@@ -64,6 +66,7 @@ DBFileInputStream::DBFileInputStream(InputStream* stream, char* fileName) {
 DBFileInputStream::~DBFileInputStream() {
 	delete _stream;
 	delete _dbVersion;
+	if (_fileName = NULL) free(_fileName);
 }
 
 void DBFileInputStream::seek(__int64 i, SEEK_DIRECTION direction) {

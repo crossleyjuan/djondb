@@ -140,6 +140,7 @@ MMapInputStream::MMapInputStream(const char* fileName, const char* flags)
 		_initaddr = _addr;
 #endif
 		_open = true;
+		delete log;
 }
 
 MMapInputStream::~MMapInputStream() {

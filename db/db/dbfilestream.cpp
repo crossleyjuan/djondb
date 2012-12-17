@@ -37,10 +37,12 @@ DBFileStream::DBFileStream(InputOutputStream* stream) {
 		char* version = stream->readChars();
 		_dbVersion = new Version(version);
 		_versionOffset = stream->currentPos();
+		free(version);
 	} else {
 		_dbVersion = new Version("0.1");
 	}
 	seek(0, FROMEND_SEEK);
+	free(mark);
 }
 
 DBFileStream::~DBFileStream() {

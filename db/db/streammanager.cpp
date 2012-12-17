@@ -123,6 +123,7 @@ StreamType* migrate20121216(StreamType* stream) {
 	StreamType* result = new StreamType(fios);
 	stream->close();
 	delete stream;
+	delete origStream;
 	return result;
 }
 
