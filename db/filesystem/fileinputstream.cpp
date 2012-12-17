@@ -55,8 +55,10 @@ FileInputStream::FileInputStream(const char* fileName, const char* flags)
 	}
     if (_pFile == INVALID_HANDLE_VALUE) 
     { 
-		assert(false);
+		cout << "Invalid handle" << endl;
+		exit(1);
     }
+#endif
 	_fileName = fileName;
 	_open = true;
 }
