@@ -352,20 +352,21 @@ std::vector<BSONObj*>* DBController::find(char* db, char* ns, const char* select
 		std::string filename = ss.str();
 		result = new std::vector<BSONObj*>();
 		FileInputStream* fis = new FileInputStream(filename.c_str(), "rb");
+		DBFileInputStream* dbStream = new DBFileInputStream(fis);
 
-		BSONInputStream* bis = new BSONInputStream(fis);
+		BSONInputStream* bis = new BSONInputStream(dbStream);
 		for (std::list<Index*>::iterator it = elements.begin(); it != elements.end(); it++) {
 			Index* index = *it;
 
 			long posData = index->posData;
-			fis->seek(posData);
+			dbStream->seek(posData);
 
 			BSONObj* obj = bis->readBSON(select);
 
 			result->push_back(obj);
 		}
 		delete bis;
-		delete fis;
+		delete dbStream;
 
 	} else {
 		result = findFullScan(db, ns, select, parser);
@@ -387,15 +388,16 @@ BSONObj* DBController::findFirst(char* db, char* ns, const char* select, const c
 	// Execute open on streammanager, just to check that the file was alrady opened
 	StreamManager::getStreamManager()->open(db, ns, DATA_FTYPE);
 
-	MMapInputStream* fis = new MMapInputStream(filename.c_str(), "rb");
+	MMapInputStream* mmis = new MMapInputStream(filename.c_str(), "rb");
+	DBFileInputStream* dbStream = new DBFileInputStream(mmis);
 	std::vector<BSONObj*> result;
 
-	BSONInputStream* bis = new BSONInputStream(fis);
+	BSONInputStream* bis = new BSONInputStream(mmis);
 
 	FilterParser* parser = FilterParser::parse(filter);
 
 	BSONObj* bsonResult = NULL;
-	while (!fis->eof()) {
+	while (!dbStream->eof()) {
 		BSONObj* obj = bis->readBSON();
 		// Only "active" Records
 		if (obj->getInt("_status") == 1) {
@@ -415,6 +417,9 @@ BSONObj* DBController::findFirst(char* db, char* ns, const char* select, const c
 			break;
 		}
 	}
+
+	dbStream->close();
+	delete dbStream;
 
 	delete parser;
 	return bsonResult;
@@ -476,7 +481,8 @@ std::vector<BSONObj*>* DBController::findFullScan(char* db, char* ns, const char
 
 	delete parser;
 	delete bis;
-	delete mmis;
+	dbStream->close();
+	delete dbStream;
 
 	return result;
 }

@@ -149,7 +149,7 @@ class TestFileSystemSuite: public Test::Suite
 			streamo.writeChars("Hello World!", 12);
 			streamo.writeShortInt(2);
 			streamo.writeInt(2);
-			streamo.writeLong(200000L);
+			streamo.writeLong((__int64)200000L);
 			streamo.writeChars(test, strlen(test));
 
 			streamo.seek(0);
@@ -157,10 +157,12 @@ class TestFileSystemSuite: public Test::Suite
 			TEST_ASSERT(i2 == INT_MAX);
 			char* text = streamo.readChars();
 			TEST_ASSERT(strcmp(text, "Hello World!") == 0);
-			int i1 = streamo.readShortInt();
+			__int16 i16 = streamo.readShortInt();
+			TEST_ASSERT(i16 == 2);
+			int i1 = streamo.readInt();
 			TEST_ASSERT(i1 == 2);
 			__int64 l = streamo.readLong();
-			TEST_ASSERT(l == 200000L);
+			TEST_ASSERT(l == (__int64)200000L);
 			char* tchar = streamo.readChars();
 			TEST_ASSERT(strcmp(test, tchar) == 0);
 			free(test);
@@ -377,7 +379,7 @@ class TestFileSystemSuite: public Test::Suite
 				obj->add("int", 1);
 				obj->add("string", std::string("test"));
 				obj->add("char*", (char*)"char*");
-				obj->add("long", 1L);
+				obj->add("long", (__int64)1L);
 				obj->add("double", 1.1);
 
 				elements.push_back(obj);

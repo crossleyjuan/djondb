@@ -57,7 +57,7 @@ class TestBSONSuite : public Test::Suite
 			// Add in
 			obj->add("int", 1);
 			obj->add("string", std::string("test"));
-			obj->add("long", (long long) 10000000000L);
+			obj->add("long", (__int64) 10000000000L);
 			obj->add("double", 1.1);
 
 			BSONObj rel;
@@ -79,8 +79,8 @@ class TestBSONSuite : public Test::Suite
 			TEST_ASSERT(obj->getString("string").compare("test") == 0);
 
 			TEST_ASSERT(obj->has("long"));
-			cout << "long: " << obj->getLong64("long") << endl;
-			TEST_ASSERT(obj->getLong64("long") == 10000000000L);
+			cout << "long: " << obj->getLong("long") << endl;
+			TEST_ASSERT(obj->getLong("long") == 10000000000L);
 
 			TEST_ASSERT(obj->has("double"));
 			TEST_ASSERT(obj->getDouble("double") == 1.1);
@@ -145,8 +145,8 @@ class TestBSONSuite : public Test::Suite
 			int chars = 1000;
 			// Add in
 			obj->add("int", 1);
-			obj->add("long", LONG_MAX);
-			obj->add("long long", LLONG_MAX);
+			obj->add("long", (__int64)LONG_MAX);
+			obj->add("long long", (__int64)LLONG_MAX);
 			obj->add("string", std::string(chars, 'a'));
 			char* temp = (char*)malloc(chars+1);
 			memset(temp, 0, chars+1);
@@ -170,7 +170,7 @@ class TestBSONSuite : public Test::Suite
 			TEST_ASSERT(obj->getLong("long") == LONG_MAX);
 
 			TEST_ASSERT(obj->has("long long"));
-			TEST_ASSERT(obj->getLong64("long long") == LLONG_MAX);
+			TEST_ASSERT(obj->getLong("long long") == LLONG_MAX);
 
 			TEST_ASSERT(obj->getString("string").compare(std::string(chars, 'a')) == 0);
 
@@ -189,7 +189,7 @@ class TestBSONSuite : public Test::Suite
 			// Add in
 			objOrig->add("int", 1);
 			objOrig->add("string", std::string("test"));
-			objOrig->add("long", 1L);
+			objOrig->add("long", (__int64)1L);
 			objOrig->add("double", 1.1);
 
 			BSONObj rel;
@@ -245,7 +245,7 @@ class TestBSONSuite : public Test::Suite
 			obj.add("int", 1);
 			obj.add("string", std::string("test"));
 			obj.add("char*", (char*)"char*");
-			obj.add("long", 1L);
+			obj.add("long", (__int64)1L);
 			obj.add("double", 1.1);
 
 			char* json = obj.toChar();
@@ -261,7 +261,7 @@ class TestBSONSuite : public Test::Suite
 			inner.add("int", 1);
 			inner.add("string", std::string("test"));
 			inner.add("char*", (char*)"char*");
-			inner.add("long", 1L);
+			inner.add("long", (__int64)1L);
 			inner.add("double", 1.1);
 			obj.add("inner", inner);
 
@@ -286,7 +286,7 @@ class TestBSONSuite : public Test::Suite
 			TEST_ASSERT(obj->getDouble("salary") == 3500.25);
 
 			TEST_ASSERT(obj->has("lnumber"));
-			TEST_ASSERT(obj->getLong64("lnumber") == 100000000000);
+			TEST_ASSERT(obj->getLong("lnumber") == 100000000000);
 
 			delete obj;
 			delete testEmpty;
@@ -418,7 +418,7 @@ class TestBSONSuite : public Test::Suite
 			cout << "testAutocasting" << endl;
 
 			BSONObj o;
-			o.add("long", 1L);
+			o.add("long", (__int64)1L);
 			o.add("double", 2.0);
 			o.add("int", 1);
 			o.add("char*", (char*)"Test");
@@ -429,7 +429,7 @@ class TestBSONSuite : public Test::Suite
 			o.add("inner", inner);
 
 			TEST_ASSERT(o.getContent("long") != NULL);
-			TEST_ASSERT((long)*o.getContent("long") == 1L);
+			TEST_ASSERT((__int64)*o.getContent("long") == 1L);
 
 			TEST_ASSERT(o.getContent("double") != NULL);
 			TEST_ASSERT((double)*o.getContent("double") == 2.0);
