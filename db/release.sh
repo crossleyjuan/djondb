@@ -48,9 +48,5 @@ cd python
 ./python.sh
 cd ..
 
-cd nodejs
+sh nodejs.sh $@
 
-if [ ! -z "${UPLOAD}" ]; 
-then
-	npm publish
-fi

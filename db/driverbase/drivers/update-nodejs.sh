@@ -1,0 +1,44 @@
+#!/bin/sh
+
+cp bsonarrayobj.h nodejs/includes/
+cp bsondefs.h nodejs/includes/
+cp bsoncontent.h nodejs/includes/
+cp bson.h nodejs/includes/
+cp bsonobj.h nodejs/includes/
+cp bsonparser.h nodejs/includes/
+cp bsonutil.h nodejs/includes/
+cp djondbconnection.h nodejs/includes/
+cp djondb_client.h nodejs/includes/
+cp djondbconnectionmanager.h nodejs/includes/
+cp constantexpression.h nodejs/includes/
+cp expressionresult.h nodejs/includes/
+cp dbcontroller.h nodejs/includes/
+cp db.h nodejs/includes/
+cp filterdefs.h nodejs/includes/
+cp filter_expressionLexer.h nodejs/includes/
+cp filter_expressionParser.h nodejs/includes/
+cp filterparser.h nodejs/includes/
+cp indexfactory.h nodejs/includes/
+cp index.h nodejs/includes/
+cp indexmanager.h nodejs/includes/
+cp simpleexpression.h nodejs/includes/
+cp streammanager.h nodejs/includes/
+cp unaryexpression.h nodejs/includes/
+cp baseexpression.h nodejs/includes/
+cp binaryexpression.h nodejs/includes/
+cp bplusindex.h nodejs/includes/
+cp logger.h nodejs/includes/
+cp settings.h nodejs/includes/
+cp stringfunctions.h nodejs/includes/
+cp threads.h nodejs/includes/
+cp util.h nodejs/includes/
+cp version.h nodejs/includes/
+cp defs.h nodejs/includes/
+cp datetime.h nodejs/includes/
+cp dtime.h nodejs/includes/
+cp errorhandle.h nodejs/includes/
+cp errors.h nodejs/includes/
+cp fileutil.h nodejs/includes/
+cp circular_queue.h nodejs/includes/
+cp config.h nodejs/includes/
+
