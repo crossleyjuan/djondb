@@ -4,7 +4,7 @@ class Test {
 	public static void main(String[] arg) {
 		try {
 			Loader.initialize();
-			Connection c = ConnectionManager.getConnection("localhost");
+			DjondbConnection c = DjondbConnectionManager.getConnection("localhost");
 
 			c.open();
 
@@ -19,7 +19,7 @@ class Test {
 				System.out.println("Hero name: " + bhero.getString("name"));
 			}
 
-			ConnectionManager.releaseConnection(c);
+			DjondbConnectionManager.releaseConnection(c);
 		} catch (LibraryException e) {
 			e.printStackTrace();
 		}
