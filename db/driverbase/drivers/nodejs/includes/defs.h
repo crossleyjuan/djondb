@@ -1,6 +1,8 @@
 #ifndef DEFS_H_INCLUDED
 #define DEFS_H_INCLUDED
 
+#include <stdlib.h>
+
 #if (defined _WIN32 | _WIN64)
 #define WINDOWS
 #endif
@@ -11,7 +13,7 @@
 #ifndef WINDOWS
 #include "config.h"
 #else
-#define VERSION "0.120121118"
+#define VERSION "0.120121216"
 #define PACKAGE_VERSION "0.1"
 #endif
 
@@ -27,11 +29,19 @@
 #define _32BITS
 #endif
 
+// typedefs
+//
 #ifndef WINDOWS
-#define __LONG64 long long
-#else
-#define __LONG64 __int64
+typedef int8_t            __int8;
+typedef int16_t           __int16;
+typedef int32_t           __int32;                
+#ifndef SWIGJAVA
+typedef int64_t           __int64;
 #endif
+#endif
+typedef __int64           __LONG64;
+
+
 
 // #define TESTING
 
