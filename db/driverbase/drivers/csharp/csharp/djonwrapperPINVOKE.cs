@@ -355,13 +355,13 @@ class djonwrapperPINVOKE {
   public static extern IntPtr new_BSONArrayObj__SWIG_1(HandleRef jarg1);
 
   [DllImport("djonwrapper", EntryPoint="CSharp_BSONArrayObj_length")]
-  public static extern IntPtr BSONArrayObj_length(HandleRef jarg1);
+  public static extern int BSONArrayObj_length(HandleRef jarg1);
 
   [DllImport("djonwrapper", EntryPoint="CSharp_BSONArrayObj_add")]
   public static extern void BSONArrayObj_add(HandleRef jarg1, HandleRef jarg2);
 
   [DllImport("djonwrapper", EntryPoint="CSharp_BSONArrayObj_get")]
-  public static extern IntPtr BSONArrayObj_get(HandleRef jarg1, HandleRef jarg2);
+  public static extern IntPtr BSONArrayObj_get(HandleRef jarg1, int jarg2);
 
   [DllImport("djonwrapper", EntryPoint="CSharp_BSONArrayObj_toChar")]
   public static extern string BSONArrayObj_toChar(HandleRef jarg1);
@@ -385,13 +385,13 @@ class djonwrapperPINVOKE {
   public static extern void delete_BSONObj(HandleRef jarg1);
 
   [DllImport("djonwrapper", EntryPoint="CSharp_BSONObj_add__SWIG_0")]
-  public static extern void BSONObj_add__SWIG_0(HandleRef jarg1, string jarg2, HandleRef jarg3);
+  public static extern void BSONObj_add__SWIG_0(HandleRef jarg1, string jarg2, int jarg3);
 
   [DllImport("djonwrapper", EntryPoint="CSharp_BSONObj_add__SWIG_1")]
   public static extern void BSONObj_add__SWIG_1(HandleRef jarg1, string jarg2, double jarg3);
 
   [DllImport("djonwrapper", EntryPoint="CSharp_BSONObj_add__SWIG_2")]
-  public static extern void BSONObj_add__SWIG_2(HandleRef jarg1, string jarg2, HandleRef jarg3);
+  public static extern void BSONObj_add__SWIG_2(HandleRef jarg1, string jarg2, long jarg3);
 
   [DllImport("djonwrapper", EntryPoint="CSharp_BSONObj_add__SWIG_3")]
   public static extern void BSONObj_add__SWIG_3(HandleRef jarg1, string jarg2, string jarg3);
@@ -406,13 +406,13 @@ class djonwrapperPINVOKE {
   public static extern bool BSONObj_has(HandleRef jarg1, string jarg2);
 
   [DllImport("djonwrapper", EntryPoint="CSharp_BSONObj_getInt")]
-  public static extern IntPtr BSONObj_getInt(HandleRef jarg1, string jarg2);
+  public static extern int BSONObj_getInt(HandleRef jarg1, string jarg2);
 
   [DllImport("djonwrapper", EntryPoint="CSharp_BSONObj_getDouble")]
   public static extern double BSONObj_getDouble(HandleRef jarg1, string jarg2);
 
   [DllImport("djonwrapper", EntryPoint="CSharp_BSONObj_getLong")]
-  public static extern IntPtr BSONObj_getLong(HandleRef jarg1, string jarg2);
+  public static extern long BSONObj_getLong(HandleRef jarg1, string jarg2);
 
   [DllImport("djonwrapper", EntryPoint="CSharp_BSONObj_getString")]
   public static extern string BSONObj_getString(HandleRef jarg1, string jarg2);
@@ -451,7 +451,7 @@ class djonwrapperPINVOKE {
   public static extern IntPtr BSONObj_end(HandleRef jarg1);
 
   [DllImport("djonwrapper", EntryPoint="CSharp_BSONObj_length")]
-  public static extern IntPtr BSONObj_length(HandleRef jarg1);
+  public static extern int BSONObj_length(HandleRef jarg1);
 
   [DllImport("djonwrapper", EntryPoint="CSharp_new_BSONParser")]
   public static extern IntPtr new_BSONParser();

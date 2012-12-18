@@ -1016,22 +1016,35 @@ static void SWIG_Php_SetModule(swig_module_info *pointer) {
 #define SWIGTYPE_p_BSONParser swig_types[4]
 #define SWIGTYPE_p_BSONTYPE swig_types[5]
 #define SWIGTYPE_p_ParseException swig_types[6]
-#define SWIGTYPE_p___int32 swig_types[7]
-#define SWIGTYPE_p___int64 swig_types[8]
+#define SWIGTYPE_p___int64 swig_types[7]
+#define SWIGTYPE_p_char swig_types[8]
 #define SWIGTYPE_p_const_iterator swig_types[9]
 #define SWIGTYPE_p_djondb__ConnectionReference swig_types[10]
 #define SWIGTYPE_p_djondb__DjondbConnection swig_types[11]
 #define SWIGTYPE_p_djondb__DjondbConnectionManager swig_types[12]
-#define SWIGTYPE_p_iterator swig_types[13]
-#define SWIGTYPE_p_size_type swig_types[14]
-#define SWIGTYPE_p_std__mapT_std__string_BSONContent_p_t__const_iterator swig_types[15]
-#define SWIGTYPE_p_std__setT_std__string_t swig_types[16]
-#define SWIGTYPE_p_std__vectorT_BSONObj_p_t swig_types[17]
-#define SWIGTYPE_p_std__vectorT_BSONObj_p_t__iterator swig_types[18]
-#define SWIGTYPE_p_std__vectorT_std__string_t swig_types[19]
-#define SWIGTYPE_p_value_type swig_types[20]
-static swig_type_info *swig_types[22];
-static swig_module_info swig_module = {swig_types, 21, 0, 0, 0, 0};
+#define SWIGTYPE_p_float swig_types[13]
+#define SWIGTYPE_p_int swig_types[14]
+#define SWIGTYPE_p_iterator swig_types[15]
+#define SWIGTYPE_p_long swig_types[16]
+#define SWIGTYPE_p_p_char swig_types[17]
+#define SWIGTYPE_p_p_unsigned_long swig_types[18]
+#define SWIGTYPE_p_short swig_types[19]
+#define SWIGTYPE_p_signed___int64 swig_types[20]
+#define SWIGTYPE_p_signed_char swig_types[21]
+#define SWIGTYPE_p_size_type swig_types[22]
+#define SWIGTYPE_p_std__mapT_std__string_BSONContent_p_t__const_iterator swig_types[23]
+#define SWIGTYPE_p_std__setT_std__string_t swig_types[24]
+#define SWIGTYPE_p_std__vectorT_BSONObj_p_t swig_types[25]
+#define SWIGTYPE_p_std__vectorT_BSONObj_p_t__iterator swig_types[26]
+#define SWIGTYPE_p_std__vectorT_std__string_t swig_types[27]
+#define SWIGTYPE_p_unsigned___int64 swig_types[28]
+#define SWIGTYPE_p_unsigned_char swig_types[29]
+#define SWIGTYPE_p_unsigned_int swig_types[30]
+#define SWIGTYPE_p_unsigned_long swig_types[31]
+#define SWIGTYPE_p_unsigned_short swig_types[32]
+#define SWIGTYPE_p_value_type swig_types[33]
+static swig_type_info *swig_types[35];
+static swig_module_info swig_module = {swig_types, 34, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -1202,19 +1215,32 @@ static swig_type_info _swigt__p_BSONObj = {"_p_BSONObj", "std::vector< BSONObj *
 static swig_type_info _swigt__p_BSONParser = {"_p_BSONParser", "BSONParser *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_BSONTYPE = {"_p_BSONTYPE", "BSONTYPE *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_ParseException = {"_p_ParseException", "ParseException *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p___int32 = {"_p___int32", "__int32 *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p___int64 = {"_p___int64", "__int64 *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p___int64 = {"_p___int64", "__int64 *|LONGLONG *|LONG64 *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_char = {"_p_char", "CHAR *|TCHAR *|char *|CCHAR *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_const_iterator = {"_p_const_iterator", "const_iterator *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_djondb__ConnectionReference = {"_p_djondb__ConnectionReference", "djondb::ConnectionReference *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_djondb__DjondbConnection = {"_p_djondb__DjondbConnection", "djondb::DjondbConnection *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_djondb__DjondbConnectionManager = {"_p_djondb__DjondbConnectionManager", "djondb::DjondbConnectionManager *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_float = {"_p_float", "FLOAT *|float *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_int = {"_p_int", "BOOL *|INT32 *|int *|INT *|INT_PTR *|LONG32 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iterator = {"_p_iterator", "iterator *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_long = {"_p_long", "SHANDLE_PTR *|LONG_PTR *|LONG *|HRESULT *|long *|SSIZE_T *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_p_char = {"_p_p_char", "PTCH *|PCTSTR *|LPCTSTR *|LPTCH *|PUTSTR *|LPUTSTR *|PCUTSTR *|LPCUTSTR *|char **|PTSTR *|LPTSTR *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_p_unsigned_long = {"_p_p_unsigned_long", "unsigned long **|PLCID *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_short = {"_p_short", "HALF_PTR *|short *|SHORT *|INT16 *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_signed___int64 = {"_p_signed___int64", "INT64 *|signed __int64 *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_signed_char = {"_p_signed_char", "signed char *|INT8 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_size_type = {"_p_size_type", "size_type *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__mapT_std__string_BSONContent_p_t__const_iterator = {"_p_std__mapT_std__string_BSONContent_p_t__const_iterator", "std::map< std::string,BSONContent * >::const_iterator *|BSONObj::const_iterator *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__setT_std__string_t = {"_p_std__setT_std__string_t", "std::set< std::string > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__vectorT_BSONObj_p_t = {"_p_std__vectorT_BSONObj_p_t", "std::vector< BSONObj * > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__vectorT_BSONObj_p_t__iterator = {"_p_std__vectorT_BSONObj_p_t__iterator", "std::vector< BSONObj * >::iterator *|BSONArrayObj::iterator *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__vectorT_std__string_t = {"_p_std__vectorT_std__string_t", "std::vector< std::string > *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_unsigned___int64 = {"_p_unsigned___int64", "UINT64 *|DWORD64 *|unsigned __int64 *|DWORDLONG *|ULONGLONG *|ULONG64 *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_unsigned_char = {"_p_unsigned_char", "FCHAR *|unsigned char *|UCHAR *|BYTE *|TBYTE *|UINT8 *|BOOLEAN *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_unsigned_int = {"_p_unsigned_int", "UINT32 *|DWORD32 *|UINT *|unsigned int *|UINT_PTR *|ULONG32 *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_unsigned_long = {"_p_unsigned_long", "HANDLE_PTR *|DWORD *|ULONG_PTR *|DWORD_PTR *|FLONG *|unsigned long *|ULONG *|SIZE_T *|LCID *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_unsigned_short = {"_p_unsigned_short", "WORD *|UHALF_PTR *|unsigned short *|USHORT *|FSHORT *|LANGID *|UINT16 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_value_type = {"_p_value_type", "value_type *", 0, 0, (void*)0, 0};
 
 static swig_type_info *swig_type_initial[] = {
@@ -1225,19 +1251,32 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_BSONParser,
   &_swigt__p_BSONTYPE,
   &_swigt__p_ParseException,
-  &_swigt__p___int32,
   &_swigt__p___int64,
+  &_swigt__p_char,
   &_swigt__p_const_iterator,
   &_swigt__p_djondb__ConnectionReference,
   &_swigt__p_djondb__DjondbConnection,
   &_swigt__p_djondb__DjondbConnectionManager,
+  &_swigt__p_float,
+  &_swigt__p_int,
   &_swigt__p_iterator,
+  &_swigt__p_long,
+  &_swigt__p_p_char,
+  &_swigt__p_p_unsigned_long,
+  &_swigt__p_short,
+  &_swigt__p_signed___int64,
+  &_swigt__p_signed_char,
   &_swigt__p_size_type,
   &_swigt__p_std__mapT_std__string_BSONContent_p_t__const_iterator,
   &_swigt__p_std__setT_std__string_t,
   &_swigt__p_std__vectorT_BSONObj_p_t,
   &_swigt__p_std__vectorT_BSONObj_p_t__iterator,
   &_swigt__p_std__vectorT_std__string_t,
+  &_swigt__p_unsigned___int64,
+  &_swigt__p_unsigned_char,
+  &_swigt__p_unsigned_int,
+  &_swigt__p_unsigned_long,
+  &_swigt__p_unsigned_short,
   &_swigt__p_value_type,
 };
 
@@ -1248,19 +1287,32 @@ static swig_cast_info _swigc__p_BSONObj[] = {  {&_swigt__p_BSONObj, 0, 0, 0},{0,
 static swig_cast_info _swigc__p_BSONParser[] = {  {&_swigt__p_BSONParser, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_BSONTYPE[] = {  {&_swigt__p_BSONTYPE, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_ParseException[] = {  {&_swigt__p_ParseException, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p___int32[] = {  {&_swigt__p___int32, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p___int64[] = {  {&_swigt__p___int64, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_const_iterator[] = {  {&_swigt__p_const_iterator, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_djondb__ConnectionReference[] = {  {&_swigt__p_djondb__ConnectionReference, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_djondb__DjondbConnection[] = {  {&_swigt__p_djondb__DjondbConnection, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_djondb__DjondbConnectionManager[] = {  {&_swigt__p_djondb__DjondbConnectionManager, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_float[] = {  {&_swigt__p_float, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_int[] = {  {&_swigt__p_int, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iterator[] = {  {&_swigt__p_iterator, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_long[] = {  {&_swigt__p_long, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_p_char[] = {  {&_swigt__p_p_char, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_p_unsigned_long[] = {  {&_swigt__p_p_unsigned_long, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_short[] = {  {&_swigt__p_short, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_signed___int64[] = {  {&_swigt__p_signed___int64, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_signed_char[] = {  {&_swigt__p_signed_char, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_size_type[] = {  {&_swigt__p_size_type, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__mapT_std__string_BSONContent_p_t__const_iterator[] = {  {&_swigt__p_std__mapT_std__string_BSONContent_p_t__const_iterator, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__setT_std__string_t[] = {  {&_swigt__p_std__setT_std__string_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__vectorT_BSONObj_p_t[] = {  {&_swigt__p_std__vectorT_BSONObj_p_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__vectorT_BSONObj_p_t__iterator[] = {  {&_swigt__p_std__vectorT_BSONObj_p_t__iterator, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__vectorT_std__string_t[] = {  {&_swigt__p_std__vectorT_std__string_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_unsigned___int64[] = {  {&_swigt__p_unsigned___int64, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_unsigned_char[] = {  {&_swigt__p_unsigned_char, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_unsigned_int[] = {  {&_swigt__p_unsigned_int, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_unsigned_long[] = {  {&_swigt__p_unsigned_long, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_unsigned_short[] = {  {&_swigt__p_unsigned_short, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_value_type[] = {  {&_swigt__p_value_type, 0, 0, 0},{0, 0, 0, 0}};
 
 static swig_cast_info *swig_cast_initial[] = {
@@ -1271,19 +1323,32 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_BSONParser,
   _swigc__p_BSONTYPE,
   _swigc__p_ParseException,
-  _swigc__p___int32,
   _swigc__p___int64,
+  _swigc__p_char,
   _swigc__p_const_iterator,
   _swigc__p_djondb__ConnectionReference,
   _swigc__p_djondb__DjondbConnection,
   _swigc__p_djondb__DjondbConnectionManager,
+  _swigc__p_float,
+  _swigc__p_int,
   _swigc__p_iterator,
+  _swigc__p_long,
+  _swigc__p_p_char,
+  _swigc__p_p_unsigned_long,
+  _swigc__p_short,
+  _swigc__p_signed___int64,
+  _swigc__p_signed_char,
   _swigc__p_size_type,
   _swigc__p_std__mapT_std__string_BSONContent_p_t__const_iterator,
   _swigc__p_std__setT_std__string_t,
   _swigc__p_std__vectorT_BSONObj_p_t,
   _swigc__p_std__vectorT_BSONObj_p_t__iterator,
   _swigc__p_std__vectorT_std__string_t,
+  _swigc__p_unsigned___int64,
+  _swigc__p_unsigned_char,
+  _swigc__p_unsigned_int,
+  _swigc__p_unsigned_long,
+  _swigc__p_unsigned_short,
   _swigc__p_value_type,
 };
 
@@ -1292,27 +1357,40 @@ static swig_cast_info *swig_cast_initial[] = {
 
 /* end header section */
 /* vdecl subsection */
-static int le_swig__p_BSONTYPE=0; /* handle for _p_BSONTYPE */
-static int le_swig__p_djondb__DjondbConnection=0; /* handle for DjondbConnection */
-static int le_swig__p_djondb__DjondbConnectionManager=0; /* handle for DjondbConnectionManager */
-static int le_swig__p_std__mapT_std__string_BSONContent_p_t__const_iterator=0; /* handle for _p_std__mapT_std__string_BSONContent_p_t__const_iterator */
-static int le_swig__p___int32=0; /* handle for _p___int32 */
-static int le_swig__p_BSONObj=0; /* handle for BSONObj */
-static int le_swig__p_std__vectorT_BSONObj_p_t=0; /* handle for BSONObjVectorPtr */
 static int le_swig__p_djondb__ConnectionReference=0; /* handle for ConnectionReference */
-static int le_swig__p_BSONContent=0; /* handle for _p_BSONContent */
-static int le_swig__p_size_type=0; /* handle for _p_size_type */
+static int le_swig__p_char=0; /* handle for _p_char */
+static int le_swig__p_p_char=0; /* handle for _p_p_char */
 static int le_swig__p_BSONParser=0; /* handle for BSONParser */
-static int le_swig__p_BSONArrayObj=0; /* handle for BSONArrayObj */
-static int le_swig__p_ParseException=0; /* handle for ParseException */
-static int le_swig__p_value_type=0; /* handle for _p_value_type */
-static int le_swig__p_std__vectorT_std__string_t=0; /* handle for StringVector */
-static int le_swig__p_std__setT_std__string_t=0; /* handle for _p_std__setT_std__string_t */
+static int le_swig__p_size_type=0; /* handle for _p_size_type */
+static int le_swig__p_BSONObj=0; /* handle for BSONObj */
 static int le_swig__int=0; /* handle for _int */
-static int le_swig__p___int64=0; /* handle for _p___int64 */
+static int le_swig__p_djondb__DjondbConnection=0; /* handle for DjondbConnection */
+static int le_swig__p_std__mapT_std__string_BSONContent_p_t__const_iterator=0; /* handle for _p_std__mapT_std__string_BSONContent_p_t__const_iterator */
+static int le_swig__p_BSONTYPE=0; /* handle for _p_BSONTYPE */
 static int le_swig__p_const_iterator=0; /* handle for _p_const_iterator */
 static int le_swig__p_std__vectorT_BSONObj_p_t__iterator=0; /* handle for _p_std__vectorT_BSONObj_p_t__iterator */
 static int le_swig__p_iterator=0; /* handle for _p_iterator */
+static int le_swig__p_long=0; /* handle for _p_long */
+static int le_swig__p_unsigned_int=0; /* handle for _p_unsigned_int */
+static int le_swig__p_ParseException=0; /* handle for ParseException */
+static int le_swig__p_std__vectorT_BSONObj_p_t=0; /* handle for BSONObjVectorPtr */
+static int le_swig__p_unsigned_char=0; /* handle for _p_unsigned_char */
+static int le_swig__p_signed_char=0; /* handle for _p_signed_char */
+static int le_swig__p_unsigned_short=0; /* handle for _p_unsigned_short */
+static int le_swig__p_short=0; /* handle for _p_short */
+static int le_swig__p_BSONArrayObj=0; /* handle for BSONArrayObj */
+static int le_swig__p_BSONContent=0; /* handle for _p_BSONContent */
+static int le_swig__p_value_type=0; /* handle for _p_value_type */
+static int le_swig__p_float=0; /* handle for _p_float */
+static int le_swig__p_int=0; /* handle for _p_int */
+static int le_swig__p_std__setT_std__string_t=0; /* handle for _p_std__setT_std__string_t */
+static int le_swig__p_std__vectorT_std__string_t=0; /* handle for StringVector */
+static int le_swig__p_p_unsigned_long=0; /* handle for _p_p_unsigned_long */
+static int le_swig__p_unsigned_long=0; /* handle for _p_unsigned_long */
+static int le_swig__p_signed___int64=0; /* handle for _p_signed___int64 */
+static int le_swig__p_unsigned___int64=0; /* handle for _p_unsigned___int64 */
+static int le_swig__p___int64=0; /* handle for _p___int64 */
+static int le_swig__p_djondb__DjondbConnectionManager=0; /* handle for DjondbConnectionManager */
 /* end vdecl subsection */
 /* wrapper section */
 ZEND_NAMED_FUNCTION(_wrap_new_BSONObjVectorPtr__SWIG_0) {
@@ -2165,8 +2243,7 @@ ZEND_NAMED_FUNCTION(_wrap_BSONArrayObj_length) {
   if(!arg1) SWIG_PHP_Error(E_ERROR, "this pointer is NULL");
   result = ((BSONArrayObj const *)arg1)->length();
   {
-    __int32 * resultobj = new __int32((const __int32 &) result);
-    SWIG_SetPointerZval(return_value, (void *)resultobj, SWIGTYPE_p___int32, 1);
+    ZVAL_LONG(return_value,result);
   }
   return;
 fail:
@@ -2206,7 +2283,6 @@ fail:
 ZEND_NAMED_FUNCTION(_wrap_BSONArrayObj_get) {
   BSONArrayObj *arg1 = (BSONArrayObj *) 0 ;
   __int32 arg2 ;
-  __int32 *tmp2 ;
   zval **args[2];
   BSONObj *result = 0 ;
   
@@ -2221,12 +2297,12 @@ ZEND_NAMED_FUNCTION(_wrap_BSONArrayObj_get) {
     }
   }
   if(!arg1) SWIG_PHP_Error(E_ERROR, "this pointer is NULL");
-  {
-    if(SWIG_ConvertPtr(*args[1], (void **) &tmp2, SWIGTYPE_p___int32, 0) < 0 || tmp2 == NULL) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 2 of BSONArrayObj_get. Expected SWIGTYPE_p___int32");
-    }
-    arg2 = *tmp2;
-  }
+  
+  /*@SWIG:/usr/share/swig2.0/php/utils.i,7,CONVERT_INT_IN@*/
+  convert_to_long_ex(args[1]);
+  arg2 = (__int32) Z_LVAL_PP(args[1]);
+  /*@SWIG@*/;
+  
   result = (BSONObj *)((BSONArrayObj const *)arg1)->get(arg2);
   
   SWIG_SetPointerZval(return_value, (void *)result, SWIGTYPE_p_BSONObj, 0);
@@ -2450,7 +2526,6 @@ ZEND_NAMED_FUNCTION(_wrap_BSONObj_add__SWIG_0) {
   BSONObj *arg1 = (BSONObj *) 0 ;
   std::string arg2 ;
   __int32 arg3 ;
-  __int32 *tmp3 ;
   zval **args[3];
   
   SWIG_ResetError();
@@ -2468,12 +2543,12 @@ ZEND_NAMED_FUNCTION(_wrap_BSONObj_add__SWIG_0) {
   convert_to_string_ex(args[1]);
   (&arg2)->assign(Z_STRVAL_PP(args[1]), Z_STRLEN_PP(args[1]));
   
-  {
-    if(SWIG_ConvertPtr(*args[2], (void **) &tmp3, SWIGTYPE_p___int32, 0) < 0 || tmp3 == NULL) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 3 of BSONObj_add. Expected SWIGTYPE_p___int32");
-    }
-    arg3 = *tmp3;
-  }
+  
+  /*@SWIG:/usr/share/swig2.0/php/utils.i,7,CONVERT_INT_IN@*/
+  convert_to_long_ex(args[2]);
+  arg3 = (__int32) Z_LVAL_PP(args[2]);
+  /*@SWIG@*/;
+  
   (arg1)->add(arg2,arg3);
   
   return;
@@ -2521,7 +2596,6 @@ ZEND_NAMED_FUNCTION(_wrap_BSONObj_add__SWIG_2) {
   BSONObj *arg1 = (BSONObj *) 0 ;
   std::string arg2 ;
   __int64 arg3 ;
-  __int64 *tmp3 ;
   zval **args[3];
   
   SWIG_ResetError();
@@ -2539,12 +2613,25 @@ ZEND_NAMED_FUNCTION(_wrap_BSONObj_add__SWIG_2) {
   convert_to_string_ex(args[1]);
   (&arg2)->assign(Z_STRVAL_PP(args[1]), Z_STRLEN_PP(args[1]));
   
-  {
-    if(SWIG_ConvertPtr(*args[2], (void **) &tmp3, SWIGTYPE_p___int64, 0) < 0 || tmp3 == NULL) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 3 of BSONObj_add. Expected SWIGTYPE_p___int64");
+  
+  /*@SWIG:/usr/share/swig2.0/php/utils.i,12,CONVERT_LONG_LONG_IN@*/
+  switch ((*(args[2]))->type) {
+  case IS_DOUBLE:
+    arg3 = (__int64) (*(args[2]))->value.dval;
+    break;
+    case IS_STRING: {
+      char * endptr;
+      errno = 0;
+      arg3 = (__int64) strtoll((*(args[2]))->value.str.val, &endptr, 10);
+      if (*endptr && !errno) break;
+      /* FALL THRU */
     }
-    arg3 = *tmp3;
+  default:
+    convert_to_long_ex(args[2]);
+    arg3 = (__int64) (*(args[2]))->value.lval;
   }
+  /*@SWIG@*/;
+  
   (arg1)->add(arg2,arg3);
   
   return;
@@ -2672,46 +2759,6 @@ ZEND_NAMED_FUNCTION(_wrap_BSONObj_add) {
       if (_v) {
         {
           void *tmp;
-          _v = (SWIG_ConvertPtr(*argv[2], (void **)&tmp, SWIGTYPE_p___int32, 0) >= 0);
-        }
-        if (_v) {
-          _wrap_BSONObj_add__SWIG_0(INTERNAL_FUNCTION_PARAM_PASSTHRU); return;
-        }
-      }
-    }
-  }
-  if (argc == 3) {
-    int _v;
-    {
-      void *tmp;
-      _v = (SWIG_ConvertPtr(*argv[0], (void**)&tmp, SWIGTYPE_p_BSONObj, 0) >= 0);
-    }
-    if (_v) {
-      _v = ( Z_TYPE_PP(argv[1]) == IS_STRING ) ? 1 : 0;
-      
-      if (_v) {
-        {
-          void *tmp;
-          _v = (SWIG_ConvertPtr(*argv[2], (void **)&tmp, SWIGTYPE_p___int64, 0) >= 0);
-        }
-        if (_v) {
-          _wrap_BSONObj_add__SWIG_2(INTERNAL_FUNCTION_PARAM_PASSTHRU); return;
-        }
-      }
-    }
-  }
-  if (argc == 3) {
-    int _v;
-    {
-      void *tmp;
-      _v = (SWIG_ConvertPtr(*argv[0], (void**)&tmp, SWIGTYPE_p_BSONObj, 0) >= 0);
-    }
-    if (_v) {
-      _v = ( Z_TYPE_PP(argv[1]) == IS_STRING ) ? 1 : 0;
-      
-      if (_v) {
-        {
-          void *tmp;
           _v = (SWIG_ConvertPtr(*argv[2], (void**)&tmp, SWIGTYPE_p_BSONObj, 0) >= 0);
         }
         if (_v) {
@@ -2736,6 +2783,40 @@ ZEND_NAMED_FUNCTION(_wrap_BSONObj_add) {
         }
         if (_v) {
           _wrap_BSONObj_add__SWIG_5(INTERNAL_FUNCTION_PARAM_PASSTHRU); return;
+        }
+      }
+    }
+  }
+  if (argc == 3) {
+    int _v;
+    {
+      void *tmp;
+      _v = (SWIG_ConvertPtr(*argv[0], (void**)&tmp, SWIGTYPE_p_BSONObj, 0) >= 0);
+    }
+    if (_v) {
+      _v = ( Z_TYPE_PP(argv[1]) == IS_STRING ) ? 1 : 0;
+      
+      if (_v) {
+        _v = (Z_TYPE_PP(argv[2]) == IS_LONG); 
+        if (_v) {
+          _wrap_BSONObj_add__SWIG_2(INTERNAL_FUNCTION_PARAM_PASSTHRU); return;
+        }
+      }
+    }
+  }
+  if (argc == 3) {
+    int _v;
+    {
+      void *tmp;
+      _v = (SWIG_ConvertPtr(*argv[0], (void**)&tmp, SWIGTYPE_p_BSONObj, 0) >= 0);
+    }
+    if (_v) {
+      _v = ( Z_TYPE_PP(argv[1]) == IS_STRING ) ? 1 : 0;
+      
+      if (_v) {
+        _v = (Z_TYPE_PP(argv[2]) == IS_LONG); 
+        if (_v) {
+          _wrap_BSONObj_add__SWIG_0(INTERNAL_FUNCTION_PARAM_PASSTHRU); return;
         }
       }
     }
@@ -2845,8 +2926,7 @@ ZEND_NAMED_FUNCTION(_wrap_BSONObj_getInt) {
   }
   
   {
-    __int32 * resultobj = new __int32((const __int32 &) result);
-    SWIG_SetPointerZval(return_value, (void *)resultobj, SWIGTYPE_p___int32, 1);
+    ZVAL_LONG(return_value,result);
   }
   return;
 fail:
@@ -2925,10 +3005,16 @@ ZEND_NAMED_FUNCTION(_wrap_BSONObj_getLong) {
     
   }
   
-  {
-    __int64 * resultobj = new __int64((const __int64 &) result);
-    SWIG_SetPointerZval(return_value, (void *)resultobj, SWIGTYPE_p___int64, 1);
+  
+  if ((long long)LONG_MIN <= result && result <= (long long)LONG_MAX) {
+    return_value->value.lval = (long)(result);
+    return_value->type = IS_LONG;
+  } else {
+    char temp[256];
+    sprintf(temp, "%lld", (long long)result);
+    ZVAL_STRING(return_value, temp, 1);
   }
+  
   return;
 fail:
   zend_error(SWIG_ErrorCode(),"%s",SWIG_ErrorMsg());
@@ -3419,8 +3505,7 @@ ZEND_NAMED_FUNCTION(_wrap_BSONObj_length) {
   if(!arg1) SWIG_PHP_Error(E_ERROR, "this pointer is NULL");
   result = ((BSONObj const *)arg1)->length();
   {
-    __int32 * resultobj = new __int32((const __int32 &) result);
-    SWIG_SetPointerZval(return_value, (void *)resultobj, SWIGTYPE_p___int32, 1);
+    ZVAL_LONG(return_value,result);
   }
   return;
 fail:
@@ -5214,67 +5299,40 @@ fail:
 }
 
 
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_BSONTYPE) {
-  /* No destructor for simple type _p_BSONTYPE */
-  efree(rsrc->ptr);
-}
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_djondb__DjondbConnection) {
-  __wrap_delete_DjondbConnection(rsrc, SWIGTYPE_p_djondb__DjondbConnection->name TSRMLS_CC);
-}
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_djondb__DjondbConnectionManager) {
-  __wrap_delete_DjondbConnectionManager(rsrc, SWIGTYPE_p_djondb__DjondbConnectionManager->name TSRMLS_CC);
-}
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_std__mapT_std__string_BSONContent_p_t__const_iterator) {
-  /* No destructor for simple type _p_std__mapT_std__string_BSONContent_p_t__const_iterator */
-  efree(rsrc->ptr);
-}
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p___int32) {
-  /* No destructor for simple type _p___int32 */
-  efree(rsrc->ptr);
-}
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_BSONObj) {
-  __wrap_delete_BSONObj(rsrc, SWIGTYPE_p_BSONObj->name TSRMLS_CC);
-}
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_std__vectorT_BSONObj_p_t) {
-  __wrap_delete_BSONObjVectorPtr(rsrc, SWIGTYPE_p_std__vectorT_BSONObj_p_t->name TSRMLS_CC);
-}
 static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_djondb__ConnectionReference) {
   __wrap_delete_ConnectionReference(rsrc, SWIGTYPE_p_djondb__ConnectionReference->name TSRMLS_CC);
 }
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_BSONContent) {
-  /* No destructor for simple type _p_BSONContent */
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_char) {
+  /* No destructor for simple type _p_char */
   efree(rsrc->ptr);
 }
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_size_type) {
-  /* No destructor for simple type _p_size_type */
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_p_char) {
+  /* No destructor for simple type _p_p_char */
   efree(rsrc->ptr);
 }
 static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_BSONParser) {
   __wrap_delete_BSONParser(rsrc, SWIGTYPE_p_BSONParser->name TSRMLS_CC);
 }
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_BSONArrayObj) {
-  __wrap_delete_BSONArrayObj(rsrc, SWIGTYPE_p_BSONArrayObj->name TSRMLS_CC);
-}
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_ParseException) {
-  __wrap_delete_ParseException(rsrc, SWIGTYPE_p_ParseException->name TSRMLS_CC);
-}
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_value_type) {
-  /* No destructor for simple type _p_value_type */
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_size_type) {
+  /* No destructor for simple type _p_size_type */
   efree(rsrc->ptr);
 }
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_std__vectorT_std__string_t) {
-  __wrap_delete_StringVector(rsrc, SWIGTYPE_p_std__vectorT_std__string_t->name TSRMLS_CC);
-}
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_std__setT_std__string_t) {
-  /* No destructor for simple type _p_std__setT_std__string_t */
-  efree(rsrc->ptr);
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_BSONObj) {
+  __wrap_delete_BSONObj(rsrc, SWIGTYPE_p_BSONObj->name TSRMLS_CC);
 }
 static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_int) {
   /* No destructor for simple type _int */
   efree(rsrc->ptr);
 }
-static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p___int64) {
-  /* No destructor for simple type _p___int64 */
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_djondb__DjondbConnection) {
+  __wrap_delete_DjondbConnection(rsrc, SWIGTYPE_p_djondb__DjondbConnection->name TSRMLS_CC);
+}
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_std__mapT_std__string_BSONContent_p_t__const_iterator) {
+  /* No destructor for simple type _p_std__mapT_std__string_BSONContent_p_t__const_iterator */
+  efree(rsrc->ptr);
+}
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_BSONTYPE) {
+  /* No destructor for simple type _p_BSONTYPE */
   efree(rsrc->ptr);
 }
 static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_const_iterator) {
@@ -5288,6 +5346,85 @@ static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_std__vectorT_BSONObj_p_t__iterator) {
 static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_iterator) {
   /* No destructor for simple type _p_iterator */
   efree(rsrc->ptr);
+}
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_long) {
+  /* No destructor for simple type _p_long */
+  efree(rsrc->ptr);
+}
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_unsigned_int) {
+  /* No destructor for simple type _p_unsigned_int */
+  efree(rsrc->ptr);
+}
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_ParseException) {
+  __wrap_delete_ParseException(rsrc, SWIGTYPE_p_ParseException->name TSRMLS_CC);
+}
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_std__vectorT_BSONObj_p_t) {
+  __wrap_delete_BSONObjVectorPtr(rsrc, SWIGTYPE_p_std__vectorT_BSONObj_p_t->name TSRMLS_CC);
+}
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_unsigned_char) {
+  /* No destructor for simple type _p_unsigned_char */
+  efree(rsrc->ptr);
+}
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_signed_char) {
+  /* No destructor for simple type _p_signed_char */
+  efree(rsrc->ptr);
+}
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_unsigned_short) {
+  /* No destructor for simple type _p_unsigned_short */
+  efree(rsrc->ptr);
+}
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_short) {
+  /* No destructor for simple type _p_short */
+  efree(rsrc->ptr);
+}
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_BSONArrayObj) {
+  __wrap_delete_BSONArrayObj(rsrc, SWIGTYPE_p_BSONArrayObj->name TSRMLS_CC);
+}
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_BSONContent) {
+  /* No destructor for simple type _p_BSONContent */
+  efree(rsrc->ptr);
+}
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_value_type) {
+  /* No destructor for simple type _p_value_type */
+  efree(rsrc->ptr);
+}
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_float) {
+  /* No destructor for simple type _p_float */
+  efree(rsrc->ptr);
+}
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_int) {
+  /* No destructor for simple type _p_int */
+  efree(rsrc->ptr);
+}
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_std__setT_std__string_t) {
+  /* No destructor for simple type _p_std__setT_std__string_t */
+  efree(rsrc->ptr);
+}
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_std__vectorT_std__string_t) {
+  __wrap_delete_StringVector(rsrc, SWIGTYPE_p_std__vectorT_std__string_t->name TSRMLS_CC);
+}
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_p_unsigned_long) {
+  /* No destructor for simple type _p_p_unsigned_long */
+  efree(rsrc->ptr);
+}
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_unsigned_long) {
+  /* No destructor for simple type _p_unsigned_long */
+  efree(rsrc->ptr);
+}
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_signed___int64) {
+  /* No destructor for simple type _p_signed___int64 */
+  efree(rsrc->ptr);
+}
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_unsigned___int64) {
+  /* No destructor for simple type _p_unsigned___int64 */
+  efree(rsrc->ptr);
+}
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p___int64) {
+  /* No destructor for simple type _p___int64 */
+  efree(rsrc->ptr);
+}
+static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_djondb__DjondbConnectionManager) {
+  __wrap_delete_DjondbConnectionManager(rsrc, SWIGTYPE_p_djondb__DjondbConnectionManager->name TSRMLS_CC);
 }
 /* end wrapper section */
 /* class entry subsection */
@@ -5656,48 +5793,74 @@ SWIG_PropagateClientData(void) {
 ZEND_INIT_MODULE_GLOBALS(djonwrapper, djonwrapper_init_globals, djonwrapper_destroy_globals);
 
 /* Register resource destructors for pointer types */
-le_swig__p_BSONTYPE=zend_register_list_destructors_ex(_wrap_destroy_p_BSONTYPE,NULL,(char *)(SWIGTYPE_p_BSONTYPE->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_BSONTYPE,&le_swig__p_BSONTYPE);
-le_swig__p_djondb__DjondbConnection=zend_register_list_destructors_ex(_wrap_destroy_p_djondb__DjondbConnection,NULL,(char *)(SWIGTYPE_p_djondb__DjondbConnection->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_djondb__DjondbConnection,&le_swig__p_djondb__DjondbConnection);
-le_swig__p_djondb__DjondbConnectionManager=zend_register_list_destructors_ex(_wrap_destroy_p_djondb__DjondbConnectionManager,NULL,(char *)(SWIGTYPE_p_djondb__DjondbConnectionManager->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_djondb__DjondbConnectionManager,&le_swig__p_djondb__DjondbConnectionManager);
-le_swig__p_std__mapT_std__string_BSONContent_p_t__const_iterator=zend_register_list_destructors_ex(_wrap_destroy_p_std__mapT_std__string_BSONContent_p_t__const_iterator,NULL,(char *)(SWIGTYPE_p_std__mapT_std__string_BSONContent_p_t__const_iterator->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_std__mapT_std__string_BSONContent_p_t__const_iterator,&le_swig__p_std__mapT_std__string_BSONContent_p_t__const_iterator);
-le_swig__p___int32=zend_register_list_destructors_ex(_wrap_destroy_p___int32,NULL,(char *)(SWIGTYPE_p___int32->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p___int32,&le_swig__p___int32);
-le_swig__p_BSONObj=zend_register_list_destructors_ex(_wrap_destroy_p_BSONObj,NULL,(char *)(SWIGTYPE_p_BSONObj->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_BSONObj,&le_swig__p_BSONObj);
-le_swig__p_std__vectorT_BSONObj_p_t=zend_register_list_destructors_ex(_wrap_destroy_p_std__vectorT_BSONObj_p_t,NULL,(char *)(SWIGTYPE_p_std__vectorT_BSONObj_p_t->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_std__vectorT_BSONObj_p_t,&le_swig__p_std__vectorT_BSONObj_p_t);
 le_swig__p_djondb__ConnectionReference=zend_register_list_destructors_ex(_wrap_destroy_p_djondb__ConnectionReference,NULL,(char *)(SWIGTYPE_p_djondb__ConnectionReference->name),module_number);
 SWIG_TypeClientData(SWIGTYPE_p_djondb__ConnectionReference,&le_swig__p_djondb__ConnectionReference);
-le_swig__p_BSONContent=zend_register_list_destructors_ex(_wrap_destroy_p_BSONContent,NULL,(char *)(SWIGTYPE_p_BSONContent->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_BSONContent,&le_swig__p_BSONContent);
-le_swig__p_size_type=zend_register_list_destructors_ex(_wrap_destroy_p_size_type,NULL,(char *)(SWIGTYPE_p_size_type->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_size_type,&le_swig__p_size_type);
+le_swig__p_char=zend_register_list_destructors_ex(_wrap_destroy_p_char,NULL,(char *)(SWIGTYPE_p_char->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_char,&le_swig__p_char);
+le_swig__p_p_char=zend_register_list_destructors_ex(_wrap_destroy_p_p_char,NULL,(char *)(SWIGTYPE_p_p_char->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_p_char,&le_swig__p_p_char);
 le_swig__p_BSONParser=zend_register_list_destructors_ex(_wrap_destroy_p_BSONParser,NULL,(char *)(SWIGTYPE_p_BSONParser->name),module_number);
 SWIG_TypeClientData(SWIGTYPE_p_BSONParser,&le_swig__p_BSONParser);
-le_swig__p_BSONArrayObj=zend_register_list_destructors_ex(_wrap_destroy_p_BSONArrayObj,NULL,(char *)(SWIGTYPE_p_BSONArrayObj->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_BSONArrayObj,&le_swig__p_BSONArrayObj);
-le_swig__p_ParseException=zend_register_list_destructors_ex(_wrap_destroy_p_ParseException,NULL,(char *)(SWIGTYPE_p_ParseException->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_ParseException,&le_swig__p_ParseException);
-le_swig__p_value_type=zend_register_list_destructors_ex(_wrap_destroy_p_value_type,NULL,(char *)(SWIGTYPE_p_value_type->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_value_type,&le_swig__p_value_type);
-le_swig__p_std__vectorT_std__string_t=zend_register_list_destructors_ex(_wrap_destroy_p_std__vectorT_std__string_t,NULL,(char *)(SWIGTYPE_p_std__vectorT_std__string_t->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_std__vectorT_std__string_t,&le_swig__p_std__vectorT_std__string_t);
-le_swig__p_std__setT_std__string_t=zend_register_list_destructors_ex(_wrap_destroy_p_std__setT_std__string_t,NULL,(char *)(SWIGTYPE_p_std__setT_std__string_t->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p_std__setT_std__string_t,&le_swig__p_std__setT_std__string_t);
+le_swig__p_size_type=zend_register_list_destructors_ex(_wrap_destroy_p_size_type,NULL,(char *)(SWIGTYPE_p_size_type->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_size_type,&le_swig__p_size_type);
+le_swig__p_BSONObj=zend_register_list_destructors_ex(_wrap_destroy_p_BSONObj,NULL,(char *)(SWIGTYPE_p_BSONObj->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_BSONObj,&le_swig__p_BSONObj);
 le_swig__int=zend_register_list_destructors_ex(_wrap_destroy_int,NULL,(char *)(SWIGTYPE_int->name),module_number);
 SWIG_TypeClientData(SWIGTYPE_int,&le_swig__int);
-le_swig__p___int64=zend_register_list_destructors_ex(_wrap_destroy_p___int64,NULL,(char *)(SWIGTYPE_p___int64->name),module_number);
-SWIG_TypeClientData(SWIGTYPE_p___int64,&le_swig__p___int64);
+le_swig__p_djondb__DjondbConnection=zend_register_list_destructors_ex(_wrap_destroy_p_djondb__DjondbConnection,NULL,(char *)(SWIGTYPE_p_djondb__DjondbConnection->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_djondb__DjondbConnection,&le_swig__p_djondb__DjondbConnection);
+le_swig__p_std__mapT_std__string_BSONContent_p_t__const_iterator=zend_register_list_destructors_ex(_wrap_destroy_p_std__mapT_std__string_BSONContent_p_t__const_iterator,NULL,(char *)(SWIGTYPE_p_std__mapT_std__string_BSONContent_p_t__const_iterator->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_std__mapT_std__string_BSONContent_p_t__const_iterator,&le_swig__p_std__mapT_std__string_BSONContent_p_t__const_iterator);
+le_swig__p_BSONTYPE=zend_register_list_destructors_ex(_wrap_destroy_p_BSONTYPE,NULL,(char *)(SWIGTYPE_p_BSONTYPE->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_BSONTYPE,&le_swig__p_BSONTYPE);
 le_swig__p_const_iterator=zend_register_list_destructors_ex(_wrap_destroy_p_const_iterator,NULL,(char *)(SWIGTYPE_p_const_iterator->name),module_number);
 SWIG_TypeClientData(SWIGTYPE_p_const_iterator,&le_swig__p_const_iterator);
 le_swig__p_std__vectorT_BSONObj_p_t__iterator=zend_register_list_destructors_ex(_wrap_destroy_p_std__vectorT_BSONObj_p_t__iterator,NULL,(char *)(SWIGTYPE_p_std__vectorT_BSONObj_p_t__iterator->name),module_number);
 SWIG_TypeClientData(SWIGTYPE_p_std__vectorT_BSONObj_p_t__iterator,&le_swig__p_std__vectorT_BSONObj_p_t__iterator);
 le_swig__p_iterator=zend_register_list_destructors_ex(_wrap_destroy_p_iterator,NULL,(char *)(SWIGTYPE_p_iterator->name),module_number);
 SWIG_TypeClientData(SWIGTYPE_p_iterator,&le_swig__p_iterator);
+le_swig__p_long=zend_register_list_destructors_ex(_wrap_destroy_p_long,NULL,(char *)(SWIGTYPE_p_long->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_long,&le_swig__p_long);
+le_swig__p_unsigned_int=zend_register_list_destructors_ex(_wrap_destroy_p_unsigned_int,NULL,(char *)(SWIGTYPE_p_unsigned_int->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_unsigned_int,&le_swig__p_unsigned_int);
+le_swig__p_ParseException=zend_register_list_destructors_ex(_wrap_destroy_p_ParseException,NULL,(char *)(SWIGTYPE_p_ParseException->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_ParseException,&le_swig__p_ParseException);
+le_swig__p_std__vectorT_BSONObj_p_t=zend_register_list_destructors_ex(_wrap_destroy_p_std__vectorT_BSONObj_p_t,NULL,(char *)(SWIGTYPE_p_std__vectorT_BSONObj_p_t->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_std__vectorT_BSONObj_p_t,&le_swig__p_std__vectorT_BSONObj_p_t);
+le_swig__p_unsigned_char=zend_register_list_destructors_ex(_wrap_destroy_p_unsigned_char,NULL,(char *)(SWIGTYPE_p_unsigned_char->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_unsigned_char,&le_swig__p_unsigned_char);
+le_swig__p_signed_char=zend_register_list_destructors_ex(_wrap_destroy_p_signed_char,NULL,(char *)(SWIGTYPE_p_signed_char->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_signed_char,&le_swig__p_signed_char);
+le_swig__p_unsigned_short=zend_register_list_destructors_ex(_wrap_destroy_p_unsigned_short,NULL,(char *)(SWIGTYPE_p_unsigned_short->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_unsigned_short,&le_swig__p_unsigned_short);
+le_swig__p_short=zend_register_list_destructors_ex(_wrap_destroy_p_short,NULL,(char *)(SWIGTYPE_p_short->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_short,&le_swig__p_short);
+le_swig__p_BSONArrayObj=zend_register_list_destructors_ex(_wrap_destroy_p_BSONArrayObj,NULL,(char *)(SWIGTYPE_p_BSONArrayObj->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_BSONArrayObj,&le_swig__p_BSONArrayObj);
+le_swig__p_BSONContent=zend_register_list_destructors_ex(_wrap_destroy_p_BSONContent,NULL,(char *)(SWIGTYPE_p_BSONContent->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_BSONContent,&le_swig__p_BSONContent);
+le_swig__p_value_type=zend_register_list_destructors_ex(_wrap_destroy_p_value_type,NULL,(char *)(SWIGTYPE_p_value_type->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_value_type,&le_swig__p_value_type);
+le_swig__p_float=zend_register_list_destructors_ex(_wrap_destroy_p_float,NULL,(char *)(SWIGTYPE_p_float->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_float,&le_swig__p_float);
+le_swig__p_int=zend_register_list_destructors_ex(_wrap_destroy_p_int,NULL,(char *)(SWIGTYPE_p_int->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_int,&le_swig__p_int);
+le_swig__p_std__setT_std__string_t=zend_register_list_destructors_ex(_wrap_destroy_p_std__setT_std__string_t,NULL,(char *)(SWIGTYPE_p_std__setT_std__string_t->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_std__setT_std__string_t,&le_swig__p_std__setT_std__string_t);
+le_swig__p_std__vectorT_std__string_t=zend_register_list_destructors_ex(_wrap_destroy_p_std__vectorT_std__string_t,NULL,(char *)(SWIGTYPE_p_std__vectorT_std__string_t->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_std__vectorT_std__string_t,&le_swig__p_std__vectorT_std__string_t);
+le_swig__p_p_unsigned_long=zend_register_list_destructors_ex(_wrap_destroy_p_p_unsigned_long,NULL,(char *)(SWIGTYPE_p_p_unsigned_long->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_p_unsigned_long,&le_swig__p_p_unsigned_long);
+le_swig__p_unsigned_long=zend_register_list_destructors_ex(_wrap_destroy_p_unsigned_long,NULL,(char *)(SWIGTYPE_p_unsigned_long->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_unsigned_long,&le_swig__p_unsigned_long);
+le_swig__p_signed___int64=zend_register_list_destructors_ex(_wrap_destroy_p_signed___int64,NULL,(char *)(SWIGTYPE_p_signed___int64->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_signed___int64,&le_swig__p_signed___int64);
+le_swig__p_unsigned___int64=zend_register_list_destructors_ex(_wrap_destroy_p_unsigned___int64,NULL,(char *)(SWIGTYPE_p_unsigned___int64->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_unsigned___int64,&le_swig__p_unsigned___int64);
+le_swig__p___int64=zend_register_list_destructors_ex(_wrap_destroy_p___int64,NULL,(char *)(SWIGTYPE_p___int64->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p___int64,&le_swig__p___int64);
+le_swig__p_djondb__DjondbConnectionManager=zend_register_list_destructors_ex(_wrap_destroy_p_djondb__DjondbConnectionManager,NULL,(char *)(SWIGTYPE_p_djondb__DjondbConnectionManager->name),module_number);
+SWIG_TypeClientData(SWIGTYPE_p_djondb__DjondbConnectionManager,&le_swig__p_djondb__DjondbConnectionManager);
 CG(active_class_entry) = NULL;
 /* end oinit subsection */
 

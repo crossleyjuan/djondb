@@ -1468,14 +1468,14 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_BSONArrayObj__SWIG_1(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_BSONArrayObj_length(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_BSONArrayObj_length(void * jarg1) {
+  int jresult ;
   BSONArrayObj *arg1 = (BSONArrayObj *) 0 ;
   __int32 result;
   
   arg1 = (BSONArrayObj *)jarg1; 
   result = ((BSONArrayObj const *)arg1)->length();
-  jresult = new __int32((const __int32 &)result); 
+  jresult = result; 
   return jresult;
 }
 
@@ -1494,20 +1494,14 @@ SWIGEXPORT void SWIGSTDCALL CSharp_BSONArrayObj_add(void * jarg1, void * jarg2) 
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_BSONArrayObj_get(void * jarg1, void * jarg2) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_BSONArrayObj_get(void * jarg1, int jarg2) {
   void * jresult ;
   BSONArrayObj *arg1 = (BSONArrayObj *) 0 ;
   __int32 arg2 ;
-  __int32 *argp2 ;
   BSONObj *result = 0 ;
   
   arg1 = (BSONArrayObj *)jarg1; 
-  argp2 = (__int32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null __int32", 0);
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg2 = (__int32)jarg2; 
   result = (BSONObj *)((BSONArrayObj const *)arg1)->get(arg2);
   jresult = (void *)result; 
   return jresult;
@@ -1598,11 +1592,10 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_BSONObj(void * jarg1) {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_BSONObj_add__SWIG_0(void * jarg1, char * jarg2, void * jarg3) {
+SWIGEXPORT void SWIGSTDCALL CSharp_BSONObj_add__SWIG_0(void * jarg1, char * jarg2, int jarg3) {
   BSONObj *arg1 = (BSONObj *) 0 ;
   std::string arg2 ;
   __int32 arg3 ;
-  __int32 *argp3 ;
   
   arg1 = (BSONObj *)jarg1; 
   if (!jarg2) {
@@ -1610,12 +1603,7 @@ SWIGEXPORT void SWIGSTDCALL CSharp_BSONObj_add__SWIG_0(void * jarg1, char * jarg
     return ;
   }
   (&arg2)->assign(jarg2); 
-  argp3 = (__int32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null __int32", 0);
-    return ;
-  }
-  arg3 = *argp3; 
+  arg3 = (__int32)jarg3; 
   (arg1)->add(arg2,arg3);
 }
 
@@ -1636,11 +1624,10 @@ SWIGEXPORT void SWIGSTDCALL CSharp_BSONObj_add__SWIG_1(void * jarg1, char * jarg
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_BSONObj_add__SWIG_2(void * jarg1, char * jarg2, void * jarg3) {
+SWIGEXPORT void SWIGSTDCALL CSharp_BSONObj_add__SWIG_2(void * jarg1, char * jarg2, long long jarg3) {
   BSONObj *arg1 = (BSONObj *) 0 ;
   std::string arg2 ;
   __int64 arg3 ;
-  __int64 *argp3 ;
   
   arg1 = (BSONObj *)jarg1; 
   if (!jarg2) {
@@ -1648,12 +1635,7 @@ SWIGEXPORT void SWIGSTDCALL CSharp_BSONObj_add__SWIG_2(void * jarg1, char * jarg
     return ;
   }
   (&arg2)->assign(jarg2); 
-  argp3 = (__int64 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null __int64", 0);
-    return ;
-  }
-  arg3 = *argp3; 
+  arg3 = (__int64)jarg3; 
   (arg1)->add(arg2,arg3);
 }
 
@@ -1736,8 +1718,8 @@ SWIGEXPORT unsigned int SWIGSTDCALL CSharp_BSONObj_has(void * jarg1, char * jarg
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_BSONObj_getInt(void * jarg1, char * jarg2) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_BSONObj_getInt(void * jarg1, char * jarg2) {
+  int jresult ;
   BSONObj *arg1 = (BSONObj *) 0 ;
   std::string arg2 ;
   __int32 result;
@@ -1757,7 +1739,7 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_BSONObj_getInt(void * jarg1, char * jarg2) 
     return 0; 
   }
   
-  jresult = new __int32((const __int32 &)result); 
+  jresult = result; 
   return jresult;
 }
 
@@ -1788,8 +1770,8 @@ SWIGEXPORT double SWIGSTDCALL CSharp_BSONObj_getDouble(void * jarg1, char * jarg
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_BSONObj_getLong(void * jarg1, char * jarg2) {
-  void * jresult ;
+SWIGEXPORT long long SWIGSTDCALL CSharp_BSONObj_getLong(void * jarg1, char * jarg2) {
+  long long jresult ;
   BSONObj *arg1 = (BSONObj *) 0 ;
   std::string arg2 ;
   __int64 result;
@@ -1809,7 +1791,7 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_BSONObj_getLong(void * jarg1, char * jarg2)
     return 0; 
   }
   
-  jresult = new __int64((const __int64 &)result); 
+  jresult = result; 
   return jresult;
 }
 
@@ -2049,14 +2031,14 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_BSONObj_end(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_BSONObj_length(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_BSONObj_length(void * jarg1) {
+  int jresult ;
   BSONObj *arg1 = (BSONObj *) 0 ;
   __int32 result;
   
   arg1 = (BSONObj *)jarg1; 
   result = ((BSONObj const *)arg1)->length();
-  jresult = new __int32((const __int32 &)result); 
+  jresult = result; 
   return jresult;
 }
 

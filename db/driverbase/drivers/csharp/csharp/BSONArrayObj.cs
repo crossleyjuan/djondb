@@ -48,8 +48,8 @@ public class BSONArrayObj : IDisposable {
     if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public SWIGTYPE_p___int32 length() {
-    SWIGTYPE_p___int32 ret = new SWIGTYPE_p___int32(djonwrapperPINVOKE.BSONArrayObj_length(swigCPtr), true);
+  public int length() {
+    int ret = djonwrapperPINVOKE.BSONArrayObj_length(swigCPtr);
     return ret;
   }
 
@@ -58,10 +58,9 @@ public class BSONArrayObj : IDisposable {
     if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public BSONObj get(SWIGTYPE_p___int32 index) {
-    IntPtr cPtr = djonwrapperPINVOKE.BSONArrayObj_get(swigCPtr, SWIGTYPE_p___int32.getCPtr(index));
+  public BSONObj get(int index) {
+    IntPtr cPtr = djonwrapperPINVOKE.BSONArrayObj_get(swigCPtr, index);
     BSONObj ret = (cPtr == IntPtr.Zero) ? null : new BSONObj(cPtr, false);
-    if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
