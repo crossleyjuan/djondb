@@ -43,16 +43,16 @@ public class BSONObj {
     this(djonwrapperJNI.new_BSONObj__SWIG_1(BSONObj.getCPtr(orig), orig), true);
   }
 
-  public void add(String arg0, SWIGTYPE_p___int32 arg1) {
-    djonwrapperJNI.BSONObj_add__SWIG_0(swigCPtr, this, arg0, SWIGTYPE_p___int32.getCPtr(arg1));
+  public void add(String arg0, int arg1) {
+    djonwrapperJNI.BSONObj_add__SWIG_0(swigCPtr, this, arg0, arg1);
   }
 
   public void add(String arg0, double arg1) {
     djonwrapperJNI.BSONObj_add__SWIG_1(swigCPtr, this, arg0, arg1);
   }
 
-  public void add(String arg0, SWIGTYPE_p___int64 arg1) {
-    djonwrapperJNI.BSONObj_add__SWIG_2(swigCPtr, this, arg0, SWIGTYPE_p___int64.getCPtr(arg1));
+  public void add(String arg0, long arg1) {
+    djonwrapperJNI.BSONObj_add__SWIG_2(swigCPtr, this, arg0, arg1);
   }
 
   public void add(String arg0, String arg1) {
@@ -71,16 +71,16 @@ public class BSONObj {
     return djonwrapperJNI.BSONObj_has(swigCPtr, this, arg0);
   }
 
-  public SWIGTYPE_p___int32 getInt(String arg0) {
-    return new SWIGTYPE_p___int32(djonwrapperJNI.BSONObj_getInt(swigCPtr, this, arg0), true);
+  public int getInt(String arg0) {
+    return djonwrapperJNI.BSONObj_getInt(swigCPtr, this, arg0);
   }
 
   public double getDouble(String arg0) {
     return djonwrapperJNI.BSONObj_getDouble(swigCPtr, this, arg0);
   }
 
-  public SWIGTYPE_p___int64 getLong(String arg0) {
-    return new SWIGTYPE_p___int64(djonwrapperJNI.BSONObj_getLong(swigCPtr, this, arg0), true);
+  public long getLong(String arg0) {
+    return djonwrapperJNI.BSONObj_getLong(swigCPtr, this, arg0);
   }
 
   public String getString(String arg0) {
@@ -136,8 +136,8 @@ public class BSONObj {
     return new SWIGTYPE_p_std__mapT_std__string_BSONContent_p_t__const_iterator(djonwrapperJNI.BSONObj_end(swigCPtr, this), true);
   }
 
-  public SWIGTYPE_p___int32 length() {
-    return new SWIGTYPE_p___int32(djonwrapperJNI.BSONObj_length(swigCPtr, this), true);
+  public int length() {
+    return djonwrapperJNI.BSONObj_length(swigCPtr, this);
   }
 
 }

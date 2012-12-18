@@ -2,6 +2,7 @@
 
 %include "std_string.i"
 %include "std_vector.i"
+%include "windows.i"
 
 %{
 #include "bsonarrayobj.h"

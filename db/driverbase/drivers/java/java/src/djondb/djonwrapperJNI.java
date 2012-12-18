@@ -34,9 +34,9 @@ public class djonwrapperJNI {
   public final static native long new_BSONArrayObj__SWIG_0();
   public final static native void delete_BSONArrayObj(long jarg1);
   public final static native long new_BSONArrayObj__SWIG_1(long jarg1, BSONArrayObj jarg1_);
-  public final static native long BSONArrayObj_length(long jarg1, BSONArrayObj jarg1_);
+  public final static native int BSONArrayObj_length(long jarg1, BSONArrayObj jarg1_);
   public final static native void BSONArrayObj_add(long jarg1, BSONArrayObj jarg1_, long jarg2, BSONObj jarg2_);
-  public final static native long BSONArrayObj_get(long jarg1, BSONArrayObj jarg1_, long jarg2);
+  public final static native long BSONArrayObj_get(long jarg1, BSONArrayObj jarg1_, int jarg2);
   public final static native String BSONArrayObj_toChar(long jarg1, BSONArrayObj jarg1_);
   public final static native long BSONArrayObj_select(long jarg1, BSONArrayObj jarg1_, String jarg2);
   public final static native long BSONArrayObj_begin(long jarg1, BSONArrayObj jarg1_);
@@ -44,14 +44,14 @@ public class djonwrapperJNI {
   public final static native long new_BSONObj__SWIG_0();
   public final static native long new_BSONObj__SWIG_1(long jarg1, BSONObj jarg1_);
   public final static native void delete_BSONObj(long jarg1);
-  public final static native void BSONObj_add__SWIG_0(long jarg1, BSONObj jarg1_, String jarg2, long jarg3);
+  public final static native void BSONObj_add__SWIG_0(long jarg1, BSONObj jarg1_, String jarg2, int jarg3);
   public final static native void BSONObj_add__SWIG_1(long jarg1, BSONObj jarg1_, String jarg2, double jarg3);
   public final static native void BSONObj_add__SWIG_2(long jarg1, BSONObj jarg1_, String jarg2, long jarg3);
   public final static native void BSONObj_add__SWIG_3(long jarg1, BSONObj jarg1_, String jarg2, String jarg3);
   public final static native void BSONObj_add__SWIG_4(long jarg1, BSONObj jarg1_, String jarg2, long jarg3, BSONObj jarg3_);
   public final static native void BSONObj_add__SWIG_5(long jarg1, BSONObj jarg1_, String jarg2, long jarg3, BSONArrayObj jarg3_);
   public final static native boolean BSONObj_has(long jarg1, BSONObj jarg1_, String jarg2);
-  public final static native long BSONObj_getInt(long jarg1, BSONObj jarg1_, String jarg2);
+  public final static native int BSONObj_getInt(long jarg1, BSONObj jarg1_, String jarg2);
   public final static native double BSONObj_getDouble(long jarg1, BSONObj jarg1_, String jarg2);
   public final static native long BSONObj_getLong(long jarg1, BSONObj jarg1_, String jarg2);
   public final static native String BSONObj_getString(long jarg1, BSONObj jarg1_, String jarg2);
@@ -66,7 +66,7 @@ public class djonwrapperJNI {
   public final static native String BSONObj_toChar(long jarg1, BSONObj jarg1_);
   public final static native long BSONObj_begin(long jarg1, BSONObj jarg1_);
   public final static native long BSONObj_end(long jarg1, BSONObj jarg1_);
-  public final static native long BSONObj_length(long jarg1, BSONObj jarg1_);
+  public final static native int BSONObj_length(long jarg1, BSONObj jarg1_);
   public final static native long new_BSONParser();
   public final static native void delete_BSONParser(long jarg1);
   public final static native long BSONParser_parse(String jarg1);

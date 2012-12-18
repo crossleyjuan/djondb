@@ -655,8 +655,8 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_new_1BSONArrayObj_1_1SWIG_11
 }
 
 
-SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_BSONArrayObj_1length(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT jint JNICALL Java_djondb_djonwrapperJNI_BSONArrayObj_1length(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
   BSONArrayObj *arg1 = (BSONArrayObj *) 0 ;
   __int32 result;
   
@@ -665,7 +665,7 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_BSONArrayObj_1length(JNIEnv 
   (void)jarg1_;
   arg1 = *(BSONArrayObj **)&jarg1; 
   result = ((BSONArrayObj const *)arg1)->length();
-  *(__int32 **)&jresult = new __int32((const __int32 &)result); 
+  jresult = (jint)result; 
   return jresult;
 }
 
@@ -688,23 +688,17 @@ SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_BSONArrayObj_1add(JNIEnv *jen
 }
 
 
-SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_BSONArrayObj_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_BSONArrayObj_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jlong jresult = 0 ;
   BSONArrayObj *arg1 = (BSONArrayObj *) 0 ;
   __int32 arg2 ;
-  __int32 *argp2 ;
   BSONObj *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(BSONArrayObj **)&jarg1; 
-  argp2 = *(__int32 **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null __int32");
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg2 = (__int32)jarg2; 
   result = (BSONObj *)((BSONArrayObj const *)arg1)->get(arg2);
   *(BSONObj **)&jresult = result; 
   return jresult;
@@ -819,11 +813,10 @@ SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_delete_1BSONObj(JNIEnv *jenv,
 }
 
 
-SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_BSONObj_1add_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jlong jarg3) {
+SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_BSONObj_1add_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jint jarg3) {
   BSONObj *arg1 = (BSONObj *) 0 ;
   std::string arg2 ;
   __int32 arg3 ;
-  __int32 *argp3 ;
   
   (void)jenv;
   (void)jcls;
@@ -837,12 +830,7 @@ SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_BSONObj_1add_1_1SWIG_10(JNIEn
   if (!arg2_pstr) return ;
   (&arg2)->assign(arg2_pstr);
   jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
-  argp3 = *(__int32 **)&jarg3; 
-  if (!argp3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null __int32");
-    return ;
-  }
-  arg3 = *argp3; 
+  arg3 = (__int32)jarg3; 
   (arg1)->add(arg2,arg3);
 }
 
@@ -873,7 +861,6 @@ SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_BSONObj_1add_1_1SWIG_12(JNIEn
   BSONObj *arg1 = (BSONObj *) 0 ;
   std::string arg2 ;
   __int64 arg3 ;
-  __int64 *argp3 ;
   
   (void)jenv;
   (void)jcls;
@@ -887,12 +874,7 @@ SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_BSONObj_1add_1_1SWIG_12(JNIEn
   if (!arg2_pstr) return ;
   (&arg2)->assign(arg2_pstr);
   jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
-  argp3 = *(__int64 **)&jarg3; 
-  if (!argp3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null __int64");
-    return ;
-  }
-  arg3 = *argp3; 
+  arg3 = (__int64)jarg3; 
   (arg1)->add(arg2,arg3);
 }
 
@@ -1004,8 +986,8 @@ SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_BSONObj_1has(JNIEnv *jenv
 }
 
 
-SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_BSONObj_1getInt(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
-  jlong jresult = 0 ;
+SWIGEXPORT jint JNICALL Java_djondb_djonwrapperJNI_BSONObj_1getInt(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+  jint jresult = 0 ;
   BSONObj *arg1 = (BSONObj *) 0 ;
   std::string arg2 ;
   __int32 result;
@@ -1031,7 +1013,7 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_BSONObj_1getInt(JNIEnv *jenv
     return 0; 
   }
   
-  *(__int32 **)&jresult = new __int32((const __int32 &)result); 
+  jresult = (jint)result; 
   return jresult;
 }
 
@@ -1095,7 +1077,7 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_BSONObj_1getLong(JNIEnv *jen
     return 0; 
   }
   
-  *(__int64 **)&jresult = new __int64((const __int64 &)result); 
+  jresult = (jlong)result; 
   return jresult;
 }
 
@@ -1400,8 +1382,8 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_BSONObj_1end(JNIEnv *jenv, j
 }
 
 
-SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_BSONObj_1length(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT jint JNICALL Java_djondb_djonwrapperJNI_BSONObj_1length(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
   BSONObj *arg1 = (BSONObj *) 0 ;
   __int32 result;
   
@@ -1410,7 +1392,7 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_BSONObj_1length(JNIEnv *jenv
   (void)jarg1_;
   arg1 = *(BSONObj **)&jarg1; 
   result = ((BSONObj const *)arg1)->length();
-  *(__int32 **)&jresult = new __int32((const __int32 &)result); 
+  jresult = (jint)result; 
   return jresult;
 }
 
