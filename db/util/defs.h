@@ -13,7 +13,7 @@
 #ifndef WINDOWS
 #include "config.h"
 #else
-#define VERSION "0.120121125"
+#define VERSION "0.120121216"
 #define PACKAGE_VERSION "0.1"
 #endif
 
@@ -35,7 +35,9 @@
 typedef int8_t            __int8;
 typedef int16_t           __int16;
 typedef int32_t           __int32;                
+#ifndef SWIGJAVA
 typedef int64_t           __int64;
+#endif
 #endif
 typedef __int64           __LONG64;
 

@@ -1,5 +1,12 @@
 #!/bin/sh
 
+while getopts j:d:u o
+   do case "$o" in
+	   u)  UPLOAD="true";;
+		\?)  echo "Usage: $0 -u" && exit 1;;
+	esac
+done
+
 cd ..
 #executes update to ensure .h files
 sh update.sh
@@ -24,10 +31,13 @@ swig2.0 -c++ -python -outdir output -o output/djonpythondriver.cpp driver-python
 cp setup.py output/
 cp MANIFEST.in output/
 
-cd output
-python setup.py register
-#python setup.py build_ext --inplace
-python setup.py sdist upload
-#python setup.py bdist_dumb upload
-#python setup.py bdist_dumb upload
+if [ ! -z "${UPLOAD}" ]; 
+then
+	cd output
+	python setup.py register
+	#python setup.py build_ext --inplace
+	python setup.py sdist upload
+	#python setup.py bdist_dumb upload
+	#python setup.py bdist_dumb upload
+fi
 

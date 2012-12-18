@@ -1,8 +1,9 @@
 #!/bin/sh
 
-while getopts j:d: o
+while getopts j:d:u o
    do case "$o" in
-		d) DIR=$2;;
+		d)  DIR="$OPTARG";;
+	   u)  UPLOAD="true";;
 		\?)  echo "Usage: $0 -d dist_dir" && exit 1;;
 	esac
 done
