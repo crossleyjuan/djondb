@@ -2,7 +2,7 @@
 #define FILEOUTPUTSTREAM_H
 
 #include "outputstream.h"
-#include "defs.h"
+#include "filesystemdefs.h"
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>

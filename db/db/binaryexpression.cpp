@@ -27,6 +27,7 @@
 
 #include "expressionresult.h"
 #include "util.h"
+#include "bson.h"
 #include <string>
 #include <string.h>
 #include <memory>
@@ -59,46 +60,52 @@ ExpressionResult* evalEqual(const BSONObj& bson, BaseExpression* left, BaseExpre
 	bool result = false;
 	if (valLeft->type() != valRight->type()) {
 		result = false;
-	} else if (((valLeft->value() != NULL) && (valRight->value() == NULL)) ||
-			((valLeft->value() == NULL) && (valRight->value() != NULL))) {
+	} else if (((valLeft->type() != ExpressionResult::RT_NULL) && (valRight->type() == ExpressionResult::RT_NULL)) ||
+			((valLeft->type() == ExpressionResult::RT_NULL) && (valRight->type() != ExpressionResult::RT_NULL))) {
 		result = false;
-	} else if (valLeft->value() == valRight->value()) {
-		result = true;
 	} else {
 
 		// the types are ensured to be equal
 		switch (valLeft->type()) {
 			case ExpressionResult::RT_INT:
-				result = (*(int*)valLeft->value() == *(int*)valRight->value());
+				result = ((__int32)*valLeft == (__int32)*valRight);
 				break;
 			case ExpressionResult::RT_LONG:
-				result = (*(long*)valLeft->value() == *(long*)valRight->value());
-				break;
 			case ExpressionResult::RT_LONG64:
-				result = (*(__LONG64*)valLeft->value() == *(__LONG64*)valRight->value());
+				result = ((__int64)*valLeft == (__int64)*valRight);
 				break;
 			case ExpressionResult::RT_DOUBLE:
-				result = (*(double*)valLeft->value() == *(double*)valRight->value());
+				result = ((double)*valLeft == (double)*valRight);
 				break;
 			case ExpressionResult::RT_BOOLEAN:
-				result = (*(bool*)valLeft->value() == *(bool*)valRight->value());
+				result = ((bool)*valLeft == (bool)*valRight);
+				break;
+			case ExpressionResult::RT_PTRCHAR:
+				{
+					result = ((djondb::string)*valLeft == (djondb::string)*valRight);
+					break;
+				}
 				break;
 			case ExpressionResult::RT_STRINGDB:
 				{
-					std::string* leftS = (std::string*)valLeft->value();
-					std::string* rightS = (std::string*)valRight->value();
-					result = (leftS->compare(*rightS) == 0);
+					std::string leftS = *valLeft;
+					std::string rightS = *valRight;
+					result = (leftS.compare(rightS) == 0);
 				}
 				break;
-			case ExpressionResult::RT_BSON:
-				result = false;
-				break;
+			case ExpressionResult::RT_BSON: 
+				{
+					BSONObj* bleft = (BSONObj*)*valLeft;
+					BSONObj* bright = (BSONObj*)*valRight;
+					result = (*bleft == *bright);
+					break;
+				}
 		}
 	}
 
 	delete valLeft;
 	delete valRight;
-	return new ExpressionResult(ExpressionResult::RT_BOOLEAN, &result);
+	return new ExpressionResult(result);
 }
 
 ExpressionResult* evalComparison(const BSONObj& bson, const FILTER_OPERATORS& oper, BaseExpression* left, BaseExpression* right) {
@@ -107,29 +114,29 @@ ExpressionResult* evalComparison(const BSONObj& bson, const FILTER_OPERATORS& op
 
 	if (valLeft->type() != valRight->type()) {
 		// ERROR types does not match
+		delete valLeft;
+		delete valRight;
 
-		return new ExpressionResult(ExpressionResult::RT_NULL, NULL);
+		return new ExpressionResult(false);
 	}
 
 	bool resultGreather = false; // this will compare only greather than, and at the end will invert
 	// based on the sign
-	if ((valLeft->value() != NULL) && (valRight->value() == NULL)) {
+	if ((valLeft->type() != ExpressionResult::RT_NULL) && (valRight->type() == ExpressionResult::RT_NULL)) {
 		resultGreather = true;
-	} else if (((valLeft->value() == NULL) && (valRight->value() != NULL))) {
+	} else if (((valLeft->type() == ExpressionResult::RT_NULL) && (valRight->type() != ExpressionResult::RT_NULL))) {
 		resultGreather = false;
 	} else {
 		switch (valLeft->type()) {
 			case ExpressionResult::RT_INT:
-				resultGreather = (*(int*)valLeft->value() > *(int*)valRight->value());
+				resultGreather = ((__int32)*valLeft > (__int32)*valRight);
 				break;
 			case ExpressionResult::RT_LONG:
-				resultGreather = (*(long*)valLeft->value() > *(long*)valRight->value());
-				break;
 			case ExpressionResult::RT_LONG64:
-				resultGreather = (*(__LONG64*)valLeft->value() > *(__LONG64*)valRight->value());
+				resultGreather = ((__int64)*valLeft > (__int64)*valRight);
 				break;
 			case ExpressionResult::RT_DOUBLE:
-				resultGreather = (*(double*)valLeft->value() > *(double*)valRight->value());
+				resultGreather = ((double)*valLeft > (double)*valRight);
 				break;
 		}
 	}
@@ -145,7 +152,7 @@ ExpressionResult* evalComparison(const BSONObj& bson, const FILTER_OPERATORS& op
 		}else {
 			bres = resultGreather;
 		}
-		result = new ExpressionResult(ExpressionResult::RT_BOOLEAN, &bres);
+		result = new ExpressionResult(bres);
 	}
 
 	delete valLeft;
@@ -161,19 +168,19 @@ ExpressionResult* evalAndOr(const BSONObj& bson, FILTER_OPERATORS oper, BaseExpr
 		// ERROR
 		return NULL;
 	} else {
-		bool* bleft = (bool*)valLeft->value();
-		bool* bright = (bool*)valRight->value();
+		bool bleft = (bool)*valLeft;
+		bool bright = (bool)*valRight;
 
-		bool* bresult = new bool();
+		bool bresult;
 		switch (oper) {
 			case FO_AND:
-				*bresult = (*bleft && *bright);
+				bresult = (bleft && bright);
 				break;
 			case FO_OR:
-				*bresult = (*bleft ||  *bright);
+				bresult = (bleft ||  bright);
 				break;
 		}
-		ExpressionResult* result = new ExpressionResult(ExpressionResult::RT_BOOLEAN, bresult);
+		ExpressionResult* result = new ExpressionResult(bresult);
 		return result;
 	}
 }

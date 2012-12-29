@@ -132,7 +132,6 @@ Index* BPlusIndex::find(BSONObj* const elem)
 		}
 	}
 	free(key);
-	delete log;
 	return result;
 }
 
@@ -178,7 +177,6 @@ void debugInfo(Bucket* bucket) {
 		debugInfo(bucket->right);
 	}
 
-	delete log;
 
 }
 
@@ -189,7 +187,7 @@ void BPlusIndex::debug() {
 void BPlusIndex::checkBucket(Bucket* const bucket)
 {
 	while (bucket->size > BUCKET_MAX_ELEMENTS) {
-		std::auto_ptr<Logger> log(getLogger(NULL));
+		Logger* log = getLogger(NULL);
 		// The bucked will be split
 		Bucket* leftBucket;
 		if (bucket->left != NULL) {
@@ -242,7 +240,7 @@ void BPlusIndex::checkBucket(Bucket* const bucket)
 // This method will insert the element into the currentBucket
 void BPlusIndex::insertBucketElement(Bucket* bucket, BucketElement* element)
 {
-	std::auto_ptr<Logger> log(getLogger(NULL));
+	Logger* log = getLogger(NULL);
 #ifdef DEBUG
 	log->debug("inserting element. key: %s", element->key);
 	log->debug("current bucket. min: %s, max: %s, size: %d", bucket->minKey, bucket->maxKey, bucket->size);
@@ -454,8 +452,8 @@ std::list<Index*> BPlusIndex::findElements(FilterParser* parser, Bucket* bucket)
 		BSONObj* obj = index->key;
 		ExpressionResult* eresult = parser->eval(*obj);
 		if (eresult->type() == ExpressionResult::RT_BOOLEAN) {
-			bool* bres = (bool*)eresult->value();
-			if (*bres) {
+			bool bres = *eresult;
+			if (bres) {
 				result.push_back(index);
 			}
 		}

@@ -41,7 +41,6 @@ StreamManager::StreamManager() {
 }
 
 StreamManager::~StreamManager() {
-	delete _logger;
 }
 
 void StreamManager::setDataDir(const std::string& dataDir) {
@@ -136,7 +135,7 @@ StreamType* StreamManager::checkVersion(StreamType* stream) {
 }
 
 StreamType* StreamManager::open(std::string db, std::string ns, FILE_TYPE type) {
-	std::auto_ptr<Logger> log(getLogger(NULL));
+	Logger* log = getLogger(NULL);
 	StreamType* stream = NULL;
 
 	map<std::string, SpacesType>* spaces = NULL;

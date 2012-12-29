@@ -128,21 +128,20 @@ class TestDBSuite: public Test::Suite
 			ExpressionResult* result = exp.eval(dummy);
 
 			TEST_ASSERT(result->type() == ExpressionResult::RT_INT);
-			int* i = (int*)result->value();
-			TEST_ASSERT(*i == 35);
+			int i = (int)*result;
+			TEST_ASSERT(i == 35);
 
 			ConstantExpression exp2(3.324);
 			ExpressionResult* result2 = exp2.eval(dummy);
 			TEST_ASSERT(result2->type() == ExpressionResult::RT_DOUBLE);
-			double* d = (double*)result2->value();
-			TEST_ASSERT(*d == 3.324);
+			double d = *result2;
+			TEST_ASSERT(d == 3.324);
 
 			ConstantExpression exp3("Test");
 			ExpressionResult* result3 = exp3.eval(dummy);
 			TEST_ASSERT(result3->type() == ExpressionResult::RT_STRINGDB);
-			std::string* s = (std::string*)result3->value();
-			TEST_ASSERT(s != NULL);
-			TEST_ASSERT(s->compare("Test") == 0);
+			djondb::string s = *result3;
+			TEST_ASSERT(strncmp(s.c_str(), "Test", s.length()) == 0);
 
 			BSONObj obj;
 			obj.add("age", 35);
@@ -154,38 +153,35 @@ class TestDBSuite: public Test::Suite
 			SimpleExpression exp4("$'age'");
 			ExpressionResult* result4 = exp4.eval(obj);
 			TEST_ASSERT(result4->type() == ExpressionResult::RT_INT);
-			int* i2 = (int*)result4->value();
-			TEST_ASSERT(i2 != NULL);
-			TEST_ASSERT(*i2 == 35);
+			int i2 = *result4;
+			TEST_ASSERT(i2 == 35);
 
 			SimpleExpression exp5("$'name'");
 			ExpressionResult* result5 = exp5.eval(obj);
-			std::string* s2 = (std::string*)result5->value();
-			TEST_ASSERT(s2 != NULL);
-			TEST_ASSERT(s2->compare("John") == 0);
+			djondb::string s2 = *result5;
+			TEST_ASSERT(strncmp(s2.c_str(), "John", s2.length()) == 0);
 			delete result5;
 
 			SimpleExpression exp6("$'child.i'");
 			ExpressionResult* result6 = exp6.eval(obj);
-			int* i3 = (int*)result6->value();
-			TEST_ASSERT(i3 != NULL);
-			TEST_ASSERT(*i3 == 100);
+			int i3 = *result6;
+			TEST_ASSERT(i3 == 100);
 
 			BinaryExpression exp7(FO_EQUALS);
 			exp7.push(new SimpleExpression("$'age'"));
 			exp7.push(new ConstantExpression(35));
 			ExpressionResult* result7 = exp7.eval(obj);
 			TEST_ASSERT(result7->type() == ExpressionResult::RT_BOOLEAN);
-			bool* bresult7 = (bool*)result7->value();
-			TEST_ASSERT(*bresult7 == true);
+			bool bresult7 = *result7;
+			TEST_ASSERT(bresult7 == true);
 
 			BinaryExpression exp8(FO_GREATERTHAN);
 			exp8.push(new SimpleExpression("$'age'"));
 			exp8.push(new ConstantExpression(30));
 			ExpressionResult* result8 = exp8.eval(obj);
 			TEST_ASSERT(result8->type() == ExpressionResult::RT_BOOLEAN);
-			bool* bresult8 = (bool*)result8->value();
-			TEST_ASSERT(*bresult8 == true);
+			bool bresult8 = *result8;
+			TEST_ASSERT(bresult8 == true);
 		}
 
 		void testUpdate() {
@@ -194,7 +190,7 @@ class TestDBSuite: public Test::Suite
 			controller->dropNamespace("dbupdate", "ns");
 			BSONObj obj;
 			string* id = uuid();
-			obj.add("_id", *id);
+			obj.add("_id", const_cast<char*>(id->c_str()));
 			obj.add("name", "John");
 			obj.add("age", 18);
 			controller->insert("dbupdate", "ns", &obj);
@@ -222,9 +218,9 @@ class TestDBSuite: public Test::Suite
 			controller->dropNamespace("dbdelete", "ns");
 			BSONObj obj;
 			string* id = uuid();
-			obj.add("_id", *id);
+			obj.add("_id", const_cast<char*>(id->c_str()));
 			string* revision = uuid();
-			obj.add("_revision", *revision);
+			obj.add("_revision", const_cast<char*>(revision->c_str()));
 			obj.add("name", "John");
 			obj.add("age", 18);
 			controller->insert("dbdelete", "ns", &obj);
@@ -289,111 +285,111 @@ class TestDBSuite: public Test::Suite
 				parser = FilterParser::parse("");
 				result = parser->eval(obj);
 				TEST_ASSERT(result->type() == ExpressionResult::RT_BOOLEAN);
-				bool* bres = (bool*)result->value();
-				TEST_ASSERT(*bres);
+				bool bres = *result;
+				TEST_ASSERT(bres);
 
 				parser = FilterParser::parse("$'age' == 35");
 				result = parser->eval(obj);
 				TEST_ASSERT(result->type() == ExpressionResult::RT_BOOLEAN);
-				bres = (bool*)result->value();
-				TEST_ASSERT(*bres);
+				bres = *result;
+				TEST_ASSERT(bres);
 
 				parser = FilterParser::parse("($'age' == 35 )");
 				result = parser->eval(obj);
 				TEST_ASSERT(result->type() == ExpressionResult::RT_BOOLEAN);
-				bres = (bool*)result->value();
-				TEST_ASSERT(*bres);
+				bres = *result;
+				TEST_ASSERT(bres);
 
 				parser = FilterParser::parse("(($'age' == 35 ) and ($'state' == 1 ))");
 				result = parser->eval(obj);
 				TEST_ASSERT(result->type() == ExpressionResult::RT_BOOLEAN);
-				bres = (bool*)result->value();
-				TEST_ASSERT(*bres);
+				bres = *result;
+				TEST_ASSERT(bres);
 
 				parser = FilterParser::parse("(($'age' == 36 ) and ($'state' == 1 ))");
 				result = parser->eval(obj);
 				TEST_ASSERT(result->type() == ExpressionResult::RT_BOOLEAN);
-				bres = (bool*)result->value();
-				TEST_ASSERT(!*bres);
+				bres = *result;
+				TEST_ASSERT(!bres);
 
 				parser = FilterParser::parse("(($'age' == 35 ) and ($'state' == 2 ))");
 				result = parser->eval(obj);
 				TEST_ASSERT(result->type() == ExpressionResult::RT_BOOLEAN);
-				bres = (bool*)result->value();
-				TEST_ASSERT(!*bres);
+				bres = *result;
+				TEST_ASSERT(!bres);
 
 				parser = FilterParser::parse("(($'age'==35) and ($'state'==1))");
 				result = parser->eval(obj);
 				TEST_ASSERT(result->type() == ExpressionResult::RT_BOOLEAN);
-				bres = (bool*)result->value();
-				TEST_ASSERT(*bres);
+				bres = *result;
+				TEST_ASSERT(bres);
 
 				parser = FilterParser::parse("(('John' == $'name') and ($'age'==35))");
 				result = parser->eval(obj);
 				TEST_ASSERT(result->type() == ExpressionResult::RT_BOOLEAN);
-				bres = (bool*)result->value();
-				TEST_ASSERT(*bres);
+				bres = *result;
+				TEST_ASSERT(bres);
 
 				parser = FilterParser::parse("(('John' == $'name') or ($'age'==36))");
 				result = parser->eval(obj);
 				TEST_ASSERT(result->type() == ExpressionResult::RT_BOOLEAN);
-				bres = (bool*)result->value();
-				TEST_ASSERT(*bres);
+				bres = *result;
+				TEST_ASSERT(bres);
 
 				parser = FilterParser::parse("(('Johnny' == $'name') or ($'age'==35))");
 				result = parser->eval(obj);
 				TEST_ASSERT(result->type() == ExpressionResult::RT_BOOLEAN);
-				bres = (bool*)result->value();
-				TEST_ASSERT(*bres);
+				bres = *result;
+				TEST_ASSERT(bres);
 
 				parser = FilterParser::parse("($'age' > 15)");
 				result = parser->eval(obj);
 				TEST_ASSERT(result->type() == ExpressionResult::RT_BOOLEAN);
-				bres = (bool*)result->value();
-				TEST_ASSERT(*bres);
+				bres = *result;
+				TEST_ASSERT(bres);
 
 				parser = FilterParser::parse("($'age' < 45)");
 				result = parser->eval(obj);
 				TEST_ASSERT(result->type() == ExpressionResult::RT_BOOLEAN);
-				bres = (bool*)result->value();
-				TEST_ASSERT(*bres);
+				bres = *result;
+				TEST_ASSERT(bres);
 
 				parser = FilterParser::parse("($'age' >= 15)");
 				result = parser->eval(obj);
 				TEST_ASSERT(result->type() == ExpressionResult::RT_BOOLEAN);
-				bres = (bool*)result->value();
-				TEST_ASSERT(*bres);
+				bres = *result;
+				TEST_ASSERT(bres);
 
 				parser = FilterParser::parse("($'age' >= 35)");
 				result = parser->eval(obj);
 				TEST_ASSERT(result->type() == ExpressionResult::RT_BOOLEAN);
-				bres = (bool*)result->value();
-				TEST_ASSERT(*bres);
+				bres = *result;
+				TEST_ASSERT(bres);
 
 				parser = FilterParser::parse("($'age' <= 45)");
 				result = parser->eval(obj);
 				TEST_ASSERT(result->type() == ExpressionResult::RT_BOOLEAN);
-				bres = (bool*)result->value();
-				TEST_ASSERT(*bres);
+				bres = *result;
+				TEST_ASSERT(bres);
 
 				parser = FilterParser::parse("($'age' <= 35)");
 				result = parser->eval(obj);
 				TEST_ASSERT(result->type() == ExpressionResult::RT_BOOLEAN);
-				bres = (bool*)result->value();
-				TEST_ASSERT(*bres);
+				bres = *result;
+				TEST_ASSERT(bres);
 
 				parser = FilterParser::parse("($'name' == \"John\")");
 				result = parser->eval(obj);
 				TEST_ASSERT(result->type() == ExpressionResult::RT_BOOLEAN);
-				bres = (bool*)result->value();
-				TEST_ASSERT(*bres);
+				bres = *result;
+				TEST_ASSERT(bres);
 
 				// Eval an attribute that does not exist
 				parser = FilterParser::parse("($'nn' == \"John\")");
 				result = parser->eval(obj);
 				TEST_ASSERT(result->type() == ExpressionResult::RT_BOOLEAN);
-				bres = (bool*)result->value();
-				TEST_ASSERT(!*bres);
+				bres = *result;
+				TEST_ASSERT(!bres);
 
 				char filter[1000];
 				memset(filter, 0, 1000);
@@ -401,8 +397,8 @@ class TestDBSuite: public Test::Suite
 				parser = FilterParser::parse(filter);
 				result = parser->eval(obj);
 				TEST_ASSERT(result->type() == ExpressionResult::RT_BOOLEAN);
-				bres = (bool*)result->value();
-				TEST_ASSERT(*bres);
+				bres = *result;
+				TEST_ASSERT(bres);
 
 			} catch (ParseException& e) {
 				TEST_FAIL(e.what());
@@ -432,7 +428,7 @@ class TestDBSuite: public Test::Suite
 			cout << "\ntestInsertWithStringId" << endl;
 			BSONObj obj;
 			std::string* id = uuid();
-			obj.add("_id", *id);
+			obj.add("_id", const_cast<char*>(id->c_str()));
 			obj.add("name", "cross");
 			delete id;
 			BSONObj* res = controller->insert("dbtest", "sp1.customer", &obj);
@@ -447,7 +443,7 @@ class TestDBSuite: public Test::Suite
 			cout << "\ntestInsertWithCharId" << endl;
 			BSONObj obj;
 			std::string* id = uuid();
-			obj.add("_id", id->c_str());
+			obj.add("_id", const_cast<char*>(id->c_str()));
 			obj.add("name", "cross");
 			delete id;
 			BSONObj* res = controller->insert("dbtest", "sp1.customer", &obj);
@@ -494,7 +490,7 @@ class TestDBSuite: public Test::Suite
 				TEST_ASSERT(innerRes != NULL);
 				TEST_ASSERT(innerRes->has("char"));
 				if (innerRes->has("char")) {
-					TEST_ASSERT(innerRes->getString("char").compare("testInner") == 0);
+					TEST_ASSERT(strcmp(innerRes->getString("char"), "testInner") == 0);
 				}
 				TEST_ASSERT(innerRes->has("int"));
 				if (innerRes->has("int")) {
@@ -523,14 +519,14 @@ class TestDBSuite: public Test::Suite
 				char temp[700];
 				memset(temp, 0, 699);
 				memset(temp, 'a', 700);
-				obj->add("content", std::string(temp));
-				obj->add("last", std::string("Smith"));
+				obj->add("content", (char*)temp);
+				obj->add("last", (char*)"Smith");
 				testInsert(obj);
 
 				int test = rand() % 10;
 				if (test > 0)
 				{
-					__ids.push_back(new std::string(obj->getString("_id").c_str()));
+					__ids.push_back(new std::string(obj->getString("_id")));
 					fos.writeString(obj->getString("_id"));
 				}
 				if ((x % 1000000) == 0)
@@ -599,8 +595,8 @@ class TestDBSuite: public Test::Suite
 					TEST_FAIL("res is null");
 					return;
 				}
-				std::string id2 = res->getString("_id");
-				if (id2.compare(*id) != 0)
+				char* id2 = res->getString("_id");
+				if (strcmp(id2, id->c_str()) != 0)
 				{
 					TEST_FAIL("id not found");
 					return;
@@ -718,8 +714,8 @@ class TestDBSuite: public Test::Suite
 			std::string filter = "$'age' == 45";
 			std::vector<BSONObj*>* found = controller->find("dbtest", "find.filter2","*", filter.c_str());
 			TEST_ASSERT(found->size() == 1); 
-			std::string name = found->at(0)->getString("lastName");
-			TEST_ASSERT(name.compare("Smith") == 0);
+			char* name = found->at(0)->getString("lastName");
+			TEST_ASSERT(strcmp(name, "Smith") == 0);
 
 			filter = "";
 			delete found;
@@ -731,9 +727,9 @@ class TestDBSuite: public Test::Suite
 			found = controller->find("dbtest", "find.filter2","*", filter.c_str());
 			TEST_ASSERT(found->size() == 2); 
 			name = found->at(0)->getString("lastName");
-			TEST_ASSERT(name.compare("Crossley") == 0);
+			TEST_ASSERT(strcmp(name, "Crossley") == 0);
 			name = found->at(1)->getString("lastName");
-			TEST_ASSERT(name.compare("Clark") == 0);
+			TEST_ASSERT(strcmp(name, "Clark") == 0);
 			delete found;
 		}
 
@@ -803,7 +799,7 @@ class TestDBSuite: public Test::Suite
 			{
 				BSONObj id;
 				std::string sid = *i;
-				id.add("_id", sid);
+				id.add("_id", const_cast<char*>(sid.c_str()));
 				tree->add(id, sid, 0, 0);
 				//tree->debug();
 				x++;
@@ -823,13 +819,13 @@ class TestDBSuite: public Test::Suite
 				std::string guid = *i;
 
 				BSONObj id;
-				id.add("_id", guid);
+				id.add("_id", const_cast<char*>(guid.c_str()));
 				Index* index = tree->find(&id);
 				TEST_ASSERT_MSG(index != NULL, ("guid not found: " + guid).c_str());
 				if (index != NULL) {
 					BSONObj* key = index->key;
 					TEST_ASSERT(key != NULL);
-					TEST_ASSERT(key->getString("_id").compare(guid) == 0);
+					TEST_ASSERT(strcmp(key->getString("_id"), guid.c_str()) == 0);
 				}
 
 				ids.erase(i);

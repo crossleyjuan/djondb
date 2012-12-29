@@ -139,12 +139,12 @@ bool DjondbConnection::insert(const std::string& db, const std::string& ns, cons
 	cmd.setDB(db);
 	if (!obj.has("_id")) {
 		std::string* id = uuid();
-		obj.add("_id", *id);
+		obj.add("_id", const_cast<char*>(id->c_str()));
 		delete id;
 	}
 	if (!obj.has("_revision")) {
 		std::string* rev = uuid();
-		obj.add("_revision", *rev);
+		obj.add("_revision", const_cast<char*>(rev->c_str()));
 		delete rev;
 	}
 	cmd.setBSON(obj);

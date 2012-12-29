@@ -50,6 +50,7 @@ FilterParser::FilterParser(const std::string& expression, BaseExpression* root, 
 
 FilterParser::FilterParser(const FilterParser& orig) {
 	_expression = orig._expression;
+	_root = NULL;
 	if (orig._root != NULL) {
 		EXPRESSION_TYPE type = orig._root->type();
 		switch (type) {
@@ -67,7 +68,7 @@ FilterParser::FilterParser(const FilterParser& orig) {
 }
 
 FilterParser::~FilterParser() {
-	delete _root;
+	if (_root != NULL) delete _root;
 	for (std::list<Token*>::iterator i = _tokens.begin(); i != _tokens.end(); i++) {
 		Token* token = *i;
 		delete token;
@@ -81,7 +82,7 @@ ExpressionResult* FilterParser::eval(const BSONObj& bson) {
 		result = _root->eval(bson);
 	} else {
 		bool bres = true;
-		result = new ExpressionResult(ExpressionResult::RT_BOOLEAN, &bres);
+		result = new ExpressionResult(bres);
 	}
 
 	return result;
@@ -195,7 +196,7 @@ BaseExpression* solveToken(Token* token) {
 	}
 	switch (extype) {
 		case ET_CONSTANT:
-			result = new ConstantExpression(token->content()->c_str());
+			result = new ConstantExpression(const_cast<char*>(token->content()->c_str()));
 			break;
 		case ET_SIMPLE: 
 			result = new SimpleExpression(token->content()->c_str());

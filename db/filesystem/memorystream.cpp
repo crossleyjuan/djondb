@@ -39,7 +39,19 @@ MemoryStream::MemoryStream() {
 	 allocate(_bufferSize);
 }
 
-MemoryStream::MemoryStream(long bufferSize) {
+MemoryStream::MemoryStream(char* buffer, __int32 len) {
+    _open = true;
+	 _currentBuffer = NULL;
+	 _currentIndex = -1;
+	 _buffer = NULL;
+	 _length = 0;
+	 _bufferSize = MEMORY_BUFFER_SIZE;
+	 allocate(_bufferSize);
+
+	 write(buffer, len);
+}
+
+MemoryStream::MemoryStream(__int64 bufferSize) {
     _open = true;
 	 _currentBuffer = NULL;
 	 _currentIndex = -1;
@@ -51,7 +63,7 @@ MemoryStream::MemoryStream(long bufferSize) {
 
 MemoryStream::~MemoryStream() {
     close();
-	 for (int x = 0; x < _maxIndexes; x++) {
+	 for (__int32 x = 0; x < _maxIndexes; x++) {
 		 char* r = _buffer[x];
 		 free(r);
 	 }
@@ -86,11 +98,12 @@ void MemoryStream::write(const char *ptr, size_t count) {
 		memcpy(_currentBuffer + _currentBufferPos, ptr, count);
 		_currentBufferPos += count;
 		_length += count;
+		count = 0;
 	} else {
-		int space = _bufferSize - _currentBufferPos;
+		__int64 space = _bufferSize - _currentBufferPos;
 		memcpy(_currentBuffer + _currentBufferPos, ptr, space);
 		_length += space;
-		int offset = space;
+		__int64 offset = space;
 		space = count - space;
 		allocate(_bufferSize);
 		write(ptr + offset, space);
@@ -107,10 +120,10 @@ size_t MemoryStream::read( char* ptr, size_t count) {
 		_currentBufferPos += count;
 		readed += count;
 	} else {
-		int space = _bufferSize - _currentBufferPos;
+		__int64 space = _bufferSize - _currentBufferPos;
 		memcpy(ptr, _currentBuffer + _currentBufferPos, space);
 		readed += space;
-		int offset = space;
+		__int64 offset = space;
 		space = count - space;
 		nextBuffer();
 		readed += read(ptr + offset, space);
@@ -154,14 +167,14 @@ void MemoryStream::writeDoubleIEEE (double v)
 	write((char*)&v, sizeof(v));
 }
 
-void MemoryStream::writeChars(const char *text, int len) {
+void MemoryStream::writeChars(const char *text, __int32 len) {
 	writeInt(len);
 	write(text, len);
 }
 
 void MemoryStream::writeString(const std::string& text) {
 	const char* c = text.c_str();
-	int l = strlen(c);
+	__int32 l = strlen(c);
 	writeChars(c, l);
 }
 
@@ -248,7 +261,7 @@ std::string* MemoryStream::readString() {
 	return res;
 }
 
-char* MemoryStream::readChars(int length) {
+char* MemoryStream::readChars(__int32 length) {
 	char* res = (char*)malloc(length+1);
 	memset(res, 0, length+1);
 	read(res, length);
@@ -259,7 +272,7 @@ const char* MemoryStream::readFull() {
 	seek(0);
 	std::stringstream ss;
 	char buffer[1024];
-	int readed = 0;
+	__int32 readed = 0;
 	while (!eof()) {
 		memset(buffer, 0, 1024);
 		readed = read(buffer, 1023);
@@ -284,13 +297,17 @@ bool MemoryStream::isClosed() {
 char* MemoryStream::toChars() {
 	char* result = (char*)malloc(_length);
 
-	long offset = 0;
-	for (int x = 0; x < _maxIndexes - 1; x++) {
+	__int64 offset = 0;
+	for (__int32 x = 0; x < _maxIndexes - 1; x++) {
 		char* b = _buffer[x];
 		memcpy(result + offset, b, _bufferSize); 
 		offset += _bufferSize;
 	}
-	memcpy(result + offset, _buffer[_maxIndexes - 1], _length - (_bufferSize * _maxIndexes));
+	memcpy(result + offset, _buffer[_maxIndexes - 1], _length - (_bufferSize * (_maxIndexes - 1)));
 
 	return result;
+}
+
+__int64 MemoryStream::size() const {
+	return _length;
 }

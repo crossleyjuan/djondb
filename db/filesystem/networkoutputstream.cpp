@@ -55,7 +55,6 @@ NetworkOutputStream::NetworkOutputStream()
 
 NetworkOutputStream::~NetworkOutputStream()
 {
-	delete _logger;
 }
 
 NetworkOutputStream::NetworkOutputStream(int socket)

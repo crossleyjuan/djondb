@@ -9,10 +9,9 @@ while getopts j:d:u o
 done
 
 sh update.sh
-sh update-php.sh
 
-#rm -rf php
-#mkdir php
+rm -rf php
+mkdir php
 
 OS=`uname -s`
 if test "$OS" = "Darwin"; then
@@ -21,7 +20,7 @@ else
 cp ../../obj/usr/lib/libdjon-client.la php/
 fi
 
-swig -c++ -php -outdir php -o php/djonphpdriver.cpp driver.i
+swig2.0 -c++ -php -outdir php -o php/djonphpdriver.cpp driver.i
 
 cp config.m4 php
 cd php

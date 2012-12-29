@@ -37,6 +37,7 @@ class TestUtilSuite : public Test::Suite
 			TEST_ADD(TestUtilSuite::testSettings);
 			TEST_ADD(TestUtilSuite::testFileUtils);
 			TEST_ADD(TestUtilSuite::testCircularQueue);
+			TEST_ADD(TestUtilSuite::testDjonStrings);
 		}
 
 	private:
@@ -236,6 +237,21 @@ class TestUtilSuite : public Test::Suite
 			TEST_ASSERT(checkFileCreation(home));
 			// test directory fail
 			TEST_ASSERT(!checkFileCreation("/"));
+		}
+
+		void testDjonStrings() {
+			djondb::string s("test", 4);
+
+			char* c = s.c_str();
+			__int32 l = s.length();
+			TEST_ASSERT(strcmp(c, "test") == 0);
+			TEST_ASSERT(l == 4);
+
+			djondb::string s2("test", 4);
+			TEST_ASSERT(s == s2);
+
+			djondb::string s3("other", 5);
+			TEST_ASSERT(s != s3);
 		}
 };
 //// Tests unconditional fail TEST_ASSERTs

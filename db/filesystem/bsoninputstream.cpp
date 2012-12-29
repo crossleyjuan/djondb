@@ -34,7 +34,6 @@ BSONInputStream::BSONInputStream(InputStream* is)
 
 BSONInputStream::~BSONInputStream()
 {
-	delete _log;
 }
 
 BSONObj* BSONInputStream::readBSON() const {
@@ -155,7 +154,7 @@ BSONObj* BSONInputStream::readBSON(const char* select) const {
 #ifdef DEBUG
 											if (log->isDebug()) log->debug("BSONInputStream::readBSON key: %s, value: %s", key->c_str(), ((std::string*)data)->c_str());
 #endif
-											obj->add(*key.get(), *(std::string*)data);
+											obj->add(*key.get(), const_cast<char*>(((std::string*)data)->c_str()));
 										} else {
 											__int32 len = _inputStream->readInt();
 											_inputStream->seek(_inputStream->currentPos() + len);
@@ -181,7 +180,6 @@ BSONObj* BSONInputStream::readBSON(const char* select) const {
 									}
 		}
 	}
-	delete log;
 	return obj;
 }
 

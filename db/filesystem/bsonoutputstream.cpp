@@ -38,50 +38,57 @@ BSONOutputStream::~BSONOutputStream()
 void BSONOutputStream::writeBSON(const BSONObj& bson) {
 	Logger* log = getLogger(NULL);
 	if (log->isDebug()) log->debug("BSONOutputStream::writeBSON bson elements: %d", bson.length());
-    _outputStream->writeLong(bson.length());
-    for (std::map<std::string, BSONContent* >::const_iterator i = bson.begin(); i != bson.end(); i++) {
-        std::string key = i->first;
-		  if (log->isDebug()) log->debug("BSONOutputStream::writeBSON name: %s", key.c_str());
-        _outputStream->writeString(key);
-        BSONContent* cont = i->second;
-		  // If the type is PTRCHAR_TYPE change it to string_type, to remove this type in future
-        _outputStream->writeLong(cont->type() != PTRCHAR_TYPE? cont->type(): STRING_TYPE);
-        char* text;
-		  BSONObj* inner;
-        switch (cont->type()) {
-            case BSON_TYPE:
-                inner = (BSONObj*)cont->_element;
-					 writeBSON(*inner); 
-                break;
-            case INT_TYPE:
-                _outputStream->writeInt(*((__int32*)cont->_element));
-                break;
-            case LONG_TYPE:
-            case LONG64_TYPE:
-                _outputStream->writeLong(*((__int64*)cont->_element));
-                break;
-            case DOUBLE_TYPE:
-                _outputStream->writeDoubleIEEE(*((double*)cont->_element));
-                break;
-            case PTRCHAR_TYPE:
-                text = (char*)cont->_element;
-                _outputStream->writeString(std::string(text));
-                break;
-				case STRING_TYPE:
-					 {
-						 string* str = (string*)cont->_element;
-						 _outputStream->writeString(*str);
-						 break;
-					 }
-				case BSONARRAY_TYPE: 
-					 {
-						 BSONArrayObj* array = (BSONArrayObj*)cont->_element;
-						 writeBSONArray(array);
-						 break;
-					 }
-		  }
-	 }
-	 delete log;
+	_outputStream->writeLong(bson.length());
+	for (std::map<std::string, BSONContent* >::const_iterator i = bson.begin(); i != bson.end(); i++) {
+		std::string key = i->first;
+		if (log->isDebug()) log->debug("BSONOutputStream::writeBSON name: %s", key.c_str());
+		_outputStream->writeString(key);
+		BSONContent* cont = i->second;
+		// If the type is PTRCHAR_TYPE change it to string_type, to remove this type in future
+		_outputStream->writeLong(cont->type() != PTRCHAR_TYPE? cont->type(): STRING_TYPE);
+		char* text;
+		BSONObj* inner;
+		switch (cont->type()) {
+			case BSON_TYPE: {
+									 BSONContentBSON* bbson = (BSONContentBSON*)cont;
+									 inner = (BSONObj*)*bbson;
+									 writeBSON(*inner); 
+									 break;
+								 }
+			case INT_TYPE: {
+									BSONContentInt* bint = (BSONContentInt*)cont;
+									_outputStream->writeInt(*bint);
+									break;
+								}
+			case LONG_TYPE:
+			case LONG64_TYPE: {
+										BSONContentLong* blong = (BSONContentLong*)cont;
+										_outputStream->writeLong(*blong);
+										break;
+									}
+			case DOUBLE_TYPE: {
+										BSONContentDouble* bdouble = (BSONContentDouble*)cont;
+										_outputStream->writeDoubleIEEE(*bdouble);
+										break;
+									}
+			case STRING_TYPE:
+			case PTRCHAR_TYPE: {
+										 BSONContentString* bstring = (BSONContentString*)cont;
+										 djondb::string str = *bstring;
+										 text = str.c_str(); 
+										 __int32 len = str.length();
+										 _outputStream->writeChars(text, len);
+										 break;
+									 }
+			case BSONARRAY_TYPE: 
+									 {
+										 BSONContentBSONArray* barray = (BSONContentBSONArray*)cont;
+										 BSONArrayObj* array = (BSONArrayObj*)*barray;
+										 writeBSONArray(array);
+										 break;
+									 }
+		}
+	}
 }
 
 void BSONOutputStream::writeBSONArray(const BSONArrayObj* array) {
@@ -93,7 +100,6 @@ void BSONOutputStream::writeBSONArray(const BSONArrayObj* array) {
 		BSONObj* obj = array->get(x);
 		writeBSON(*obj);
 	}
-	delete log;
 }
 
 void BSONOutputStream::writeBSONArray(const std::vector<BSONObj*>& array) {
@@ -104,5 +110,4 @@ void BSONOutputStream::writeBSONArray(const std::vector<BSONObj*>& array) {
 		BSONObj* obj = *i;
 		writeBSON(*obj);
 	}
-	delete log;
 }

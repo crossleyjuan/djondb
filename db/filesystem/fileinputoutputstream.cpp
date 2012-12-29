@@ -19,7 +19,7 @@
 #include "fileinputoutputstream.h"
 
 #include "util.h"
-#include "defs.h"
+#include "filesystemdefs.h"
 #include <string.h>
 #include <boost/crc.hpp>
 #include <stdlib.h>
@@ -69,7 +69,6 @@ FileInputOutputStream::FileInputOutputStream(const std::string& fileName, const 
 
     _fileName = fileName;
     _open = true;
-	 delete log;
 }
 
 FileInputOutputStream::~FileInputOutputStream() {

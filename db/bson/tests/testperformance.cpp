@@ -25,7 +25,7 @@ void testToChar() {
 	BSONObj obj;
 	obj.add("int", 10);
 	obj.add("long", (__int64)10L);
-	obj.add("string", std::string("Test"));
+	obj.add("string", (char*)"Test");
 	obj.add("double", 3.14159);
 
 	Logger* log = getLogger(NULL);

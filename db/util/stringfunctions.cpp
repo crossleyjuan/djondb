@@ -25,15 +25,65 @@
 #include <sstream>
 #include <boost/algorithm/string.hpp>
 
+djondb::string::string() {
+	_text = NULL;
+	_len = 0;
+}
+
+djondb::string::string(char* c, __int32 len) {
+	_text = c;
+	_len = len;
+}
+
+djondb::string::string(const djondb::string& orig) {
+	this->_text = orig._text;
+	this->_len = orig._len;
+}
+
+const djondb::string::~string() {
+}
+
+char* djondb::string::c_str() const {
+	return _text;
+}
+
+__int32 djondb::string::length() const {
+	return _len;
+}
+
+bool djondb::string::operator ==(const djondb::string& str) {
+	if (this->_len != str._len) {
+		return false;
+	} else {
+		if (strncmp(this->_text, str._text, this->_len) == 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+}
+
+bool djondb::string::operator !=(const djondb::string& str) {
+	if (this->_len != str._len) {
+		return true;
+	} else {
+		if (strncmp(this->_text, str._text, this->_len) == 0) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+}
+
 char* strcpy(std::string str) {
-    return strcpy(const_cast<char*>(str.c_str()), str.length());
+	return strcpy(const_cast<char*>(str.c_str()), str.length());
 }
 
 char* strcpy(char* str, int offset, int len) {
-    char* result = (char*)malloc(len + 1);
-    memset(result, 0, len +1);
-    memcpy(result, str + offset, len);
-    return result;
+	char* result = (char*)malloc(len + 1);
+	memset(result, 0, len +1);
+	memcpy(result, str + offset, len);
+	return result;
 }
 
 char* strcpy(char* str, int len) {

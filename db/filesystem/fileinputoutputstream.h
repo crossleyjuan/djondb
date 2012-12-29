@@ -2,7 +2,7 @@
 #define FILEINPUTOUTPUTSTREAM_H
 
 #include "inputoutputstream.h"
-#include "defs.h"
+#include "filesystemdefs.h"
 #include <string>
 
 using namespace std;

@@ -10,6 +10,33 @@
 
 #include <string>
 #include <vector>
+#include "defs.h"
+
+namespace djondb {
+	/**
+	 * This class is just a wrapper for a char*, it will keep the same char* passed and this
+	 * will just work as wrapper container
+	 * This class should be used if the char* should keep the same pointed element as the original, 
+	 * useful when working with Buffers
+	 **/
+	class string {
+		public:
+			string();
+			string(char* c, __int32 len);
+			string(const string& str);
+			const ~string();
+
+			char* c_str() const;
+			__int32 length() const;
+
+			bool operator ==(const djondb::string& str);
+			bool operator !=(const djondb::string& str);
+
+		private:
+			char* _text;
+			__int32 _len;
+	};
+};
 
 char* strcpy(char* str, int len);
 char* strcpy(char* str, int offset, int len);

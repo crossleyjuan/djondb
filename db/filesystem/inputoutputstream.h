@@ -29,7 +29,7 @@
 
 #include "inputstream.h"
 #include "outputstream.h"
-#include "defs.h"
+#include "filesystemdefs.h"
 #include <string>
 
 using namespace std;

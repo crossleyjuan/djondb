@@ -13,6 +13,9 @@ lib_LTLIBRARIES = libdjon-filesystem.la
 libdjon_filesystem_la_LDFLAGS = -static
 libdjon_filesystem_la_SOURCES = bsoninputstream.cpp \
 										  bsonoutputstream.cpp \
+										  bsonbufferedobj.cpp \
+										  bsonbufferedarrayobj.cpp \
+										  bsonbufferedcontent.hpp \
 										  fileinputoutputstream.cpp \
 										  fileinputstream.cpp \
 										  fileinputstreamw32.cpp \
@@ -26,14 +29,14 @@ TESTS = test-filesystem
 check_PROGRAMS = test-filesystem
 test_filesystem_LDADD = libdjon-filesystem.la $(top_builddir)/bson/libdjon-bson.la $(top_builddir)/util/libdjon-util.la -lpthread -lcpptest
 if !MAC
-   test_filesystem_LDADD += -lrt -luuid 
+test_filesystem_LDADD += -lrt -luuid 
 endif
 test_filesystem_SOURCES = tests/main.cpp
 
 bin_PROGRAMS = testfile
 testfile_LDADD = libdjon-filesystem.la $(top_builddir)/bson/libdjon-bson.la $(top_builddir)/util/libdjon-util.la -lpthread -lcpptest
 if !MAC
-   testfile_LDADD += -lrt -luuid 
+testfile_LDADD += -lrt -luuid 
 endif
 testfile_SOURCES = tests/testfile.cpp
 

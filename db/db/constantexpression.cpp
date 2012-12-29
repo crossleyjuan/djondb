@@ -28,14 +28,14 @@
 #include "expressionresult.h"
 #include <assert.h>
 
-	ConstantExpression::ConstantExpression(const char* expression)
+	ConstantExpression::ConstantExpression(char* expression)
 :BaseExpression(ET_CONSTANT)
 {
-	_expression = new std::string(expression);
+	_expression = strcpy(expression, strlen(expression));
 	_intValue = NULL;
 	_longValue = NULL;
 	_doubleValue = NULL;
-	_value = new ExpressionResult(ExpressionResult::RT_STRINGDB, _expression);
+	_value = new ExpressionResult(djondb::string(_expression, strlen(_expression)));
 }
 
 	ConstantExpression::ConstantExpression(__int32 expression)
@@ -46,7 +46,7 @@
 	*_intValue = expression;
 	_longValue = NULL;
 	_doubleValue = NULL;
-	_value = new ExpressionResult(ExpressionResult::RT_INT, _intValue);
+	_value = new ExpressionResult(*_intValue);
 }
 
 	ConstantExpression::ConstantExpression(__int64 expression)
@@ -57,7 +57,7 @@
 	_longValue = new __int64();
 	*_longValue = expression;
 	_doubleValue = NULL;
-	_value = new ExpressionResult(ExpressionResult::RT_LONG, _longValue);
+	_value = new ExpressionResult(*_longValue);
 }
 
 	ConstantExpression::ConstantExpression(double expression)
@@ -67,7 +67,7 @@
 	_intValue = NULL;
 	_doubleValue = new double();
 	*_doubleValue = expression;
-	_value = new ExpressionResult(ExpressionResult::RT_DOUBLE, _doubleValue);
+	_value = new ExpressionResult(*_doubleValue);
 }
 
 	ConstantExpression::ConstantExpression(const ConstantExpression& orig)
@@ -85,21 +85,20 @@ ConstantExpression::~ConstantExpression() {
 	if (_value) {
 		delete _value;
 	}
-	if (_expression != NULL) delete _expression;
+	if (_expression != NULL) free(_expression);
 	if (_intValue != NULL) delete _intValue;
 	if (_doubleValue != NULL) delete _doubleValue;
 	_value = NULL;
 }
 
 ExpressionResult* ConstantExpression::eval(const BSONObj& bson) {
-	ExpressionResult* result = new ExpressionResult(*_value);
-	return result; 
+	return new ExpressionResult(*_value); 
 }
 
 BaseExpression* ConstantExpression::copyExpression() {
 	ConstantExpression* result;
 	if (_expression != NULL) {
-		result = new ConstantExpression(this->_expression->c_str());
+		result = new ConstantExpression(this->_expression);
 	} else if (_intValue != NULL) {
 		result = new ConstantExpression(*this->_intValue);
 	} else if (_longValue != NULL) {

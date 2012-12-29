@@ -124,6 +124,15 @@ char* commands[] = {
 	"readfile"
 };
 
+char* getHistoryFilename() {
+	std::string* homeDir = getHomeDir();
+	char* file = (char*)malloc(2048);
+	memset(file, 0, 2048);
+	sprintf(file, "%s%s.djonshell", homeDir->c_str(), FILESEPARATOR);
+	delete homeDir;
+	return file;
+}
+
 int main(int argc, char* argv[]) {
 	v8::V8::SetFlagsFromCommandLine(&argc, argv, true);
 	run_shell = (argc == 1);
@@ -653,7 +662,9 @@ v8::Handle<v8::Value> Quit(const v8::Arguments& args) {
 	fflush(stderr);
 
 #ifndef WINDOWS
-	linenoiseHistorySave(".djonshell_history");
+	char* file = getHistoryFilename();
+	linenoiseHistorySave(file);
+	free(file);
 #endif
 	exit(exit_code);
 	return v8::Undefined();
@@ -786,7 +797,9 @@ void RunShell(v8::Handle<v8::Context> context) {
 	v8::Local<v8::String> name(v8::String::New("(shell)"));
 
 #ifndef WINDOWS
-	linenoiseHistoryLoad(".djonshell_history");
+	char* file = getHistoryFilename();
+	linenoiseHistoryLoad(file);
+	free(file);
 	linenoiseSetCompletionCallback(completion);
 #endif
 	std::stringstream ss;

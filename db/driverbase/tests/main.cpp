@@ -125,7 +125,7 @@ class TestDriverBaseSuite: public Test::Suite {
 
 			BSONObj obj;
 			std::string* id = uuid();
-			obj.add("_id", *id);
+			obj.add("_id", const_cast<char*>(id->c_str()));
 			obj.add("name", "John");
 			BSONObj inner;
 			inner.add("innername", "Test");
@@ -168,7 +168,7 @@ class TestDriverBaseSuite: public Test::Suite {
 			TEST_ASSERT(res2->size() == 1);
 			if (res2->size() == 1) {
 				BSONObj* objCustomer = *res2->begin();
-				int d = objCustomer->getXpath("finantial.salary");
+				int d = *objCustomer->getXpath("finantial.salary");
 				TEST_ASSERT(d == 150000);
 				delete objCustomer;
 			}
@@ -196,7 +196,7 @@ class TestDriverBaseSuite: public Test::Suite {
 
 				BSONObj obj;
 				std::auto_ptr<std::string> guid(uuid());
-				obj.add("_id", *guid.get());
+				obj.add("_id", const_cast<char*>(guid->c_str()));
 				int test = rand() % 10;
 				if (test > 0) {
 					ids.push_back(*guid.get());
@@ -243,7 +243,6 @@ class TestDriverBaseSuite: public Test::Suite {
 			//    conn->close();
 			//
 			//    delete conn;
-			delete(log);
 		}
 
 		void testFinds() {
@@ -262,7 +261,7 @@ class TestDriverBaseSuite: public Test::Suite {
 
 			BSONObj test;
 			std::string* guid = uuid();
-			test.add("_id", *guid);
+			test.add("_id", const_cast<char*>(guid->c_str()));
 			test.add("int", 1);
 			test.add("long", (__int64) 10L);
 			test.add("longmax",(__int64) LONG_MAX);
@@ -282,11 +281,10 @@ class TestDriverBaseSuite: public Test::Suite {
 			TEST_ASSERT(objResult->has("longmax"));
 			TEST_ASSERT(objResult->getLong("longmax") == LONG_MAX);
 			TEST_ASSERT(objResult->has("char"));
-			TEST_ASSERT(objResult->getString("char").compare("testing") == 0);
+			TEST_ASSERT(strcmp(objResult->getString("char"), "testing") == 0);
 
 			__running = false;
 
-			delete(log);
 		}
 
 		void testFindByFilter() {
@@ -324,7 +322,7 @@ class TestDriverBaseSuite: public Test::Suite {
 			BSONObj* objR = *result->begin();
 			TEST_ASSERT(objR != NULL);
 			TEST_ASSERT(objR->has("name"));
-			TEST_ASSERT(objR->getString("name").compare("Test") == 0);
+			TEST_ASSERT(strcmp(objR->getString("name"), "Test") == 0);
 
 			char* temp = objR->toChar();
 			cout << "\nobj: " << temp << endl;
@@ -374,7 +372,7 @@ class TestDriverBaseSuite: public Test::Suite {
 				std::auto_ptr<std::string> guid(fisIds->readString());
 
 				BSONObj obj;
-				obj.add("_id", *guid.get());
+				obj.add("_id", const_cast<char*>(guid->c_str()));
 
 				idsUpdated.push_back(*guid.get());
 				char* temp = (char*)malloc(100);
@@ -407,7 +405,7 @@ class TestDriverBaseSuite: public Test::Suite {
 				char* temp = (char*)malloc(100);
 				memset(temp, 0, 100);
 				memset(temp, 'b', 99);
-				TEST_ASSERT(resObj->getString("content").compare(temp) == 0);
+				TEST_ASSERT(strcmp(resObj->getString("content"), temp) == 0);
 				free(temp);
 			}
 			DTime rec = log->recordedTime();
@@ -427,7 +425,6 @@ class TestDriverBaseSuite: public Test::Suite {
 			//    conn->close();
 			//
 			//    delete conn;
-			delete(log);
 		}
 
 		void testRemove() {
@@ -445,8 +442,8 @@ class TestDriverBaseSuite: public Test::Suite {
 			BSONObj obj;
 			std::string* id = uuid();
 			std::string* revision = uuid();
-			obj.add("_id", *id); 
-			obj.add("_revision", *revision); 
+			obj.add("_id", const_cast<char*>(id->c_str())); 
+			obj.add("_revision", const_cast<char*>(revision->c_str())); 
 
 			conn->insert("testdb", "deletens", obj);
 

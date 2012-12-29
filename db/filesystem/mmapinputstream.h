@@ -38,6 +38,7 @@ public:
 	virtual void seek(__int64 pos, SEEK_DIRECTION direction = FROMSTART_SEEK);
     virtual __int64 crc32();
 
+	 virtual __int64 length() const;
     virtual std::string* readString();
     virtual const std::string fileName() const;
     virtual bool eof();
@@ -45,6 +46,8 @@ public:
     virtual void close();
 
     virtual bool isClosed();
+
+	 char* pointer();
 private:
 	 void read(char* dest, int len);
 

@@ -31,7 +31,6 @@ FileOutputStream::FileOutputStream(char* fileName, const char* flags) {
 
 FileOutputStream::~FileOutputStream() {
     close();
-    free(_pFile);
 }
 
 bool FileOutputStream::isOpen() const {

@@ -18,7 +18,7 @@
 
 #include "networkinputstream.h"
 
-#include "defs.h"
+#include "filesystemdefs.h"
 #include "util.h"
 
 #include <stdlib.h>
@@ -65,7 +65,6 @@ NetworkInputStream::NetworkInputStream(const NetworkInputStream& orig) {
 NetworkInputStream::~NetworkInputStream() {
 	free (_buffer);
 	//    closeStream();
-	delete _logger;
 }
 
 unsigned char NetworkInputStream::readChar() {
@@ -294,7 +293,6 @@ int NetworkInputStream::fillBuffer(int timeout) {
 		_bufferPos = 0;
 		_bufferSize = readed;
 	}
-	delete log;
 	if (error) {
 		close();
 		return -1;

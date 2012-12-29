@@ -73,8 +73,6 @@ void FindCommand::execute() {
 	if (log->isDebug()) log->debug("executing find command on %s", nameSpace()->c_str());
 
 	_findresult = dbController()->find(const_cast<char*>(DB()->c_str()), const_cast<char*>(nameSpace()->c_str()), select()->c_str(), filter()->c_str());
-
-	delete log;
 }
 
 void* FindCommand::result() {
@@ -111,7 +109,6 @@ void FindCommand::writeResult(OutputStream* out) const {
 	BSONOutputStream* bsonout = new BSONOutputStream(out);
 	bsonout->writeBSONArray(*_findresult);
 	delete bsonout;
-	delete log;
 }
 
 void FindCommand::setNameSpace(const std::string& ns) {

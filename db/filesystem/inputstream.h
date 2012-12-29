@@ -2,7 +2,7 @@
 #define INPUTSTREAM_H
 
 #include "util.h"
-#include "defs.h"
+#include "filesystemdefs.h"
 #include <istream>
 #include <iostream>
 #include <stdio.h>

@@ -67,7 +67,7 @@ MMapInputStream::MMapInputStream(const char* fileName, const char* flags)
 				log->error("Error mapping the file: %s, couldn't set hints, errno: %d", fileName, errno, errno);
 				exit(1);
 			}
-		close();
+		::close(_pFile);
 	}
 #else
 		// Create the test file. Open it "Create Always" to overwrite any
@@ -140,7 +140,6 @@ MMapInputStream::MMapInputStream(const char* fileName, const char* flags)
 		_initaddr = _addr;
 #endif
 		_open = true;
-		delete log;
 }
 
 MMapInputStream::~MMapInputStream() {
@@ -255,7 +254,6 @@ void MMapInputStream::seek(__int64 i, SEEK_DIRECTION direction) {
 		log->error(std::string("Unsupported direction in Memory Mapped Files")); 
 		assert(false);
 	}
-	delete log;
 }
 
 __int64 MMapInputStream::crc32() {
@@ -263,9 +261,9 @@ __int64 MMapInputStream::crc32() {
 }
 
 void MMapInputStream::close() {
-	if (_pFile > 0) {
+	if (_open) {
 #ifndef WINDOWS
-		::close(_pFile);
+		munmap(_initaddr, _len);
 		_pFile = 0;
 #else
 		CloseHandle(_pFile);
@@ -276,4 +274,12 @@ void MMapInputStream::close() {
 
 bool MMapInputStream::isClosed() {
 	return !_open;
+}
+
+char* MMapInputStream::pointer() {
+	return _addr;
+}
+
+__int64 MMapInputStream::length() const {
+	return _len;
 }

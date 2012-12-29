@@ -21,6 +21,7 @@
 #include "util.h"
 #include "fileinputoutputstream.h"
 #include "fileinputstream.h"
+#include "bsonbufferedobj.h"
 #include "mmapinputstream.h"
 #include "fileoutputstream.h"
 #include "dbfileinputstream.h"
@@ -187,28 +188,23 @@ BSONObj* DBController::insert(char* db, char* ns, BSONObj* obj) {
 		if (_logger->isDebug()) _logger->debug(2, "BSON does not contain an id, DBController is creating one");
 		string* tid = uuid();
 		std::string key("_id");
-		obj->add(key, *tid);
+		obj->add(key, const_cast<char*>(tid->c_str()));
 		result = new BSONObj();
-		result->add("_id", *tid);
+		result->add("_id", const_cast<char*>(tid->c_str()));
 		delete tid;
 	}
 	if (!obj->has("_revision")) {
 		if (_logger->isDebug()) _logger->debug(2, "BSON does not contain revision, DBController is creating one");
 		string* trev = uuid();
 		std::string key("_revision");
-		obj->add(key, *trev);
+		obj->add(key, const_cast<char*>(trev->c_str()));
 		result = new BSONObj();
-		result->add("_revision", *trev);
+		result->add("_revision", const_cast<char*>(trev->c_str()));
 		delete trev;
 	}
 	// _status flag
 	obj->add("_status", 1); // Active
 
-	std::string id;
-	if (obj->type("_id") == STRING_TYPE) {
-		id = obj->getString("_id");
-	}
-	assert(id.length() > 0);
 	//    long crcStructure = checkStructure(obj);
 
 	//    char* text = obj->toChar();
@@ -262,7 +258,7 @@ void DBController::remove(char* db, char* ns, const std::string& documentId, con
 	IndexAlgorithm* impl = IndexFactory::indexFactory.index(db, ns, "_id");
 
 	BSONObj indexBSON;
-	indexBSON.add("_id", documentId);
+	indexBSON.add("_id", const_cast<char*>(documentId.c_str()));
 	Index* index = impl->find(&indexBSON);
 	if (index != NULL) {
 
@@ -287,6 +283,7 @@ void DBController::remove(char* db, char* ns, const std::string& documentId, con
 		std::string id = obj->getString("_id");
 
 		CacheManager::objectCache()->remove(id);
+		delete obj;
 	}
 }
 
@@ -316,7 +313,7 @@ void DBController::updateIndex(char* db, char* ns, Index* index, long filePos) {
 void DBController::insertIndex(char* db, char* ns, BSONObj* bson, long filePos) {
 	BSONObj indexBSON;
 	std::string id = bson->getString("_id");
-	indexBSON.add("_id", id);
+	indexBSON.add("_id", const_cast<char*>(id.c_str()));
 
 	IndexAlgorithm* impl = IndexFactory::indexFactory.index(db, ns, "_id");
 
@@ -372,6 +369,7 @@ std::vector<BSONObj*>* DBController::find(char* db, char* ns, const char* select
 		result = findFullScan(db, ns, select, parser);
 	}
 
+	delete parser;
 	return result;
 }
 
@@ -396,15 +394,22 @@ BSONObj* DBController::findFirst(char* db, char* ns, const char* select, const c
 
 	FilterParser* parser = FilterParser::parse(filter);
 
+	BSONBufferedObj* obj = NULL;
 	BSONObj* bsonResult = NULL;
-	while (!dbStream->eof()) {
-		BSONObj* obj = bis->readBSON();
+	mmis->seek(29);
+	while (!mmis->eof()) {
+		if (obj == NULL) {
+			obj = new BSONBufferedObj(mmis->pointer(), mmis->length() - mmis->currentPos());
+		} else {
+			obj->reset(mmis->pointer(), mmis->length() - mmis->currentPos());
+		}
+		mmis->seek(mmis->currentPos() + obj->bufferLength());
 		// Only "active" Records
 		if (obj->getInt("_status") == 1) {
 			ExpressionResult* result = parser->eval(*obj);
 			if (result->type() == ExpressionResult::RT_BOOLEAN) {
-				bool* bres = (bool*)result->value();
-				if (*bres) {
+				bool bres = *result;
+				if (bres) {
 					bsonResult = obj->select(select);
 					delete obj;
 					break;
@@ -412,12 +417,12 @@ BSONObj* DBController::findFirst(char* db, char* ns, const char* select, const c
 			}
 			delete result;
 		}
-		delete obj;
 		if (bsonResult) {
 			break;
 		}
 	}
 
+	if (obj != NULL) delete obj;
 	dbStream->close();
 	delete dbStream;
 
@@ -446,6 +451,7 @@ std::vector<BSONObj*>* DBController::findFullScan(char* db, char* ns, const char
 
 	std::set<std::string> tokens = parser->xpathTokens();
 	std::string filterSelect;
+
 	if (tokens.size() > 0) {
 		// this will reserve enough space to concat the filter tokens
 		filterSelect.reserve(tokens.size() * 100);
@@ -461,25 +467,30 @@ std::vector<BSONObj*>* DBController::findFullScan(char* db, char* ns, const char
 		filterSelect = "*";
 	}
 
-	while (!dbStream->eof()) {
-		BSONObj* obj = bis->readBSON("*");
+	mmis->seek(29);
+	BSONBufferedObj* obj = NULL;
+	while (!mmis->eof()) {
+		if (obj == NULL) {
+			obj = new BSONBufferedObj(mmis->pointer(), mmis->length() - mmis->currentPos());
+		} else {
+			obj->reset(mmis->pointer(), mmis->length() - mmis->currentPos());
+		}
+		mmis->seek(mmis->currentPos() + obj->bufferLength());
 		// Only "active" Records
 		if (obj->getInt("_status") == 1) {
 			bool match = false;
 			ExpressionResult* expresult = parser->eval(*obj);
 			if (expresult->type() == ExpressionResult::RT_BOOLEAN) {
-				bool* bres = (bool*)expresult->value();
-				match = *bres;
+				match = *expresult;
 			}
 			delete expresult;
 			if (match) {
 				result->push_back(obj->select(select));
 			}
 		}
-		delete obj;
 	}
 
-	delete parser;
+	if (obj != NULL) delete obj;
 	delete bis;
 	dbStream->close();
 	delete dbStream;

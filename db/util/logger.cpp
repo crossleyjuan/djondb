@@ -39,6 +39,8 @@
 
 Logger::Config* Logger::_configSettings;
 
+Logger* __logger = NULL;
+
 #define PRINT(TYPE, CLAZZ) \
 	const char* cmessage = message.c_str(); \
 	int bufferSize = 10000; \
@@ -163,8 +165,11 @@ int clock_gettime(int X, struct timeval *tv)
 #endif
 
 Logger* getLogger(void* clazz) {
-	Logger* logger = new Logger(clazz);
-	return logger;
+	if (__logger == NULL) {
+		__logger = new Logger(clazz);
+
+	}
+	return __logger;
 }
 
 Logger::Logger(void* clazz) {

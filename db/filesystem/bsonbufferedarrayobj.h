@@ -1,7 +1,7 @@
 // =====================================================================================
 //  Filename:  bsonarrayobj.h
 //
-//  Description:  This file contains the definition of the class BSONArrayObj which is an array of BSONObj
+//  Description:  This file contains the definition of the class BSONBufferedArrayObj which is an array of BSONBufferedObj
 //
 //  Version:  1.0
 //  Created:  02/15/2012 09:07:11 AM
@@ -23,31 +23,36 @@
 // this program will be open sourced and all its derivated work will be too.
 // =====================================================================================
 
-#ifndef BSONARRAYOBJ_H_INCLUDED
-#define BSONARRAYOBJ_H_INCLUDED
+#ifndef BSONBUFFEREDARRAYOBJ_H_INCLUDED
+#define BSONBUFFEREDARRAYOBJ_H_INCLUDED
 
 #include <vector>
-#include "defs.h"
+#include "bsonarrayobj.h"
 
-class BSONObj;
+class BSONBufferedObj;
 
-class BSONArrayObj {
+class BSONBufferedArrayObj: public BSONArrayObj {
 public:
-	BSONArrayObj();
-	~BSONArrayObj();
-	BSONArrayObj(const BSONArrayObj& orig);
+	BSONBufferedArrayObj(char* buffer, __int64 len);
+	~BSONBufferedArrayObj();
+	BSONBufferedArrayObj(const BSONBufferedArrayObj& orig);
 
-	virtual __int32 length() const;
-	void add(const BSONObj& obj);
-	virtual BSONObj* get(__int32 index) const;
-   virtual char* toChar() const;
-	typedef std::vector<BSONObj*>::iterator iterator;
-	virtual BSONArrayObj* select(const char* select) const;
+	__int32 length() const;
+	BSONObj* get(__int32 index) const;
+   char* toChar() const;
+	BSONArrayObj* select(const char* select) const;
 	
-	virtual iterator begin();
-	virtual iterator end();
+	iterator begin();
+	iterator end();
+	virtual __int64 bufferLength() const;
 
 private:
+	void initialize();
+	char* _buffer;
+	int   _bufferMaxLen;
+
+	int   _bufferArrayLen;
+
 	std::vector<BSONObj*> _elements;
 };
-#endif // BSONARRAYOBJ_H_INCLUDED
+#endif // BSONBUFFEREDARRAYOBJ_H_INCLUDED
