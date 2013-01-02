@@ -86,6 +86,7 @@ class TestDBSuite: public Test::Suite
 			fos.writeString(std::string("13"));
 			fos.close();
 
+			TEST_ADD(TestDBSuite::testManualIndex);
 			TEST_ADD(TestDBSuite::testInsertComplexBSON);
 			TEST_ADD(TestDBSuite::testSimpleIndex);
 			TEST_ADD(TestDBSuite::testComplexIndex);
@@ -784,6 +785,35 @@ class TestDBSuite: public Test::Suite
 			}
 		}
 
+		void testManualIndex()
+		{
+			cout << "\ntestManualIndex" << endl;
+			std::set<std::string> keys;
+			keys.insert("_id");
+			std::auto_ptr<BPlusIndex> tree(new BPlusIndex(keys));
+
+			std::auto_ptr<Logger> log(getLogger(NULL));
+
+			log->startTimeRecord();
+			// Inserting
+			int x = 0;
+			char chr[100];
+			do {
+				cout << "Element: ";
+				scanf("%s", chr);
+				if (strncmp(chr, "end", 3) == 0) {
+					break;
+				}
+				cout << "Number readed: " << chr << endl;
+				BSONObj id;
+				id.add("_id", const_cast<char*>(chr));
+				tree->add(id, std::string(chr), 0, 0);
+				tree->debug();
+				getchar();
+				x++;
+			} while (strncmp(chr, "end", 3) != 0);
+		}
+
 		void testIndex(std::vector<std::string> ids)
 		{
 			std::set<std::string> keys;
@@ -801,7 +831,6 @@ class TestDBSuite: public Test::Suite
 				std::string sid = *i;
 				id.add("_id", const_cast<char*>(sid.c_str()));
 				tree->add(id, sid, 0, 0);
-				//tree->debug();
 				x++;
 			}
 			log->stopTimeRecord();
