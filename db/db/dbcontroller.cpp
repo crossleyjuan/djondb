@@ -469,7 +469,18 @@ std::vector<BSONObj*>* DBController::findFullScan(char* db, char* ns, const char
 
 	mmis->seek(29);
 	BSONBufferedObj* obj = NULL;
-	while (!mmis->eof()) {
+
+	std::string smax = getSetting("max_results");
+	__int64 maxResults = 30;
+	if (smax.length() > 0) {
+#ifdef WINDOWS
+		maxResults = _atoi64(smax.c_str());
+#else
+		maxResults = atoll(smax.c_str());
+	}
+#endif
+	__int64 count = 0;
+	while (!mmis->eof() && (count < maxResults)) {
 		if (obj == NULL) {
 			obj = new BSONBufferedObj(mmis->pointer(), mmis->length() - mmis->currentPos());
 		} else {
@@ -486,6 +497,7 @@ std::vector<BSONObj*>* DBController::findFullScan(char* db, char* ns, const char
 			delete expresult;
 			if (match) {
 				result->push_back(obj->select(select));
+				count++;
 			}
 		}
 	}
