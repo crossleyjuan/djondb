@@ -118,10 +118,12 @@ IndexPage* BPlusIndex::findIndexPage(IndexPage* start, INDEXPOINTERTYPE key) con
 void BPlusIndex::insertIndexElement(IndexPage* page, Index* index) {
 	Logger* log = getLogger(NULL);
 
-	IndexPage* pageFound = findIndexPage(_head, index->key->toChar());
+	char* key = index->key->toChar();
+	IndexPage* pageFound = findIndexPage(_head, key);
 
 	pageFound->add(index);
 	checkPage(pageFound);
+	free(key);
 }
 
 IndexPage::IndexPage() {
@@ -140,6 +142,7 @@ IndexPage::IndexPage() {
 
 IndexPage::~IndexPage() {
 	for (int x = 0; x < size; x++) {
+		delete elements[x]->key;
 		delete elements[x];
 		elements[x] = NULL;
 	}
@@ -150,6 +153,8 @@ IndexPage::~IndexPage() {
 			pointers[x] = NULL;
 		}
 	}
+	free(elements);
+	free(pointers);
 }
 
 int IndexPage::add(Index* index) {
@@ -170,6 +175,7 @@ int IndexPage::add(Index* index) {
 			} else {
 				INDEXPOINTERTYPE currentKey = current->key->toChar();
 				int res = strcmp(key, currentKey); 
+				free(currentKey);
 				if (res < 0) {
 					// Moves the elements to the right side before inserting the new element
 					for (int i = size; i > x; i--) {
@@ -183,6 +189,7 @@ int IndexPage::add(Index* index) {
 				}
 			}
 		}
+		free(key);
 	}
 	size++;
 	return indexPositionResult;

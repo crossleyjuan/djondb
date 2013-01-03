@@ -40,6 +40,7 @@ std::set<std::string> bson_splitSelect(const char* select) {
 			s = s.substr(0, dotPos);
 		}
 		result.insert(s);
+		free(cs);
 	}
 
 	return result;
