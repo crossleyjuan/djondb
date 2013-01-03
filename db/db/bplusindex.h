@@ -14,7 +14,7 @@ typedef char* INDEXPOINTERTYPE;
 #define COMPAREKEYS(k1, k2) \
 	(strcmp(k1, k2) == 0);
 
-const int BUCKET_MAX_ELEMENTS = 3; // Should be even (3, 5, 7)
+const int BUCKET_MAX_ELEMENTS = 5; // Should be even (3, 5, 7)
 
 class IndexPage;
 

@@ -210,6 +210,8 @@ void BPlusIndex::checkPage(IndexPage* page) {
 			int indexInserted = parentElement->add(midElement);
 			parentElement->pointers[indexInserted + 1] = rightPage;
 			parentElement->pointers[indexInserted] = page;
+			rightPage->parentElement = parentElement;
+			page->parentElement = parentElement;
 
 			checkPage(parentElement);
 		}

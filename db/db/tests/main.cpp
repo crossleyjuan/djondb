@@ -841,7 +841,11 @@ class TestDBSuite: public Test::Suite
 				id.add("_id", const_cast<char*>(sid.c_str()));
 				tree->add(id, sid, 0, 0);
 
-				//tree->debug();
+				log->debug("====================================");
+				log->debug("Inserting %s", sid.c_str());
+				tree->debug();
+
+				//getchar();
 				x++;
 			}
 			log->stopTimeRecord();
