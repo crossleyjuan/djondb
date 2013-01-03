@@ -64,6 +64,15 @@ class TestDBSuite: public Test::Suite
 			remove("find.filter.idx");
 
 			FileOutputStream fos("simple.dat", "wb");
+			/* 
+			fos.writeString(std::string("1"));
+			fos.writeString(std::string("4"));
+			fos.writeString(std::string("6"));
+			fos.writeString(std::string("2"));
+			fos.writeString(std::string("3"));
+			fos.writeString(std::string("5"));
+			fos.writeString(std::string("8"));
+			*/
 			fos.writeString(std::string("1"));
 			fos.writeString(std::string("4"));
 			fos.writeString(std::string("11"));
@@ -86,10 +95,10 @@ class TestDBSuite: public Test::Suite
 			fos.writeString(std::string("13"));
 			fos.close();
 
-			TEST_ADD(TestDBSuite::testManualIndex);
-			TEST_ADD(TestDBSuite::testInsertComplexBSON);
 			TEST_ADD(TestDBSuite::testSimpleIndex);
 			TEST_ADD(TestDBSuite::testComplexIndex);
+			//TEST_ADD(TestDBSuite::testManualIndex);
+			TEST_ADD(TestDBSuite::testInsertComplexBSON);
 			TEST_ADD(TestDBSuite::testIndexFactory);
 			TEST_ADD(TestDBSuite::testExpressions);
 			TEST_ADD(TestDBSuite::testFilterExpressionParser);
@@ -507,7 +516,7 @@ class TestDBSuite: public Test::Suite
 		{
 			cout << "\ntestMassiveInsert" << endl;
 			int inserts = 100;
-			std::auto_ptr<Logger> log(getLogger(NULL));
+			Logger* log = getLogger(NULL);
 
 			log->startTimeRecord();
 
@@ -580,7 +589,7 @@ class TestDBSuite: public Test::Suite
 		{
 			cout << "\ntestFinds" << endl;
 
-			std::auto_ptr<Logger> log(getLogger(NULL));
+			Logger* log = getLogger(NULL);
 
 			log->startTimeRecord();
 
@@ -737,7 +746,7 @@ class TestDBSuite: public Test::Suite
 		void testFindPrevious()
 		{
 			cout << "\ntestFindPrevious" << endl;
-			std::auto_ptr<Logger> log(getLogger(NULL));
+			Logger* log = getLogger(NULL);
 
 			FileInputStream fis("temp.txt", "rb");
 			std::vector<std::string*> ids;
@@ -792,7 +801,7 @@ class TestDBSuite: public Test::Suite
 			keys.insert("_id");
 			std::auto_ptr<BPlusIndex> tree(new BPlusIndex(keys));
 
-			std::auto_ptr<Logger> log(getLogger(NULL));
+			Logger* log = getLogger(NULL);
 
 			log->startTimeRecord();
 			// Inserting
@@ -820,7 +829,7 @@ class TestDBSuite: public Test::Suite
 			keys.insert("_id");
 			std::auto_ptr<BPlusIndex> tree(new BPlusIndex(keys));
 
-			std::auto_ptr<Logger> log(getLogger(NULL));
+			Logger* log = getLogger(NULL);
 
 			log->startTimeRecord();
 			// Inserting
@@ -831,6 +840,8 @@ class TestDBSuite: public Test::Suite
 				std::string sid = *i;
 				id.add("_id", const_cast<char*>(sid.c_str()));
 				tree->add(id, sid, 0, 0);
+
+				//tree->debug();
 				x++;
 			}
 			log->stopTimeRecord();

@@ -16,57 +16,58 @@ typedef char* INDEXPOINTERTYPE;
 
 const int BUCKET_MAX_ELEMENTS = 3; // Should be even (3, 5, 7)
 
-struct BucketElement {
-    Index* index;
+class IndexPage;
 
-    INDEXPOINTERTYPE key;
+class IndexPage {
+	public:
+		IndexPage();
+		int size;
 
-    BucketElement* previous;
-    BucketElement* next;
-};
+		Index** elements;
+		IndexPage** pointers;
 
-struct Bucket {
-    int size;
-    INDEXPOINTERTYPE minKey;
-    INDEXPOINTERTYPE maxKey;
+		IndexPage* parentElement;
 
-    BucketElement* root;
-    BucketElement* tail;
-
-    Bucket* left;
-    Bucket* right;
-
-    Bucket* parentBucket;
+		void debug() const;
+		bool isLeaf() const;
+		bool isFull() const;
+		int add(Index* index);
+		bool _leaf;
 };
 
 class BPlusIndex: public IndexAlgorithm
 {
-    public:
-        BPlusIndex(std::set<std::string> keys);
-        virtual ~BPlusIndex();
+	public:
+		BPlusIndex(std::set<std::string> keys);
+		virtual ~BPlusIndex();
 
-        virtual void add(const BSONObj& elem, std::string documentId, long filePos, long indexPos);
-        virtual Index* find(BSONObj* const elem);
-        virtual void remove(const BSONObj& elem);
-		  virtual std::list<Index*> find(FilterParser* parser);
+		virtual void add(const BSONObj& elem, std::string documentId, long filePos, long indexPos);
+		virtual Index* find(BSONObj* const elem);
+		virtual void remove(const BSONObj& elem);
+		virtual std::list<Index*> find(FilterParser* parser);
 
-		  void debug();
-	 protected:
-	 private:
-		  Bucket* _head;
-//		  PriorityCache<INDEXPOINTERTYPE, Index*>* _priorityCache;
+		void debug();
+		
+		void checkPage(IndexPage* page);
+	protected:
+	private:
+		IndexPage* _head;
 
-	 private:
-		  bool insertElement(const Index& elem);
-		  BucketElement* findBucketElement(Bucket* start, const Index& idx, bool create);
-		  void initializeBucket(Bucket* const element);
-		  void initializeBucketElement(BucketElement* const elem);
+	private:
+		IndexPage* findIndexPage(IndexPage* start, INDEXPOINTERTYPE key) const;
+		void insertIndexElement(IndexPage* page, Index* index);
+		/*  
+			 bool insertElement(const Index& elem);
+			 BucketElement* findBucketElement(Bucket* start, const Index& idx, bool create);
+			 void initializeBucket(Bucket* const element);
+			 void initializeBucketElement(BucketElement* const elem);
 
-		  void insertBucketElement(Bucket* bucket, BucketElement* element);
-		  void checkBucket(Bucket* const bucket);
+			 void insertBucketElement(Bucket* bucket, BucketElement* element);
+			 void checkBucket(Bucket* const bucket);
 
-		  std::list<Index*> find(FilterParser* parser, Bucket* bucket);
-		  std::list<Index*> findElements(FilterParser* parser, Bucket* bucket);
+			 std::list<Index*> find(FilterParser* parser, Bucket* bucket);
+			 std::list<Index*> findElements(FilterParser* parser, Bucket* bucket);
+			 */
 };
 
 #endif // BPLUSINDEX_H
