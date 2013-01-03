@@ -21,6 +21,7 @@ class IndexPage;
 class IndexPage {
 	public:
 		IndexPage();
+		~IndexPage();
 		int size;
 
 		Index** elements;
@@ -33,6 +34,7 @@ class IndexPage {
 		bool isFull() const;
 		int add(Index* index);
 		bool _leaf;
+		std::list<Index*> find(FilterParser* parser) const;
 };
 
 class BPlusIndex: public IndexAlgorithm
@@ -56,6 +58,7 @@ class BPlusIndex: public IndexAlgorithm
 	private:
 		IndexPage* findIndexPage(IndexPage* start, INDEXPOINTERTYPE key) const;
 		void insertIndexElement(IndexPage* page, Index* index);
+		void dispose(IndexPage* page);
 		/*  
 			 bool insertElement(const Index& elem);
 			 BucketElement* findBucketElement(Bucket* start, const Index& idx, bool create);

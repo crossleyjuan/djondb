@@ -40,11 +40,11 @@ BPlusIndex::BPlusIndex(std::set<std::string> keys)
     _head = new IndexPage();
 }
 
-
 BPlusIndex::~BPlusIndex()
 {
     if (_head)
     {
+		 delete _head;
     }
 }
 
@@ -138,6 +138,20 @@ IndexPage::IndexPage() {
 	}
 }
 
+IndexPage::~IndexPage() {
+	for (int x = 0; x < size; x++) {
+		delete elements[x];
+		elements[x] = NULL;
+	}
+	for (int x = 0; x <= size; x++) {
+		if (pointers[x] != NULL) {
+			IndexPage* page = pointers[x];
+			delete page;
+			pointers[x] = NULL;
+		}
+	}
+}
+
 int IndexPage::add(Index* index) {
 	Logger* log = getLogger(NULL);
 	int indexPositionResult = 0;
@@ -219,7 +233,14 @@ void BPlusIndex::checkPage(IndexPage* page) {
 }
 
 std::list<Index*> BPlusIndex::find(FilterParser* parser) {
-	return std::list<Index*>();
+	std::list<Index*> result;
+
+	if (_head != NULL) {
+		std::list<Index*> partial = _head->find(parser);
+		result.insert(result.begin(), partial.begin(), partial.end());
+	}
+
+	return result;
 }
 
 void IndexPage::debug() const {
@@ -247,5 +268,30 @@ void IndexPage::debug() const {
 		if (pointers[x] != NULL)
 			pointers[x]->debug();
 	}
+}
+
+
+std::list<Index*> IndexPage::find(FilterParser* parser) const {
+	std::list<Index*> result;
+	for (int x = 0; x < size; x++) {
+		BSONObj* key = elements[x]->key;
+		bool match = false;
+		ExpressionResult* expresult = parser->eval(*key);
+		if (expresult->type() == ExpressionResult::RT_BOOLEAN) {
+			match = *expresult;
+		}
+		delete expresult;
+		if (match) {
+			result.push_back(elements[x]);
+		}
+	}
+	for (int x = 0; x <= size; x++) {
+		IndexPage* innerPage = pointers[x];
+		if (innerPage != NULL) {
+			std::list<Index*> inner = innerPage->find(parser);
+			result.insert(result.begin(), inner.begin(), inner.end());
+		}
+	}
+	return result;
 }
 
