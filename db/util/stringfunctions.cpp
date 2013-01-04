@@ -26,25 +26,52 @@
 #include <boost/algorithm/string.hpp>
 
 djondb::string::string() {
-	_text = NULL;
+	_holder = NULL;
 	_len = 0;
 }
 
 djondb::string::string(char* c, __int32 len) {
-	_text = c;
+	_holder = new stringHolder(c);
+	_len = len;
+}
+
+djondb::string::string(const char* c, __int32 len) {
+	_holder = new stringHolder(c);
 	_len = len;
 }
 
 djondb::string::string(const djondb::string& orig) {
-	this->_text = orig._text;
+	this->_holder = orig._holder;
+	if (this->_holder != NULL) {
+		this->_holder->addReference();
+	}
 	this->_len = orig._len;
 }
 
-const djondb::string::~string() {
+djondb::string& djondb::string::operator=(const djondb::string& rvar) {
+	this->_holder = rvar._holder;
+	if (this->_holder != NULL) {
+		this->_holder->addReference();
+	}
+	this->_len = rvar._len;
+	return *this;
 }
 
-char* djondb::string::c_str() const {
-	return _text;
+const djondb::string::~string() {
+	if (this->_holder != NULL) {
+		this->_holder->removeReference();
+		if (this->_holder->references() == 0) {
+			delete this->_holder;
+		}
+	}
+}
+
+const char* djondb::string::c_str() const {
+	if (_holder != NULL) {
+		return const_cast<const char*>((char*)*_holder);
+	} else {
+		return NULL;
+	}
 }
 
 __int32 djondb::string::length() const {
@@ -55,7 +82,7 @@ bool djondb::string::operator ==(const djondb::string& str) {
 	if (this->_len != str._len) {
 		return false;
 	} else {
-		if (strncmp(this->_text, str._text, this->_len) == 0) {
+		if (strncmp(c_str(), str.c_str(), this->_len) == 0) {
 			return true;
 		} else {
 			return false;
@@ -67,7 +94,7 @@ bool djondb::string::operator !=(const djondb::string& str) {
 	if (this->_len != str._len) {
 		return true;
 	} else {
-		if (strncmp(this->_text, str._text, this->_len) == 0) {
+		if (strncmp(c_str(), str.c_str(), this->_len) == 0) {
 			return false;
 		} else {
 			return true;

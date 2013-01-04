@@ -56,7 +56,7 @@ class TestBSONSuite : public Test::Suite
 			BSONObj* obj = new BSONObj();
 			// Add in
 			obj->add("int", 1);
-			obj->add("string", (char*)"test");
+			obj->add("string", (const char*)"test");
 			obj->add("long", (__int64) 10000000000L);
 			obj->add("double", 1.1);
 

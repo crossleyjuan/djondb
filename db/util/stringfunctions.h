@@ -13,6 +13,60 @@
 #include "defs.h"
 
 namespace djondb {
+
+	class stringHolder {
+		public:
+			stringHolder(char* c) {
+				_char = c;
+				_constChar = NULL;
+				_references = 1;
+			}
+
+			stringHolder(const char* c) {
+				_constChar = c;
+				_char = NULL;
+				_references = 1;
+			}
+
+			void addReference() {
+				_references++;
+			}
+
+			void removeReference() {
+				_references--;
+			}
+
+			__int32 references() const {
+				return _references;
+			}
+
+			~stringHolder() {
+				if (_char != NULL) free(_char);
+				_char = NULL;
+			}
+
+			operator char*() {
+				if (_char != NULL) {
+					return _char;
+				} else {
+					return const_cast<char*>(_constChar);
+				}
+			}
+
+			operator const char*() {
+				if (_constChar != NULL) {
+					return _constChar;
+				} else {
+					return const_cast<const char*>(_char);
+				}
+			}
+
+		private:
+			char* _char;
+			const char* _constChar;
+			__int32 _references;
+	};
+
 	/**
 	 * This class is just a wrapper for a char*, it will keep the same char* passed and this
 	 * will just work as wrapper container
@@ -23,17 +77,19 @@ namespace djondb {
 		public:
 			string();
 			string(char* c, __int32 len);
+			string(const char* c, __int32 len);
 			string(const string& str);
 			const ~string();
 
-			char* c_str() const;
+			const char* c_str() const;
 			__int32 length() const;
 
 			bool operator ==(const djondb::string& str);
 			bool operator !=(const djondb::string& str);
+			djondb::string& operator=(const djondb::string& rvar);
 
 		private:
-			char* _text;
+			stringHolder* _holder;
 			__int32 _len;
 	};
 };

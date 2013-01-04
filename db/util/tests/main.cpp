@@ -252,6 +252,36 @@ class TestUtilSuite : public Test::Suite
 
 			djondb::string s3("other", 5);
 			TEST_ASSERT(s != s3);
+
+
+			// Testing copy smart references
+			char* cx = strcpy("Testing", 7);
+			djondb::string s4(cx, 7);
+			djondb::string s5(s4);
+			char* c4 = s4.c_str();
+			char* c5 = s5.c_str();
+			// Compare the references, they should be the same
+			TEST_ASSERT(c4 == c5);
+
+			// testing simple copying
+			djondb::string s6(strcpy("Otra", 4), 4);
+			djondb::string* s7 = new djondb::string(s6);
+			delete s7;
+			char* c6 = s6.c_str();
+			TEST_ASSERT(strcmp(c6, "Otra") == 0);
+
+
+			djondb::string s8(strcpy("Otra", 4), 4);
+			{
+				djondb::string s9 = s8;
+				char* c9 = s9.c_str();
+				TEST_ASSERT(strcmp(s8.c_str(), c9) == 0);
+			};
+		   TEST_ASSERT(strcmp(s8.c_str(), "Otra") == 0);
+
+			// Test null strings
+			djondb::string s10;
+			djondb::string s11(s10);
 		}
 };
 //// Tests unconditional fail TEST_ASSERTs

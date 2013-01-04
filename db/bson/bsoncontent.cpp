@@ -149,11 +149,11 @@ BSONContentBSONArray::~BSONContentBSONArray() {
 }
 
 bool BSONContent::operator ==(const BSONContent& content) {
-	throw new BSONException("cannot compare BSONContents");
+	throw BSONException("cannot compare BSONContents");
 }
 
 bool BSONContent::operator !=(const BSONContent& content) {
-	throw new BSONException("cannot compare BSONContents");
+	throw BSONException("cannot compare BSONContents");
 }
 
 bool BSONContentInt::operator ==(const BSONContentInt& content) {

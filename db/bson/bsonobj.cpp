@@ -152,7 +152,7 @@ char* BSONObj::toChar() {
 								 }
 			case LONG_TYPE: {
 									 BSONContentLong* blong = (BSONContentLong*)content;
-									 sprintf(result + pos, "%ld", (__int64)*blong);
+									 sprintf(result + pos, "%lld", (__int64)*blong);
 									 break;
 								 }
 			case DOUBLE_TYPE: {
@@ -216,7 +216,7 @@ __int64 BSONObj::getLong(std::string key) const throw(BSONException) {
 	}
 }
 
-char* BSONObj::getString(std::string key) const throw(BSONException) {
+const char* BSONObj::getString(std::string key) const throw(BSONException) {
 	BSONContent* content = getContent(key);
 	if ((content != NULL) && (content->type() == PTRCHAR_TYPE)) {
 		BSONContentString* bstring = (BSONContentString*)content;
@@ -506,9 +506,9 @@ BSONObj* BSONObj::select(const char* sel) const {
 					{
 						BSONContentString* bstring = (BSONContentString*)origContent;
 						djondb::string str = *bstring;
-						char* val = str.c_str();
+						const char* val = str.c_str();
 						__int32 len = str.length();
-						result->add(key, val, len);
+						result->add(key, const_cast<char*>(val), len);
 						break;
 					}
 			}

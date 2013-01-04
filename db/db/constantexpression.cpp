@@ -35,7 +35,7 @@
 	_intValue = NULL;
 	_longValue = NULL;
 	_doubleValue = NULL;
-	_value = new ExpressionResult(djondb::string(_expression, strlen(_expression)));
+	_value = new ExpressionResult(djondb::string(strcpy(_expression, strlen(_expression)), strlen(_expression)));
 }
 
 	ConstantExpression::ConstantExpression(__int32 expression)

@@ -46,7 +46,6 @@ void BSONOutputStream::writeBSON(const BSONObj& bson) {
 		BSONContent* cont = i->second;
 		// If the type is PTRCHAR_TYPE change it to string_type, to remove this type in future
 		_outputStream->writeLong(cont->type() != PTRCHAR_TYPE? cont->type(): STRING_TYPE);
-		char* text;
 		BSONObj* inner;
 		switch (cont->type()) {
 			case BSON_TYPE: {
@@ -75,9 +74,9 @@ void BSONOutputStream::writeBSON(const BSONObj& bson) {
 			case PTRCHAR_TYPE: {
 										 BSONContentString* bstring = (BSONContentString*)cont;
 										 djondb::string str = *bstring;
-										 text = str.c_str(); 
+										 const char* text = str.c_str(); 
 										 __int32 len = str.length();
-										 _outputStream->writeChars(text, len);
+										 _outputStream->writeChars(const_cast<char*>(text), len);
 										 break;
 									 }
 			case BSONARRAY_TYPE: 

@@ -291,7 +291,7 @@ Index* DBController::findIndex(char* db, char* ns, BSONObj* bson) {
 	IndexAlgorithm* impl = IndexFactory::indexFactory.index(db, ns, "_id");
 
 	BSONObj indexBSON;
-	indexBSON.add("_id", bson->getString("_id"));
+	indexBSON.add("_id", const_cast<char*>(bson->getString("_id")));
 	Index* index = impl->find(&indexBSON);
 
 	return index;
