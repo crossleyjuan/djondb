@@ -411,7 +411,6 @@ BSONObj* DBController::findFirst(char* db, char* ns, const char* select, const c
 				bool bres = *result;
 				if (bres) {
 					bsonResult = obj->select(select);
-					delete obj;
 					break;
 				}
 			}

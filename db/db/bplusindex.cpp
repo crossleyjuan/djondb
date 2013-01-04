@@ -87,7 +87,12 @@ void BPlusIndex::debug() {
 }
 
 bool IndexPage::isLeaf() const {
-	return _leaf;
+	for (int x = 0; x <= size; x++) {
+		if (pointers[x] != NULL) {
+			return false;
+		}
+	}
+	return true;
 }
 
 bool IndexPage::isFull() const {
@@ -107,6 +112,9 @@ IndexPage* BPlusIndex::findIndexPage(IndexPage* start, INDEXPOINTERTYPE key) con
 
 			if ((result < 0) && (start->pointers[x] != NULL)) {
 				return findIndexPage(start->pointers[x], key);
+			}
+			if (result == 0) {
+				return start;
 			}
 		}
 		if (start->pointers[start->size] != NULL) {
@@ -142,11 +150,13 @@ IndexPage::IndexPage() {
 
 IndexPage::~IndexPage() {
 	for (int x = 0; x < size; x++) {
-		delete elements[x]->key;
-		delete elements[x];
-		elements[x] = NULL;
+		if (elements[x] != NULL) {
+			if (elements[x]->key) delete elements[x]->key;
+			delete elements[x];
+			elements[x] = NULL;
+		}
 	}
-	for (int x = 0; x <= size; x++) {
+	for (int x = 0; x <= BUCKET_MAX_ELEMENTS; x++) {
 		if (pointers[x] != NULL) {
 			IndexPage* page = pointers[x];
 			delete page;
@@ -208,12 +218,17 @@ void BPlusIndex::checkPage(IndexPage* page) {
 			rightPage->size++;
 			i++;
 		}
+
+		log->debug("Right page:");
+		rightPage->debug();
 		Index* midElement = page->elements[midPoint];
-		for (int x = midPoint; x < page->size; x++) {
+		for (int x = midPoint; x < BUCKET_MAX_ELEMENTS; x++) {
 			page->elements[x] = NULL;
 			page->pointers[x +1] = NULL;
 		}
-		page->size -= (midPoint + 1);
+		page->size = midPoint;
+		log->debug("left page:");
+		page->debug();
 
 		IndexPage* parentElement = page->parentElement;
 		if (parentElement == NULL) {
@@ -233,6 +248,7 @@ void BPlusIndex::checkPage(IndexPage* page) {
 			parentElement->pointers[indexInserted] = page;
 			rightPage->parentElement = parentElement;
 			page->parentElement = parentElement;
+			parentElement->_leaf = false;
 
 			checkPage(parentElement);
 		}

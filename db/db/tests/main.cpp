@@ -89,7 +89,6 @@ class TestDBSuite: public Test::Suite
 			fos.writeString(std::string("5"));
 			fos.writeString(std::string("17"));
 			fos.writeString(std::string("10"));
-			fos.writeString(std::string("12"));
 			fos.writeString(std::string("16"));
 			fos.writeString(std::string("12"));
 			fos.writeString(std::string("13"));
