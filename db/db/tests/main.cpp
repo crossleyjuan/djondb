@@ -73,6 +73,7 @@ class TestDBSuite: public Test::Suite
 			fos.writeString(std::string("5"));
 			fos.writeString(std::string("8"));
 			*/
+			fos.writeString(std::string("13"));
 			fos.writeString(std::string("1"));
 			fos.writeString(std::string("4"));
 			fos.writeString(std::string("11"));
@@ -91,9 +92,10 @@ class TestDBSuite: public Test::Suite
 			fos.writeString(std::string("10"));
 			fos.writeString(std::string("16"));
 			fos.writeString(std::string("12"));
-			fos.writeString(std::string("13"));
 			fos.close();
 
+			TEST_ADD(TestDBSuite::testIndexPage);
+			/*
 			TEST_ADD(TestDBSuite::testSimpleIndex);
 			TEST_ADD(TestDBSuite::testComplexIndex);
 			//TEST_ADD(TestDBSuite::testManualIndex);
@@ -118,6 +120,7 @@ class TestDBSuite: public Test::Suite
 			TEST_ADD(TestDBSuite::testDbs);
 			TEST_ADD(TestDBSuite::testNamespaces);
 			TEST_ADD(TestDBSuite::testErrorHandling);
+			*/
 		}
 	private:
 
@@ -604,7 +607,7 @@ class TestDBSuite: public Test::Suite
 					TEST_FAIL("res is null");
 					return;
 				}
-				char* id2 = res->getString("_id");
+				const char* id2 = res->getString("_id");
 				if (strcmp(id2, id->c_str()) != 0)
 				{
 					TEST_FAIL("id not found");
@@ -723,7 +726,7 @@ class TestDBSuite: public Test::Suite
 			std::string filter = "$'age' == 45";
 			std::vector<BSONObj*>* found = controller->find("dbtest", "find.filter2","*", filter.c_str());
 			TEST_ASSERT(found->size() == 1); 
-			char* name = found->at(0)->getString("lastName");
+			const char* name = found->at(0)->getString("lastName");
 			TEST_ASSERT(strcmp(name, "Smith") == 0);
 
 			filter = "";
@@ -822,6 +825,60 @@ class TestDBSuite: public Test::Suite
 			} while (strncmp(chr, "end", 3) != 0);
 		}
 
+		void testIndexPage() {
+			std::vector<std::string> ids;
+			FileInputStream fis("guids.txt", "rb");
+			const char* full = fis.readFull();
+			std::vector<std::string> tids = split(full, "\n");
+			for (std::vector<std::string>::iterator i = tids.begin(); i != tids.end(); i++) {
+				ids.push_back(*i);
+			}
+			fis.close();
+			testIndex(ids);
+			/*
+			ids.push_back("1");
+			ids.push_back("2");
+			ids.push_back("3");
+			ids.push_back("4");
+			ids.push_back("5");
+
+			testIndex(ids);
+
+			ids.push_back("6");
+			testIndex(ids);
+			ids.push_back("7");
+			ids.push_back("8");
+			ids.push_back("9");
+			ids.push_back("91");
+			ids.push_back("92");
+			testIndex(ids);
+
+			ids.push_back("11");
+			ids.push_back("12");
+			ids.push_back("13");
+			testIndex(ids);
+
+			ids.clear();
+			ids.push_back("1f0d2a02-e812-433c-8615-0db9dbad0eae");
+			ids.push_back("803bbd79-b897-4a68-b8bb-ca54eb52b8ec");
+			ids.push_back("9012e35d-b117-4669-a8f7-b3418033cebb");
+			ids.push_back("c840c949-3509-46d8-8503-d203646913a4");
+			ids.push_back("dd4339cd-d5d4-4e53-9165-e7410b4d42c5");
+			ids.push_back("a9594d16-2358-4e38-a42c-2c61ddd88c36");
+			testIndex(ids);
+
+			ids.clear();
+			Logger* log = getLogger(NULL);
+			for (int x = 0; x < 100; x++) {
+				std::string* guid = uuid();
+				ids.push_back(*guid);
+				log->debug(guid->c_str());
+				delete guid;
+			}
+			testIndex(ids);
+			*/
+		}
+
 		void testIndex(std::vector<std::string> ids)
 		{
 			std::set<std::string> keys;
@@ -837,11 +894,13 @@ class TestDBSuite: public Test::Suite
 			{
 				BSONObj id;
 				std::string sid = *i;
-				id.add("_id", const_cast<char*>(sid.c_str()));
-				tree->add(id, sid, 0, 0);
 
 				log->debug("====================================");
 				log->debug("Inserting %s", sid.c_str());
+
+				id.add("_id", const_cast<char*>(sid.c_str()));
+				tree->add(id, sid, 0, 0);
+
 				tree->debug();
 
 				//getchar();
@@ -892,19 +951,34 @@ class TestDBSuite: public Test::Suite
 			testIndex(ids);
 		}
 
+		std::vector<std::string> generateGuids(int count) {
+			std::vector<std::string> ids;
+			for (int x = 0; x < count; x++)
+			{
+				std::string* guid = uuid();
+				ids.push_back(*guid);
+				delete guid;
+			}
+			return ids;
+		}
+
 		void testComplexIndex()
 		{
 			cout << "\ntestComplexIndex" << endl;
-			FileInputStream fis("guids.txt", "rb");
-			std::vector<std::string> ids;
-			while (!fis.eof())
-			{
-				std::string* s= fis.readString();
-				ids.push_back(*s);
-				delete s;
-			}
-			fis.close();
+			cout << "testing 10 ids" << endl;
+			std::vector<std::string> ids = generateGuids(10);
 			testIndex(ids);
+			/*
+			cout << "testing 100 ids" << endl;
+			ids = generateGuids(100);
+			testIndex(ids);
+			cout << "testing 1000 ids" << endl;
+			ids = generateGuids(1000);
+			testIndex(ids);
+			cout << "testing 1000000 ids" << endl;
+			ids = generateGuids(1000);
+			testIndex(ids);
+			*/
 		}
 
 		void testIndexFactory() {

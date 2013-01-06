@@ -26,15 +26,20 @@ class IndexPage {
 
 		Index** elements;
 		IndexPage** pointers;
+		IndexPage* rightSibling;
+		IndexPage* leftSibling;
 
 		IndexPage* parentElement;
 
 		void debug() const;
 		bool isLeaf() const;
 		bool isFull() const;
-		int add(Index* index);
 		bool _leaf;
 		std::list<Index*> find(FilterParser* parser) const;
+		int findInsertPosition(Index* index) const;
+
+		void moveElements(int startPoint, int count);
+		void movePointers(int startPoint, int count);
 };
 
 class BPlusIndex: public IndexAlgorithm
@@ -50,15 +55,24 @@ class BPlusIndex: public IndexAlgorithm
 
 		void debug();
 		
-		void checkPage(IndexPage* page);
 	protected:
 	private:
 		IndexPage* _head;
 
 	private:
 		IndexPage* findIndexPage(IndexPage* start, INDEXPOINTERTYPE key) const;
+		Index* findIndex(IndexPage* start, INDEXPOINTERTYPE key) const;
 		void insertIndexElement(IndexPage* page, Index* index);
 		void dispose(IndexPage* page);
+		void createRoot(Index* element, IndexPage* left, IndexPage* right);
+		int addElement(IndexPage* page, Index* element, IndexPage* rightPointer);
+		void splitAdd(IndexPage* page, Index* index, IndexPage* rightPointer);
+		void splitAddLeaf(IndexPage* page, Index* index);
+		void splitAddInner(IndexPage* page, Index* index, IndexPage* rightPointer);
+
+		void copyElements(IndexPage* source, IndexPage* destination, int startIndex, int endIndex);
+		void removeElements(IndexPage* source, int startIndex, int endIndex);
+		void moveElements(IndexPage* source, IndexPage* destination, int startIndex, int endIndex);
 		/*  
 			 bool insertElement(const Index& elem);
 			 BucketElement* findBucketElement(Bucket* start, const Index& idx, bool create);

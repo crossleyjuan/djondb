@@ -57,7 +57,7 @@ class BSONBufferedContent: public BSONContent {
 		}
 
 		operator djondb::string() const {
-			return djondb::string(_element, _size);
+			return djondb::string((const char*)const_cast<const char*>(_element), _size);
 		}
 
 		operator __int32() const {
