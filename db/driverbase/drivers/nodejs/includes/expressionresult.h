@@ -26,6 +26,9 @@
 #define EXPRESSIONRESULT_INCLUDED_H
 
 #include "filterdefs.h"
+#include "defs.h"
+
+class BSONObj;
 
 class ExpressionResult {
 	public: 
@@ -36,19 +39,41 @@ class ExpressionResult {
 			RT_LONG64,
 			RT_BOOLEAN,
 			RT_STRINGDB,
+			RT_PTRCHAR,
 			RT_BSON,
 			RT_NULL
 		};
 	public:
-		ExpressionResult(RESULT_TYPE type, void* value);
+		ExpressionResult(__int32 value);
+		ExpressionResult(__int64 value);
+		ExpressionResult(double value);
+		ExpressionResult(bool value);
+		ExpressionResult(std::string value);
+		ExpressionResult(BSONObj* value);
+		ExpressionResult(djondb::string value);
 		ExpressionResult(const ExpressionResult& orig);
+		ExpressionResult();
 		~ExpressionResult();
 
 		RESULT_TYPE type();
-		void* value();
+
+		operator __int32();
+		operator __int64();
+		operator double();
+		operator bool();
+		operator std::string();
+		operator djondb::string();
+		operator BSONObj*();
 
 	private:
-		void* _value;
+		__int32 _ivalue;
+		__int64 _lvalue;
+		double _dvalue;
+		bool _bvalue;
+		std::string _svalue;
+		djondb::string _dsvalue;
+		BSONObj* _bsonvalue;
+
 		RESULT_TYPE _type;
 };
 

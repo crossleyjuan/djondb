@@ -20,7 +20,7 @@ else
 cp ../../obj/usr/lib/libdjon-client.la php/
 fi
 
-swig2.0 -c++ -php -outdir php -o php/djonphpdriver.cpp driver.i
+swig -c++ -php -outdir php -o php/djonphpdriver.cpp driver.i
 
 cp config.m4 php
 cd php

@@ -59,12 +59,16 @@ public class BSONObj {
     djonwrapperJNI.BSONObj_add__SWIG_3(swigCPtr, this, arg0, arg1);
   }
 
+  public void add(String arg0, String arg1, int arg2) {
+    djonwrapperJNI.BSONObj_add__SWIG_4(swigCPtr, this, arg0, arg1, arg2);
+  }
+
   public void add(String arg0, BSONObj arg1) {
-    djonwrapperJNI.BSONObj_add__SWIG_4(swigCPtr, this, arg0, BSONObj.getCPtr(arg1), arg1);
+    djonwrapperJNI.BSONObj_add__SWIG_5(swigCPtr, this, arg0, BSONObj.getCPtr(arg1), arg1);
   }
 
   public void add(String arg0, BSONArrayObj arg1) {
-    djonwrapperJNI.BSONObj_add__SWIG_5(swigCPtr, this, arg0, BSONArrayObj.getCPtr(arg1), arg1);
+    djonwrapperJNI.BSONObj_add__SWIG_6(swigCPtr, this, arg0, BSONArrayObj.getCPtr(arg1), arg1);
   }
 
   public boolean has(String arg0) {
@@ -98,7 +102,8 @@ public class BSONObj {
   }
 
   public SWIGTYPE_p_BSONContent get(String arg0) {
-    return new SWIGTYPE_p_BSONContent(djonwrapperJNI.BSONObj_get(swigCPtr, this, arg0), true);
+    long cPtr = djonwrapperJNI.BSONObj_get(swigCPtr, this, arg0);
+    return (cPtr == 0) ? null : new SWIGTYPE_p_BSONContent(cPtr, false);
   }
 
   public SWIGTYPE_p_BSONContent getContent(String arg0) {
@@ -112,7 +117,8 @@ public class BSONObj {
   }
 
   public SWIGTYPE_p_BSONContent getXpath(String xpath) {
-    return new SWIGTYPE_p_BSONContent(djonwrapperJNI.BSONObj_getXpath(swigCPtr, this, xpath), true);
+    long cPtr = djonwrapperJNI.BSONObj_getXpath(swigCPtr, this, xpath);
+    return (cPtr == 0) ? null : new SWIGTYPE_p_BSONContent(cPtr, false);
   }
 
   public BSONObj select(String sel) {

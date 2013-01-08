@@ -55,7 +55,7 @@ class TestCommandSuite: public Test::Suite {
 			cmd.setDB("testdb");
 			cmd.setNameSpace("test.namespace.db");
 			BSONObj obj;
-			obj.add("name", std::string("Cross"));
+			obj.add("name", "Cross");
 			obj.add("age", 18);
 			cmd.setBSON(obj);
 
@@ -74,7 +74,7 @@ class TestCommandSuite: public Test::Suite {
 			BSONObj* objResult = rdCmd->bson();
 			TEST_ASSERT(objResult != NULL);
 			TEST_ASSERT(objResult->has("name"));	
-			TEST_ASSERT(objResult->getString("name").compare("Cross") == 0);
+			TEST_ASSERT(strcmp(objResult->getString("name"), "Cross") == 0);
 		}
 
 		void testShowdbs() {
@@ -137,9 +137,9 @@ class TestCommandSuite: public Test::Suite {
 			cmd.setNameSpace("test.namespace.db");
 			BSONObj obj;
 			std::string* uid = uuid();
-			obj.add("_id", *uid);
+			obj.add("_id", const_cast<char*>(uid->c_str()));
 			delete uid;
-			obj.add("name", std::string("Cross"));
+			obj.add("name", "Cross");
 			obj.add("age", 18);
 			cmd.setBSON(obj);
 
@@ -158,7 +158,7 @@ class TestCommandSuite: public Test::Suite {
 			BSONObj* objResult = rdCmd->bson();
 			TEST_ASSERT(objResult  != NULL);
 			TEST_ASSERT(objResult->has("name"));	
-			TEST_ASSERT(objResult->getString("name").compare("Cross") == 0);
+			TEST_ASSERT(strcmp(objResult->getString("name"), "Cross") == 0);
 		}
 
 		void testRemoveCommand() {

@@ -9,64 +9,84 @@ class PriorityCache;
 
 #include <boost/shared_ptr.hpp>
 
-typedef char* INDEXPOINTERTYPE;
+//typedef char* INDEXPOINTERTYPE;
+typedef const char* INDEXPOINTERTYPE;
 
 #define COMPAREKEYS(k1, k2) \
 	(strcmp(k1, k2) == 0);
 
-const int BUCKET_MAX_ELEMENTS = 3; // Should be even (3, 5, 7)
+const int BUCKET_MAX_ELEMENTS = 5; // Should be even (3, 5, 7)
 
-struct BucketElement {
-    Index* index;
+class IndexPage;
 
-    INDEXPOINTERTYPE key;
+class IndexPage {
+	public:
+		IndexPage();
+		~IndexPage();
+		int size;
 
-    BucketElement* previous;
-    BucketElement* next;
-};
+		Index** elements;
+		IndexPage** pointers;
+		IndexPage* rightSibling;
+		IndexPage* leftSibling;
 
-struct Bucket {
-    int size;
-    INDEXPOINTERTYPE minKey;
-    INDEXPOINTERTYPE maxKey;
+		IndexPage* parentElement;
 
-    BucketElement* root;
-    BucketElement* tail;
+		void debugElements() const;
+		void debug() const;
+		bool isLeaf() const;
+		bool isFull() const;
+		bool _leaf;
+		std::list<Index*> find(FilterParser* parser) const;
+		int findInsertPosition(Index* index) const;
 
-    Bucket* left;
-    Bucket* right;
-
-    Bucket* parentBucket;
+		void moveElements(int startPoint, int count);
+		void movePointers(int startPoint, int count);
 };
 
 class BPlusIndex: public IndexAlgorithm
 {
-    public:
-        BPlusIndex(std::set<std::string> keys);
-        virtual ~BPlusIndex();
+	public:
+		BPlusIndex(std::set<std::string> keys);
+		virtual ~BPlusIndex();
 
-        virtual void add(const BSONObj& elem, std::string documentId, long filePos, long indexPos);
-        virtual Index* find(BSONObj* const elem);
-        virtual void remove(const BSONObj& elem);
-		  virtual std::list<Index*> find(FilterParser* parser);
+		virtual void add(const BSONObj& elem, std::string documentId, long filePos, long indexPos);
+		virtual Index* find(BSONObj* const elem);
+		virtual void remove(const BSONObj& elem);
+		virtual std::list<Index*> find(FilterParser* parser);
 
-		  void debug();
-	 protected:
-	 private:
-		  Bucket* _head;
-//		  PriorityCache<INDEXPOINTERTYPE, Index*>* _priorityCache;
+		void debug();
+		
+	protected:
+	private:
+		IndexPage* _head;
 
-	 private:
-		  bool insertElement(const Index& elem);
-		  BucketElement* findBucketElement(Bucket* start, const Index& idx, bool create);
-		  void initializeBucket(Bucket* const element);
-		  void initializeBucketElement(BucketElement* const elem);
+	private:
+		IndexPage* findIndexPage(IndexPage* start, INDEXPOINTERTYPE key) const;
+		Index* findIndex(IndexPage* start, INDEXPOINTERTYPE key) const;
+		void insertIndexElement(IndexPage* page, Index* index);
+		void dispose(IndexPage* page);
+		void createRoot(Index* element, IndexPage* left, IndexPage* right);
+		int addElement(IndexPage* page, Index* element, IndexPage* rightPointer);
+		void splitAdd(IndexPage* page, Index* index, IndexPage* rightPointer);
+		void splitAddLeaf(IndexPage* page, Index* index);
+		void splitAddInner(IndexPage* page, Index* index, IndexPage* rightPointer);
 
-		  void insertBucketElement(Bucket* bucket, BucketElement* element);
-		  void checkBucket(Bucket* const bucket);
+		void copyElements(IndexPage* source, IndexPage* destination, int startIndex, int endIndex);
+		void removeElements(IndexPage* source, int startIndex, int endIndex);
+		void moveElements(IndexPage* source, IndexPage* destination, int startIndex, int endIndex);
+		/*  
+			 bool insertElement(const Index& elem);
+			 BucketElement* findBucketElement(Bucket* start, const Index& idx, bool create);
+			 void initializeBucket(Bucket* const element);
+			 void initializeBucketElement(BucketElement* const elem);
 
-		  std::list<Index*> find(FilterParser* parser, Bucket* bucket);
-		  std::list<Index*> findElements(FilterParser* parser, Bucket* bucket);
+			 void insertBucketElement(Bucket* bucket, BucketElement* element);
+			 void checkBucket(Bucket* const bucket);
+
+			 std::list<Index*> find(FilterParser* parser, Bucket* bucket);
+			 std::list<Index*> findElements(FilterParser* parser, Bucket* bucket);
+			 */
 };
 
 #endif // BPLUSINDEX_H

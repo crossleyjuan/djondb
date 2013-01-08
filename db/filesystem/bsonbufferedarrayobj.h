@@ -28,6 +28,7 @@
 
 #include <vector>
 #include "bsonarrayobj.h"
+#include <limits.h>
 
 class BSONBufferedObj;
 
@@ -54,5 +55,31 @@ private:
 	int   _bufferArrayLen;
 
 	std::vector<BSONObj*> _elements;
+
+private:
+	char readChar(char*& buffer)  const {
+		char c = buffer[0];
+		buffer += 1;
+		return c;
+	}
+
+	template <typename T>
+		T readData(char*& buffer) {
+			T result = 0;
+			unsigned char* v = (unsigned char*)&result;
+			int size = sizeof(T);
+			for (int i = 0; i < size; i++) {
+				v[i] = readChar(buffer) & UCHAR_MAX;
+			}
+			T clear = 0;
+			for (int i = 0; i < size; i++) {
+				clear = clear << 8;
+				clear = clear | 0xFF;
+			}
+			//printf("\nresult before add: %x\n", result);
+			result = result & clear;
+			//printf("result after add: %x\n", result);
+			return result;
+		}
 };
 #endif // BSONBUFFEREDARRAYOBJ_H_INCLUDED

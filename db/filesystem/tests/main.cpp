@@ -49,6 +49,7 @@ class TestFileSystemSuite: public Test::Suite
 			TEST_ADD(TestFileSystemSuite::testInnerArrays);
 			TEST_ADD(TestFileSystemSuite::testMemoryStream);
 			TEST_ADD(TestFileSystemSuite::testBSONSelect);
+			TEST_ADD(TestFileSystemSuite::testBSONBufferedArray);
 			TEST_ADD(TestFileSystemSuite::testBSONBuffered);
 		}
 
@@ -190,6 +191,8 @@ class TestFileSystemSuite: public Test::Suite
 
 		void testBSONStreams()
 		{
+			cout << "\ntestBSONStreams\n" << endl;
+
 			std::auto_ptr<FileOutputStream> fos(new FileOutputStream("bson.txt", "wb"));
 			std::auto_ptr<BSONOutputStream> bsonOut(new BSONOutputStream(fos.get()));
 
@@ -201,6 +204,12 @@ class TestFileSystemSuite: public Test::Suite
 			obj->add("long", (__int64)100000000L);
 			obj->add("long64", (__int64)LLONG_MAX);
 			obj->add("double", 1.1);
+
+			BSONObj inner;
+			inner.add("name", "John");
+			inner.add("long", (__int64)LONG_MAX);
+			inner.add("int", (__int32)1);
+			obj->add("inner", inner);
 
 			bsonOut->writeBSON(*obj);
 
@@ -229,6 +238,18 @@ class TestFileSystemSuite: public Test::Suite
 
 			TEST_ASSERT(obj->has("double"));
 			TEST_ASSERT(obj->getDouble("double") == 1.1);
+
+			BSONObj* innerR = obj->getBSON("inner");
+			TEST_ASSERT(innerR != NULL);
+
+			TEST_ASSERT(innerR->has("name"));
+			TEST_ASSERT(strcmp(innerR->getString("name"), "John") == 0);
+
+			TEST_ASSERT(innerR->has("int"));
+			TEST_ASSERT(innerR->getInt("int") == 1);
+
+			TEST_ASSERT(innerR->has("long"));
+			TEST_ASSERT(innerR->getLong("long") == LONG_MAX);
 
 			fis->close();
 
@@ -436,6 +457,27 @@ class TestFileSystemSuite: public Test::Suite
 			delete result;
 		}
 
+		void testBSONBufferedArray() {
+			cout << "\ntestBSONBufferedArray" << endl;
+
+			MemoryStream ms;
+			BSONArrayObj array;
+			BSONObj* o1 = BSONParser::parse("{ 'a': 1}");
+			array.add(*o1);
+			BSONObj* o2 = BSONParser::parse("{ 'a': 2}");
+			array.add(*o1);
+
+			BSONOutputStream bos(&ms);
+			bos.writeBSONArray(&array);
+
+			char* c = ms.toChars();
+
+			BSONBufferedArrayObj bufferedarray(c, ms.size());
+
+			TEST_ASSERT(bufferedarray.length() == 2);
+
+		}
+
 		void testBSONBuffered() {
 			cout << "\ntestBSONBuffered\n" << endl;
 
@@ -446,11 +488,17 @@ class TestFileSystemSuite: public Test::Suite
 			o.add("char", "Test Char");
 			o.add("double", 2.14159);
 
+			BSONObj inner;
+			inner.add("name", "John");
+			inner.add("int", 1);
+			o.add("inner", inner);
+
 			BSONArrayObj array;
 			BSONObj* o1 = BSONParser::parse("{ 'a': 1}");
 			array.add(*o1);
 			BSONObj* o2 = BSONParser::parse("{ 'a': 2}");
-			array.add(*o1);
+			array.add(*o2);
+			o.add("array", array);
 
 			delete o1;
 			delete o2;
@@ -465,7 +513,7 @@ class TestFileSystemSuite: public Test::Suite
 			TEST_ASSERT(buffered.getInt("int") == 10);
 			TEST_ASSERT(buffered.getLong("long") == (__int64)1000000);
 			TEST_ASSERT(strcmp(buffered.getString("char"), "Test Char") == 0);
-			TEST_ASSERT(buffered.getDouble("doule") == (double)2.14159);
+			TEST_ASSERT(buffered.getDouble("double") == (double)2.14159);
 
 			BSONObj* or2 = buffered.select("$'int', $'long'");
 			TEST_ASSERT(or2->getInt("int") == 10);

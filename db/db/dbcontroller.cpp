@@ -119,6 +119,7 @@ void DBController::initialize(std::string dataDir) {
 				long currentPos = stream->currentPos();
 				stream->seek(0);
 
+				int records = 0;
 				IndexAlgorithm* impl = NULL;
 				while (!stream->eof()) {
 					BSONObj* obj = readBSON(stream);
@@ -135,10 +136,13 @@ void DBController::initialize(std::string dataDir) {
 					long posData = stream->readLong();
 					if (obj->has("_id")) {
 						impl->add(*obj, obj->getString("_id"), posData, indexPos);
+						records++;
 					}
 					delete obj;
 				}
 				stream->seek(currentPos);
+
+				//if (_logger->isInfo()) _logger->info("db: %s, ns: %s, Index initialized. Records: %d", db->c_str(), ns->c_str(), records);
 			}
 		}
 	}

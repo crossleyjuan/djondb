@@ -154,7 +154,6 @@ class TestDriverBaseSuite: public Test::Suite {
 
 			TEST_ASSERT(o2->has("array"));
 
-
 			delete res;
 			delete res2;
 

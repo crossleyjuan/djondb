@@ -41,8 +41,7 @@ BSONBufferedArrayObj::BSONBufferedArrayObj(char* buffer, __int64 len) {
 void BSONBufferedArrayObj::initialize() {
 	char* pCurrentElement = _buffer;
 
-	 __int64 elements = *(__int64*)pCurrentElement;
-	 pCurrentElement += sizeof(__int64);
+	 __int64 elements = readData<__int64>(pCurrentElement);
 	 _bufferArrayLen += sizeof(__int64);
 
 	 for (__int64 x = 0; x < elements; x++) {
@@ -114,13 +113,9 @@ BSONArrayObj* BSONBufferedArrayObj::select(const char* select) const {
 	BSONArrayObj* result = new BSONArrayObj();
 	for (std::vector<BSONObj*>::const_iterator i = _elements.begin(); i != _elements.end(); i++) {
 		BSONBufferedObj* element = (BSONBufferedObj*)*i;
-		if (include_all) {
-			result->add(*element);
-		} else {
-			BSONObj* sub = element->select(select);
-			result->add(*sub);
-			delete sub;
-		}
+		BSONObj* sub = element->select(select);
+		result->add(*sub);
+		delete sub;
 	}
 	return result;
 }

@@ -35,6 +35,7 @@
 #include <string>
 #include <string.h>
 #include "bsonarrayobj.h"
+#include <limits.h>
 
 using namespace std;
 
@@ -84,6 +85,31 @@ class BSONBufferedObj: public BSONObj
 		  char* getValue(char* key) const;
 		  BSONTYPE getType(char* key) const;
 
+		  char readChar(char*& buffer)  const {
+			  char c = buffer[0];
+			  buffer += 1;
+			  return c;
+		  }
+
+		  template <typename T>
+			  T readData(char*& buffer) {
+				  T result = 0;
+				  unsigned char* v = (unsigned char*)&result;
+				  int size = sizeof(T);
+				  for (int i = 0; i < size; i++) {
+					  v[i] = readChar(buffer) & UCHAR_MAX;
+				  }
+				  T clear = 0;
+				  for (int i = 0; i < size; i++) {
+					  clear = clear << 8;
+					  clear = clear | 0xFF;
+				  }
+				  //printf("\nresult before add: %x\n", result);
+				  result = result & clear;
+				  //printf("result after add: %x\n", result);
+				  return result;
+			  }
+
 	 private:
 		  char* _buffer;
 		  __int64   _bufferMaxLen;
@@ -95,8 +121,8 @@ class BSONBufferedObj: public BSONObj
 		  __int32** _keySize;
 		  __int64** _types;
 		  char**    _values;
-		  int       _elements;
-		  
+		  __int64   _elements;
+
 		  char* _cBSON;
 };
 

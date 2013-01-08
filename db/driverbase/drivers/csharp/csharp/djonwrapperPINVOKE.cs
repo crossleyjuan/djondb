@@ -397,10 +397,13 @@ class djonwrapperPINVOKE {
   public static extern void BSONObj_add__SWIG_3(HandleRef jarg1, string jarg2, string jarg3);
 
   [DllImport("djonwrapper", EntryPoint="CSharp_BSONObj_add__SWIG_4")]
-  public static extern void BSONObj_add__SWIG_4(HandleRef jarg1, string jarg2, HandleRef jarg3);
+  public static extern void BSONObj_add__SWIG_4(HandleRef jarg1, string jarg2, string jarg3, int jarg4);
 
   [DllImport("djonwrapper", EntryPoint="CSharp_BSONObj_add__SWIG_5")]
   public static extern void BSONObj_add__SWIG_5(HandleRef jarg1, string jarg2, HandleRef jarg3);
+
+  [DllImport("djonwrapper", EntryPoint="CSharp_BSONObj_add__SWIG_6")]
+  public static extern void BSONObj_add__SWIG_6(HandleRef jarg1, string jarg2, HandleRef jarg3);
 
   [DllImport("djonwrapper", EntryPoint="CSharp_BSONObj_has")]
   public static extern bool BSONObj_has(HandleRef jarg1, string jarg2);

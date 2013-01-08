@@ -78,7 +78,7 @@ class TestPerfomance {
 				}
 			}
 
-			conn->shutdown();
+//			conn->shutdown();
 
 			conn->close();
 

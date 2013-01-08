@@ -20,43 +20,43 @@ class BSONObj
         void add(std::string, __int32);
         void add(std::string, double);
         void add(std::string, __int64);
-        void add(std::string, std::string);
+        void add(std::string, char*);
+        void add(std::string, char*, __int32);
         void add(std::string, const BSONObj&);
         void add(std::string, const BSONArrayObj&);
 
-        bool has(std::string) const;
+        virtual bool has(std::string) const;
 
-        __int32 getInt(std::string) const throw(BSONException);
-        double getDouble(std::string) const throw(BSONException);
-        __int64 getLong(std::string) const throw(BSONException);
-        std::string getString(std::string) const throw(BSONException);
-        BSONObj* getBSON(std::string) const throw(BSONException);
-        BSONArrayObj* getBSONArray(std::string) const throw(BSONException);
-        BSONContent get(std::string) const throw(BSONException);
-        BSONContent* getContent(std::string) const;
-        BSONContent* getContent(std::string, BSONTYPE) const;
+        virtual __int32 getInt(std::string) const throw(BSONException);
+        virtual double getDouble(std::string) const throw(BSONException);
+        virtual __int64 getLong(std::string) const throw(BSONException);
+        virtual const char* getString(std::string) const throw(BSONException);
+        virtual BSONObj* getBSON(std::string) const throw(BSONException);
+        virtual BSONArrayObj* getBSONArray(std::string) const throw(BSONException);
+        virtual BSONContent* get(std::string) const throw(BSONException);
+        virtual BSONContent* getContent(std::string) const;
+        virtual BSONContent* getContent(std::string, BSONTYPE) const;
 
-		  BSONContent getXpath(const std::string& xpath) const;
+		  virtual BSONContent* getXpath(const std::string& xpath) const;
 
-		  BSONObj* select(const char* sel) const;
+		  virtual BSONObj* select(const char* sel) const;
 
-        BSONTYPE type(std::string) const;
+        virtual BSONTYPE type(std::string) const;
 
-        char* toChar();
+        virtual char* toChar();
 
 		  typedef std::map<std::string, BSONContent* >::iterator iterator;
 		  typedef std::map<std::string, BSONContent* >::const_iterator const_iterator;
 
-        const_iterator begin() const;
-        const_iterator end() const;
-        __int32 length() const;
+        virtual const_iterator begin() const;
+        virtual const_iterator end() const;
+        virtual __int32 length() const;
 
-		  bool operator ==(const BSONObj& obj) const;
-		  bool operator !=(const BSONObj& obj) const;
+		  virtual bool operator ==(const BSONObj& obj) const;
+		  virtual bool operator !=(const BSONObj& obj) const;
 
-    protected:
 	 private:
-		  void fillContent(std::string kkey, BSONTYPE ttype, void* vval);
+		  void remove(std::string kkey);
 	 private:
 		  std::map<std::string, BSONContent* > _elements;
 		  char* _cBSON;

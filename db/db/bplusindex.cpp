@@ -37,8 +37,7 @@ bool compareIndex(INDEXPOINTERTYPE key1, INDEXPOINTERTYPE key2) {
 void shiftRightArray(void** array, int startPoint, int count, int size) {
 	for (int i = 0; i < count; i++) {
 		for (int x = size - 2; x > startPoint - 1; x--) {
-			array[x + 1] = array[x];
-			array[x] = NULL;
+			array[x + 1] = array[x]; array[x] = NULL;
 		}
 	}
 }
@@ -64,7 +63,8 @@ int findInsertPositionArray(Index** elements, Index* index, int len, int size) {
 		return 0;
 	} else {
 		int res;
-		INDEXPOINTERTYPE key = index->key->toChar();
+//		INDEXPOINTERTYPE key = index->key->toChar();
+		INDEXPOINTERTYPE key = index->key->getString("_id");
 		bool found = false;
 		for (int x = 0; x < size; x++) {
 			Index* current = elements[x];
@@ -73,9 +73,10 @@ int findInsertPositionArray(Index** elements, Index* index, int len, int size) {
 				found = true;
 				break;
 			} else {
-				INDEXPOINTERTYPE currentKey = current->key->toChar();
+	INDEXPOINTERTYPE currentKey = current->key->getString("_id");
+	//			INDEXPOINTERTYPE currentKey = current->key->toChar();
 				int res = strcmp(key, currentKey); 
-				free(currentKey);
+				//free(currentKey);
 				if (res < 0) {
 					found = true;
 					break;
@@ -85,7 +86,7 @@ int findInsertPositionArray(Index** elements, Index* index, int len, int size) {
 		if (!found) {
 			indexPositionResult++;
 		}
-		free(key);
+		//free(key);
 	}
 	return indexPositionResult;
 }
@@ -136,10 +137,6 @@ BPlusIndex::~BPlusIndex()
 
 void BPlusIndex::add(const BSONObj& elem, const std::string documentId, long filePos, long indexPos)
 {
-	if (documentId.compare("be2ae29d-dd28-4ae2-b0ad-b8565d627ee5") == 0) {
-		Logger* log = getLogger(NULL);
-		log->debug("aqui");
-	}
 	Index* index = new Index();
 	index->key = new BSONObj(elem);
 	index->documentId = documentId;
@@ -150,17 +147,17 @@ void BPlusIndex::add(const BSONObj& elem, const std::string documentId, long fil
 
 Index* BPlusIndex::find(BSONObj* const elem)
 {
-	INDEXPOINTERTYPE key = elem->toChar();
+	//INDEXPOINTERTYPE key = elem->toChar();
+	INDEXPOINTERTYPE key = elem->getString("_id");
 	Index* result = findIndex(_head, key);
 
-	free(key);
+	//free(key);
 	return result;
 }
 
 void BPlusIndex::remove(const BSONObj& elem)
 {
 }
-
 
 void BPlusIndex::debug() {
 	_head->debug();
@@ -191,9 +188,10 @@ Index* BPlusIndex::findIndex(IndexPage* start, INDEXPOINTERTYPE key) const {
 	Logger* log = getLogger(NULL);
 	for (int x = 0; x < start->size; x++) {
 		Index* current = start->elements[x];
-		INDEXPOINTERTYPE testKey = current->key->toChar();
+		//INDEXPOINTERTYPE testKey = current->key->toChar();
+		INDEXPOINTERTYPE testKey = current->key->getString("_id");
 		int result = strcmp(key, testKey);
-		free(testKey);
+		//free(testKey);
 
 		if (result < 0) {
 			if (start->pointers[x] != NULL) {
@@ -219,12 +217,10 @@ IndexPage* BPlusIndex::findIndexPage(IndexPage* start, INDEXPOINTERTYPE key) con
 	} else {
 		for (int x = 0; x < start->size; x++) {
 			Index* current = start->elements[x];
-			if (current == NULL) {
-				log->debug("NULL");
-			}
-			INDEXPOINTERTYPE testKey = current->key->toChar();
+			//INDEXPOINTERTYPE testKey = current->key->toChar();
+			INDEXPOINTERTYPE testKey = current->key->getString("_id");
 			int result = strcmp(key, testKey);
-			free(testKey);
+			//free(testKey);
 
 			if (result < 0) {
 				if (start->pointers[x] != NULL) {
@@ -242,14 +238,25 @@ IndexPage* BPlusIndex::findIndexPage(IndexPage* start, INDEXPOINTERTYPE key) con
 	}
 }
 
+
+void refreshParentRelationship(IndexPage* page) {
+	for (int x = 0; x < BUCKET_MAX_ELEMENTS + 1; x++) {
+		if (page->pointers[x] != NULL) {
+			IndexPage* child = page->pointers[x];
+			child->parentElement = page;
+		}
+	}
+}
+
 void BPlusIndex::insertIndexElement(IndexPage* page, Index* index) {
 	Logger* log = getLogger(NULL);
 
-	char* key = index->key->toChar();
+	INDEXPOINTERTYPE key = index->key->getString("_id");
+	//char* key = index->key->toChar();
 	IndexPage* pageFound = findIndexPage(_head, key);
 
 	addElement(pageFound, index, NULL);
-	free(key);
+	//free(key);
 }
 
 IndexPage::IndexPage() {
@@ -270,24 +277,26 @@ IndexPage::IndexPage() {
 
 IndexPage::~IndexPage() {
 	Logger* log = getLogger(NULL);
-	log->debug("Deleting page: %d", (long)this);
+	if (log->isDebug()) {
+		log->debug("Deleting page: %d", (long)this);
 
-	for (int x = 0; x < size; x++) {
-		if (elements[x] != NULL) {
-			log->debug("Deleting element: %d", (long)elements[x]);
-			delete elements[x];
-			elements[x] = NULL;
+		for (int x = 0; x < size; x++) {
+			if (elements[x] != NULL) {
+				log->debug("Deleting element: %d", (long)elements[x]);
+				delete elements[x];
+				elements[x] = NULL;
+			}
 		}
-	}
-	for (int x = 0; x <= size + 1; x++) {
-		if (pointers[x] != NULL) {
-			IndexPage* page = pointers[x];
-			delete page;
-			pointers[x] = NULL;
+		for (int x = 0; x < size + 1; x++) {
+			if (pointers[x] != NULL) {
+				IndexPage* page = pointers[x];
+				delete page;
+				pointers[x] = NULL;
+			}
 		}
+		free(elements);
+		free(pointers);
 	}
-	free(elements);
-	free(pointers);
 }
 
 void BPlusIndex::splitAddLeaf(IndexPage* page, Index* index) {
@@ -314,19 +323,21 @@ void BPlusIndex::splitAddLeaf(IndexPage* page, Index* index) {
 	//copyArray((void**)tmppointers, (void**)page->pointers, 0, midPoint + 1, 0);
 	copyArray((void**)tmpelements, (void**)rightPage->elements, midPoint + 1, BUCKET_MAX_ELEMENTS, 0);
 	rightPage->size = (BUCKET_MAX_ELEMENTS / 2) + 1;
+	refreshParentRelationship(rightPage);
 	//copyArray((void**)tmppointers, (void**)rightPage->pointers, midPoint + 2, BUCKET_MAX_ELEMENTS + 2, 0);
-	
+
 	// Promotion
 	IndexPage* parentElement = page->parentElement;
 	Index* copyElement = new Index(*rightPage->elements[0]);
 	if (parentElement == NULL) {
 		createRoot(copyElement, page, rightPage);
+		parentElement = _head;
 	} else {
 		int pos = addElement(parentElement, copyElement, rightPage);
-		rightPage->parentElement = parentElement;
 	}
 
 	free(tmpelements);
+	refreshParentRelationship(parentElement);
 }
 
 void BPlusIndex::splitAddInner(IndexPage* page, Index* index, IndexPage* rightPage) {
@@ -345,12 +356,11 @@ void BPlusIndex::splitAddInner(IndexPage* page, Index* index, IndexPage* rightPa
 	int posToInsert = findInsertPositionArray(tmpelements, index, page->size, BUCKET_MAX_ELEMENTS);
 
 	insertArray((void**)tmpelements, index, posToInsert, BUCKET_MAX_ELEMENTS + 1);
-
 	insertArray((void**)tmppointers, rightPage, posToInsert + 1, BUCKET_MAX_ELEMENTS + 2);
 
 	// clean the previous "left"
 	initializeArray((void**)page->elements, BUCKET_MAX_ELEMENTS);
-	initializeArray((void**)page->pointers, BUCKET_MAX_ELEMENTS);
+	initializeArray((void**)page->pointers, BUCKET_MAX_ELEMENTS + 1);
 
 	IndexPage* newRightPage = new IndexPage();
 	int midPoint = (BUCKET_MAX_ELEMENTS / 2);
@@ -362,24 +372,23 @@ void BPlusIndex::splitAddInner(IndexPage* page, Index* index, IndexPage* rightPa
 	copyArray((void**)tmppointers, (void**)newRightPage->pointers, midPoint + 2, BUCKET_MAX_ELEMENTS + 1, 1);
 
 	newRightPage->size = (BUCKET_MAX_ELEMENTS / 2) + 1;
-	
+	refreshParentRelationship(newRightPage);
+
 	// Promotion
 	IndexPage* parentElement = page->parentElement;
 	Index* element = newRightPage->elements[0];
 
-	if (newRightPage->pointers[0] != NULL) {
-		log->debug("Algo raro");
-	}
 	if (parentElement == NULL) {
 		createRoot(element, page, newRightPage);
+		parentElement = _head;
 	} else {
 		int pos = addElement(parentElement, element, newRightPage);
-		newRightPage->parentElement = parentElement;
 	}
 	shiftLeftArray((void**)newRightPage->elements, 0, 1, BUCKET_MAX_ELEMENTS - 1);
 	shiftLeftArray((void**)newRightPage->pointers, 0, 1, BUCKET_MAX_ELEMENTS);
 	newRightPage->size--;
-	
+
+	refreshParentRelationship(parentElement);
 	free(tmpelements);
 	free(tmppointers);
 }
@@ -388,6 +397,7 @@ void BPlusIndex::splitAdd(IndexPage* page, Index* index, IndexPage* rightPointer
 	Logger* log = getLogger(NULL);
 
 	if (page->isLeaf()) {
+		assert(rightPointer == NULL);
 		splitAddLeaf(page, index);
 	} else {
 		splitAddInner(page, index, rightPointer);
@@ -402,6 +412,9 @@ int BPlusIndex::addElement(IndexPage* page, Index* index, IndexPage* rightPointe
 		page->elements[pos] = index;
 		page->pointers[pos + 1] = rightPointer;
 		page->size++;
+		if (rightPointer != NULL) {
+			rightPointer->parentElement = page;
+		}
 	} else {
 		splitAdd(page, index, rightPointer);
 	}
@@ -451,34 +464,49 @@ std::list<Index*> BPlusIndex::find(FilterParser* parser) {
 	return result;
 }
 
+void IndexPage::debugElements() const {
+	Logger* log = getLogger(NULL);
+	if (log->isDebug()) {
+
+		std::stringstream ss;
+		for (int x = 0; x < size; x++) {
+			if (pointers[x] == NULL) {
+				ss << " (NULL) ";
+			} else {
+				ss << " (" << (long)pointers[x] << ") ";
+			}
+			if (elements[x] != NULL) {
+				ss << " <<" << (long) elements[x] << ">> " << elements[x]->key->getString("_id");
+			} else {
+				ss << " << NULL >> ";
+			}
+		}
+		if (pointers[size] != NULL) {
+			ss << " (" << (long)pointers[size] << ") ";
+		} else {
+			ss << " (NULL) ";
+		}
+		std::string s = ss.str();
+		log->debug("%s", s.c_str());
+	}
+}
+
 void IndexPage::debug() const {
 	Logger* log = getLogger(NULL);
+	if (log->isDebug()) {
 
-	log->debug("Page: %d", this);
-	std::stringstream ss;
-	for (int x = 0; x < size; x++) {
-		if (pointers[x] == NULL) {
-			ss << " (NULL) ";
+		if (parentElement != NULL) {
+			log->debug("Page: %d, parentPage: %d", this, parentElement);
 		} else {
-			ss << " (" << (long)pointers[x] << ") ";
+			log->debug("Page: %d", this);
 		}
-		if (elements[x] != NULL) {
-			ss << " <<" << (long) elements[x] << ">> " << elements[x]->key->getString("_id");
-		} else {
-			ss << " << NULL >> ";
-		}
-	}
-	if (pointers[size] != NULL) {
-		ss << " (" << (long)pointers[size] << ") ";
-	} else {
-		ss << " (NULL) ";
-	}
-	std::string s = ss.str();
-	log->debug("%s", s.c_str());
 
-	for (int x = 0; x <= size; x++) {
-		if (pointers[x] != NULL)
-			pointers[x]->debug();
+		debugElements();
+
+		for (int x = 0; x <= size; x++) {
+			if (pointers[x] != NULL)
+				pointers[x]->debug();
+		}
 	}
 }
 

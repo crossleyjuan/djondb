@@ -48,8 +48,9 @@ public class djonwrapperJNI {
   public final static native void BSONObj_add__SWIG_1(long jarg1, BSONObj jarg1_, String jarg2, double jarg3);
   public final static native void BSONObj_add__SWIG_2(long jarg1, BSONObj jarg1_, String jarg2, long jarg3);
   public final static native void BSONObj_add__SWIG_3(long jarg1, BSONObj jarg1_, String jarg2, String jarg3);
-  public final static native void BSONObj_add__SWIG_4(long jarg1, BSONObj jarg1_, String jarg2, long jarg3, BSONObj jarg3_);
-  public final static native void BSONObj_add__SWIG_5(long jarg1, BSONObj jarg1_, String jarg2, long jarg3, BSONArrayObj jarg3_);
+  public final static native void BSONObj_add__SWIG_4(long jarg1, BSONObj jarg1_, String jarg2, String jarg3, int jarg4);
+  public final static native void BSONObj_add__SWIG_5(long jarg1, BSONObj jarg1_, String jarg2, long jarg3, BSONObj jarg3_);
+  public final static native void BSONObj_add__SWIG_6(long jarg1, BSONObj jarg1_, String jarg2, long jarg3, BSONArrayObj jarg3_);
   public final static native boolean BSONObj_has(long jarg1, BSONObj jarg1_, String jarg2);
   public final static native int BSONObj_getInt(long jarg1, BSONObj jarg1_, String jarg2);
   public final static native double BSONObj_getDouble(long jarg1, BSONObj jarg1_, String jarg2);

@@ -9,7 +9,8 @@ class PriorityCache;
 
 #include <boost/shared_ptr.hpp>
 
-typedef char* INDEXPOINTERTYPE;
+//typedef char* INDEXPOINTERTYPE;
+typedef const char* INDEXPOINTERTYPE;
 
 #define COMPAREKEYS(k1, k2) \
 	(strcmp(k1, k2) == 0);
@@ -31,6 +32,7 @@ class IndexPage {
 
 		IndexPage* parentElement;
 
+		void debugElements() const;
 		void debug() const;
 		bool isLeaf() const;
 		bool isFull() const;

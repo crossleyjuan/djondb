@@ -95,9 +95,10 @@ class TestDBSuite: public Test::Suite
 			fos.close();
 
 			TEST_ADD(TestDBSuite::testIndexPage);
-			/*
 			TEST_ADD(TestDBSuite::testSimpleIndex);
 			TEST_ADD(TestDBSuite::testComplexIndex);
+			//TEST_ADD(TestDBSuite::testMassiveInsertIndex);
+			//TEST_ADD(TestDBSuite::testHighMemIndex);
 			//TEST_ADD(TestDBSuite::testManualIndex);
 			TEST_ADD(TestDBSuite::testInsertComplexBSON);
 			TEST_ADD(TestDBSuite::testIndexFactory);
@@ -120,7 +121,6 @@ class TestDBSuite: public Test::Suite
 			TEST_ADD(TestDBSuite::testDbs);
 			TEST_ADD(TestDBSuite::testNamespaces);
 			TEST_ADD(TestDBSuite::testErrorHandling);
-			*/
 		}
 	private:
 
@@ -151,7 +151,7 @@ class TestDBSuite: public Test::Suite
 
 			ConstantExpression exp3("Test");
 			ExpressionResult* result3 = exp3.eval(dummy);
-			TEST_ASSERT(result3->type() == ExpressionResult::RT_STRINGDB);
+			TEST_ASSERT(result3->type() == ExpressionResult::RT_PTRCHAR);
 			djondb::string s = *result3;
 			TEST_ASSERT(strncmp(s.c_str(), "Test", s.length()) == 0);
 
@@ -480,6 +480,13 @@ class TestDBSuite: public Test::Suite
 			inner.add("char", "testInner");
 			obj.add("inner", inner);
 
+			BSONArrayObj innerArray;
+			BSONObj o1;
+			o1.add("int", (int)1);
+			innerArray.add(o1);
+
+			obj.add("array", innerArray);
+
 			controller->insert("dbtest", "sp1.customercomplex", &obj);
 
 			std::vector<BSONObj*>* array = controller->find("dbtest", "sp1.customercomplex", "*", "$'int' == 1");
@@ -508,6 +515,20 @@ class TestDBSuite: public Test::Suite
 				if (innerRes->has("int")) {
 					cout << "\n\ninner int value: " << innerRes->getInt("int") << endl << endl;
 					TEST_ASSERT(innerRes->getInt("int") == 200000);
+				}
+
+				TEST_ASSERT(res->has("array"));
+				if (res->has("array")) {
+					BSONArrayObj* innerArrayRes = res->getBSONArray("array");
+					TEST_ASSERT(innerArrayRes->length() == 1);
+					if (innerArrayRes->length() == 1) {
+						BSONObj* oa1 = innerArrayRes->get(0);
+						TEST_ASSERT(oa1->has("int"));
+						if (oa1->has("int")) {
+							TEST_ASSERT(oa1->getInt("int") == 1);
+						}
+
+					}
 				}
 				delete res;
 			}
@@ -827,15 +848,16 @@ class TestDBSuite: public Test::Suite
 
 		void testIndexPage() {
 			std::vector<std::string> ids;
-			FileInputStream fis("guids.txt", "rb");
-			const char* full = fis.readFull();
-			std::vector<std::string> tids = split(full, "\n");
-			for (std::vector<std::string>::iterator i = tids.begin(); i != tids.end(); i++) {
+			/* 
+				FileInputStream fis("guids.txt", "rb");
+				const char* full = fis.readFull();
+				std::vector<std::string> tids = split(full, "\n");
+				for (std::vector<std::string>::iterator i = tids.begin(); i != tids.end(); i++) {
 				ids.push_back(*i);
-			}
-			fis.close();
-			testIndex(ids);
-			/*
+				}
+				fis.close();
+				testIndex(ids);
+				*/
 			ids.push_back("1");
 			ids.push_back("2");
 			ids.push_back("3");
@@ -876,7 +898,36 @@ class TestDBSuite: public Test::Suite
 				delete guid;
 			}
 			testIndex(ids);
-			*/
+		}
+
+		void testMassiveInsertIndex()
+		{
+			std::set<std::string> keys;
+			keys.insert("_id");
+			std::auto_ptr<BPlusIndex> tree(new BPlusIndex(keys));
+
+			Logger* log = getLogger(NULL);
+
+			// Inserting
+			for (int n = 0; n < 100; n++)
+			{
+				log->startTimeRecord();
+				for (int x = 0; x < 100000; x++) {
+					BSONObj id;
+					std::string* sid = uuid();
+
+					id.add("_id", const_cast<char*>(sid->c_str()));
+
+					tree->add(id, *sid, 0, 0);
+					delete sid;
+
+				}
+				log->stopTimeRecord();
+				DTime time = log->recordedTime();
+				log->info("Inserted in: %d", time.totalSecs());
+				log->info("Total inserted: %d", 100000 * (n + 1));
+			}
+
 		}
 
 		void testIndex(std::vector<std::string> ids)
@@ -899,9 +950,22 @@ class TestDBSuite: public Test::Suite
 				log->debug("Inserting %s", sid.c_str());
 
 				id.add("_id", const_cast<char*>(sid.c_str()));
+				if (log->isDebug()) {
+					if (sid.compare("98979097-fce5-4265-ab0c-60b4e41a9d40") == 0) {
+						log->debug("Error");
+						tree->debug();
+					}
+				}
 				tree->add(id, sid, 0, 0);
 
-				tree->debug();
+				/*
+					Index* test = tree->find(&id);
+					if (test == NULL) {
+					tree->debug();
+					} else {
+					if (log->isDebug()) tree->debug();
+					}
+					*/
 
 				//getchar();
 				x++;
@@ -909,6 +973,9 @@ class TestDBSuite: public Test::Suite
 			log->stopTimeRecord();
 			DTime time = log->recordedTime();
 
+			log->info("Inserted in: %d", time.totalSecs());
+
+			log->info("Starting find");
 			log->startTimeRecord();
 			while (ids.size() > 0)
 			{
@@ -928,12 +995,20 @@ class TestDBSuite: public Test::Suite
 					BSONObj* key = index->key;
 					TEST_ASSERT(key != NULL);
 					TEST_ASSERT(strcmp(key->getString("_id"), guid.c_str()) == 0);
+				} else {
+					log->debug("id: %s not found", guid.c_str());
 				}
 
 				ids.erase(i);
 			}
 			log->stopTimeRecord();
 			time = log->recordedTime();
+			if (log->isDebug()) tree->debug();
+			log->info("found in: %d", time.totalSecs());
+
+			BSONObj id2;
+			id2.add("_id", "67c480cd-94cb-4acb-b039-c371357662dc");
+			tree->find(&id2);
 		}
 
 		void testSimpleIndex()
@@ -962,6 +1037,27 @@ class TestDBSuite: public Test::Suite
 			return ids;
 		}
 
+		void testHighMemIndex()
+		{
+			cout << "\ntestHighMemIndex" << endl;
+
+			int x = 100000;
+			cout << "testing " << x << " ids" << endl;
+			std::vector<std::string> ids = generateGuids(x);
+			testIndex(ids);
+			/*
+				cout << "testing 100 ids" << endl;
+				ids = generateGuids(100);
+				testIndex(ids);
+				cout << "testing 1000 ids" << endl;
+				ids = generateGuids(1000);
+				testIndex(ids);
+				cout << "testing 1000000 ids" << endl;
+				ids = generateGuids(1000);
+				testIndex(ids);
+				*/
+		}
+
 		void testComplexIndex()
 		{
 			cout << "\ntestComplexIndex" << endl;
@@ -969,16 +1065,16 @@ class TestDBSuite: public Test::Suite
 			std::vector<std::string> ids = generateGuids(10);
 			testIndex(ids);
 			/*
-			cout << "testing 100 ids" << endl;
-			ids = generateGuids(100);
-			testIndex(ids);
-			cout << "testing 1000 ids" << endl;
-			ids = generateGuids(1000);
-			testIndex(ids);
-			cout << "testing 1000000 ids" << endl;
-			ids = generateGuids(1000);
-			testIndex(ids);
-			*/
+				cout << "testing 100 ids" << endl;
+				ids = generateGuids(100);
+				testIndex(ids);
+				cout << "testing 1000 ids" << endl;
+				ids = generateGuids(1000);
+				testIndex(ids);
+				cout << "testing 1000000 ids" << endl;
+				ids = generateGuids(1000);
+				testIndex(ids);
+				*/
 		}
 
 		void testIndexFactory() {

@@ -9,11 +9,16 @@
 class BSONObj;
 class FilterParser;
 
-struct Index {
-	BSONObj* key;
-	 std::string documentId;
-	long posData;
-	long indexPos;
+class Index {
+	public:
+		Index() {};
+		virtual ~Index();
+
+		Index(const Index& orig);
+		BSONObj* key;
+		std::string documentId;
+		long posData;
+		long indexPos;
 };
 
 class IndexAlgorithm {

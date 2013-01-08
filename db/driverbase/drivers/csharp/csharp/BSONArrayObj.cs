@@ -48,7 +48,7 @@ public class BSONArrayObj : IDisposable {
     if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public int length() {
+  public virtual int length() {
     int ret = djonwrapperPINVOKE.BSONArrayObj_length(swigCPtr);
     return ret;
   }
@@ -58,29 +58,29 @@ public class BSONArrayObj : IDisposable {
     if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public BSONObj get(int index) {
+  public virtual BSONObj get(int index) {
     IntPtr cPtr = djonwrapperPINVOKE.BSONArrayObj_get(swigCPtr, index);
     BSONObj ret = (cPtr == IntPtr.Zero) ? null : new BSONObj(cPtr, false);
     return ret;
   }
 
-  public string toChar() {
+  public virtual string toChar() {
     string ret = djonwrapperPINVOKE.BSONArrayObj_toChar(swigCPtr);
     return ret;
   }
 
-  public BSONArrayObj select(string select) {
+  public virtual BSONArrayObj select(string select) {
     IntPtr cPtr = djonwrapperPINVOKE.BSONArrayObj_select(swigCPtr, select);
     BSONArrayObj ret = (cPtr == IntPtr.Zero) ? null : new BSONArrayObj(cPtr, false);
     return ret;
   }
 
-  public SWIGTYPE_p_std__vectorT_BSONObj_p_t__iterator begin() {
+  public virtual SWIGTYPE_p_std__vectorT_BSONObj_p_t__iterator begin() {
     SWIGTYPE_p_std__vectorT_BSONObj_p_t__iterator ret = new SWIGTYPE_p_std__vectorT_BSONObj_p_t__iterator(djonwrapperPINVOKE.BSONArrayObj_begin(swigCPtr), true);
     return ret;
   }
 
-  public SWIGTYPE_p_std__vectorT_BSONObj_p_t__iterator end() {
+  public virtual SWIGTYPE_p_std__vectorT_BSONObj_p_t__iterator end() {
     SWIGTYPE_p_std__vectorT_BSONObj_p_t__iterator ret = new SWIGTYPE_p_std__vectorT_BSONObj_p_t__iterator(djonwrapperPINVOKE.BSONArrayObj_end(swigCPtr), true);
     return ret;
   }

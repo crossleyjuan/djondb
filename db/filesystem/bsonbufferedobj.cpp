@@ -142,6 +142,7 @@ BSONTYPE BSONBufferedObj::getType(char* key) const {
 }
 
 void BSONBufferedObj::initialize() {
+	Logger* log = getLogger(NULL);
 	if (_keys != NULL) {
 		// Cleans the previous allocated elements
 		free(_keys);
@@ -150,11 +151,12 @@ void BSONBufferedObj::initialize() {
 		free(_types);
 	}
 	char* pCurrentElement = _buffer;
-	_elements = *(__int64*)pCurrentElement;
-	pCurrentElement += sizeof(__int64);
+	this->_elements = readData<__int64>(pCurrentElement);
+
+	//pCurrentElement += sizeof(__int64);
 	_bufferBSONLen += sizeof(__int64);
 	if (_elements == 0) {
-		cout << "Error" << endl;
+		log->error("Error reading the BSON element, the stream returned 0 elements");
 	}
 
 	_keys = (char**)malloc(sizeof(char*) * _elements);
@@ -213,7 +215,7 @@ void BSONBufferedObj::initialize() {
 								 }
 			case BSONARRAY_TYPE: {
 											BSONBufferedArrayObj* innerArray = new BSONBufferedArrayObj(pCurrentElement, _bufferMaxLen - _bufferBSONLen);
-									 		pCurrentElement += innerArray->bufferLength();
+											pCurrentElement += innerArray->bufferLength();
 											_bufferBSONLen += innerArray->bufferLength();
 											_values[x] = (char*)innerArray;
 											break;

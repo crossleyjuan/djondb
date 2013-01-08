@@ -51,7 +51,7 @@
 #define PACKAGE_NAME "djondb"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "djondb 0.1201216"
+#define PACKAGE_STRING "djondb 0.220130106"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "djondb"
@@ -60,7 +60,7 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "0.1201216"
+#define PACKAGE_VERSION "0.220130106"
 
 /* Define Profile variable */
 /* #undef PROFILE */
@@ -69,4 +69,4 @@
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "0.1201216"
+#define VERSION "0.220130106"

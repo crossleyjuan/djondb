@@ -242,7 +242,7 @@ class TestUtilSuite : public Test::Suite
 		void testDjonStrings() {
 			djondb::string s("test", 4);
 
-			char* c = s.c_str();
+			const char* c = s.c_str();
 			__int32 l = s.length();
 			TEST_ASSERT(strcmp(c, "test") == 0);
 			TEST_ASSERT(l == 4);
@@ -258,8 +258,8 @@ class TestUtilSuite : public Test::Suite
 			char* cx = strcpy("Testing", 7);
 			djondb::string s4(cx, 7);
 			djondb::string s5(s4);
-			char* c4 = s4.c_str();
-			char* c5 = s5.c_str();
+			const char* c4 = s4.c_str();
+			const char* c5 = s5.c_str();
 			// Compare the references, they should be the same
 			TEST_ASSERT(c4 == c5);
 
@@ -267,14 +267,14 @@ class TestUtilSuite : public Test::Suite
 			djondb::string s6(strcpy("Otra", 4), 4);
 			djondb::string* s7 = new djondb::string(s6);
 			delete s7;
-			char* c6 = s6.c_str();
+			const char* c6 = s6.c_str();
 			TEST_ASSERT(strcmp(c6, "Otra") == 0);
 
 
 			djondb::string s8(strcpy("Otra", 4), 4);
 			{
 				djondb::string s9 = s8;
-				char* c9 = s9.c_str();
+				const char* c9 = s9.c_str();
 				TEST_ASSERT(strcmp(s8.c_str(), c9) == 0);
 			};
 		   TEST_ASSERT(strcmp(s8.c_str(), "Otra") == 0);
