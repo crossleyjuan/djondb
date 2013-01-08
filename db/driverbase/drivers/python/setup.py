@@ -14,7 +14,7 @@ pydjondb_module = Extension('_pydjondb',
 		)
 
 setup (name = 'pydjondb',
-		version = '0.120121212',
+		version = '0.220130106',
 		author      = "Cross",
 		author_email = "cross@djondb.com",
 		license = "GPL",
