@@ -26,7 +26,7 @@ else
 cp ../../../obj/usr/lib/libdjon-client.la output/
 fi
 
-swig2.0 -c++ -python -outdir output -o output/djonpythondriver.cpp driver-python.i
+swig -c++ -python -outdir output -o output/djonpythondriver.cpp driver-python.i
 
 cp setup.py output/
 cp MANIFEST.in output/
