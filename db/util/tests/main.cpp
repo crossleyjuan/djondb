@@ -239,6 +239,16 @@ class TestUtilSuite : public Test::Suite
 			TEST_ASSERT(!checkFileCreation("/"));
 		}
 
+		void testFunction(const char* x) {
+			djondb::string s("test", 4);
+			TEST_ASSERT(strcmp(s.c_str(), x) == 0);
+		}
+
+		const char* testFunctionWithReturn(djondb::string s) {
+			djondb::string s2 = s;
+                        return s2.c_str();
+                }
+
 		void testDjonStrings() {
 			djondb::string s("test", 4);
 
@@ -277,11 +287,23 @@ class TestUtilSuite : public Test::Suite
 				const char* c9 = s9.c_str();
 				TEST_ASSERT(strcmp(s8.c_str(), c9) == 0);
 			};
-		   TEST_ASSERT(strcmp(s8.c_str(), "Otra") == 0);
+			TEST_ASSERT(strcmp(s8.c_str(), "Otra") == 0);
 
 			// Test null strings
 			djondb::string s10;
 			djondb::string s11(s10);
+
+
+			djondb::string s12("test", 4);
+			const char* cs12 = testFunctionWithReturn(s12);
+			testFunction(s12.c_str());
+			TEST_ASSERT(strcmp(s12.c_str(), cs12) == 0);
+
+
+			djondb::string s13("aaaa", 4);
+       			djondb::string s14("bbbb", 4);
+                        TEST_ASSERT(s13.compare(s14) < 0);                 
+                        TEST_ASSERT(s13.compare(s14.c_str()) < 0);                 
 		}
 };
 //// Tests unconditional fail TEST_ASSERTs

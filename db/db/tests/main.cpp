@@ -509,7 +509,7 @@ class TestDBSuite: public Test::Suite
 				TEST_ASSERT(innerRes != NULL);
 				TEST_ASSERT(innerRes->has("char"));
 				if (innerRes->has("char")) {
-					TEST_ASSERT(strcmp(innerRes->getString("char"), "testInner") == 0);
+					TEST_ASSERT(innerRes->getString("char").compare("testInner") == 0);
 				}
 				TEST_ASSERT(innerRes->has("int"));
 				if (innerRes->has("int")) {
@@ -517,6 +517,7 @@ class TestDBSuite: public Test::Suite
 					TEST_ASSERT(innerRes->getInt("int") == 200000);
 				}
 
+cout << "testing array" << endl;
 				TEST_ASSERT(res->has("array"));
 				if (res->has("array")) {
 					BSONArrayObj* innerArrayRes = res->getBSONArray("array");
@@ -560,7 +561,7 @@ class TestDBSuite: public Test::Suite
 				if (test > 0)
 				{
 					__ids.push_back(new std::string(obj->getString("_id")));
-					fos.writeString(obj->getString("_id"));
+					fos.writeString(obj->getString("_id").c_str());
 				}
 				if ((x % 1000000) == 0)
 				{
@@ -628,8 +629,8 @@ class TestDBSuite: public Test::Suite
 					TEST_FAIL("res is null");
 					return;
 				}
-				const char* id2 = res->getString("_id");
-				if (strcmp(id2, id->c_str()) != 0)
+				djondb::string id2 = res->getString("_id");
+				if (id2.compare(id->c_str()) != 0)
 				{
 					TEST_FAIL("id not found");
 					return;
@@ -747,8 +748,8 @@ class TestDBSuite: public Test::Suite
 			std::string filter = "$'age' == 45";
 			std::vector<BSONObj*>* found = controller->find("dbtest", "find.filter2","*", filter.c_str());
 			TEST_ASSERT(found->size() == 1); 
-			const char* name = found->at(0)->getString("lastName");
-			TEST_ASSERT(strcmp(name, "Smith") == 0);
+			djondb::string name = found->at(0)->getString("lastName");
+			TEST_ASSERT(name.compare("Smith") == 0);
 
 			filter = "";
 			delete found;
@@ -760,9 +761,9 @@ class TestDBSuite: public Test::Suite
 			found = controller->find("dbtest", "find.filter2","*", filter.c_str());
 			TEST_ASSERT(found->size() == 2); 
 			name = found->at(0)->getString("lastName");
-			TEST_ASSERT(strcmp(name, "Crossley") == 0);
+			TEST_ASSERT(name.compare("Crossley") == 0);
 			name = found->at(1)->getString("lastName");
-			TEST_ASSERT(strcmp(name, "Clark") == 0);
+			TEST_ASSERT(name.compare("Clark") == 0);
 			delete found;
 		}
 
@@ -794,10 +795,10 @@ class TestDBSuite: public Test::Suite
 				}
 				else
 				{
-					std::string id2 = res->getString("_id");
+					djondb::string id2 = res->getString("_id");
 					//        cout << "\nLooking for: " << *id << endl;
 					//        cout << "\nFound        " << *id2 << endl;
-					if (id2.compare(*id) != 0)
+					if (strcmp(id2, id->c_str()) != 0)
 					{
 						TEST_FAIL("findFirst returned an incorrect result");
 					}
@@ -839,7 +840,7 @@ class TestDBSuite: public Test::Suite
 				cout << "Number readed: " << chr << endl;
 				BSONObj id;
 				id.add("_id", const_cast<char*>(chr));
-				tree->add(id, std::string(chr), 0, 0);
+				tree->add(id, djondb::string(chr, strlen(chr)), 0, 0);
 				tree->debug();
 				getchar();
 				x++;
@@ -918,7 +919,7 @@ class TestDBSuite: public Test::Suite
 
 					id.add("_id", const_cast<char*>(sid->c_str()));
 
-					tree->add(id, *sid, 0, 0);
+					tree->add(id, djondb::string(sid->c_str(), sid->length()), 0, 0);
 					delete sid;
 
 				}
@@ -956,7 +957,7 @@ class TestDBSuite: public Test::Suite
 						tree->debug();
 					}
 				}
-				tree->add(id, sid, 0, 0);
+				tree->add(id, djondb::string(sid.c_str(), sid.length()), 0, 0);
 
 				/*
 					Index* test = tree->find(&id);
@@ -994,7 +995,7 @@ class TestDBSuite: public Test::Suite
 				if (index != NULL) {
 					BSONObj* key = index->key;
 					TEST_ASSERT(key != NULL);
-					TEST_ASSERT(strcmp(key->getString("_id"), guid.c_str()) == 0);
+					TEST_ASSERT(key->getString("_id").compare(guid.c_str()) == 0);
 				} else {
 					log->debug("id: %s not found", guid.c_str());
 				}

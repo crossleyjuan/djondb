@@ -347,14 +347,14 @@ __int64 BSONBufferedObj::getLong(std::string key) const throw(BSONException) {
 	}
 }
 
-char* BSONBufferedObj::getString(std::string key) const throw(BSONException) {
+const djondb::string BSONBufferedObj::getString(std::string key) const throw(BSONException) {
 	char* value = getValue(const_cast<char*>(key.c_str()));
 	if (value == NULL) {
 		throw BSONException(format("key not found %s", key.c_str()).c_str());
 	} else {
 		__int32 len = *(__int32*)value;
-		char* result = value + sizeof(__int32);
-		return strcpy(result, len);
+		const char* result = value + sizeof(__int32);
+		return djondb::string(result, len);
 	}
 }
 
@@ -537,9 +537,8 @@ BSONObj* BSONBufferedObj::select(const char* sel) const {
 				case STRING_TYPE:
 				case PTRCHAR_TYPE:
 					{
-						char* val = getString(key);
-						result->add(key, val);
-						free(val);
+						djondb::string val = getString(key);
+						result->add(key, (char*)val.c_str());
 						break;
 					}
 			}

@@ -216,12 +216,12 @@ __int64 BSONObj::getLong(std::string key) const throw(BSONException) {
 	}
 }
 
-const char* BSONObj::getString(std::string key) const throw(BSONException) {
+const djondb::string BSONObj::getString(std::string key) const throw(BSONException) {
 	BSONContent* content = getContent(key);
 	if ((content != NULL) && (content->type() == PTRCHAR_TYPE)) {
 		BSONContentString* bstring = (BSONContentString*)content;
 		djondb::string s = *bstring;
-		return s.c_str();
+		return s;
 	} else {
 		throw BSONException(format("key not found %s", key.c_str()).c_str());
 	}

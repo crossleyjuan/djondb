@@ -30,10 +30,6 @@
 #include <boost/shared_ptr.hpp>
 #include <vector>
 
-bool compareIndex(INDEXPOINTERTYPE key1, INDEXPOINTERTYPE key2) {
-	return strcmp(key1, key2);
-}
-
 void shiftRightArray(void** array, int startPoint, int count, int size) {
 	for (int i = 0; i < count; i++) {
 		for (int x = size - 2; x > startPoint - 1; x--) {
@@ -64,7 +60,7 @@ int findInsertPositionArray(Index** elements, Index* index, int len, int size) {
 	} else {
 		int res;
 //		INDEXPOINTERTYPE key = index->key->toChar();
-		INDEXPOINTERTYPE key = index->key->getString("_id");
+		djondb::string key = index->key->getString("_id");
 		bool found = false;
 		for (int x = 0; x < size; x++) {
 			Index* current = elements[x];
@@ -73,9 +69,9 @@ int findInsertPositionArray(Index** elements, Index* index, int len, int size) {
 				found = true;
 				break;
 			} else {
-	INDEXPOINTERTYPE currentKey = current->key->getString("_id");
+	djondb::string currentKey = current->key->getString("_id");
 	//			INDEXPOINTERTYPE currentKey = current->key->toChar();
-				int res = strcmp(key, currentKey); 
+				int res = currentKey.compare(key); 
 				//free(currentKey);
 				if (res < 0) {
 					found = true;
@@ -135,7 +131,7 @@ BPlusIndex::~BPlusIndex()
 	}
 }
 
-void BPlusIndex::add(const BSONObj& elem, const std::string documentId, long filePos, long indexPos)
+void BPlusIndex::add(const BSONObj& elem, const djondb::string documentId, long filePos, long indexPos)
 {
 	Index* index = new Index();
 	index->key = new BSONObj(elem);
@@ -148,7 +144,7 @@ void BPlusIndex::add(const BSONObj& elem, const std::string documentId, long fil
 Index* BPlusIndex::find(BSONObj* const elem)
 {
 	//INDEXPOINTERTYPE key = elem->toChar();
-	INDEXPOINTERTYPE key = elem->getString("_id");
+	djondb::string key = elem->getString("_id");
 	Index* result = findIndex(_head, key);
 
 	//free(key);
@@ -181,16 +177,16 @@ void IndexPage::moveElements(int startPoint, int count) {
 }
 
 bool IndexPage::isFull() const {
-	return size == BUCKET_MAX_ELEMENTS;
+	return size >= BUCKET_MAX_ELEMENTS;
 }
 
-Index* BPlusIndex::findIndex(IndexPage* start, INDEXPOINTERTYPE key) const {
+Index* BPlusIndex::findIndex(IndexPage* start, djondb::string key) const {
 	Logger* log = getLogger(NULL);
 	for (int x = 0; x < start->size; x++) {
 		Index* current = start->elements[x];
 		//INDEXPOINTERTYPE testKey = current->key->toChar();
-		INDEXPOINTERTYPE testKey = current->key->getString("_id");
-		int result = strcmp(key, testKey);
+		djondb::string testKey = current->key->getString("_id");
+		int result = testKey.compare(key);
 		//free(testKey);
 
 		if (result < 0) {
@@ -210,7 +206,7 @@ Index* BPlusIndex::findIndex(IndexPage* start, INDEXPOINTERTYPE key) const {
 	}
 }
 
-IndexPage* BPlusIndex::findIndexPage(IndexPage* start, INDEXPOINTERTYPE key) const {
+IndexPage* BPlusIndex::findIndexPage(IndexPage* start, djondb::string key) const {
 	Logger* log = getLogger(NULL);
 	if (start->isLeaf()) {
 		return start;
@@ -218,8 +214,8 @@ IndexPage* BPlusIndex::findIndexPage(IndexPage* start, INDEXPOINTERTYPE key) con
 		for (int x = 0; x < start->size; x++) {
 			Index* current = start->elements[x];
 			//INDEXPOINTERTYPE testKey = current->key->toChar();
-			INDEXPOINTERTYPE testKey = current->key->getString("_id");
-			int result = strcmp(key, testKey);
+			djondb::string testKey = current->key->getString("_id");
+			int result = testKey.compare(key);
 			//free(testKey);
 
 			if (result < 0) {
@@ -251,7 +247,7 @@ void refreshParentRelationship(IndexPage* page) {
 void BPlusIndex::insertIndexElement(IndexPage* page, Index* index) {
 	Logger* log = getLogger(NULL);
 
-	INDEXPOINTERTYPE key = index->key->getString("_id");
+	djondb::string key = index->key->getString("_id");
 	//char* key = index->key->toChar();
 	IndexPage* pageFound = findIndexPage(_head, key);
 
@@ -421,7 +417,7 @@ int BPlusIndex::addElement(IndexPage* page, Index* index, IndexPage* rightPointe
 }
 
 int IndexPage::findInsertPosition(Index* index) const {
-	findInsertPositionArray(elements, index, size, BUCKET_MAX_ELEMENTS);
+	return findInsertPositionArray(elements, index, size, BUCKET_MAX_ELEMENTS);
 }
 
 void BPlusIndex::moveElements(IndexPage* source, IndexPage* destination, int startIndex, int endIndex) {
@@ -476,7 +472,7 @@ void IndexPage::debugElements() const {
 				ss << " (" << (long)pointers[x] << ") ";
 			}
 			if (elements[x] != NULL) {
-				ss << " <<" << (long) elements[x] << ">> " << elements[x]->key->getString("_id");
+				ss << " <<" << (long) elements[x] << ">> " << (const char*)elements[x]->key->getString("_id");
 			} else {
 				ss << " << NULL >> ";
 			}

@@ -84,6 +84,12 @@ namespace djondb {
 			const char* c_str() const;
 			__int32 length() const;
 
+			int compare(const djondb::string s2) const;
+			int compare(const char* s2) const;
+
+			operator const char*() const;
+			operator char*() const;
+
 			bool operator ==(const djondb::string& str);
 			bool operator !=(const djondb::string& str);
 			djondb::string& operator=(const djondb::string& rvar);
