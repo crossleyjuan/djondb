@@ -82,7 +82,7 @@ int djondb::string::compare(const char* s2) const {
     const char* s1 = (const char*)*_holder;
     // the null char should not be compared to avoid unexpected results on buffers
     int lenWithoutNull = _len - 1;
-    return strncmp(s1, s2, lenWithoutNul);
+    return strncmp(s1, s2, lenWithoutNull);
 }
 
 __int32 djondb::string::length() const {
