@@ -1113,7 +1113,7 @@ SWIGEXPORT jstring JNICALL Java_djondb_djonwrapperJNI_BSONObj_1getString(JNIEnv 
   jstring jresult = 0 ;
   BSONObj *arg1 = (BSONObj *) 0 ;
   std::string arg2 ;
-  char *result = 0 ;
+  djondb::string result;
   
   (void)jenv;
   (void)jcls;
@@ -1128,7 +1128,7 @@ SWIGEXPORT jstring JNICALL Java_djondb_djonwrapperJNI_BSONObj_1getString(JNIEnv 
   (&arg2)->assign(arg2_pstr);
   jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
   try {
-    result = (char *)((BSONObj const *)arg1)->getString(arg2);
+    result = ((BSONObj const *)arg1)->getString(arg2);
   }
   catch(BSONException &_e) {
     (void)_e;
@@ -1136,7 +1136,7 @@ SWIGEXPORT jstring JNICALL Java_djondb_djonwrapperJNI_BSONObj_1getString(JNIEnv 
     return 0; 
   }
   
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  jresult = jenv->NewStringUTF((&result)->c_str()); 
   return jresult;
 }
 

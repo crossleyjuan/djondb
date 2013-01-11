@@ -216,7 +216,11 @@ __int64 BSONObj::getLong(std::string key) const throw(BSONException) {
 	}
 }
 
-const djondb::string BSONObj::getString(std::string key) const throw(BSONException) {
+const std::string BSONObj::getString(std::string key) const throw(BSONException) {
+	return getDJString(key).str();
+}
+
+const djondb::string BSONObj::getDJString(std::string key) const throw(BSONException) {
 	BSONContent* content = getContent(key);
 	if ((content != NULL) && (content->type() == PTRCHAR_TYPE)) {
 		BSONContentString* bstring = (BSONContentString*)content;

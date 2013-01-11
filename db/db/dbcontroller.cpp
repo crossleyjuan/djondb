@@ -135,7 +135,7 @@ void DBController::initialize(std::string dataDir) {
 					long indexPos = stream->readLong();
 					long posData = stream->readLong();
 					if (obj->has("_id")) {
-						impl->add(*obj, obj->getString("_id"), posData, indexPos);
+						impl->add(*obj, obj->getDJString("_id"), posData, indexPos);
 						records++;
 					}
 					delete obj;
@@ -250,7 +250,7 @@ void DBController::update(char* db, char* ns, BSONObj* obj) {
 
 	writeBSON(streamData, obj);
 
-	//std::string id = obj->getString("_id");
+	//std::string id = obj->getDJString("_id");
 
 	//CacheManager::objectCache()->add(id, new BSONObj(*obj));
 }
@@ -284,7 +284,7 @@ void DBController::remove(char* db, char* ns, const std::string& documentId, con
 		// restores the last position
 		out->seek(currentPos);
 
-		//std::string id = obj->getString("_id");
+		//std::string id = obj->getDJString("_id");
 
 		//CacheManager::objectCache()->remove(id);
 		delete obj;
@@ -295,7 +295,7 @@ Index* DBController::findIndex(char* db, char* ns, BSONObj* bson) {
 	IndexAlgorithm* impl = IndexFactory::indexFactory.index(db, ns, "_id");
 
 	BSONObj indexBSON;
-	indexBSON.add("_id", bson->getString("_id"));
+	indexBSON.add("_id", bson->getDJString("_id"));
 	Index* index = impl->find(&indexBSON);
 
 	return index;
@@ -316,7 +316,7 @@ void DBController::updateIndex(char* db, char* ns, Index* index, long filePos) {
 
 void DBController::insertIndex(char* db, char* ns, BSONObj* bson, long filePos) {
 	BSONObj indexBSON;
-	djondb::string id = bson->getString("_id");
+	djondb::string id = bson->getDJString("_id");
 	indexBSON.add("_id", (char*)id);
 
 	IndexAlgorithm* impl = IndexFactory::indexFactory.index(db, ns, "_id");

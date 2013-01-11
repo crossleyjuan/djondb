@@ -60,7 +60,7 @@ int findInsertPositionArray(Index** elements, Index* index, int len, int size) {
 	} else {
 		int res;
 //		INDEXPOINTERTYPE key = index->key->toChar();
-		djondb::string key = index->key->getString("_id");
+		djondb::string key = index->key->getDJString("_id");
 		bool found = false;
 		for (int x = 0; x < size; x++) {
 			Index* current = elements[x];
@@ -69,7 +69,7 @@ int findInsertPositionArray(Index** elements, Index* index, int len, int size) {
 				found = true;
 				break;
 			} else {
-	djondb::string currentKey = current->key->getString("_id");
+	djondb::string currentKey = current->key->getDJString("_id");
 	//			INDEXPOINTERTYPE currentKey = current->key->toChar();
 				int res = currentKey.compare(key); 
 				//free(currentKey);
@@ -144,7 +144,7 @@ void BPlusIndex::add(const BSONObj& elem, const djondb::string documentId, long 
 Index* BPlusIndex::find(BSONObj* const elem)
 {
 	//INDEXPOINTERTYPE key = elem->toChar();
-	djondb::string key = elem->getString("_id");
+	djondb::string key = elem->getDJString("_id");
 	Index* result = findIndex(_head, key);
 
 	//free(key);
@@ -185,7 +185,7 @@ Index* BPlusIndex::findIndex(IndexPage* start, djondb::string key) const {
 	for (int x = 0; x < start->size; x++) {
 		Index* current = start->elements[x];
 		//INDEXPOINTERTYPE testKey = current->key->toChar();
-		djondb::string testKey = current->key->getString("_id");
+		djondb::string testKey = current->key->getDJString("_id");
 		int result = testKey.compare(key);
 		//free(testKey);
 
@@ -214,7 +214,7 @@ IndexPage* BPlusIndex::findIndexPage(IndexPage* start, djondb::string key) const
 		for (int x = 0; x < start->size; x++) {
 			Index* current = start->elements[x];
 			//INDEXPOINTERTYPE testKey = current->key->toChar();
-			djondb::string testKey = current->key->getString("_id");
+			djondb::string testKey = current->key->getDJString("_id");
 			int result = testKey.compare(key);
 			//free(testKey);
 
@@ -247,7 +247,7 @@ void refreshParentRelationship(IndexPage* page) {
 void BPlusIndex::insertIndexElement(IndexPage* page, Index* index) {
 	Logger* log = getLogger(NULL);
 
-	djondb::string key = index->key->getString("_id");
+	djondb::string key = index->key->getDJString("_id");
 	//char* key = index->key->toChar();
 	IndexPage* pageFound = findIndexPage(_head, key);
 
@@ -472,7 +472,7 @@ void IndexPage::debugElements() const {
 				ss << " (" << (long)pointers[x] << ") ";
 			}
 			if (elements[x] != NULL) {
-				ss << " <<" << (long) elements[x] << ">> " << (const char*)elements[x]->key->getString("_id");
+				ss << " <<" << (long) elements[x] << ">> " << (const char*)elements[x]->key->getDJString("_id");
 			} else {
 				ss << " << NULL >> ";
 			}

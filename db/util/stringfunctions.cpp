@@ -66,6 +66,14 @@ const djondb::string::~string() {
 	}
 }
 
+std::string djondb::string::str() const {
+	char* chr = (char*)malloc(length() + 1);
+	memset(chr, 0, length() + 1);
+	strncpy(chr, (char*)*_holder, length() - 1);
+	std::string result(chr);
+	return result;
+}
+
 const char* djondb::string::c_str() const {
 	if (_holder != NULL) {
 		return const_cast<const char*>((char*)*_holder);

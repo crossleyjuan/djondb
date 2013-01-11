@@ -30,7 +30,8 @@ class BSONObj
         virtual __int32 getInt(std::string) const throw(BSONException);
         virtual double getDouble(std::string) const throw(BSONException);
         virtual __int64 getLong(std::string) const throw(BSONException);
-        virtual const djondb::string getString(std::string) const throw(BSONException);
+        const std::string getString(std::string) const throw(BSONException);
+        virtual const djondb::string getDJString(std::string) const throw(BSONException);
         virtual BSONObj* getBSON(std::string) const throw(BSONException);
         virtual BSONArrayObj* getBSONArray(std::string) const throw(BSONException);
         virtual BSONContent* get(std::string) const throw(BSONException);

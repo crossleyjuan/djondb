@@ -280,7 +280,7 @@ class TestDriverBaseSuite: public Test::Suite {
 			TEST_ASSERT(objResult->has("longmax"));
 			TEST_ASSERT(objResult->getLong("longmax") == LONG_MAX);
 			TEST_ASSERT(objResult->has("char"));
-			TEST_ASSERT(strcmp(objResult->getString("char"), "testing") == 0);
+			TEST_ASSERT(objResult->getString("char").compare("testing") == 0);
 
 			__running = false;
 
@@ -321,7 +321,7 @@ class TestDriverBaseSuite: public Test::Suite {
 			BSONObj* objR = *result->begin();
 			TEST_ASSERT(objR != NULL);
 			TEST_ASSERT(objR->has("name"));
-			TEST_ASSERT(strcmp(objR->getString("name"), "Test") == 0);
+			TEST_ASSERT(objR->getString("name").compare("Test") == 0);
 
 			char* temp = objR->toChar();
 			cout << "\nobj: " << temp << endl;
@@ -404,7 +404,7 @@ class TestDriverBaseSuite: public Test::Suite {
 				char* temp = (char*)malloc(100);
 				memset(temp, 0, 100);
 				memset(temp, 'b', 99);
-				TEST_ASSERT(strcmp(resObj->getString("content"), temp) == 0);
+				TEST_ASSERT(resObj->getString("content").compare(temp) == 0);
 				free(temp);
 			}
 			DTime rec = log->recordedTime();
