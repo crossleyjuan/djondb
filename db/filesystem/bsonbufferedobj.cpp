@@ -538,7 +538,7 @@ BSONObj* BSONBufferedObj::select(const char* sel) const {
 				case PTRCHAR_TYPE:
 					{
 						djondb::string val = getDJString(key);
-						result->add(key, (char*)val.c_str());
+						result->add(key, const_cast<char*>(val.c_str()), val.length());
 						break;
 					}
 			}

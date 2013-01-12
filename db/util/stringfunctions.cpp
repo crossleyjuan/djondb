@@ -68,8 +68,8 @@ const djondb::string::~string() {
 
 std::string djondb::string::str() const {
 	char* chr = (char*)malloc(length() + 1);
-	memset(chr, 0, length() + 1);
-	strncpy(chr, (char*)*_holder, length() - 1);
+	strncpy(chr, (char*)*_holder, length());
+	chr[length()] = 0;
 	std::string result(chr);
 	return result;
 }
