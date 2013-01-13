@@ -142,7 +142,7 @@ void DBController::initialize(std::string dataDir) {
 				}
 				stream->seek(currentPos);
 
-				//if (_logger->isInfo()) _logger->info("db: %s, ns: %s, Index initialized. Records: %d", db->c_str(), ns->c_str(), records);
+				if (_logger->isInfo()) _logger->info("db: %s, ns: %s, Index initialized. Records: %d", db->c_str(), ns->c_str(), records);
 			}
 		}
 	}
@@ -443,6 +443,8 @@ std::vector<BSONObj*>* DBController::findFullScan(char* db, char* ns, const char
 
 	std::string filename = ss.str();
 
+	// Execute open on streammanager, just to check that the file was alrady opened
+	StreamManager::getStreamManager()->open(db, ns, INDEX_FTYPE);
 	// Execute open on streammanager, just to check that the file was alrady opened
 	StreamManager::getStreamManager()->open(db, ns, DATA_FTYPE);
 	//FileInputStream* fis = new FileInputStream(filename.c_str(), "rb");
