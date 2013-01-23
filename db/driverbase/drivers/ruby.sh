@@ -4,7 +4,7 @@ sh update.sh
 rm -rf ruby
 mkdir ruby
 
-swig2.0 -c++ -ruby -outdir ruby -o ruby/djonrubydriver.cpp driver-ruby.i
+swig -c++ -ruby -outdir ruby -o ruby/djonrubydriver.cpp driver-ruby.i
 
 cd ruby
 cp ../*.h .

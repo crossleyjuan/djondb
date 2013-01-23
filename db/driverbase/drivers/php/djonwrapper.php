@@ -371,6 +371,22 @@ class BSONObj {
 		return $r;
 	}
 
+	function get($arg1) {
+		return BSONObj_get($this->_cPtr,$arg1);
+	}
+
+	function getContent($arg1,$arg2=null) {
+		switch (func_num_args()) {
+		case 1: $r=BSONObj_getContent($this->_cPtr,$arg1); break;
+		default: $r=BSONObj_getContent($this->_cPtr,$arg1,$arg2);
+		}
+		return $r;
+	}
+
+	function getXpath($xpath) {
+		return BSONObj_getXpath($this->_cPtr,$xpath);
+	}
+
 	function select($sel) {
 		$r=BSONObj_select($this->_cPtr,$sel);
 		if (is_resource($r)) {
