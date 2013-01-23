@@ -101,26 +101,6 @@ public class BSONObj {
     return (cPtr == 0) ? null : new BSONArrayObj(cPtr, false);
   }
 
-  public SWIGTYPE_p_BSONContent get(String arg0) {
-    long cPtr = djonwrapperJNI.BSONObj_get(swigCPtr, this, arg0);
-    return (cPtr == 0) ? null : new SWIGTYPE_p_BSONContent(cPtr, false);
-  }
-
-  public SWIGTYPE_p_BSONContent getContent(String arg0) {
-    long cPtr = djonwrapperJNI.BSONObj_getContent__SWIG_0(swigCPtr, this, arg0);
-    return (cPtr == 0) ? null : new SWIGTYPE_p_BSONContent(cPtr, false);
-  }
-
-  public SWIGTYPE_p_BSONContent getContent(String arg0, SWIGTYPE_p_BSONTYPE arg1) {
-    long cPtr = djonwrapperJNI.BSONObj_getContent__SWIG_1(swigCPtr, this, arg0, SWIGTYPE_p_BSONTYPE.getCPtr(arg1));
-    return (cPtr == 0) ? null : new SWIGTYPE_p_BSONContent(cPtr, false);
-  }
-
-  public SWIGTYPE_p_BSONContent getXpath(String xpath) {
-    long cPtr = djonwrapperJNI.BSONObj_getXpath(swigCPtr, this, xpath);
-    return (cPtr == 0) ? null : new SWIGTYPE_p_BSONContent(cPtr, false);
-  }
-
   public BSONObj select(String sel) {
     long cPtr = djonwrapperJNI.BSONObj_select(swigCPtr, this, sel);
     return (cPtr == 0) ? null : new BSONObj(cPtr, false);

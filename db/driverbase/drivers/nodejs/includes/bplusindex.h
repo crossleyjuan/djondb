@@ -50,7 +50,7 @@ class BPlusIndex: public IndexAlgorithm
 		BPlusIndex(std::set<std::string> keys);
 		virtual ~BPlusIndex();
 
-		virtual void add(const BSONObj& elem, std::string documentId, long filePos, long indexPos);
+		virtual void add(const BSONObj& elem, djondb::string documentId, long filePos, long indexPos);
 		virtual Index* find(BSONObj* const elem);
 		virtual void remove(const BSONObj& elem);
 		virtual std::list<Index*> find(FilterParser* parser);
@@ -62,8 +62,8 @@ class BPlusIndex: public IndexAlgorithm
 		IndexPage* _head;
 
 	private:
-		IndexPage* findIndexPage(IndexPage* start, INDEXPOINTERTYPE key) const;
-		Index* findIndex(IndexPage* start, INDEXPOINTERTYPE key) const;
+		IndexPage* findIndexPage(IndexPage* start, djondb::string key) const;
+		Index* findIndex(IndexPage* start, djondb::string key) const;
 		void insertIndexElement(IndexPage* page, Index* index);
 		void dispose(IndexPage* page);
 		void createRoot(Index* element, IndexPage* left, IndexPage* right);

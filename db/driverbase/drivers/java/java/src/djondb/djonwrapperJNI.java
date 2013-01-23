@@ -58,10 +58,6 @@ public class djonwrapperJNI {
   public final static native String BSONObj_getString(long jarg1, BSONObj jarg1_, String jarg2);
   public final static native long BSONObj_getBSON(long jarg1, BSONObj jarg1_, String jarg2);
   public final static native long BSONObj_getBSONArray(long jarg1, BSONObj jarg1_, String jarg2);
-  public final static native long BSONObj_get(long jarg1, BSONObj jarg1_, String jarg2);
-  public final static native long BSONObj_getContent__SWIG_0(long jarg1, BSONObj jarg1_, String jarg2);
-  public final static native long BSONObj_getContent__SWIG_1(long jarg1, BSONObj jarg1_, String jarg2, long jarg3);
-  public final static native long BSONObj_getXpath(long jarg1, BSONObj jarg1_, String jarg2);
   public final static native long BSONObj_select(long jarg1, BSONObj jarg1_, String jarg2);
   public final static native long BSONObj_type(long jarg1, BSONObj jarg1_, String jarg2);
   public final static native String BSONObj_toChar(long jarg1, BSONObj jarg1_);
