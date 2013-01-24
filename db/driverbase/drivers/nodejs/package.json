@@ -1,6 +1,6 @@
 {
   "name": "djondb",
-  "version": "0.1.20121216",
+  "version": "0.220130106",
   "description": "djondb driver for nodejs",
   "main": "./build/Release/djondb",
   "scripts": {

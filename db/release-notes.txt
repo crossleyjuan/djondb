@@ -1,4 +1,15 @@
 
+    Version 0.220130106
+    ===========================================================================
+
+    * the find methods now return a BSONArrayObj instead of a vector, this makes
+      easier to convert to json using the toChar than iterating over the elements
+      and doing toChar over each element
+    * a new find method without filter was included in the driver to make easier
+      the usage
+    * major performance improve, new indexes implementation, new full scan 
+      implemented
+
     Version 0.120120923
     ===========================================================================
 

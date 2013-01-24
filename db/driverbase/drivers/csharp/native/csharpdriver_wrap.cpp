@@ -1888,6 +1888,95 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_BSONObj_getBSONArray(void * jarg1, char * j
 }
 
 
+SWIGEXPORT void * SWIGSTDCALL CSharp_BSONObj_get(void * jarg1, char * jarg2) {
+  void * jresult ;
+  BSONObj *arg1 = (BSONObj *) 0 ;
+  std::string arg2 ;
+  BSONContent *result = 0 ;
+  
+  arg1 = (BSONObj *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  (&arg2)->assign(jarg2); 
+  try {
+    result = (BSONContent *)((BSONObj const *)arg1)->get(arg2);
+  }
+  catch(BSONException &_e) {
+    (void)_e;
+    SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, "C++ BSONException exception thrown");
+    return 0; 
+  }
+  
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_BSONObj_getContent__SWIG_0(void * jarg1, char * jarg2) {
+  void * jresult ;
+  BSONObj *arg1 = (BSONObj *) 0 ;
+  std::string arg2 ;
+  BSONContent *result = 0 ;
+  
+  arg1 = (BSONObj *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  (&arg2)->assign(jarg2); 
+  result = (BSONContent *)((BSONObj const *)arg1)->getContent(arg2);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_BSONObj_getContent__SWIG_1(void * jarg1, char * jarg2, void * jarg3) {
+  void * jresult ;
+  BSONObj *arg1 = (BSONObj *) 0 ;
+  std::string arg2 ;
+  BSONTYPE arg3 ;
+  BSONTYPE *argp3 ;
+  BSONContent *result = 0 ;
+  
+  arg1 = (BSONObj *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  (&arg2)->assign(jarg2); 
+  argp3 = (BSONTYPE *)jarg3; 
+  if (!argp3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null BSONTYPE", 0);
+    return 0;
+  }
+  arg3 = *argp3; 
+  result = (BSONContent *)((BSONObj const *)arg1)->getContent(arg2,arg3);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_BSONObj_getXpath(void * jarg1, char * jarg2) {
+  void * jresult ;
+  BSONObj *arg1 = (BSONObj *) 0 ;
+  std::string *arg2 = 0 ;
+  BSONContent *result = 0 ;
+  
+  arg1 = (BSONObj *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  result = (BSONContent *)((BSONObj const *)arg1)->getXpath((std::string const &)*arg2);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT void * SWIGSTDCALL CSharp_BSONObj_select(void * jarg1, char * jarg2) {
   void * jresult ;
   BSONObj *arg1 = (BSONObj *) 0 ;

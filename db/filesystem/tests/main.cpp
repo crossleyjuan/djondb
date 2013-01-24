@@ -433,10 +433,10 @@ class TestFileSystemSuite: public Test::Suite
 			std::auto_ptr<FileInputStream> fis(new FileInputStream("bson.txt", "rb"));
 			std::auto_ptr<BSONInputStream> bsonIn(new BSONInputStream(fis.get()));
 
-			std::vector<BSONObj*>* result = bsonIn->readBSONArray();
+			BSONArrayObj* result = bsonIn->readBSONArray();
 
-			TEST_ASSERT(result->size() == 10);
-			for (std::vector<BSONObj*>::const_iterator i = result->begin(); i != result->end(); i++) {
+			TEST_ASSERT(result->length() == 10);
+			for (BSONArrayObj::iterator i = result->begin(); i != result->end(); i++) {
 				BSONObj* obj = *i;
 				TEST_ASSERT(obj->has("int"));
 				TEST_ASSERT(obj->getInt("int") == 1);

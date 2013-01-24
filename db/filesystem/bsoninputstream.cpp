@@ -209,11 +209,11 @@ BSONArrayObj* BSONInputStream::readBSONInnerArray(const char* select) const {
 	return result;
 }
 
-std::vector<BSONObj*>* BSONInputStream::readBSONArray() const {
+BSONArrayObj* BSONInputStream::readBSONArray() const {
 	return readBSONArray("*");
 }
 
-std::vector<BSONObj*>* BSONInputStream::readBSONArray(const char* select) const {
+BSONArrayObj* BSONInputStream::readBSONArray(const char* select) const {
 #ifdef DEBUG
 	if (_log->isDebug()) _log->debug(3, "BSONInputStream::readBSONArray");
 #endif
@@ -221,14 +221,15 @@ std::vector<BSONObj*>* BSONInputStream::readBSONArray(const char* select) const 
 #ifdef DEBUG
 	if (_log->isDebug()) _log->debug(3, "elements read: %d", elements);
 #endif
-	std::vector<BSONObj*>* result = new std::vector<BSONObj*>();
+	BSONArrayObj* result = new BSONArrayObj();
 
 	for (__int32 x= 0; x < elements; x++) {
 		BSONObj* obj = readBSON(select);
 #ifdef DEBUG
 		if (_log->isDebug()) _log->debug(3, "obj: %s", obj->toChar());
 #endif
-		result->push_back(obj);
+		result->add(*obj);
+		delete obj;
 	}
 
 	return result;

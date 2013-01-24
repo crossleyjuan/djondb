@@ -107,7 +107,7 @@ public class BSONObj : IDisposable {
     return ret;
   }
 
-  public virtual string getString(string arg0) {
+  public string getString(string arg0) {
     string ret = djonwrapperPINVOKE.BSONObj_getString(swigCPtr, arg0);
     if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
     return ret;
@@ -123,6 +123,34 @@ public class BSONObj : IDisposable {
   public virtual BSONArrayObj getBSONArray(string arg0) {
     IntPtr cPtr = djonwrapperPINVOKE.BSONObj_getBSONArray(swigCPtr, arg0);
     BSONArrayObj ret = (cPtr == IntPtr.Zero) ? null : new BSONArrayObj(cPtr, false);
+    if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public virtual SWIGTYPE_p_BSONContent get(string arg0) {
+    IntPtr cPtr = djonwrapperPINVOKE.BSONObj_get(swigCPtr, arg0);
+    SWIGTYPE_p_BSONContent ret = (cPtr == IntPtr.Zero) ? null : new SWIGTYPE_p_BSONContent(cPtr, false);
+    if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public virtual SWIGTYPE_p_BSONContent getContent(string arg0) {
+    IntPtr cPtr = djonwrapperPINVOKE.BSONObj_getContent__SWIG_0(swigCPtr, arg0);
+    SWIGTYPE_p_BSONContent ret = (cPtr == IntPtr.Zero) ? null : new SWIGTYPE_p_BSONContent(cPtr, false);
+    if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public virtual SWIGTYPE_p_BSONContent getContent(string arg0, SWIGTYPE_p_BSONTYPE arg1) {
+    IntPtr cPtr = djonwrapperPINVOKE.BSONObj_getContent__SWIG_1(swigCPtr, arg0, SWIGTYPE_p_BSONTYPE.getCPtr(arg1));
+    SWIGTYPE_p_BSONContent ret = (cPtr == IntPtr.Zero) ? null : new SWIGTYPE_p_BSONContent(cPtr, false);
+    if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public virtual SWIGTYPE_p_BSONContent getXpath(string xpath) {
+    IntPtr cPtr = djonwrapperPINVOKE.BSONObj_getXpath(swigCPtr, xpath);
+    SWIGTYPE_p_BSONContent ret = (cPtr == IntPtr.Zero) ? null : new SWIGTYPE_p_BSONContent(cPtr, false);
     if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }

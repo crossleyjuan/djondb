@@ -233,14 +233,14 @@ BSONObj* DjondbConnection::findByKey(const std::string& db, const std::string& n
 
 	std::string filter = "$'_id' == '" + id + "'";
 
-	std::vector<BSONObj*>* result = find(db, ns, select, filter);
+	BSONArrayObj* result = find(db, ns, select, filter);
 
 	BSONObj* res = NULL;
-	if (result->size() == 1) {
+	if (result->length() == 1) {
 		if (_logger->isDebug()) _logger->debug(2, "findByKey found 1 result");
 		res = *result->begin();
 	} else {
-		if (result->size() > 1) {
+		if (result->length() > 1) {
 			throw "The result contains more than 1 result";
 		}
 	}
@@ -254,11 +254,15 @@ BSONObj* DjondbConnection::findByKey(const std::string& db, const std::string& n
 	return bsonresult;
 }
 
-std::vector<BSONObj*>* DjondbConnection::find(const std::string& db, const std::string& ns, const std::string& filter) throw(ParseException) {
+BSONArrayObj* DjondbConnection::find(const std::string& db, const std::string& ns) throw(ParseException) {
+	return find(db, ns, "*", "");
+}
+
+BSONArrayObj* DjondbConnection::find(const std::string& db, const std::string& ns, const std::string& filter) throw(ParseException) {
 	return find(db, ns, "*", filter);
 }
 
-std::vector<BSONObj*>* DjondbConnection::find(const std::string& db, const std::string& ns, const std::string& select, const std::string& filter) throw(ParseException) {
+BSONArrayObj* DjondbConnection::find(const std::string& db, const std::string& ns, const std::string& select, const std::string& filter) throw(ParseException) {
 	if (_logger->isDebug()) _logger->debug("executing find db: %s, ns: %s, select: %s, filter: %s", db.c_str(), ns.c_str(), select.c_str(), filter.c_str());
 
 	try {
@@ -276,7 +280,7 @@ std::vector<BSONObj*>* DjondbConnection::find(const std::string& db, const std::
 	_commandWriter->writeCommand(&cmd);
 	
 	cmd.readResult(_inputStream);
-	std::vector<BSONObj*>* result = (std::vector<BSONObj*>*)cmd.result();
+	BSONArrayObj* result = (BSONArrayObj*)cmd.result();
 
 	return result;
 }

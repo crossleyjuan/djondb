@@ -183,6 +183,8 @@ char* BSONObj::toChar() {
 
 	char* cresult = strcpy(result);
 
+	if (log->isDebug()) log->debug("toChar result: %s", cresult);
+
 	return cresult;
 }
 

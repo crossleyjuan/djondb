@@ -426,6 +426,18 @@ class djonwrapperPINVOKE {
   [DllImport("djonwrapper", EntryPoint="CSharp_BSONObj_getBSONArray")]
   public static extern IntPtr BSONObj_getBSONArray(HandleRef jarg1, string jarg2);
 
+  [DllImport("djonwrapper", EntryPoint="CSharp_BSONObj_get")]
+  public static extern IntPtr BSONObj_get(HandleRef jarg1, string jarg2);
+
+  [DllImport("djonwrapper", EntryPoint="CSharp_BSONObj_getContent__SWIG_0")]
+  public static extern IntPtr BSONObj_getContent__SWIG_0(HandleRef jarg1, string jarg2);
+
+  [DllImport("djonwrapper", EntryPoint="CSharp_BSONObj_getContent__SWIG_1")]
+  public static extern IntPtr BSONObj_getContent__SWIG_1(HandleRef jarg1, string jarg2, HandleRef jarg3);
+
+  [DllImport("djonwrapper", EntryPoint="CSharp_BSONObj_getXpath")]
+  public static extern IntPtr BSONObj_getXpath(HandleRef jarg1, string jarg2);
+
   [DllImport("djonwrapper", EntryPoint="CSharp_BSONObj_select")]
   public static extern IntPtr BSONObj_select(HandleRef jarg1, string jarg2);
 

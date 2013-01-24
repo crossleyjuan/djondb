@@ -43,10 +43,6 @@ FindCommand::~FindCommand()
 	if (_db != NULL) delete _db;
 
 	if (_findresult != NULL) {
-		for (std::vector<BSONObj*>::const_iterator i = _findresult->begin(); i != _findresult->end(); i++) {
-			BSONObj* obj = *i;
-			delete obj;
-		}
 		delete _findresult;
 	}
 }
@@ -59,12 +55,7 @@ FindCommand::FindCommand(const FindCommand& other) :Command(FIND)
 	this->_db = new std::string(*other._db);
 
 	if (other._findresult != NULL) {
-		this->_findresult = new std::vector<BSONObj*>();
-
-		for (std::vector<BSONObj*>::const_iterator i = other._findresult->begin(); i != other._findresult->end(); i++) {
-			BSONObj* obj = new BSONObj(**i);
-			this->_findresult->push_back(obj);
-		}
+		this->_findresult = new BSONArrayObj(*other._findresult);
 	}
 }
 
@@ -76,12 +67,9 @@ void FindCommand::execute() {
 }
 
 void* FindCommand::result() {
-	std::vector<BSONObj*>* result = new std::vector<BSONObj*>();
+	// Creates a copy
+	BSONArrayObj* result = new BSONArrayObj(*_findresult);
 
-	for (std::vector<BSONObj*>::const_iterator i = _findresult->begin(); i != _findresult->end(); i++) {
-		BSONObj* obj = new BSONObj(**i);
-		result->push_back(obj);
-	}
 	return result;
 }
 
@@ -97,7 +85,7 @@ void FindCommand::readResult(InputStream* is) {
 	if (log->isDebug()) log->debug("writing result of find command on %s", nameSpace()->c_str());
 
 	BSONInputStream* bsonin = new BSONInputStream(is);
-	std::vector<BSONObj*>* result = bsonin->readBSONArray();
+	BSONArrayObj* result = bsonin->readBSONArray();
 	_findresult = result;
 
 	delete bsonin;
@@ -107,7 +95,7 @@ void FindCommand::writeResult(OutputStream* out) const {
 	Logger* log = getLogger(NULL);
 	if (log->isDebug()) log->debug("writing result of find command on %s", nameSpace()->c_str());
 	BSONOutputStream* bsonout = new BSONOutputStream(out);
-	bsonout->writeBSONArray(*_findresult);
+	bsonout->writeBSONArray(_findresult);
 	delete bsonout;
 }
 

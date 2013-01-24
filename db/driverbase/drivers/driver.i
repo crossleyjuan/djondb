@@ -21,6 +21,8 @@ namespace std {
    %template(StringVector) vector<std::string>;
 }
 
+%ignore getDJString;
+
 /* Let's just grab the original header file here */
 %include "bsonarrayobj.h"
 %include "bson.h"
