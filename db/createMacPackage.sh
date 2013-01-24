@@ -1,9 +1,10 @@
 #!/bin/sh
 
 cd mac
+mkdir -p djonpkg
 rm djonpkg/usr/bin/*
 rm djonpkg/usr/lib/*
-cp -R ../obj/usr djonpkg/usr
+cp -R ../obj/usr djonpkg
 
 cd djonpkg
 rm usr/bin/test*
