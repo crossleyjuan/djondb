@@ -102,16 +102,23 @@ public class DjondbConnection : IDisposable {
     return ret;
   }
 
-  public BSONObjVectorPtr find(string db, string ns, string select, string filter) {
-    IntPtr cPtr = djonwrapperPINVOKE.DjondbConnection_find__SWIG_0(swigCPtr, db, ns, select, filter);
-    BSONObjVectorPtr ret = (cPtr == IntPtr.Zero) ? null : new BSONObjVectorPtr(cPtr, false);
+  public BSONArrayObj find(string db, string ns) {
+    IntPtr cPtr = djonwrapperPINVOKE.DjondbConnection_find__SWIG_0(swigCPtr, db, ns);
+    BSONArrayObj ret = (cPtr == IntPtr.Zero) ? null : new BSONArrayObj(cPtr, false);
     if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public BSONObjVectorPtr find(string db, string ns, string filter) {
+  public BSONArrayObj find(string db, string ns, string filter) {
     IntPtr cPtr = djonwrapperPINVOKE.DjondbConnection_find__SWIG_1(swigCPtr, db, ns, filter);
-    BSONObjVectorPtr ret = (cPtr == IntPtr.Zero) ? null : new BSONObjVectorPtr(cPtr, false);
+    BSONArrayObj ret = (cPtr == IntPtr.Zero) ? null : new BSONArrayObj(cPtr, false);
+    if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public BSONArrayObj find(string db, string ns, string select, string filter) {
+    IntPtr cPtr = djonwrapperPINVOKE.DjondbConnection_find__SWIG_2(swigCPtr, db, ns, select, filter);
+    BSONArrayObj ret = (cPtr == IntPtr.Zero) ? null : new BSONArrayObj(cPtr, false);
     if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }

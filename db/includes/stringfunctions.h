@@ -90,6 +90,8 @@ namespace djondb {
 			operator const char*() const;
 			operator char*() const;
 
+			std::string str() const;
+
 			bool operator ==(const djondb::string& str);
 			bool operator !=(const djondb::string& str);
 			djondb::string& operator=(const djondb::string& rvar);

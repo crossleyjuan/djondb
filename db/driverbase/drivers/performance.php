@@ -14,14 +14,7 @@ function test() {
 
 	echo "find returned";
 
-	for ($x = 0; $x < $res->size(); $x++) {
-		echo "printing";
-		$element = $res->get($x);
-		echo "returned element";
-
-		echo "print: ";
-		echo $element->toChar();
-	}
+	echo "result: \n".$res->toChar()."\n";
 
 	DjondbConnectionManager::releaseConnection($c);
 }

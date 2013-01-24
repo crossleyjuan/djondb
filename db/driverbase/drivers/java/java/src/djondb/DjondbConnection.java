@@ -85,14 +85,19 @@ public class DjondbConnection {
     return (cPtr == 0) ? null : new BSONObj(cPtr, false);
   }
 
-  public BSONObjVectorPtr find(String db, String ns, String select, String filter) {
-    long cPtr = djonwrapperJNI.DjondbConnection_find__SWIG_0(swigCPtr, this, db, ns, select, filter);
-    return (cPtr == 0) ? null : new BSONObjVectorPtr(cPtr, false);
+  public BSONArrayObj find(String db, String ns) {
+    long cPtr = djonwrapperJNI.DjondbConnection_find__SWIG_0(swigCPtr, this, db, ns);
+    return (cPtr == 0) ? null : new BSONArrayObj(cPtr, false);
   }
 
-  public BSONObjVectorPtr find(String db, String ns, String filter) {
+  public BSONArrayObj find(String db, String ns, String filter) {
     long cPtr = djonwrapperJNI.DjondbConnection_find__SWIG_1(swigCPtr, this, db, ns, filter);
-    return (cPtr == 0) ? null : new BSONObjVectorPtr(cPtr, false);
+    return (cPtr == 0) ? null : new BSONArrayObj(cPtr, false);
+  }
+
+  public BSONArrayObj find(String db, String ns, String select, String filter) {
+    long cPtr = djonwrapperJNI.DjondbConnection_find__SWIG_2(swigCPtr, this, db, ns, select, filter);
+    return (cPtr == 0) ? null : new BSONArrayObj(cPtr, false);
   }
 
   public boolean update(String db, String ns, String json) {

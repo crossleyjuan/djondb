@@ -571,15 +571,16 @@ class DjondbConnection {
 		}
 	}
 
-	function find($db,$ns,$select_or_filter,$filter=null) {
+	function find($db,$ns,$filter_or_select=null,$filter=null) {
 		switch (func_num_args()) {
-		case 3: $r=DjondbConnection_find($this->_cPtr,$db,$ns,$select_or_filter); break;
-		default: $r=DjondbConnection_find($this->_cPtr,$db,$ns,$select_or_filter,$filter);
+		case 2: $r=DjondbConnection_find($this->_cPtr,$db,$ns); break;
+		case 3: $r=DjondbConnection_find($this->_cPtr,$db,$ns,$filter_or_select); break;
+		default: $r=DjondbConnection_find($this->_cPtr,$db,$ns,$filter_or_select,$filter);
 		}
 		if (!is_resource($r)) return $r;
 		switch (get_resource_type($r)) {
-		case '_p_std__vectorT_BSONObj_p_t': return new BSONObjVectorPtr($r);
-		default: return new BSONObjVectorPtr($r);
+		case '_p_BSONArrayObj': return new BSONArrayObj($r);
+		default: return new BSONArrayObj($r);
 		}
 	}
 

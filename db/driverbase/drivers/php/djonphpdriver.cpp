@@ -4565,6 +4565,116 @@ ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_find__SWIG_0) {
   djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
+  std::string temp2 ;
+  std::string temp3 ;
+  zval **args[3];
+  BSONArrayObj *result = 0 ;
+  
+  SWIG_ResetError();
+  if(ZEND_NUM_ARGS() != 3 || zend_get_parameters_array_ex(3, args) != SUCCESS) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_djondb__DjondbConnection, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of DjondbConnection_find. Expected SWIGTYPE_p_djondb__DjondbConnection");
+    }
+  }
+  if(!arg1) SWIG_PHP_Error(E_ERROR, "this pointer is NULL");
+  
+  convert_to_string_ex(args[1]);
+  temp2.assign(Z_STRVAL_PP(args[1]), Z_STRLEN_PP(args[1]));
+  arg2 = &temp2;
+  
+  
+  convert_to_string_ex(args[2]);
+  temp3.assign(Z_STRVAL_PP(args[2]), Z_STRLEN_PP(args[2]));
+  arg3 = &temp3;
+  
+  try {
+    result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3);
+  }
+  catch(ParseException &_e) {
+    (void)_e;
+    zend_throw_exception(NULL, const_cast<char*>("C++ ParseException exception thrown"), 0 TSRMLS_CC);
+    return;
+    
+  }
+  
+  
+  SWIG_SetPointerZval(return_value, (void *)result, SWIGTYPE_p_BSONArrayObj, 0);
+  
+  
+  
+  return;
+fail:
+  SWIG_FAIL();
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_find__SWIG_1) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
+  std::string *arg2 = 0 ;
+  std::string *arg3 = 0 ;
+  std::string *arg4 = 0 ;
+  std::string temp2 ;
+  std::string temp3 ;
+  std::string temp4 ;
+  zval **args[4];
+  BSONArrayObj *result = 0 ;
+  
+  SWIG_ResetError();
+  if(ZEND_NUM_ARGS() != 4 || zend_get_parameters_array_ex(4, args) != SUCCESS) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_djondb__DjondbConnection, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of DjondbConnection_find. Expected SWIGTYPE_p_djondb__DjondbConnection");
+    }
+  }
+  if(!arg1) SWIG_PHP_Error(E_ERROR, "this pointer is NULL");
+  
+  convert_to_string_ex(args[1]);
+  temp2.assign(Z_STRVAL_PP(args[1]), Z_STRLEN_PP(args[1]));
+  arg2 = &temp2;
+  
+  
+  convert_to_string_ex(args[2]);
+  temp3.assign(Z_STRVAL_PP(args[2]), Z_STRLEN_PP(args[2]));
+  arg3 = &temp3;
+  
+  
+  convert_to_string_ex(args[3]);
+  temp4.assign(Z_STRVAL_PP(args[3]), Z_STRLEN_PP(args[3]));
+  arg4 = &temp4;
+  
+  try {
+    result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4);
+  }
+  catch(ParseException &_e) {
+    (void)_e;
+    zend_throw_exception(NULL, const_cast<char*>("C++ ParseException exception thrown"), 0 TSRMLS_CC);
+    return;
+    
+  }
+  
+  
+  SWIG_SetPointerZval(return_value, (void *)result, SWIGTYPE_p_BSONArrayObj, 0);
+  
+  
+  
+  
+  return;
+fail:
+  SWIG_FAIL();
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_find__SWIG_2) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
+  std::string *arg2 = 0 ;
+  std::string *arg3 = 0 ;
   std::string *arg4 = 0 ;
   std::string *arg5 = 0 ;
   std::string temp2 ;
@@ -4572,7 +4682,7 @@ ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_find__SWIG_0) {
   std::string temp4 ;
   std::string temp5 ;
   zval **args[5];
-  std::vector< BSONObj * > *result = 0 ;
+  BSONArrayObj *result = 0 ;
   
   SWIG_ResetError();
   if(ZEND_NUM_ARGS() != 5 || zend_get_parameters_array_ex(5, args) != SUCCESS) {
@@ -4606,7 +4716,7 @@ ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_find__SWIG_0) {
   arg5 = &temp5;
   
   try {
-    result = (std::vector< BSONObj * > *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4,(std::string const &)*arg5);
+    result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4,(std::string const &)*arg5);
   }
   catch(ParseException &_e) {
     (void)_e;
@@ -4616,67 +4726,8 @@ ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_find__SWIG_0) {
   }
   
   
-  SWIG_SetPointerZval(return_value, (void *)result, SWIGTYPE_p_std__vectorT_BSONObj_p_t, 0);
+  SWIG_SetPointerZval(return_value, (void *)result, SWIGTYPE_p_BSONArrayObj, 0);
   
-  
-  
-  
-  
-  return;
-fail:
-  SWIG_FAIL();
-}
-
-
-ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_find__SWIG_1) {
-  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
-  std::string *arg2 = 0 ;
-  std::string *arg3 = 0 ;
-  std::string *arg4 = 0 ;
-  std::string temp2 ;
-  std::string temp3 ;
-  std::string temp4 ;
-  zval **args[4];
-  std::vector< BSONObj * > *result = 0 ;
-  
-  SWIG_ResetError();
-  if(ZEND_NUM_ARGS() != 4 || zend_get_parameters_array_ex(4, args) != SUCCESS) {
-    WRONG_PARAM_COUNT;
-  }
-  
-  {
-    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_djondb__DjondbConnection, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of DjondbConnection_find. Expected SWIGTYPE_p_djondb__DjondbConnection");
-    }
-  }
-  if(!arg1) SWIG_PHP_Error(E_ERROR, "this pointer is NULL");
-  
-  convert_to_string_ex(args[1]);
-  temp2.assign(Z_STRVAL_PP(args[1]), Z_STRLEN_PP(args[1]));
-  arg2 = &temp2;
-  
-  
-  convert_to_string_ex(args[2]);
-  temp3.assign(Z_STRVAL_PP(args[2]), Z_STRLEN_PP(args[2]));
-  arg3 = &temp3;
-  
-  
-  convert_to_string_ex(args[3]);
-  temp4.assign(Z_STRVAL_PP(args[3]), Z_STRLEN_PP(args[3]));
-  arg4 = &temp4;
-  
-  try {
-    result = (std::vector< BSONObj * > *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4);
-  }
-  catch(ParseException &_e) {
-    (void)_e;
-    zend_throw_exception(NULL, const_cast<char*>("C++ ParseException exception thrown"), 0 TSRMLS_CC);
-    return;
-    
-  }
-  
-  
-  SWIG_SetPointerZval(return_value, (void *)result, SWIGTYPE_p_std__vectorT_BSONObj_p_t, 0);
   
   
   
@@ -4693,6 +4744,24 @@ ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_find) {
   
   argc = ZEND_NUM_ARGS();
   zend_get_parameters_array_ex(argc,argv);
+  if (argc == 3) {
+    int _v;
+    {
+      void *tmp;
+      _v = (SWIG_ConvertPtr(*argv[0], (void**)&tmp, SWIGTYPE_p_djondb__DjondbConnection, 0) >= 0);
+    }
+    if (_v) {
+      _v = ( Z_TYPE_PP(argv[1]) == IS_STRING ) ? 1 : 0;
+      
+      if (_v) {
+        _v = ( Z_TYPE_PP(argv[2]) == IS_STRING ) ? 1 : 0;
+        
+        if (_v) {
+          _wrap_DjondbConnection_find__SWIG_0(INTERNAL_FUNCTION_PARAM_PASSTHRU); return;
+        }
+      }
+    }
+  }
   if (argc == 4) {
     int _v;
     {
@@ -4734,7 +4803,7 @@ ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_find) {
             _v = ( Z_TYPE_PP(argv[4]) == IS_STRING ) ? 1 : 0;
             
             if (_v) {
-              _wrap_DjondbConnection_find__SWIG_0(INTERNAL_FUNCTION_PARAM_PASSTHRU); return;
+              _wrap_DjondbConnection_find__SWIG_2(INTERNAL_FUNCTION_PARAM_PASSTHRU); return;
             }
           }
         }

@@ -228,25 +228,14 @@ v8::Handle<v8::Value> WrapConnection::find(const v8::Arguments& args) {
 	try {
 		WrapConnection* obj = ObjectWrap::Unwrap<WrapConnection>(args.This());
 
-		std::vector<BSONObj*>* result = obj->_con->find(db, ns, select, filter);
+		BSONArrayObj* result = __djonConnection->find(db, ns, select, filter);
 
-		std::stringstream ss;
-		ss << "[";
-		if (result->size() > 0) {
-			for (std::vector<BSONObj*>::const_iterator i = result->begin(); i != result->end(); i++) {
-				BSONObj* obj = *i;
-				if (i != result->begin()) {
-					ss << ", ";
-				}
-				ss << obj->toChar();
-			}
-		}
-		ss << "]";
+		char* str = result->toChar();
 
-		std::string sresult = ss.str();
-
+		v8::Handle<v8::Value> jsonValue = parseJSON(v8::String::New(str));
+		free(str);
 		delete result;
-		return scope.Close(parseJSON(v8::String::New(sresult.c_str())));
+		return scope.Close(jsonValue);
 	} catch (ParseException e) {
 		return v8::ThrowException(v8::String::New("the filter expression contains an error\n"));
 	}

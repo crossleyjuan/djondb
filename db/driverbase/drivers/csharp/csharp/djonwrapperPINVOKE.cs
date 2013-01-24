@@ -535,10 +535,13 @@ class djonwrapperPINVOKE {
   public static extern IntPtr DjondbConnection_findByKey__SWIG_1(HandleRef jarg1, string jarg2, string jarg3, string jarg4);
 
   [DllImport("djonwrapper", EntryPoint="CSharp_DjondbConnection_find__SWIG_0")]
-  public static extern IntPtr DjondbConnection_find__SWIG_0(HandleRef jarg1, string jarg2, string jarg3, string jarg4, string jarg5);
+  public static extern IntPtr DjondbConnection_find__SWIG_0(HandleRef jarg1, string jarg2, string jarg3);
 
   [DllImport("djonwrapper", EntryPoint="CSharp_DjondbConnection_find__SWIG_1")]
   public static extern IntPtr DjondbConnection_find__SWIG_1(HandleRef jarg1, string jarg2, string jarg3, string jarg4);
+
+  [DllImport("djonwrapper", EntryPoint="CSharp_DjondbConnection_find__SWIG_2")]
+  public static extern IntPtr DjondbConnection_find__SWIG_2(HandleRef jarg1, string jarg2, string jarg3, string jarg4, string jarg5);
 
   [DllImport("djonwrapper", EntryPoint="CSharp_DjondbConnection_update__SWIG_0")]
   public static extern bool DjondbConnection_update__SWIG_0(HandleRef jarg1, string jarg2, string jarg3, string jarg4);
