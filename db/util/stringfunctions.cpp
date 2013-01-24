@@ -57,7 +57,7 @@ djondb::string& djondb::string::operator=(const djondb::string& rvar) {
 	return *this;
 }
 
-const djondb::string::~string() {
+djondb::string::~string() {
 	if (this->_holder != NULL) {
 		this->_holder->removeReference();
 		if (this->_holder->references() == 0) {

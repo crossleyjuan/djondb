@@ -329,7 +329,7 @@ void BPlusIndex::splitAddLeaf(IndexPage* page, Index* index) {
 		createRoot(copyElement, page, rightPage);
 		parentElement = _head;
 	} else {
-		int pos = addElement(parentElement, copyElement, rightPage);
+		addElement(parentElement, copyElement, rightPage);
 	}
 
 	free(tmpelements);
@@ -378,7 +378,7 @@ void BPlusIndex::splitAddInner(IndexPage* page, Index* index, IndexPage* rightPa
 		createRoot(element, page, newRightPage);
 		parentElement = _head;
 	} else {
-		int pos = addElement(parentElement, element, newRightPage);
+		addElement(parentElement, element, newRightPage);
 	}
 	shiftLeftArray((void**)newRightPage->elements, 0, 1, BUCKET_MAX_ELEMENTS - 1);
 	shiftLeftArray((void**)newRightPage->pointers, 0, 1, BUCKET_MAX_ELEMENTS);
@@ -400,7 +400,7 @@ void BPlusIndex::splitAdd(IndexPage* page, Index* index, IndexPage* rightPointer
 	}
 }
 
-int BPlusIndex::addElement(IndexPage* page, Index* index, IndexPage* rightPointer) {
+void BPlusIndex::addElement(IndexPage* page, Index* index, IndexPage* rightPointer) {
 	if (!page->isFull()) {
 		int pos = page->findInsertPosition(index);
 		page->moveElements(pos, 1);
