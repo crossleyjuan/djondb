@@ -484,8 +484,8 @@ BSONArrayObj* DBController::findFullScan(char* db, char* ns, const char* select,
 		maxResults = _atoi64(smax.c_str());
 #else
 		maxResults = atoll(smax.c_str());
-	}
 #endif
+	}
 	__int64 count = 0;
 	while (!mmis->eof() && (count < maxResults)) {
 		if (obj == NULL) {
