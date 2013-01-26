@@ -1,11 +1,10 @@
 {
   "name": "djondb",
-  "version": "0.2.20130106",
+  "version": "0.2.3",
   "description": "djondb driver for nodejs",
   "main": "./build/Release/djondb",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "install": "node-gyp rebuild"
+    "install": "sh install.sh"
   },
   "repository": "",
   "keywords": [
