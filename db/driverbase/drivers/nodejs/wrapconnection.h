@@ -1,7 +1,7 @@
 #ifndef WRAP_CONNECTION_H
 #define WRAP_CONNECTION_H
 
-#include <nodejs/node.h>
+#include <node/node.h>
 #include <string>
 #include <vector>
 #include "djondb_client.h"
