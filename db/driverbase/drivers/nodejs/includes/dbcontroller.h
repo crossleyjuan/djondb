@@ -10,6 +10,7 @@
 class FileInputOutputStream;
 class FileInputStream;
 class BSONObj;
+class BSONArrayObj;
 class Command;
 class Logger;
 class FilterParser;
@@ -30,7 +31,7 @@ class DBController
 		  bool dropNamespace(char* db, char* ns);
         void update(char* db, char* ns, BSONObj* bson);
         void remove(char* db, char* ns, const std::string& documentId, const std::string& revision);
-        std::vector<BSONObj*>* find(char* db, char* ns, const char* select, const char* filter) throw (ParseException);
+        BSONArrayObj* find(char* db, char* ns, const char* select, const char* filter) throw (ParseException);
         BSONObj* findFirst(char* db, char* ns, const char* select, const char* filter) throw (ParseException);
         BSONObj* readBSON(StreamType* stream);
 		  std::vector<std::string>* dbs() const;
@@ -42,7 +43,7 @@ class DBController
 		  std::string _dataDir;
 
 	 private:
-		  std::vector<BSONObj*>* findFullScan(char* db, char* ns, const char* select, FilterParser* parser) throw (ParseException);
+		  BSONArrayObj* findFullScan(char* db, char* ns, const char* select, FilterParser* parser) throw (ParseException);
 		  void clearCache();
 		  long checkStructure(BSONObj* bson);
 		  void updateIndex(char* db, char* ns, Index* index, long filePos);

@@ -18,7 +18,6 @@
 
 #include <iostream>
 #include "util.h"
-#include "linkedmap.hpp"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -38,7 +37,7 @@ class TestUtilSuite : public Test::Suite
 			TEST_ADD(TestUtilSuite::testSettings);
 			TEST_ADD(TestUtilSuite::testFileUtils);
 			TEST_ADD(TestUtilSuite::testCircularQueue);
-			TEST_ADD(TestUtilSuite::testLinkedMap);
+			TEST_ADD(TestUtilSuite::testDjonStrings);
 		}
 
 	private:
@@ -63,70 +62,6 @@ class TestUtilSuite : public Test::Suite
 			dt2 = DateTime(2011, 3, 1);
 			int diff = dt2.daysTo(dt);
 			TEST_ASSERT(diff == 19);
-		}
-
-		static bool compare(int i1, int i2) {
-			return i1 == i2;
-		}
-
-		static bool compareString(std::string i1, std::string i2) {
-			return i1.compare(i2) == 0;
-		}
-
-		void testLinkedMap() {
-			cout << "\ntestLinkedMap" << endl;
-			LinkedMap<int, int> map(TestUtilSuite::compare);
-
-			map.add(1, 10);
-			map.add(0, 11);
-			map.add(3, 12);
-
-			LinkedMap<int, int>::iterator it = map.begin();
-			int i = it->first;
-			TEST_ASSERT(i == 1);
-			it++;
-			i = it->first;
-			TEST_ASSERT(i == 0);
-			it++;
-			i = it->first;
-			TEST_ASSERT(i == 3);
-
-			map.erase(0);
-			
-			it = map.begin();
-			i = it->first;
-			TEST_ASSERT(i == 1);
-			it++;
-			i = it->first;
-			TEST_ASSERT(i == 3);
-			it++;
-			TEST_ASSERT(it == map.end());
-
-
-			// Test empty map
-			LinkedMap<int, int> map2(TestUtilSuite::compare);
-			TEST_ASSERT(map2.begin() == map2.end());
-
-			LinkedMap<std::string, std::string> map3(TestUtilSuite::compareString);
-			TEST_ASSERT(map3.begin() == map3.end());
-
-
-			//Test unique elements
-			LinkedMap<std::string, std::string> map4(TestUtilSuite::compareString);
-			map4.add(std::string("test"), "test");
-			map4.add(std::string("test2"), "test2");
-			map4.add(std::string("test"), "ass");
-
-			TEST_ASSERT(map4.size() == 2);
-			TEST_ASSERT(map4["test"].compare(std::string("ass")) == 0);
-			LinkedMap<std::string, std::string>::iterator it4 = map4.begin();
-			TEST_ASSERT(it4->first.compare(std::string("test")) == 0);
-			TEST_ASSERT(it4->second.compare("ass") == 0);
-			it4++;
-			TEST_ASSERT(it4->first.compare("test2") == 0);
-			TEST_ASSERT(it4->second.compare("test2") == 0);
-			it4++;
-			TEST_ASSERT(it4 == map4.end());
 		}
 
 		void testCircularQueue() {
@@ -274,10 +209,8 @@ class TestUtilSuite : public Test::Suite
 
 			char* untrimmed = " Hello";
 			char* trimExpected = "Hello";
-			char* result = cmalloc(strlen(untrimmed) + 1);
-			trim(result, untrimmed);
+			char* result = trim(untrimmed, strlen(untrimmed));
 			TEST_ASSERT(strcmp(trimExpected, result) == 0);
-			free(result);
 		}
 
 		void testUUID()
@@ -304,6 +237,73 @@ class TestUtilSuite : public Test::Suite
 			TEST_ASSERT(checkFileCreation(home));
 			// test directory fail
 			TEST_ASSERT(!checkFileCreation("/"));
+		}
+
+		void testFunction(const char* x) {
+			djondb::string s("test", 4);
+			TEST_ASSERT(strcmp(s.c_str(), x) == 0);
+		}
+
+		const char* testFunctionWithReturn(djondb::string s) {
+			djondb::string s2 = s;
+                        return s2.c_str();
+                }
+
+		void testDjonStrings() {
+			djondb::string s("test", 4);
+
+			const char* c = s.c_str();
+			__int32 l = s.length();
+			TEST_ASSERT(strcmp(c, "test") == 0);
+			TEST_ASSERT(l == 4);
+
+			djondb::string s2("test", 4);
+			TEST_ASSERT(s == s2);
+
+			djondb::string s3("other", 5);
+			TEST_ASSERT(s != s3);
+
+
+			// Testing copy smart references
+			char* cx = strcpy("Testing", 7);
+			djondb::string s4(cx, 7);
+			djondb::string s5(s4);
+			const char* c4 = s4.c_str();
+			const char* c5 = s5.c_str();
+			// Compare the references, they should be the same
+			TEST_ASSERT(c4 == c5);
+
+			// testing simple copying
+			djondb::string s6(strcpy("Otra", 4), 4);
+			djondb::string* s7 = new djondb::string(s6);
+			delete s7;
+			const char* c6 = s6.c_str();
+			TEST_ASSERT(strcmp(c6, "Otra") == 0);
+
+
+			djondb::string s8(strcpy("Otra", 4), 4);
+			{
+				djondb::string s9 = s8;
+				const char* c9 = s9.c_str();
+				TEST_ASSERT(strcmp(s8.c_str(), c9) == 0);
+			};
+			TEST_ASSERT(strcmp(s8.c_str(), "Otra") == 0);
+
+			// Test null strings
+			djondb::string s10;
+			djondb::string s11(s10);
+
+
+			djondb::string s12("test", 4);
+			const char* cs12 = testFunctionWithReturn(s12);
+			testFunction(s12.c_str());
+			TEST_ASSERT(strcmp(s12.c_str(), cs12) == 0);
+
+
+			djondb::string s13("aaaa", 4);
+       			djondb::string s14("bbbb", 4);
+                        TEST_ASSERT(s13.compare(s14) < 0);                 
+                        TEST_ASSERT(s13.compare(s14.c_str()) < 0);                 
 		}
 };
 //// Tests unconditional fail TEST_ASSERTs

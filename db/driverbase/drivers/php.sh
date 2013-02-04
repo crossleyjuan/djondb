@@ -1,8 +1,9 @@
 #!/bin/sh
 
-while getopts j:d: o
+while getopts j:d:u o
    do case "$o" in
-		d) DIR=$2;;
+		d)  DIR="$OPTARG";;
+	   u)  UPLOAD="true";;
 		\?)  echo "Usage: $0 -d dist_dir" && exit 1;;
 	esac
 done
@@ -19,7 +20,7 @@ else
 cp ../../obj/usr/lib/libdjon-client.la php/
 fi
 
-swig2.0 -c++ -php -outdir php -o php/djonphpdriver.cpp driver.i
+swig -c++ -php -outdir php -o php/djonphpdriver.cpp driver.i
 
 cp config.m4 php
 cd php

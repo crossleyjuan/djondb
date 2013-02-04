@@ -14,5 +14,5 @@ then
 	exit 1;
 fi
 
-$JAVA/bin/javac -classpath java/dist/djondb_client_Linux_x86_64.jar:. Test.java
-$JAVA/bin/java -classpath java/dist/djondb_client_Linux_x86_64.jar:. Test
+$JAVA/bin/javac -classpath java/dist/djondb_client_Linux_i686.jar:. Test.java
+$JAVA/bin/java -classpath java/dist/djondb_client_Linux_i686.jar:. Test

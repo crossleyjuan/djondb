@@ -60,8 +60,6 @@ InsertCommand* parseInsert(InputStream* is)  {
     BSONObj* obj = bsonis->readBSON();
     command->setBSON(*obj);
 	 
-	 delete log;
-
     delete ns;
     delete db;
     delete obj;
@@ -203,7 +201,6 @@ Command* CommandReader::readCommand() {
             break;
     }
     assert(cmd != NULL);
-	 delete log;
     return cmd;
 }
 

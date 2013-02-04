@@ -124,6 +124,15 @@ char* commands[] = {
 	"readfile"
 };
 
+char* getHistoryFilename() {
+	std::string* homeDir = getHomeDir();
+	char* file = (char*)malloc(2048);
+	memset(file, 0, 2048);
+	sprintf(file, "%s%s.djonshell", homeDir->c_str(), FILESEPARATOR);
+	delete homeDir;
+	return file;
+}
+
 int main(int argc, char* argv[]) {
 	v8::V8::SetFlagsFromCommandLine(&argc, argv, true);
 	run_shell = (argc == 1);
@@ -487,10 +496,12 @@ v8::Handle<v8::Value> find(const v8::Arguments& args) {
 	try {
 		BSONArrayObj* result = __djonConnection->find(db, ns, select, filter);
 
-		std::string sresult(result->toChar());
+		char* str = result->toChar();
 
+		v8::Handle<v8::Value> jsonValue = parseJSON(v8::String::New(str));
+		free(str);
 		delete result;
-		return parseJSON(v8::String::New(sresult.c_str()));
+		return jsonValue;
 	} catch (ParseException e) {
 		return v8::ThrowException(v8::String::New("the filter expression contains an error\n"));
 	}
@@ -640,7 +651,9 @@ v8::Handle<v8::Value> Quit(const v8::Arguments& args) {
 	fflush(stderr);
 
 #ifndef WINDOWS
-	linenoiseHistorySave(".djonshell_history");
+	char* file = getHistoryFilename();
+	linenoiseHistorySave(file);
+	free(file);
 #endif
 	exit(exit_code);
 	return v8::Undefined();
@@ -773,7 +786,9 @@ void RunShell(v8::Handle<v8::Context> context) {
 	v8::Local<v8::String> name(v8::String::New("(shell)"));
 
 #ifndef WINDOWS
-	linenoiseHistoryLoad(".djonshell_history");
+	char* file = getHistoryFilename();
+	linenoiseHistoryLoad(file);
+	free(file);
 	linenoiseSetCompletionCallback(completion);
 #endif
 	std::stringstream ss;
@@ -815,6 +830,10 @@ void RunShell(v8::Handle<v8::Context> context) {
 				ss.str("");
 				lastCmd = cmd;
 				_commands.push_back(std::string(cmd));
+				if ((startsWith(cmd, "exit") == 0) || (startsWith(cmd, "quit") == 0)) {
+					if (strlen(cmd) < 5)
+						cmd = "quit();";
+				}
 				ExecuteString(v8::String::New(cmd), name, true, true);
 			}
 		}

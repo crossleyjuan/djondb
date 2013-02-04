@@ -293,6 +293,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\dbfileinputstream.h"
+				>
+			</File>
+			<File
+				RelativePath=".\dbfilestream.h"
+				>
+			</File>
+			<File
 				RelativePath=".\expressionresult.h"
 				>
 			</File>
@@ -362,6 +370,14 @@
 			</File>
 			<File
 				RelativePath=".\dbcontroller.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbfileinputstream.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbfilestream.cpp"
 				>
 			</File>
 			<File

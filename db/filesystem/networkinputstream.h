@@ -4,6 +4,7 @@
 #include "inputstream.h"
 #include "util.h"
 #include <string>
+#include <assert.h>
 
 class NetworkInputStream : public InputStream
 {
@@ -18,43 +19,54 @@ class NetworkInputStream : public InputStream
     public:
         virtual unsigned char readChar();
         /* Reads 2 bytes in the input (little endian order) */
-        virtual short int readShortInt ();
+        virtual __int16 readShortInt ();
         /* Reads 4 bytes in the input (little endian order) */
-        virtual int readInt ();
-        /* Reads 4 bytes in the input (little endian order) */
-        virtual long readLong ();
+        virtual __int32 readInt ();
         /* Reads 8 bytes in the input (little endian order) */
-        virtual __LONG64 readLong64 ();
+        virtual __int64 readLong ();
+		/* Reads a 16 byte long in the input */
+		virtual __int64 readLong64();
         /* Reads a 4 byte float in the input */
         virtual float readFloatIEEE ();
         /* Reads a 8 byte double in the input */
         virtual double readDoubleIEEE ();
         /* Read a chars */
         virtual char* readChars();
-        virtual char* readChars(int length);
+        virtual char* readChars(__int32 length);
 
-        virtual void closeStream();
-        bool eof();
+        virtual void close();
+        virtual bool eof();
         int available();
         int waitAvailable(int timeout = 10);
         bool isClosed();
 
-        virtual std::string* readString();
-        int setNonblocking();
+		virtual void seek(__int64 pos, SEEK_DIRECTION direction = FROMSTART_SEEK) {
+			  // Unsupported methods in network interfaces
+			  assert(false);
+		  };
 
-        char* _buffer;
-        int _bufferPos;
-        int _bufferSize;
-    protected:
-    private:
-        int _socket;
-        bool _open;
+		  virtual __int64 currentPos() const {
+			  // Unsupported methods in network interfaces
+			  assert(false);
+			  return 0;
+		  };
+
+		  virtual std::string* readString();
+		  int setNonblocking();
+
+		  char* _buffer;
+		  int _bufferPos;
+		  int _bufferSize;
+	 protected:
+	 private:
+		  int _socket;
+		  bool _open;
 		  Logger* _logger;
 
-    private:
-        int checkStatus();
-        int readBufferData(void *buffer, int len);
-        int fillBuffer(int timeout);
+	 private:
+		  int checkStatus();
+		  int readBufferData(void *buffer, __int32 len);
+		  int fillBuffer(int timeout);
 };
 
 #endif // NETWORKINPUTSTREAM_H

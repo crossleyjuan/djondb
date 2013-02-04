@@ -50,16 +50,15 @@ class TestPerfomance {
 				}
 				cout << "Testing performance over: " << tests[i] << " inserts" << endl;
 				for (int x = 0; x < tests[i]; x++) {
-					std::string* uid = uuid();
 					BSONObj obj;
 					char* text = (char*)malloc(1001);
 					memset(text, 0, 1001);
 					memset(text, 'a', 1000);
 
+					obj.add("t", x);
+
 					obj.add("text", text);
 
-					obj.add("_id", *uid);
-					delete uid;
 					conn->insert("db", "test.performance", obj);
 					free(text);
 				}
@@ -79,7 +78,7 @@ class TestPerfomance {
 				}
 			}
 
-			conn->shutdown();
+//			conn->shutdown();
 
 			conn->close();
 

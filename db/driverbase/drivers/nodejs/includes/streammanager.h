@@ -16,7 +16,7 @@
  * =====================================================================================
  */
 
-#include "fileinputoutputstream.h"
+#include "dbfilestream.h"
 #include "util.h"
 #include <map>
 #include <string>
@@ -28,7 +28,7 @@ enum FILE_TYPE {
     INDEX_FTYPE
 };
 
-typedef FileInputOutputStream StreamType;
+typedef DBFileStream StreamType;
 struct Space {
 	std::string ns;
 	std::map<FILE_TYPE, StreamType*>* streams;
@@ -45,11 +45,16 @@ class StreamManager {
 		  std::vector<std::string>* dbs() const;
 		  std::vector<std::string>* namespaces(const char* db) const;
 		void saveDatabases();
+		void closeDatabases();
 		bool dropNamespace(char* db, char* ns);
 		void setDataDir(const std::string& dataDir);
 
+		void setInitializing(bool initializing);
+
 	private:
 		bool close(char* db, char* ns);
+		StreamType* checkVersion(StreamType* stream);
+
 	private:
 		std::map<std::string, std::map<std::string, SpacesType>* > _spaces;
 		std::string fileName(std::string ns, FILE_TYPE type) const;
@@ -58,5 +63,6 @@ class StreamManager {
 
 		static StreamManager* _manager;
 		Logger* _logger;
+		bool _initializing;
 };
 

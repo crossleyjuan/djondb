@@ -27,8 +27,8 @@
 #include "settings.h"
 #include <map>
 #include <stdlib.h>
-#include "util.h"
-#include <string.h>
+#include "fileutil.h"
+#include "stringfunctions.h" 
 #include <map>
 
 std::map<std::string, std::string> __settingsValues;
@@ -40,23 +40,21 @@ void readSettings() {
 #else
 	char* ccont = readFile("djondb.conf");
 #endif
-	std::string content(ccont);
-
+	std::string content;
+	if (ccont != NULL) {
+		content = std::string(ccont);
+	}
 	std::vector<std::string> lines = splitLines(content);
 	for (std::vector<std::string>::const_iterator i = lines.begin(); i != lines.end(); i++) {
-		std::string sline = *i;
-		const char* line = sline.c_str();
-		char* trimmedLine = cmalloc(sline.length() + 1);
-		trim(trimmedLine, const_cast<char*>(line));
+		std::string line = *i;
 		// omit the parameter if the line is commented
-		if (!startsWith(trimmedLine, (char*)"#")) {
-			std::vector<std::string> vals = split(trimmedLine, "=");
+		if (!startsWith(line.c_str(), (char*)"#")) {
+			std::vector<std::string> vals = split(line, "=");
 			std::string key = vals[0];
 			std::string value = vals[1];
 
 			__settingsValues.insert(std::pair<std::string, std::string>(key, value));
 		}
-		free(trimmedLine);
 	}
 	__settingsLoaded = true;
 	free(ccont);
@@ -72,7 +70,7 @@ std::string getSetting(std::string key) {
 	if (it != __settingsValues.end()) {
 		return it->second;
 	} else {
-		return "";
+		return std::string();
 	}
 }
 

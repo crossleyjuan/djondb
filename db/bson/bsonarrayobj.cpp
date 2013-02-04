@@ -48,14 +48,6 @@ BSONArrayObj::BSONArrayObj(const BSONArrayObj& orig) {
 	}
 }
 
-BSONArrayObj::BSONArrayObj(const std::vector<BSONObj*>& orig) {
-	for (std::vector<BSONObj*>::const_iterator i = orig.begin(); i != orig.end(); i++) {
-		BSONObj* element = *i;
-		BSONObj* copy = new BSONObj(*element);
-		this->_elements.push_back(copy);
-	}
-}
-
 __int32 BSONArrayObj::length() const {
 	return _elements.size();
 }

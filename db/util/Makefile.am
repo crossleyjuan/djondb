@@ -17,8 +17,6 @@ libdjon_util_la_SOURCES = util.cpp \
 			  errorhandle.cpp \
 			  logger.cpp \
 			  datetime.cpp \
-			  linkedmap.hpp \
-			  lock.cpp \
 			  util.h \
 			  config.h \
 			  datetime.h \

@@ -23,7 +23,6 @@
 #include <string.h>
 #include <cpptest.h>
 #include <limits.h>
-#include <stdlib.h>
 
 using namespace std;
 
@@ -32,9 +31,8 @@ class TestBSONSuite : public Test::Suite
 	public:
 		TestBSONSuite()
 		{
-			TEST_ADD(TestBSONSuite::testBigBSON);
 			TEST_ADD(TestBSONSuite::testBSON);
-			TEST_ADD(TestBSONSuite::testBSONArray);
+			TEST_ADD(TestBSONSuite::testBigBSON);
 			TEST_ADD(TestBSONSuite::testEquals);
 			TEST_ADD(TestBSONSuite::testCopyBSON);
 			TEST_ADD(TestBSONSuite::testParserTrivial);
@@ -58,12 +56,12 @@ class TestBSONSuite : public Test::Suite
 			BSONObj* obj = new BSONObj();
 			// Add in
 			obj->add("int", 1);
-			obj->add("string", std::string("test"));
-			obj->add("long", (long long) 10000000000L);
+			obj->add("string", (const char*)"test");
+			obj->add("long", (__int64) 10000000000L);
 			obj->add("double", 1.1);
 
 			BSONObj rel;
-			rel.add("innertext", std::string("inner text"));
+			rel.add("innertext", (char*)"inner text");
 			obj->add("rel1", rel);
 
 			BSONArrayObj array;
@@ -78,17 +76,17 @@ class TestBSONSuite : public Test::Suite
 			TEST_ASSERT(obj->has("int"));
 			TEST_ASSERT(obj->getInt("int") == 1);
 
-			TEST_ASSERT(obj->getString("string").compare("test") == 0);
+			TEST_ASSERT(strcmp(obj->getString("string"), "test") == 0);
 
 			TEST_ASSERT(obj->has("long"));
-			cout << "long: " << obj->getLong64("long") << endl;
-			TEST_ASSERT(obj->getLong64("long") == 10000000000L);
+			cout << "long: " << obj->getLong("long") << endl;
+			TEST_ASSERT(obj->getLong("long") == 10000000000L);
 
 			TEST_ASSERT(obj->has("double"));
 			TEST_ASSERT(obj->getDouble("double") == 1.1);
 
 			TEST_ASSERT(obj->has("rel1"));
-			TEST_ASSERT(obj->getBSON("rel1")->getString("innertext").compare("inner text") == 0);
+			TEST_ASSERT(strcmp(obj->getBSON("rel1")->getString("innertext"), "inner text") == 0);
 			
 			TEST_ASSERT(obj->has("array"));
 			BSONArrayObj* arrayR = obj->getBSONArray("array");
@@ -116,41 +114,23 @@ class TestBSONSuite : public Test::Suite
 			delete obj;
 		}
 
-		void testBSONArray() {
-			cout << "\ntestBSONArray\n" << endl;
-			BSONArrayObj o;
-
-			BSONObj elem;
-			o.add(elem);
-
-			TEST_ASSERT(o.length() == 1);
-
-			std::vector<BSONObj*> array;
-			array.push_back(&elem);
-
-			BSONArrayObj o2(array);
-			TEST_ASSERT(o2.length() == 1);
-			BSONObj* test2 = o2.get(0);
-			TEST_ASSERT(*test2 == elem);
-		}
-
 		void testEquals() {
 			cout << "\ntestEquals" << endl;
 			BSONObj obj1;
 			obj1.add("int", 1);
 			obj1.add("double", 1.2);
-			obj1.add("string", std::string("Test"));
+			obj1.add("string", (char*)"Test");
 
 			BSONObj obj2;
 			obj2.add("int", 1);
 			obj2.add("double", 1.2);
-			obj2.add("string", std::string("Test"));
+			obj2.add("string", (char*)"Test");
 
 			TEST_ASSERT(obj1 == obj2);
 
-			obj2.add("string2", std::string("Test"));
+			obj2.add("string2", (char*)"Test");
 			TEST_ASSERT(obj1 != obj2);
-			obj1.add("string2", std::string("Test"));
+			obj1.add("string2", (char*)"Test");
 			TEST_ASSERT(obj1 == obj2);
 
 			obj1.add("test", 1);
@@ -165,9 +145,8 @@ class TestBSONSuite : public Test::Suite
 			int chars = 1000;
 			// Add in
 			obj->add("int", 1);
-			obj->add("long", LONG_MAX);
-			obj->add("long long", LLONG_MAX);
-			obj->add("string", std::string(chars, 'a'));
+			obj->add("long", (__int64)LONG_MAX);
+			obj->add("long long", (__int64)LLONG_MAX);
 			char* temp = (char*)malloc(chars+1);
 			memset(temp, 0, chars+1);
 			memset(temp, 'a', chars);
@@ -176,7 +155,6 @@ class TestBSONSuite : public Test::Suite
 			BSONObj rel;
 			rel.add("innertext", temp);
 			obj->add("rel1", rel);
-			free(temp);
 
 			char* json = obj->toChar();
 
@@ -190,15 +168,16 @@ class TestBSONSuite : public Test::Suite
 			TEST_ASSERT(obj->getLong("long") == LONG_MAX);
 
 			TEST_ASSERT(obj->has("long long"));
-			TEST_ASSERT(obj->getLong64("long long") == LLONG_MAX);
+			TEST_ASSERT(obj->getLong("long long") == LLONG_MAX);
 
-			TEST_ASSERT(obj->getString("string").compare(std::string(chars, 'a')) == 0);
+			TEST_ASSERT(strcmp(obj->getString("char*"), temp) == 0);
 
 			TEST_ASSERT(obj->has("rel1"));
-			TEST_ASSERT(obj->getBSON("rel1")->getString("innertext").compare(std::string(chars, 'a')) == 0);
+			TEST_ASSERT(strcmp(obj->getBSON("rel1")->getString("innertext"), temp) == 0);
 
 			delete obj;
 			delete obj2;
+			free(temp);
 		}
 
 		void testCopyBSON()
@@ -208,12 +187,12 @@ class TestBSONSuite : public Test::Suite
 			BSONObj* objOrig = new BSONObj();
 			// Add in
 			objOrig->add("int", 1);
-			objOrig->add("string", std::string("test"));
-			objOrig->add("long", 1L);
+			objOrig->add("string", (char*)"test");
+			objOrig->add("long", (__int64)1L);
 			objOrig->add("double", 1.1);
 
 			BSONObj rel;
-			rel.add("innertext", std::string("inner text"));
+			rel.add("innertext", (char*)"inner text");
 			objOrig->add("rel1", rel);
 
 			BSONArrayObj array;
@@ -232,7 +211,7 @@ class TestBSONSuite : public Test::Suite
 			TEST_ASSERT(obj->has("int"));
 			TEST_ASSERT(obj->getInt("int") == 1);
 
-			TEST_ASSERT(obj->getString("string").compare("test") == 0);
+			TEST_ASSERT(strcmp(obj->getString("string"), "test") == 0);
 
 			TEST_ASSERT(obj->has("long"));
 			TEST_ASSERT(obj->getLong("long") == 1L);
@@ -242,7 +221,7 @@ class TestBSONSuite : public Test::Suite
 
 			BSONObj* temp = obj->getBSON("rel1");
 			TEST_ASSERT(temp != NULL);
-			TEST_ASSERT(obj->getBSON("rel1")->getString("innertext").compare("inner text") == 0);
+			TEST_ASSERT(strcmp(obj->getBSON("rel1")->getString("innertext"), "inner text") == 0);
 
 			TEST_ASSERT(obj->getBSONArray("array") != NULL);
 			BSONArrayObj* arrayR = obj->getBSONArray("array");
@@ -263,9 +242,9 @@ class TestBSONSuite : public Test::Suite
 
 			BSONObj obj;
 			obj.add("int", 1);
-			obj.add("string", std::string("test"));
+			obj.add("string", (char*)"test");
 			obj.add("char*", (char*)"char*");
-			obj.add("long", 1L);
+			obj.add("long", (__int64)1L);
 			obj.add("double", 1.1);
 
 			char* json = obj.toChar();
@@ -279,9 +258,9 @@ class TestBSONSuite : public Test::Suite
 
 			BSONObj inner;
 			inner.add("int", 1);
-			inner.add("string", std::string("test"));
+			inner.add("string", (char*)"test");
 			inner.add("char*", (char*)"char*");
-			inner.add("long", 1L);
+			inner.add("long", (__int64)1L);
 			inner.add("double", 1.1);
 			obj.add("inner", inner);
 
@@ -300,13 +279,13 @@ class TestBSONSuite : public Test::Suite
 			BSONObj* obj = BSONParser::parse("{age: 1, name: 'John:test\\'test2\\'', salary: 3500.25, lnumber: 100000000000}");
 			TEST_ASSERT(obj->has("age"));
 			TEST_ASSERT(obj->getInt("age") == 1);
-			TEST_ASSERT(obj->getString("name").compare("John:test\\'test2\\'") == 0);
+			TEST_ASSERT(strcmp(obj->getString("name"), "John:test\\'test2\\'") == 0);
 
 			TEST_ASSERT(obj->has("salary"));
 			TEST_ASSERT(obj->getDouble("salary") == 3500.25);
 
 			TEST_ASSERT(obj->has("lnumber"));
-			TEST_ASSERT(obj->getLong64("lnumber") == 100000000000);
+			TEST_ASSERT(obj->getLong("lnumber") == 100000000000);
 
 			delete obj;
 			delete testEmpty;
@@ -318,7 +297,7 @@ class TestBSONSuite : public Test::Suite
 
 			BSONObj* obj = BSONParser::parse("{age: '1'}");
 			TEST_ASSERT(obj->has("age"));
-			TEST_ASSERT(obj->getString("age").compare("1") == 0);
+			TEST_ASSERT(strcmp(obj->getString("age"), "1") == 0);
 
 			delete obj;
 
@@ -335,15 +314,15 @@ class TestBSONSuite : public Test::Suite
 			TEST_ASSERT(obj->has("age"));
 			TEST_ASSERT(obj->getInt("age") == 1);
 			TEST_ASSERT(obj->has("name"));
-			TEST_ASSERT(obj->getString("name").compare("John") == 0);
+			TEST_ASSERT(strcmp(obj->getString("name"), "John") == 0);
 
-			int salary = obj->getXpath("rel1.salary");
+			__int32 salary = *obj->getXpath("rel1.salary");
 			TEST_ASSERT(salary == 150000);
-			int rent = obj->getXpath("rel1.rent");
+			__int32 rent = *obj->getXpath("rel1.rent");
 			TEST_ASSERT(rent == 10000);
 
 			TEST_ASSERT(obj->getBSON("rel1") != NULL);
-			TEST_ASSERT(obj->getBSON("rel1")->getString("innertext").compare("inner text") == 0);
+			TEST_ASSERT(strcmp(obj->getBSON("rel1")->getString("innertext"), "inner text") == 0);
 
 			delete obj;
 		}
@@ -361,13 +340,13 @@ class TestBSONSuite : public Test::Suite
 			TEST_ASSERT(obj->has("age"));
 			TEST_ASSERT(obj->getInt("age") == 1);
 			TEST_ASSERT(obj->has("name"));
-			TEST_ASSERT(obj->getString("name").compare("John") == 0);
+			TEST_ASSERT(strcmp(obj->getString("name"), "John") == 0);
 
 			TEST_ASSERT(obj->has("salary"));
 			TEST_ASSERT(obj->getDouble("salary") == 3500.25);
 
 			TEST_ASSERT(obj->getBSON("rel1") != NULL);
-			TEST_ASSERT(obj->getBSON("rel1")->getString("innertext").compare("inner text") == 0);
+			TEST_ASSERT(strcmp(obj->getBSON("rel1")->getString("innertext"), "inner text") == 0);
 
 			BSONArrayObj::iterator i = array->begin();
 			TEST_ASSERT(i != array->end());
@@ -383,7 +362,7 @@ class TestBSONSuite : public Test::Suite
 			TEST_ASSERT(obj->has("age"));
 			TEST_ASSERT(obj->getInt("age") == 1);
 			TEST_ASSERT(obj->has("name"));
-			TEST_ASSERT(obj->getString("name").compare("John") == 0);
+			TEST_ASSERT(strcmp(obj->getString("name"), "John") == 0);
 
 			TEST_ASSERT(obj->has("salary"));
 			TEST_ASSERT(obj->getDouble("salary") == 3500.25);
@@ -391,7 +370,7 @@ class TestBSONSuite : public Test::Suite
 			TEST_ASSERT(obj->getBSONArray("rel1") != NULL);
 			TEST_ASSERT(obj->getBSONArray("rel1")->length() == 4);
 			TEST_ASSERT(obj->getBSONArray("rel1")->get(0)->has("innertext"));
-			TEST_ASSERT(obj->getBSONArray("rel1")->get(0)->getString("innertext").compare("inner text") == 0);
+			TEST_ASSERT(strcmp(obj->getBSONArray("rel1")->get(0)->getString("innertext"), "inner text") == 0);
 
 			delete obj;
 		}
@@ -404,16 +383,16 @@ class TestBSONSuite : public Test::Suite
 			TEST_ASSERT(obj->has("age"));
 			TEST_ASSERT(obj->getInt("age") == 1);
 			TEST_ASSERT(obj->has("name"));
-			TEST_ASSERT(obj->getString("name").compare("John") == 0);
+			TEST_ASSERT(strcmp(obj->getString("name"), "John") == 0);
 
 			TEST_ASSERT(obj->has("salary"));
 			TEST_ASSERT(obj->getDouble("salary") == 3500.25);
 
 			TEST_ASSERT(obj->getBSON("rel1") != NULL);
-			TEST_ASSERT(obj->getBSON("rel1")->getString("innertext").compare("inner text") == 0);
+			TEST_ASSERT(strcmp(obj->getBSON("rel1")->getString("innertext"), "inner text") == 0);
 
 			TEST_ASSERT(obj->getBSON("rel1")->getBSON("innerrel1") != NULL);
-			TEST_ASSERT(obj->getBSON("rel1")->getBSON("innerrel1")->getString("innertext").compare("text2") == 0);
+			TEST_ASSERT(strcmp(obj->getBSON("rel1")->getBSON("innerrel1")->getString("innertext"), "text2") == 0);
 			delete obj;
 		}
 
@@ -438,18 +417,17 @@ class TestBSONSuite : public Test::Suite
 			cout << "testAutocasting" << endl;
 
 			BSONObj o;
-			o.add("long", 1L);
+			o.add("long", (__int64)1L);
 			o.add("double", 2.0);
 			o.add("int", 1);
 			o.add("char*", (char*)"Test");
-			o.add("string", (std::string)"String");
 
 			BSONObj inner;
 			inner.add("text", "text");
 			o.add("inner", inner);
 
 			TEST_ASSERT(o.getContent("long") != NULL);
-			TEST_ASSERT((long)*o.getContent("long") == 1L);
+			TEST_ASSERT((__int64)*o.getContent("long") == 1L);
 
 			TEST_ASSERT(o.getContent("double") != NULL);
 			TEST_ASSERT((double)*o.getContent("double") == 2.0);
@@ -457,15 +435,9 @@ class TestBSONSuite : public Test::Suite
 			TEST_ASSERT(o.getContent("int") != NULL);
 			TEST_ASSERT((int)*o.getContent("int") == 1);
 
-			TEST_ASSERT(o.getContent("char*") != NULL);
-			TEST_ASSERT(((std::string)*o.getContent("char*")).compare("Test") == 0);
-
-			TEST_ASSERT(o.getContent("string") != NULL);
-			TEST_ASSERT(((std::string)*o.getContent("string")).compare("String") == 0);
-
 			TEST_ASSERT(o.getContent("inner") != NULL);
-			BSONObj obj = *o.getContent("inner");
-			TEST_ASSERT(obj.getString("text").compare("text") == 0);
+			BSONObj* obj = *o.getContent("inner");
+			TEST_ASSERT(strcmp(obj->getString("text"), "text") == 0);
 		}
 
 		void testXPath() {
@@ -473,14 +445,14 @@ class TestBSONSuite : public Test::Suite
 
 			BSONObj* obj1 = BSONParser::parse("{ name: 'John', age: 35, one: { data: 1 }, children: [ { name: 'Joshua', age: 15}, { name: 'Mary', age: 30}] }");
 
-			int age = obj1->getXpath("age");
+			__int32 age = *obj1->getXpath("age");
 
 			TEST_ASSERT(age == 35);
 
-			BSONArrayObj children = obj1->getXpath("children");
-			TEST_ASSERT(children.length() == 2);
+			BSONArrayObj* children = *obj1->getXpath("children");
+			TEST_ASSERT(children->length() == 2);
 
-			int data = obj1->getXpath("one.data");
+			__int32 data = *obj1->getXpath("one.data");
 			TEST_ASSERT(data == 1);
 
 			delete obj1;
@@ -520,7 +492,6 @@ class TestBSONSuite : public Test::Suite
 			subresult = bson_subselect(selectsimple, "test2");
 			expected = "$\"inner\", $\"inner2\", $\"inner2.testii\"";
 			TEST_ASSERT(strcmp(subresult, expected) == 0);
-			free(subresult);
 		}
 
 		void testBSONSelect() {
@@ -545,8 +516,6 @@ class TestBSONSuite : public Test::Suite
 			TEST_ASSERT(*result == *expected);
 
 			delete obj;
-			delete expected;
-			delete result;
 		}
 };
 

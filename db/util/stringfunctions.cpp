@@ -25,15 +25,119 @@
 #include <sstream>
 #include <boost/algorithm/string.hpp>
 
+djondb::string::string() {
+	_holder = NULL;
+	_len = 0;
+}
+
+djondb::string::string(char* c, __int32 len) {
+	_holder = new stringHolder(c);
+	_len = len;
+}
+
+djondb::string::string(const char* c, __int32 len) {
+	_holder = new stringHolder(c);
+	_len = len;
+}
+
+djondb::string::string(const djondb::string& orig) {
+	this->_holder = orig._holder;
+	if (this->_holder != NULL) {
+		this->_holder->addReference();
+	}
+	this->_len = orig._len;
+}
+
+djondb::string& djondb::string::operator=(const djondb::string& rvar) {
+	this->_holder = rvar._holder;
+	if (this->_holder != NULL) {
+		this->_holder->addReference();
+	}
+	this->_len = rvar._len;
+	return *this;
+}
+
+djondb::string::~string() {
+	if (this->_holder != NULL) {
+		this->_holder->removeReference();
+		if (this->_holder->references() == 0) {
+			delete this->_holder;
+		}
+	}
+}
+
+std::string djondb::string::str() const {
+	char* chr = (char*)malloc(length() + 1);
+	strncpy(chr, (char*)*_holder, length());
+	chr[length()] = 0;
+	std::string result(chr);
+	return result;
+}
+
+const char* djondb::string::c_str() const {
+	if (_holder != NULL) {
+		return const_cast<const char*>((char*)*_holder);
+	} else {
+		return NULL;
+	}
+}
+
+int djondb::string::compare(const djondb::string s2) const {
+	return compare(s2.c_str());
+}
+
+int djondb::string::compare(const char* s2) const {
+    const char* s1 = (const char*)*_holder;
+    // the null char should not be compared to avoid unexpected results on buffers
+    int lenWithoutNull = _len - 1;
+    return strncmp(s1, s2, lenWithoutNull);
+}
+
+__int32 djondb::string::length() const {
+	return _len;
+}
+
+djondb::string::operator const char*() const {
+	return *_holder;
+}
+
+djondb::string::operator char*() const {
+	return *_holder;
+}
+
+bool djondb::string::operator ==(const djondb::string& str) {
+	if (this->_len != str._len) {
+		return false;
+	} else {
+		if (strncmp(c_str(), str.c_str(), this->_len) == 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+}
+
+bool djondb::string::operator !=(const djondb::string& str) {
+	if (this->_len != str._len) {
+		return true;
+	} else {
+		if (strncmp(c_str(), str.c_str(), this->_len) == 0) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+}
+
 char* strcpy(std::string str) {
-    return strcpy(const_cast<char*>(str.c_str()), str.length());
+	return strcpy(const_cast<char*>(str.c_str()), str.length());
 }
 
 char* strcpy(char* str, int offset, int len) {
-    char* result = (char*)malloc(len + 1);
-    memset(result, 0, len +1);
-    memcpy(result, str + offset, len);
-    return result;
+	char* result = (char*)malloc(len + 1);
+	memset(result, 0, len +1);
+	memcpy(result, str + offset, len);
+	return result;
 }
 
 char* strcpy(char* str, int len) {
@@ -204,21 +308,19 @@ bool compareInsensitive(const char* text1, const char* text2) {
 	return boost::iequals(std::string(text1), std::string(text2));
 }
 
-void trim(char* dest, char* str) {
-	memset(dest, 0, strlen(str) + 1);
+char* trim(char* str, int len) {
 	int pos = 0;
-	int len = strlen(str);
 	// removes the first spaces
 	while (str[pos] == ' ') {
 		pos++;
 	}
 
-	strncpy(dest, &str[pos], len - pos);
+	char* result = strcpy(str + pos, len - pos);
 	// Removes the spaces at the end
-	pos = strlen(dest) - 1;
-	while (dest[pos] == ' ') {
-		dest[pos] = 0;
+	pos = strlen(result) - 1;
+	while (result[pos] == ' ') {
+		result[pos] = 0;
 		pos--;
 	}
+	return result;
 }
-

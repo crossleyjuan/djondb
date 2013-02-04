@@ -59,38 +59,44 @@ BSONObj::~BSONObj()
 	*/
 
 void BSONObj::add(std::string key, __int32 val) {
-	__int32* internalValue = new __int32();
-	*internalValue = val;
-	fillContent(key, INT_TYPE, internalValue);
+	remove(key);
+	BSONContentInt* content = new BSONContentInt(val); 
+	_elements.insert(pair<std::string, BSONContent* >(key, content));
 }
 
 void BSONObj::add(std::string key, double val) {
-	double* internalValue = new double();
-	*internalValue = val;
-	fillContent(key, DOUBLE_TYPE, internalValue);
+	remove(key);
+	BSONContentDouble* content = new BSONContentDouble(val); 
+	_elements.insert(pair<std::string, BSONContent* >(key, content));
 }
 
 void BSONObj::add(std::string key, __int64 val) {
-	__int64* internalValue = new __int64();
-	*internalValue = val;
-	fillContent(key, LONG_TYPE, internalValue);
+	remove(key);
+	BSONContentLong* content = new BSONContentLong(val); 
+	_elements.insert(pair<std::string, BSONContent* >(key, content));
 }
 
-void BSONObj::add(std::string key, std::string val) {
-	std::string* internalValue = new std::string(val);
-	fillContent(key, STRING_TYPE, internalValue);
+void BSONObj::add(std::string key, char* val) {
+	add(key, val, strlen(val));
+}
+
+void BSONObj::add(std::string key, char* val, __int32 length) {
+	remove(key);
+	BSONContentString* content = new BSONContentString(strcpy(val, length), length); 
+	_elements.insert(pair<std::string, BSONContent* >(key, content));
 }
 
 void BSONObj::add(std::string key, const BSONObj& val) {
-	BSONObj* internalValue = new BSONObj(val);
-	fillContent(key, BSON_TYPE, internalValue);
+	remove(key);
+	BSONContentBSON* content = new BSONContentBSON(new BSONObj(val)); 
+	_elements.insert(pair<std::string, BSONContent* >(key, content));
 }
 
 void BSONObj::add(std::string key, const BSONArrayObj& val) {
-	BSONArrayObj* internalValue = new BSONArrayObj(val);
-	fillContent(key, BSONARRAY_TYPE, internalValue);
+	remove(key);
+	BSONContentBSONArray* content = new BSONContentBSONArray(new BSONArrayObj(val)); 
+	_elements.insert(pair<std::string, BSONContent* >(key, content));
 }
-
 
 char* BSONObj::toChar() {
 	// if the toChar was already calculated before use it
@@ -123,29 +129,45 @@ char* BSONObj::toChar() {
 		char* chr;
 		const char* cstr;
 		switch (content->type())  {
-			case BSON_TYPE:
-					chr = ((BSONObj*)content->_element)->toChar();
-					sprintf(result + pos, "%s", chr);
-					free(chr);
-					break;
-			case BSONARRAY_TYPE:
-					chr = ((BSONArrayObj*)content->_element)->toChar();
-					sprintf(result + pos, "%s", chr);
-					free(chr);
-					break;
-			case INT_TYPE: 
-					sprintf(result + pos, "%d", *((__int32*)content->_element));
-					break;
-			case LONG_TYPE:
-					sprintf(result + pos, "%ld", *((__int64*)content->_element));
-					break;
-			case DOUBLE_TYPE:
-					sprintf(result + pos, "%f", *((double*)content->_element));
-					break;
+			case BSON_TYPE: {
+									 BSONContentBSON* bbson = (BSONContentBSON*)content;
+									 BSONObj* bson = (BSONObj*)*bbson;
+									 char* chrbson = bson->toChar();
+									 sprintf(result + pos, "%s", chrbson);
+									 free(chrbson);
+									 break;
+								 }
+			case BSONARRAY_TYPE: {
+											BSONContentBSONArray* bbsonarray = (BSONContentBSONArray*)content;
+											BSONArrayObj* bsonarray = (BSONArrayObj*)*bbsonarray;
+											char* chrbsonarray = bsonarray->toChar();
+											sprintf(result + pos, "%s", chrbsonarray);
+											free(chrbsonarray);
+											break;
+										}
+			case INT_TYPE:  {
+									 BSONContentInt* bint = (BSONContentInt*)content;
+									 sprintf(result + pos, "%d", (__int32)*bint);
+									 break;
+								 }
+			case LONG_TYPE: {
+									 BSONContentLong* blong = (BSONContentLong*)content;
+									 sprintf(result + pos, "%lld", (__int64)*blong);
+									 break;
+								 }
+			case DOUBLE_TYPE: {
+									 BSONContentDouble* bdouble = (BSONContentDouble*)content;
+									 sprintf(result + pos, "%f", (double)*bdouble);
+									 break;
+								 }
 			case STRING_TYPE:
-					cstr = ((std::string*)content->_element)->c_str();
-					sprintf(result + pos, "\"%s\"", cstr);
-					break;
+			case PTRCHAR_TYPE: { 
+										 BSONContentString* bstring = (BSONContentString*)content;
+
+										 djondb::string s = *bstring;
+										 sprintf(result + pos, "\"%.*s\"", s.length(), s.c_str());
+										 break;
+									 }
 		}
 		pos = strlen(result);
 		assert(pos < MAX_BSONOBJ_BUFFER);
@@ -161,15 +183,16 @@ char* BSONObj::toChar() {
 
 	char* cresult = strcpy(result);
 
-	delete log;
+	if (log->isDebug()) log->debug("toChar result: %s", cresult);
+
 	return cresult;
 }
 
 __int32 BSONObj::getInt(std::string key) const throw(BSONException) {
 	BSONContent* content = getContent(key);
 	if ((content != NULL) && (content->type() == INT_TYPE)) {
-		__int32* res = (__int32*)content->_element;
-		return *res;
+		BSONContentInt* bint = (BSONContentInt*)content;
+		return *bint;
 	} else {
 		throw BSONException(format("key not found %s", key.c_str()).c_str());
 	}
@@ -178,8 +201,8 @@ __int32 BSONObj::getInt(std::string key) const throw(BSONException) {
 double BSONObj::getDouble(std::string key) const throw(BSONException) {
 	BSONContent* content = getContent(key);
 	if ((content != NULL) && (content->type() == DOUBLE_TYPE)) {
-		double* res = (double*)content->_element;
-		return *res;
+		BSONContentDouble* bdouble = (BSONContentDouble*)content;
+		return *bdouble;
 	} else {
 		throw BSONException(format("key not found %s", key.c_str()).c_str());
 	}
@@ -188,32 +211,33 @@ double BSONObj::getDouble(std::string key) const throw(BSONException) {
 __int64 BSONObj::getLong(std::string key) const throw(BSONException) {
 	BSONContent* content = getContent(key);
 	if ((content != NULL) && (content->type() == LONG_TYPE)) {
-		__int64* res = (__int64*)content->_element;
-		return *res;
+		BSONContentLong* blong = (BSONContentLong*)content;
+		return *blong;
 	} else {
 		throw BSONException(format("key not found %s", key.c_str()).c_str());
 	}
 }
 
-std::string BSONObj::getString(std::string key) const throw(BSONException) {
+const std::string BSONObj::getString(std::string key) const throw(BSONException) {
+	return getDJString(key).str();
+}
+
+const djondb::string BSONObj::getDJString(std::string key) const throw(BSONException) {
 	BSONContent* content = getContent(key);
-	if (!content) {
+	if ((content != NULL) && (content->type() == PTRCHAR_TYPE)) {
+		BSONContentString* bstring = (BSONContentString*)content;
+		djondb::string s = *bstring;
+		return s;
+	} else {
 		throw BSONException(format("key not found %s", key.c_str()).c_str());
 	}
-	std::string result;
-	if (content->type() == STRING_TYPE) {
-		result = *(std::string*)content->_element;
-	} else {
-		assert(false);
-	}
-	return result;
 }
 
 BSONObj* BSONObj::getBSON(std::string key) const throw(BSONException) {
 	BSONContent* content = getContent(key);
 	if ((content != NULL) && (content->type() == BSON_TYPE)) {
-		BSONObj* res = (BSONObj*)content->_element;
-		return res;
+		BSONContentBSON* bbson = (BSONContentBSON*)content;
+		return *bbson;
 	} else {
 		throw BSONException(format("key not found %s", key.c_str()).c_str());
 	}
@@ -222,8 +246,8 @@ BSONObj* BSONObj::getBSON(std::string key) const throw(BSONException) {
 BSONArrayObj* BSONObj::getBSONArray(std::string key) const throw(BSONException) {
 	BSONContent* content = getContent(key);
 	if ((content != NULL) && (content->type() == BSONARRAY_TYPE)) {
-		BSONArrayObj* res = (BSONArrayObj*)content->_element;
-		return res;
+		BSONContentBSONArray* bbson = (BSONContentBSONArray*)content;
+		return *bbson;
 	} else {
 		throw BSONException(format("key not found %s", key.c_str()).c_str());
 	}
@@ -277,7 +301,33 @@ BSONObj::BSONObj(const BSONObj& orig) {
 	for (std::map<std::string, BSONContent* >::const_iterator i = orig._elements.begin(); i != orig._elements.end(); i++) {
 		std::string key = i->first;
 		BSONContent* origContent = i->second;
-		BSONContent* content = new BSONContent(*origContent);
+		BSONContent* content;
+		switch (origContent->type()) {
+			case INT_TYPE: {
+									content = new BSONContentInt(*(BSONContentInt*)origContent);
+									break;
+								}
+			case LONG_TYPE: {
+									content = new BSONContentLong(*(BSONContentLong*)origContent);
+									break;
+								}
+			case DOUBLE_TYPE: {
+									content = new BSONContentDouble(*(BSONContentDouble*)origContent);
+									break;
+								}
+			case PTRCHAR_TYPE: {
+									content = new BSONContentString(*(BSONContentString*)origContent);
+									break;
+								}
+			case BSON_TYPE: {
+									content = new BSONContentBSON(*(BSONContentBSON*)origContent);
+									break;
+								}
+			case BSONARRAY_TYPE: {
+									content = new BSONContentBSONArray(*(BSONContentBSONArray*)origContent);
+									break;
+								}
+		}
 
 		this->_elements.insert(pair<std::string, BSONContent* >(i->first, content));
 	}
@@ -290,7 +340,6 @@ BSONObj::BSONObj(const BSONObj& orig) {
 
 BSONTYPE BSONObj::type(std::string key) const {
 	BSONContent* content = NULL;
-	//    SEARCHBSON(key, STRING_TYPE);
 	for (std::map<std::string, BSONContent* >::const_iterator it = _elements.begin(); it != _elements.end(); it++) {
 		std::string itKey = it->first;
 		if (itKey.compare(key) == 0) {
@@ -305,9 +354,8 @@ BSONTYPE BSONObj::type(std::string key) const {
 	}
 }
 
-BSONContent BSONObj::get(std::string key) const throw(BSONException) {
+BSONContent* BSONObj::get(std::string key) const throw(BSONException) {
 	BSONContent* content = NULL;
-	//    SEARCHBSON(key, STRING_TYPE);
 	for (std::map<std::string, BSONContent* >::const_iterator it = _elements.begin(); it != _elements.end(); it++) {
 		std::string itKey = it->first;
 		if (itKey.compare(key) == 0) {
@@ -316,36 +364,32 @@ BSONContent BSONObj::get(std::string key) const throw(BSONException) {
 		}
 	}
 	if (content != NULL) {
-		return *content;
+		return content;
 	} else {
 		throw BSONException(format("key not found %s", key.c_str()).c_str());
 	}
 }
 
-BSONContent BSONObj::getXpath(const std::string& xpath) const {
+BSONContent* BSONObj::getXpath(const std::string& xpath) const {
 	__int32 posDot = xpath.find('.');
+	BSONContent* result = NULL;
 	if (posDot == string::npos) {
-		BSONContent* result = getContent(xpath);
-		if (result != NULL) {
-			return *result;
-		} else {
-			return BSONContent(); // this will return a NULL_TYPE
-		}
+		result = getContent(xpath);
 	} else {
 		std::string path = xpath.substr(0, posDot);
-		BSONContent* content = getContent(path);
-		if (content == NULL) {
-			return BSONContent();
-		}
-		if (content->type() == BSON_TYPE) {
-			BSONObj inner = (BSONObj)*content;
-			return inner.getXpath(xpath.substr(posDot + 1));
-		} else {
-			return BSONContent();
+		result = getContent(path);
+		if ((result != NULL) && (result->type() == BSON_TYPE)) {
+			BSONContentBSON* bcontent = (BSONContentBSON*)result;
+			BSONObj* inner = (BSONObj*)*bcontent;
+			result = inner->getXpath(xpath.substr(posDot + 1));
 		}
 	}
 
-	return BSONContent();
+	if (result != NULL) {
+		return result->clone();
+	} else {
+		return NULL;
+	}
 }
 
 bool BSONObj::operator ==(const BSONObj& obj) const {
@@ -415,59 +459,62 @@ BSONObj* BSONObj::select(const char* sel) const {
 			switch (origContent->type()) {
 				case BSON_TYPE:  
 					{
-						BSONObj inner = (BSONObj)*origContent;
-						
-					   if (!include_all) {
+						BSONContentBSON* bbson = (BSONContentBSON*)origContent;
+						BSONObj* inner = (BSONObj*)*bbson;
+
+						if (!include_all) {
 							char* subselect = bson_subselect(sel, key.c_str());
-							BSONObj* innerSubSelect = inner.select(subselect);
+							BSONObj* innerSubSelect = inner->select(subselect);
 							result->add(key, *innerSubSelect);
 							delete innerSubSelect;
 						} else {
-							result->add(key, inner);
+							result->add(key, *inner);
 						}
 						break;
 					}
 				case BSONARRAY_TYPE: 
 					{
-						BSONArrayObj innerArray = (BSONArrayObj)*origContent;
-					   if (!include_all) {
+						BSONContentBSONArray* bbsonarray = (BSONContentBSONArray*)origContent;
+						BSONArrayObj* innerArray = (BSONArrayObj*)*bbsonarray;
+						if (!include_all) {
 							char* subselect = bson_subselect(sel, key.c_str());
-							BSONArrayObj* innerSubArray = innerArray.select(subselect);
+							BSONArrayObj* innerSubArray = innerArray->select(subselect);
 							result->add(key, *innerSubArray);
 							delete innerSubArray;
 						} else {
-							result->add(key, innerArray);
+							result->add(key, *innerArray);
 						}
 						break;
 					}
 				case INT_TYPE: 
 					{
-						__int32 val = *origContent;
+						BSONContentInt* bint = (BSONContentInt*)origContent;
+						__int32 val = *bint;
 						result->add(key, val);
 						break;
 					}
 				case LONG_TYPE:
 					{
-						__int64 val = *origContent;
-						result->add(key, val);
-						break;
-					}
-				case LONG64_TYPE:
-					{
-						__LONG64 val = *origContent;
+						BSONContentLong* blong = (BSONContentLong*)origContent;
+						__int64 val = *blong;
 						result->add(key, val);
 						break;
 					}
 				case DOUBLE_TYPE:
 					{
-						double val = *origContent;
+						BSONContentDouble* bdouble = (BSONContentDouble*)origContent;
+						double val = *bdouble;
 						result->add(key, val);
 						break;
 					}
+				case PTRCHAR_TYPE:
 				case STRING_TYPE:
 					{
-						std::string val = *origContent;
-						result->add(key, val);
+						BSONContentString* bstring = (BSONContentString*)origContent;
+						djondb::string str = *bstring;
+						const char* val = str.c_str();
+						__int32 len = str.length();
+						result->add(key, const_cast<char*>(val), len);
 						break;
 					}
 			}
@@ -476,7 +523,7 @@ BSONObj* BSONObj::select(const char* sel) const {
 	return result;
 }
 
-void BSONObj::fillContent(std::string kkey, BSONTYPE ttype, void* vval) {
+void BSONObj::remove(std::string kkey) {
 	std::map<std::string, BSONContent* >::iterator i = _elements.find(kkey);
 	if (i != _elements.end()) {
 		// Removes the previous element
@@ -484,10 +531,6 @@ void BSONObj::fillContent(std::string kkey, BSONTYPE ttype, void* vval) {
 		delete current;
 		_elements.erase(i);
 	}
-	BSONContent* content = new BSONContent(); 
-	content->setType(ttype); 
-	content->_element = vval; 
-	_elements.insert(pair<std::string, BSONContent* >(kkey, content));
 
 	// cleans up the cached toChar value
 	if (_cBSON != NULL) {

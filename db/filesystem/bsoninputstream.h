@@ -20,8 +20,8 @@ class BSONInputStream
 
         BSONObj* readBSON() const;
         BSONObj* readBSON(const char* select) const;
-		  std::vector<BSONObj*>* readBSONArray() const;
-		  std::vector<BSONObj*>* readBSONArray(const char* select) const;
+		  BSONArrayObj* readBSONArray() const;
+		  BSONArrayObj* readBSONArray(const char* select) const;
 		  BSONArrayObj* readBSONInnerArray() const;
 		  BSONArrayObj* readBSONInnerArray(const char* select) const;
 

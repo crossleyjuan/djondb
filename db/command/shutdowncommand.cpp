@@ -41,8 +41,6 @@ ShutdownCommand::ShutdownCommand(const ShutdownCommand& other)
 void ShutdownCommand::execute() {
 	Logger* log = getLogger(NULL);
 	if (log->isDebug()) log->debug("executing shutdown command ");
-
-	delete log;
 }
 
 void* ShutdownCommand::result() {
@@ -57,6 +55,5 @@ void ShutdownCommand::readResult(InputStream* is)  {
 
 void ShutdownCommand::writeResult(OutputStream* out) const {
 	Logger* log = getLogger(NULL);
-	delete log;
 }
 

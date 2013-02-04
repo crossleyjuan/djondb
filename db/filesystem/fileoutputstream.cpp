@@ -31,7 +31,6 @@ FileOutputStream::FileOutputStream(char* fileName, const char* flags) {
 
 FileOutputStream::~FileOutputStream() {
     close();
-    free(_pFile);
 }
 
 bool FileOutputStream::isOpen() const {
@@ -45,9 +44,9 @@ void FileOutputStream::writeChar (unsigned char v)
 }
 
 /* Write 2 bytes in the output (little endian order) */
-void FileOutputStream::writeShortInt (short int v)
+void FileOutputStream::writeShortInt (__int16 v)
 {
-	writeData<short int>(v);
+	writeData<__int16>(v);
 }
 
 /* Write 4 bytes in the output (little endian order) */
@@ -114,9 +113,13 @@ __int64 FileOutputStream::crc32(__int32 pos) {
 	return result;
 }
 
-void FileOutputStream::seek(__int64 i) {
+void FileOutputStream::seek(__int64 i, SEEK_DIRECTION direction) {
 	fflush(_pFile);
-	fseek (_pFile, i, SEEK_SET);
+	if (direction == FROMSTART_SEEK) {
+		fseek (_pFile, i, SEEK_SET);
+	} else {
+		fseek (_pFile, i, SEEK_END);
+	}
 }
 
 __int64 FileOutputStream::currentPos() const {

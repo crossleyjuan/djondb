@@ -14,11 +14,13 @@ public:
 
     virtual unsigned char readChar();
     /* Reads 2 bytes in the input (little endian order) */
-    virtual short int readShortInt ();
+    virtual __int16 readShortInt ();
     /* Reads 4 bytes in the input (little endian order) */
     virtual __int32 readInt ();
     /* Reads 4 bytes in the input (little endian order) */
     virtual __int64 readLong ();
+    /* Reads a 16 byte long in the input */
+    virtual __int64 readLong64();
     /* Reads a 4 byte float in the input */
     virtual float readFloatIEEE ();
     /* Reads a 8 byte double in the input */
@@ -26,9 +28,10 @@ public:
     /* Read a chars */
     virtual char* readChars();
     virtual char* readChars(__int32 length);
+    virtual void readChars(__int32 length, char* res);
     virtual const char* readFull();
     virtual __int64 currentPos() const;
-    virtual void seek(__int64 i);
+	virtual void seek(__int64 pos, SEEK_DIRECTION direction = FROMSTART_SEEK);
     virtual __int64 crc32();
 
     virtual std::string* readString();
@@ -39,7 +42,15 @@ public:
 
     virtual bool isClosed();
 private:
-    FILE* _pFile;
+	__int64 read(char* buffer, __int32 len); 
+
+private:
+#ifndef A
+	FILE* _pFile;
+#else
+	HANDLE _pFile;
+	bool _eof;
+#endif
     std::string _fileName;
     bool _open;
 };

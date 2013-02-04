@@ -2,6 +2,7 @@
 
 %include "std_string.i"
 %include "std_vector.i"
+%include "windows.i"
 
 %{
 #include "bsonarrayobj.h"
@@ -19,6 +20,8 @@ namespace std {
    %template(BSONObjVectorPtr) vector<BSONObj*>;
    %template(StringVector) vector<std::string>;
 }
+
+%ignore getDJString;
 
 /* Let's just grab the original header file here */
 %include "bsonarrayobj.h"

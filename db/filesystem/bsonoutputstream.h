@@ -17,7 +17,7 @@ class BSONOutputStream
 
         void writeBSON(const BSONObj& bson);
         void writeBSONArray(const std::vector<BSONObj*>& array);
-        void writeBSONArray(const BSONArrayObj* array);
+		  void writeBSONArray(const BSONArrayObj* array);
 
     protected:
     private:

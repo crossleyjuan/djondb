@@ -2,6 +2,7 @@
 #define INPUTSTREAM_H
 
 #include "util.h"
+#include "filesystemdefs.h"
 #include <istream>
 #include <iostream>
 #include <stdio.h>
@@ -14,9 +15,13 @@ public:
 
     virtual unsigned char readChar() = 0;
     /* Reads 2 bytes in the input (little endian order) */
-    virtual int readInt () = 0;
+    virtual __int16 readShortInt () = 0;
+    /* Reads 2 bytes in the input (little endian order) */
+    virtual __int32 readInt () = 0;
     /* Reads 4 bytes in the input (little endian order) */
-    virtual long readLong () = 0;
+    virtual __int64 readLong () = 0;
+    /* Reads a 16 byte float in the input */
+    virtual __int64 readLong64() = 0;
     /* Reads a 4 byte float in the input */
     virtual float readFloatIEEE () = 0;
     /* Reads a 8 byte double in the input */
@@ -24,29 +29,35 @@ public:
     /* Read a chars */
     virtual char* readChars() = 0;
     virtual char* readChars(int length) = 0;
-    bool eof();
+    virtual bool eof() = 0;
     virtual bool isClosed() = 0;
+
+    virtual void close() = 0;
+
+	virtual void seek(__int64 pos, SEEK_DIRECTION direction = FROMSTART_SEEK) = 0;
+
+	 virtual __int64 currentPos() const = 0;
 
 	 virtual std::string* readString() = 0;
 
 	 template <typename T>
-	 T readData() {
-		 T result = 0;
-		 unsigned char* v = (unsigned char*)&result;
-		 int size = sizeof(T);
-		 for (int i = 0; i < size; i++) {
-			 v[i] = readChar() & UCHAR_MAX;
+		 T readData() {
+			 T result = 0;
+			 unsigned char* v = (unsigned char*)&result;
+			 int size = sizeof(T);
+			 for (int i = 0; i < size; i++) {
+				 v[i] = readChar() & UCHAR_MAX;
+			 }
+			 T clear = 0;
+			 for (int i = 0; i < size; i++) {
+				 clear = clear << 8;
+				 clear = clear | 0xFF;
+			 }
+			 //printf("\nresult before add: %x\n", result);
+			 result = result & clear;
+			 //printf("result after add: %x\n", result);
+			 return result;
 		 }
-		 T clear = 0;
-		 for (int i = 0; i < size; i++) {
-			 clear = clear << 8;
-			 clear = clear | 0xFF;
-		 }
-		 //printf("\nresult before add: %x\n", result);
-		 result = result & clear;
-		 //printf("result after add: %x\n", result);
-		 return result;
-	 }
 };
 
 #endif // INPUTSTREAM_H

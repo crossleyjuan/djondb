@@ -273,6 +273,18 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\bsonbufferedarrayobj.h"
+				>
+			</File>
+			<File
+				RelativePath=".\bsonbufferedcontent.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\bsonbufferedobj.h"
+				>
+			</File>
+			<File
 				RelativePath=".\bsoninputstream.h"
 				>
 			</File>
@@ -293,11 +305,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\fileinputstreamw32.h"
+				>
+			</File>
+			<File
 				RelativePath=".\fileoutputstream.h"
 				>
 			</File>
 			<File
+				RelativePath=".\inputoutputstream.h"
+				>
+			</File>
+			<File
 				RelativePath=".\inputstream.h"
+				>
+			</File>
+			<File
+				RelativePath=".\memorystream.h"
+				>
+			</File>
+			<File
+				RelativePath=".\mmapinputstream.h"
 				>
 			</File>
 			<File
@@ -325,6 +353,14 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\bsonbufferedarrayobj.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\bsonbufferedobj.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\bsoninputstream.cpp"
 				>
 			</File>
@@ -341,7 +377,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\fileinputstreamw32.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\fileoutputstream.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\memorystream.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\mmapinputstream.cpp"
 				>
 			</File>
 			<File

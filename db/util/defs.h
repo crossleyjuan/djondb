@@ -13,8 +13,8 @@
 #ifndef WINDOWS
 #include "config.h"
 #else
-#define VERSION "0.120121125"
-#define PACKAGE_VERSION "0.1"
+#define VERSION "0.220130106"
+#define PACKAGE_VERSION "0.2"
 #endif
 
 #if (defined __MACH__ || __APPLE__ || TARGET_OS_MAC)
@@ -31,11 +31,16 @@
 
 // typedefs
 //
+#ifndef WINDOWS
 typedef int8_t            __int8;
 typedef int16_t           __int16;
 typedef int32_t           __int32;                
+#ifndef SWIGJAVA
 typedef int64_t           __int64;
-typedef int64_t           __LONG64;
+#endif
+#endif
+typedef __int64           __LONG64;
+
 
 
 // #define TESTING

@@ -57,9 +57,13 @@ char* readFile(char* fileName) {
 
     delete(buffer);
 
-    char* result = strcpy(str);
+	if (str.length() > 0) {
+		char* result = strcpy(str);
 
-    return result;
+		return result;
+	} else {
+		return NULL;
+	}
 }
 
 int writeFile(const std::string& fileName, const std::string& text, bool append) {
@@ -149,7 +153,6 @@ bool existDir(const char* dir) {
 	exists = Directory::Exists(folder);
 	if (log->isDebug()) log->debug(3, "Directory::Exists(%s) returns: %d", dir, exists);
 #endif //#ifndef WINDOWS
-	delete log;
     return exists;
 }
 
@@ -178,13 +181,13 @@ bool checkFileCreation(const char* dir) {
 
 	removeFile(file);
 	free (file);
-	delete log;
 	return result;
 }
 
 bool removeFile(const char* file) {
 	if (remove(file) != 0) {
-		setLastError(errno, strerror(errno));
+		const char* error = strerror(errno);
+		setLastError(errno, error);
 		return false;
 	} else {
 		return true;
@@ -215,11 +218,22 @@ bool makeDir(const char* dir) {
 			if (res < 0) {
 				char* error = strerror(errno);
 				logger->error("An error ocurred creating the directory %s. Error: %s", dir, error);
-				delete logger;
 				exit(1);
 			}
 		}
 	}
-	delete logger;
 	return true;
+}
+
+__int64 fileSize(const char* file) {
+	struct stat st;
+	Logger* log = getLogger(NULL);
+
+	__int64 ret = -1;
+	if (stat(file, &st) == 0)
+		ret = st.st_size;
+	else 
+		log->error("Error getting the file: %s size: %d", file, errno); 
+
+	return ret;
 }

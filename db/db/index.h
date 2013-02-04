@@ -5,15 +5,21 @@
 #include <string>
 #include <set>
 #include <string>
+#include "util.h"
 
 class BSONObj;
 class FilterParser;
 
-struct Index {
-	BSONObj* key;
-	 std::string documentId;
-	long posData;
-	long indexPos;
+class Index {
+	public:
+		Index() {};
+		virtual ~Index();
+
+		Index(const Index& orig);
+		BSONObj* key;
+		djondb::string documentId;
+		long posData;
+		long indexPos;
 };
 
 class IndexAlgorithm {
@@ -23,7 +29,7 @@ class IndexAlgorithm {
 		}
 
 		virtual ~IndexAlgorithm() {};
-		virtual void add(const BSONObj& elem, std::string documentId, long filePos, long indexPos) = 0;
+		virtual void add(const BSONObj& elem, djondb::string documentId, long filePos, long indexPos) = 0;
 		virtual Index* find(BSONObj* const elem) = 0;
 		virtual void remove(const BSONObj& elem) = 0;
 		virtual std::list<Index*> find(FilterParser* parser) = 0;

@@ -18,7 +18,7 @@
 
 #include "networkinputstream.h"
 
-#include "defs.h"
+#include "filesystemdefs.h"
 #include "util.h"
 
 #include <stdlib.h>
@@ -65,7 +65,6 @@ NetworkInputStream::NetworkInputStream(const NetworkInputStream& orig) {
 NetworkInputStream::~NetworkInputStream() {
 	free (_buffer);
 	//    closeStream();
-	delete _logger;
 }
 
 unsigned char NetworkInputStream::readChar() {
@@ -79,35 +78,36 @@ unsigned char NetworkInputStream::readChar() {
 }
 
 /* Reads 2 bytes in the input (little endian order) */
-short int NetworkInputStream::readShortInt () {
+__int16 NetworkInputStream::readShortInt () {
 	if (_logger->isDebug()) _logger->debug(3, "NetworkInputStream::readShortInt");
-	short int result = readData<short int>();
+	__int16 result = readData<__int16>();
 	if (_logger->isDebug()) _logger->debug(3, "~NetworkInputStream::readInt");
 	return result;
 }
 
 /* Reads 4 bytes in the input (little endian order) */
-int NetworkInputStream::readInt () {
+__int32 NetworkInputStream::readInt () {
 	if (_logger->isDebug()) _logger->debug(3, "NetworkInputStream::readInt");
-	int v = readData<int>(); 
+	__int32 v = readData<__int32>(); 
 
 	if (_logger->isDebug()) _logger->debug(3, "int: %d", v);
-	if (_logger->isDebug()) _logger->debug(3, "~NetworkInputStream::readLong");
+	if (_logger->isDebug()) _logger->debug(3, "~NetworkInputStream::readInt");
 	return v;
 }
 
 /* Reads 4 bytes in the input (little endian order) */
-long NetworkInputStream::readLong () {
-#ifdef _64BITS
-	return (long)readLong64();
-#else
-	return (long)readInt();
-#endif
+__int64 NetworkInputStream::readLong () {
+	if (_logger->isDebug()) _logger->debug(3, "NetworkInputStream::readLong");
+	__int64 v = readData<__int64>(); 
+
+	if (_logger->isDebug()) _logger->debug(3, "long: %d", v);
+	if (_logger->isDebug()) _logger->debug(3, "~NetworkInputStream::readLong");
+	return v;
 }
 
-/* Reads 4 bytes in the input (little endian order) */
-__LONG64 NetworkInputStream::readLong64 () {
-	return readData<__LONG64>();
+/* Reads 16 bytes in the input (little endian order) */
+__int64 NetworkInputStream::readLong64() {
+	return readData<__int64>();
 }
 
 /* Reads a 4 byte float in the input */
@@ -127,7 +127,7 @@ double NetworkInputStream::readDoubleIEEE () {
 /* Read a chars */
 char* NetworkInputStream::readChars() {
 	if (_logger->isDebug()) _logger->debug(3, "NetworkInputStream::readChars");
-	int len = readLong();
+	__int32 len = readInt();
 	char* res;
 	if (len > 0) {
 		res = readChars(len);
@@ -150,7 +150,7 @@ std::string* NetworkInputStream::readString() {
 	return res;
 }
 
-char* NetworkInputStream::readChars(int length) {
+char* NetworkInputStream::readChars(__int32 length) {
 	char* res = (char*)malloc((length+1) * sizeof(char));
 	memset(res, 0, length+1);
 	int readed = readBufferData(res, length);
@@ -162,11 +162,11 @@ bool NetworkInputStream::eof() {
 	return false;
 }
 
-void NetworkInputStream::closeStream() {
+void NetworkInputStream::close() {
 #ifdef _WIN32
 	::closesocket(_socket);
 #else
-	close(_socket);
+	::close(_socket);
 #endif
 	_open = false;
 }
@@ -181,7 +181,7 @@ int NetworkInputStream::checkStatus() {
 	if (_open) {
 		int res = waitAvailable(2000);
 		if (res < 0) {
-			closeStream();
+			close();
 		}
 		return res;
 	}
@@ -198,7 +198,7 @@ int NetworkInputStream::available() {
 	//    return nbytes;
 }
 
-int NetworkInputStream::readBufferData(void* data, int len) {
+int NetworkInputStream::readBufferData(void* data, __int32 len) {
 	if (checkStatus() < 0) {
 		return -1;
 	}
@@ -293,9 +293,8 @@ int NetworkInputStream::fillBuffer(int timeout) {
 		_bufferPos = 0;
 		_bufferSize = readed;
 	}
-	delete log;
 	if (error) {
-		closeStream();
+		close();
 		return -1;
 	}
 	return 0;

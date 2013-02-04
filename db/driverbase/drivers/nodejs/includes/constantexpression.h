@@ -32,10 +32,9 @@ class ExpressionResult;
 
 class ConstantExpression: public BaseExpression {
 	public:
-		ConstantExpression(const char* expression);
-		ConstantExpression(int expression);
-		ConstantExpression(long expression);
-		ConstantExpression(__LONG64 expression);
+		ConstantExpression(char* expression);
+		ConstantExpression(__int32 expression);
+		ConstantExpression(__int64 expression);
 		ConstantExpression(double expression);
 		ConstantExpression(const ConstantExpression& orig);
 		virtual ~ConstantExpression();
@@ -43,10 +42,9 @@ class ConstantExpression: public BaseExpression {
 		virtual ExpressionResult* eval(const BSONObj& bson);
 		virtual BaseExpression* copyExpression();
 	private:
-		std::string* _expression;
-		int* _intValue;
-		long* _longValue;
-		__LONG64* _long64Value;
+		char* _expression;
+		__int32* _intValue;
+		__int64* _longValue;
 		double* _doubleValue;
 		ExpressionResult* _value;
 

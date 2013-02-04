@@ -64,13 +64,12 @@ void FindCommand::execute() {
 	if (log->isDebug()) log->debug("executing find command on %s", nameSpace()->c_str());
 
 	_findresult = dbController()->find(const_cast<char*>(DB()->c_str()), const_cast<char*>(nameSpace()->c_str()), select()->c_str(), filter()->c_str());
-
-	delete log;
 }
 
 void* FindCommand::result() {
+	// Creates a copy
 	BSONArrayObj* result = new BSONArrayObj(*_findresult);
-	
+
 	return result;
 }
 
@@ -86,11 +85,8 @@ void FindCommand::readResult(InputStream* is) {
 	if (log->isDebug()) log->debug("writing result of find command on %s", nameSpace()->c_str());
 
 	BSONInputStream* bsonin = new BSONInputStream(is);
-	std::vector<BSONObj*>* result = bsonin->readBSONArray();
-	_findresult = new BSONArrayObj(*result);
-
-
-	delete result;
+	BSONArrayObj* result = bsonin->readBSONArray();
+	_findresult = result;
 
 	delete bsonin;
 }
@@ -101,7 +97,6 @@ void FindCommand::writeResult(OutputStream* out) const {
 	BSONOutputStream* bsonout = new BSONOutputStream(out);
 	bsonout->writeBSONArray(_findresult);
 	delete bsonout;
-	delete log;
 }
 
 void FindCommand::setNameSpace(const std::string& ns) {

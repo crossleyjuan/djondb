@@ -98,7 +98,7 @@ void DjondbConnection::close() {
 
 void DjondbConnection::internalClose() {
 	if (_open) {
-		_inputStream->closeStream();
+		_inputStream->close();
 		_outputStream->closeStream();
 		if (_inputStream)   {
 			delete (_inputStream);
@@ -139,12 +139,12 @@ bool DjondbConnection::insert(const std::string& db, const std::string& ns, cons
 	cmd.setDB(db);
 	if (!obj.has("_id")) {
 		std::string* id = uuid();
-		obj.add("_id", *id);
+		obj.add("_id", const_cast<char*>(id->c_str()));
 		delete id;
 	}
 	if (!obj.has("_revision")) {
 		std::string* rev = uuid();
-		obj.add("_revision", *rev);
+		obj.add("_revision", const_cast<char*>(rev->c_str()));
 		delete rev;
 	}
 	cmd.setBSON(obj);
@@ -252,6 +252,10 @@ BSONObj* DjondbConnection::findByKey(const std::string& db, const std::string& n
 
 	delete result;
 	return bsonresult;
+}
+
+BSONArrayObj* DjondbConnection::find(const std::string& db, const std::string& ns) throw(ParseException) {
+	return find(db, ns, "*", "");
 }
 
 BSONArrayObj* DjondbConnection::find(const std::string& db, const std::string& ns, const std::string& filter) throw(ParseException) {

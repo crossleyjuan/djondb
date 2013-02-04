@@ -96,6 +96,7 @@ class FilterParser {
 		const std::set<std::string> tokens() const;
 		
 		static FilterParser* parse(const std::string& expression) throw(ParseException) ;
+		std::set<std::string> xpathTokens();
 			//throw (ParseException);
 
 	private:

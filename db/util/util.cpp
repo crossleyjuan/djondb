@@ -108,11 +108,11 @@ bool makedir(const char* path) {
     }
 }
 
-std::string* getTempDir() {
+std::string getTempDir() {
 #ifndef WINDOWS
-    string* tmp = new string("/tmp");
+    string tmp("/tmp");
 #else
-    string* tmp = new std::string(getenv("TMP"));
+    string tmp(getenv("TMP"));
 #endif
     return tmp;
 }
@@ -135,12 +135,6 @@ void* mmalloc(size_t size) {
         exit(EXIT_FAILURE);
     }
     return p;
-}
-
-char* cmalloc(size_t size) {
-	char* c = (char*)mmalloc(size);
-	memset(c, 0, size);
-	return c;
 }
 
 Version getCurrentVersion() {

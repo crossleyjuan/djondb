@@ -39,7 +39,7 @@ std::string* uuid();
 
 bool makedir(const char* path);
 std::string* getHomeDir();
-std::string* getTempDir();
+std::string getTempDir();
 
 Version getCurrentVersion();
 Version getVersion(const char* version);
@@ -48,7 +48,6 @@ Version getVersion(const char* version);
 * Memory functions
 ***********************************************************************/
 void* mmalloc(size_t size);
-char* cmalloc(size_t size);
 
 /***********************************************************************/
 

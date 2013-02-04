@@ -25,268 +25,253 @@
 
 using namespace std;
 
-BSONContent::BSONContent() {
-	this->_element = NULL;
-	this->_type = NULL_TYPE;
+BSONContent::BSONContent(BSONTYPE type) {
+	this->_type = type;
+}
+
+BSONContentInt::BSONContentInt(__int32 element):
+	BSONContent(INT_TYPE)
+{
+	_element = element;
+}
+
+BSONContentInt::BSONContentInt(const BSONContentInt& orig):
+	BSONContent(INT_TYPE)
+{
+	this->_element = orig._element;
+}
+
+BSONContentInt* BSONContentInt::clone() const {
+	return new BSONContentInt(*this);
+}
+
+BSONContentLong::BSONContentLong(__int64 element):
+	BSONContent(LONG_TYPE)
+{
+	_element = element;
+}
+
+BSONContentLong::BSONContentLong(const BSONContentLong& orig):
+	BSONContent(LONG_TYPE)
+{
+	this->_element = orig._element;
+}
+
+BSONContentLong* BSONContentLong::clone() const {
+	return new BSONContentLong(*this);
+}
+
+BSONContentDouble::BSONContentDouble(double element):
+	BSONContent(DOUBLE_TYPE)
+{
+	_element = element;
+}
+
+BSONContentDouble::BSONContentDouble(const BSONContentDouble& orig):
+	BSONContent(DOUBLE_TYPE)
+{
+	this->_element = orig._element;
+}
+
+BSONContentDouble* BSONContentDouble::clone() const {
+	return new BSONContentDouble(*this);
+}
+
+BSONContentString::BSONContentString(char* element, __int32 len):
+	BSONContent(PTRCHAR_TYPE)
+{
+	_element = djondb::string(element, len);
+}
+
+BSONContentString::BSONContentString(const BSONContentString& orig):
+	BSONContent(PTRCHAR_TYPE)
+{
+	this->_element = orig._element;
+}
+
+BSONContentString* BSONContentString::clone() const {
+	return new BSONContentString(*this);
+}
+
+BSONContentBSON::BSONContentBSON(BSONObj* element):
+	BSONContent(BSON_TYPE)
+{
+	_element = element;
+}
+
+BSONContentBSON::BSONContentBSON(const BSONContentBSON& orig):
+	BSONContent(BSON_TYPE)
+{
+	this->_element = new BSONObj(*orig._element);
+}
+
+BSONContentBSON* BSONContentBSON::clone() const {
+	return new BSONContentBSON(*this);
+}
+
+BSONContentBSONArray::BSONContentBSONArray(BSONArrayObj* element):
+	BSONContent(BSONARRAY_TYPE)
+{
+	_element = element;
+}
+
+BSONContentBSONArray::BSONContentBSONArray(const BSONContentBSONArray& orig):
+	BSONContent(BSONARRAY_TYPE)
+{
+	this->_element = new BSONArrayObj(*orig._element);
+}
+
+BSONContentBSONArray* BSONContentBSONArray::clone() const {
+	return new BSONContentBSONArray(*this);
 }
 
 BSONContent::~BSONContent() {
-	if (!_element) {
-		return;
-	}
-	switch (_type) {
-		case STRING_TYPE:
-			delete ((string*)_element);
-			break;
-		case INT_TYPE:
-			delete ((__int32*)_element);
-			break;
-		case LONG_TYPE:
-			delete ((__int64*)_element);
-			break;
-		case LONG64_TYPE:
-			delete ((__LONG64*)_element);
-			break;
-		case DOUBLE_TYPE:
-			delete ((double*)_element);
-			break;
-		case BSON_TYPE:
-			delete ((BSONObj*)_element);
-			break;
-		case BSONARRAY_TYPE:
-			delete ((BSONArrayObj*)_element); 
-			break;
-		default:
-			break;
-	}
-	_element = 0;
 }
 
-BSONContent::BSONContent(const BSONContent& orig) {
-	this->_type = orig._type;
-	__int32 len = 0;
-	__int32* internalInt;
-	__int64* internalLong;
-	double* internalDouble;
-	__int32 i;
-	__int64 l;
-	double d;
-	BSONObj* bson;
-	BSONObj* internalBson;
-	BSONArrayObj* bsonArray;
-	BSONArrayObj* internalBsonArray;
-	switch (this->_type) {
-		case STRING_TYPE:
-			this->_element = new std::string(*(std::string*)orig._element);
-			break;
-		case INT_TYPE:
-			i = *((__int32*)orig._element);
-			internalInt = new __int32();
-			*internalInt = i;
-			this->_element = internalInt;
-			break;
-		case LONG_TYPE:
-			l = *((__int64*)orig._element);
-			internalLong = new __int64();
-			*internalLong = l;
-			this->_element = internalLong;
-			break;
-		case LONG64_TYPE:
-			{
-				__LONG64 ll = *((__LONG64*)orig._element);
-				__LONG64* longlong = new __LONG64();
-				*longlong = ll;
-				this->_element = longlong;
-				break;
-			}
-		case DOUBLE_TYPE:
-			d = *((double*)orig._element);
-			internalDouble = new double();
-			*internalDouble = d;
-			this->_element = internalDouble;
-			break;
-		case BSON_TYPE:
-			bson = (BSONObj*)orig._element;
-			internalBson = new BSONObj(*bson);
-			this->_element = internalBson;
-			break;
-		case BSONARRAY_TYPE:
-			bsonArray = (BSONArrayObj*)orig._element;
-			internalBsonArray = new BSONArrayObj(*bsonArray);
-			this->_element = internalBsonArray;
-			break;
-		default:
-			break;
-	}
+BSONContentInt::~BSONContentInt() {
 }
 
+BSONContentLong::~BSONContentLong() {
+}
+
+BSONContentDouble::~BSONContentDouble() {
+}
+
+BSONContentString::~BSONContentString() {
+}
+
+BSONContentBSON::~BSONContentBSON() {
+	delete(_element);
+}
+
+BSONContentBSONArray::~BSONContentBSONArray() {
+	delete(_element);
+}
 
 bool BSONContent::operator ==(const BSONContent& content) {
-	if (this->_type != content._type) {
-		return false;
-	} else {
-		void* cont1 = this->_element;
-		void* cont2 = content._element;
-		// if the pointers are equal it's pointless to compare the contents
-		if (cont1 == cont2) {
-			return true;
-		} else {
-			bool result;
-			switch (this->_type) {
-				case STRING_TYPE:
-					result = ((std::string*)cont1)->compare(*(std::string*)cont2) == 0;
-					break;
-				case INT_TYPE: 
-					{
-						__int32 i1 = *(__int32*)cont1;
-						__int32 i2 = *(__int32*)cont2;
-						result = (i1 == i2);
-					}
-					break;
-				case LONG_TYPE:
-					{
-						__int64 l1 = *(__int64*)cont1;
-						__int64 l2 = *(__int64*)cont2;
-						result = (l1 == l2);
-					}
-					break;
-				case LONG64_TYPE:
-					{
-						__LONG64 l1 = *(__LONG64*)cont1;
-						__LONG64 l2 = *(__LONG64*)cont2;
-						result = (l1 == l2);
-					}
-					break;
-				case DOUBLE_TYPE:
-					{
-						__int64 l1 = *(__int64*)cont1;
-						__int64 l2 = *(__int64*)cont2;
-						result = (l1 == l2);
-					}
-					break;
-				case BSON_TYPE:
-					{
-						BSONObj* obj1 = (BSONObj*)cont1;
-						BSONObj* obj2 = (BSONObj*)cont2;
-						result = (*obj1 == *obj2);
-					}
-				case BSONARRAY_TYPE:
-					result = false;
-					break;
-				default:
-					break;
-			}
-			return result;
-		}	
-	}
+	throw BSONException("cannot compare BSONContents");
 }
 
 bool BSONContent::operator !=(const BSONContent& content) {
-	if (this->_type != content._type) {
-		return true;
-	} else {
-		void* cont1 = this->_element;
-		void* cont2 = content._element;
-		// if the pointers are equal it's pointless to compare the contents
-		if (cont1 == cont2) {
-			return false;
-		} else {
-			bool result;
-			switch (this->_type) {
-				case STRING_TYPE:
-					result = ((std::string*)cont1)->compare(*(std::string*)cont2) != 0;
-					break;
-				case INT_TYPE: 
-					{
-						__int32 i1 = *(__int32*)cont1;
-						__int32 i2 = *(__int32*)cont2;
-						result = (i1 != i2);
-					}
-					break;
-				case LONG_TYPE:
-					{
-						__int64 l1 = *(__int64*)cont1;
-						__int64 l2 = *(__int64*)cont2;
-						result = (l1 != l2);
-					}
-					break;
-				case LONG64_TYPE:
-					{
-						__LONG64 l1 = *(__LONG64*)cont1;
-						__LONG64 l2 = *(__LONG64*)cont2;
-						result = (l1 != l2);
-					}
-					break;
-				case DOUBLE_TYPE:
-					{
-						__int64 l1 = *(__int64*)cont1;
-						__int64 l2 = *(__int64*)cont2;
-						result = (l1 != l2);
-					}
-					break;
-				case BSON_TYPE:
-					{
-						BSONObj* obj1 = (BSONObj*)cont1;
-						BSONObj* obj2 = (BSONObj*)cont2;
-
-						result = (*obj1 != *obj2);
-					}
-				case BSONARRAY_TYPE:
-					return false;
-					break;
-				default:
-					break;
-			}
-			return result;
-		}	
-	}
+	throw BSONException("cannot compare BSONContents");
 }
 
-BSONContent::operator __int32() {
-	assert(_type == INT_TYPE);
-	__int32* content = (__int32*)_element;
-	return *content; 
+bool BSONContentInt::operator ==(const BSONContentInt& content) {
+	__int32 i1 = _element;
+	__int32 i2 = (BSONContentInt)content;
+	return (i1 == i2);
 }
 
-BSONContent::operator __int64() {
-	assert(_type == LONG_TYPE);
-	__int64* content = (__int64*)_element;
-	return *content; 
-
+bool BSONContentInt::operator !=(const BSONContentInt& content) {
+	__int32 i1 = _element;
+	__int32 i2 = (BSONContentInt)content;
+	return (i1 != i2);
 }
 
-BSONContent::operator double() {
-	assert(_type == DOUBLE_TYPE);
-	double* content = (double*)_element;
-	return *content; 
-}
-/*
- * To make the user of this library easier the char* will not be implemented, use std::string instead
- * otherwise the user should handle the free of the char*
- BSONContent::operator char*() {
- assert(_type == PTRCHAR_TYPE);
- char* content = (char*)_element;
- char* result = (char*)malloc(strlen(content + 1));
- memset(result, 0, strlen(content + 1));
- memcpy(result, content, strlen(content));
- return result; 
- }
- */
-
-BSONContent::operator std::string() {
-	assert(_type == STRING_TYPE);
-	std::string* content = (std::string*)_element;
-	return *content; 
+bool BSONContentLong::operator ==(const BSONContentLong& content) {
+	__int64 i1 = _element;
+	__int64 i2 = (BSONContentLong)content;
+	return (i1 == i2);
 }
 
-BSONContent::operator BSONObj() {
-	assert(_type == BSON_TYPE);
-	BSONObj* content = (BSONObj*)_element;
-	return *content; 
+bool BSONContentLong::operator !=(const BSONContentLong& content) {
+	__int64 i1 = _element;
+	__int64 i2 = (BSONContentLong)content;
+	return (i1 != i2);
 }
 
-BSONContent::operator BSONArrayObj() {
-	assert(_type == BSONARRAY_TYPE);
-	BSONArrayObj* content = (BSONArrayObj*)_element;
-	return *content; 
+bool BSONContentDouble::operator ==(const BSONContentDouble& content) {
+	double i1 = _element;
+	double i2 = (BSONContentDouble)content;
+	return (i1 == i2);
 }
+
+bool BSONContentDouble::operator !=(const BSONContentDouble& content) {
+	double i1 = _element;
+	double i2 = (BSONContentDouble)content;
+	return (i1 != i2);
+}
+
+bool BSONContentString::operator ==(const BSONContentString& content) {
+	djondb::string i1 = _element;
+	djondb::string i2= content;
+	return (i1 == i2);
+}
+
+bool BSONContentString::operator !=(const BSONContentString& content) {
+	djondb::string i1 = _element;
+	djondb::string i2= content;
+	return (i1 != i2);
+}
+
+bool BSONContentBSON::operator ==(const BSONContentBSON& content) {
+	BSONObj* i1 = _element;
+	BSONObj* i2 = (BSONContentBSON)content;
+	return (*i1 == *i2);
+}
+
+bool BSONContentBSON::operator !=(const BSONContentBSON& content) {
+	BSONObj* i1 = _element;
+	BSONObj* i2 = (BSONContentBSON)content;
+	return (*i1 != *i2);
+}
+
+bool BSONContentBSONArray::operator ==(const BSONContentBSONArray& content) {
+	// Never compare arrays, it's futile
+	return false;
+}
+
+bool BSONContentBSONArray::operator !=(const BSONContentBSONArray& content) {
+	// Never compare arrays, it's futile
+	return true;
+}
+
+
+BSONContent::operator __int32() const {
+	throw BSONException("This operator should be overriden by the inherited class");
+}
+
+BSONContentInt::operator __int32() const {
+	return _element; 
+}
+
+BSONContent::operator __int64() const {
+	throw BSONException("This operator should be overriden by the inherited class");
+}
+
+BSONContentLong::operator __int64() const {
+	return _element; 
+}
+
+BSONContent::operator double() const {
+	throw BSONException("This operator should be overriden by the inherited class");
+}
+
+BSONContentDouble::operator double() const {
+	return _element; 
+}
+
+BSONContent::operator djondb::string() const {
+	throw BSONException("This operator should be overriden by the inherited class");
+}
+
+BSONContentString::operator djondb::string() const {
+	return _element; 
+}
+
+BSONContent::operator BSONObj*() const {
+	throw BSONException("This operator should be overriden by the inherited class");
+}
+
+BSONContentBSON::operator BSONObj*() const {
+	return _element; 
+}
+
+BSONContent::operator BSONArrayObj*() const {
+	throw BSONException("This operator should be overriden by the inherited class");
+}
+
+BSONContentBSONArray::operator BSONArrayObj*() const {
+	return _element; 
+}
+
