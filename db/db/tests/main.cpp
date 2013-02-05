@@ -102,6 +102,7 @@ class TestDBSuite: public Test::Suite
 			//TEST_ADD(TestDBSuite::testManualIndex);
 			TEST_ADD(TestDBSuite::testInsertComplexBSON);
 			TEST_ADD(TestDBSuite::testIndexFactory);
+			TEST_ADD(TestDBSuite::testDropIndexes);
 			TEST_ADD(TestDBSuite::testExpressions);
 			TEST_ADD(TestDBSuite::testFilterExpressionParser);
 			TEST_ADD(TestDBSuite::testFilterExpressionParserEquals);
@@ -1088,6 +1089,45 @@ cout << "testing array" << endl;
 
 			bool res2 = IndexFactory::indexFactory.containsIndex("dbtest", "ns.a", "nkey");
 			TEST_ASSERT(!res2);
+		}
+
+		void testDropIndexes() {
+			cout << "\ntestDropIndexes" << endl;
+
+			IndexAlgorithm* index = IndexFactory::indexFactory.index("dbtest", "ns.a", "_id");
+			TEST_ASSERT(index != NULL);
+
+			// Let's check if the factory returns the same instance for the same key
+			IndexAlgorithm* indexCompare = IndexFactory::indexFactory.index("dbtest", "ns.a", "_id");
+			TEST_ASSERT(index == indexCompare);
+
+			// Let's change the keys and test if a new IndexAlgorithm will be returned
+			IndexAlgorithm* indexCompare2 = IndexFactory::indexFactory.index("dbtest", "ns.a", "key");
+			TEST_ASSERT(index != indexCompare2);
+
+			// Checking the contains method
+			bool res = IndexFactory::indexFactory.containsIndex("dbtest", "ns.a", "_id");
+			TEST_ASSERT(res);
+
+			bool res2 = IndexFactory::indexFactory.containsIndex("dbtest", "ns.a", "nkey");
+			TEST_ASSERT(!res2);
+
+			IndexFactory::indexFactory.dropIndex("dbtest", "ns.a", "_id");
+
+			res = IndexFactory::indexFactory.containsIndex("dbtest", "ns.a", "_id");
+			TEST_ASSERT(!res);
+
+			IndexFactory::indexFactory.index("dbtest", "ns.a", "test");
+			IndexFactory::indexFactory.index("dbtest", "ns.a", "next");
+			IndexFactory::indexFactory.dropIndexes("dbtest", "ns.a");
+			res = IndexFactory::indexFactory.containsIndex("dbtest", "ns.a", "_id");
+			TEST_ASSERT(!res);
+			res = IndexFactory::indexFactory.containsIndex("dbtest", "ns.a", "key");
+			TEST_ASSERT(!res);
+			res = IndexFactory::indexFactory.containsIndex("dbtest", "ns.a", "test");
+			TEST_ASSERT(!res);
+			res = IndexFactory::indexFactory.containsIndex("dbtest", "ns.a", "next");
+			TEST_ASSERT(!res);
 		}
 
 		void testDropnamespace()
