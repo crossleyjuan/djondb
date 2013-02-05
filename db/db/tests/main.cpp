@@ -848,16 +848,7 @@ cout << "testing array" << endl;
 
 		void testIndexPage() {
 			std::vector<std::string> ids;
-			/* 
-				FileInputStream fis("guids.txt", "rb");
-				const char* full = fis.readFull();
-				std::vector<std::string> tids = split(full, "\n");
-				for (std::vector<std::string>::iterator i = tids.begin(); i != tids.end(); i++) {
-				ids.push_back(*i);
-				}
-				fis.close();
-				testIndex(ids);
-				*/
+
 			ids.push_back("1");
 			ids.push_back("2");
 			ids.push_back("3");
