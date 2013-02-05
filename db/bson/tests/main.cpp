@@ -57,6 +57,7 @@ class TestBSONSuite : public Test::Suite
 			// Add in
 			obj->add("int", 1);
 			obj->add("string", (const char*)"test");
+			obj->add("string2", (const char*)"t");
 			obj->add("long", (__int64) 10000000000L);
 			obj->add("double", 1.1);
 
@@ -77,6 +78,8 @@ class TestBSONSuite : public Test::Suite
 			TEST_ASSERT(obj->getInt("int") == 1);
 
 			TEST_ASSERT(strcmp(obj->getString("string").c_str(), "test") == 0);
+			TEST_ASSERT(obj->getDJString("string").compare(djondb::string("test", 4)) == 0);
+			TEST_ASSERT(obj->getDJString("string2").compare(djondb::string("e", 1)) != 0);
 
 			TEST_ASSERT(obj->has("long"));
 			cout << "long: " << obj->getLong("long") << endl;
