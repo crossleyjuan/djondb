@@ -301,9 +301,13 @@ class TestUtilSuite : public Test::Suite
 
 
 			djondb::string s13("aaaa", 4);
-       			djondb::string s14("bbbb", 4);
-                        TEST_ASSERT(s13.compare(s14) < 0);                 
-                        TEST_ASSERT(s13.compare(s14.c_str()) < 0);                 
+			djondb::string s14("bbbb", 4);
+			TEST_ASSERT(s13.compare(s14) < 0);                 
+			TEST_ASSERT(s13.compare(s14.c_str(), 4) < 0);                 
+
+			djondb::string s15("aa", 2);
+			djondb::string s16("aabb", 4);
+			TEST_ASSERT(s15.compare(s16) < 0);                 
 		}
 };
 //// Tests unconditional fail TEST_ASSERTs

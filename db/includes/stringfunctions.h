@@ -79,13 +79,13 @@ namespace djondb {
 			string(char* c, __int32 len);
 			string(const char* c, __int32 len);
 			string(const string& str);
-			virtual ~string();
+			const ~string();
 
 			const char* c_str() const;
 			__int32 length() const;
 
 			int compare(const djondb::string s2) const;
-			int compare(const char* s2, __int32 len) const;
+			int compare(const char* s2) const;
 
 			operator const char*() const;
 			operator char*() const;
