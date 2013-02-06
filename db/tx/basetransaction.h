@@ -37,6 +37,7 @@
 #include <string>
 #include <list>
 #include <map>
+#include <queue>
 
 class BSONObj;
 class FileInputOutputStream;
@@ -74,10 +75,12 @@ class BaseTransaction: public Controller
 		FileInputOutputStream* _controlFile;
 
 		struct Control {
-			long startPos; // Contains the first valid position to be used on the first logFile
-			long lastValidPos; // this is a reference to the last valid position in the last logFile
-			std::vector<FileInputOutputStream*> logFiles;
-			FileInputOutputStream* currentFile;
+			__int64 startPos; // Contains the first valid position to be used on the first logFile
+			__int64 lastValidPos; // this is a reference to the last valid position in the last logFile
+			__int32 maximumBufferSize;
+			std::queue<TransactionBuffer*> logBuffers;
+			InputOutputStream* logFile;
+			TransactionBuffer* currentBuffer;
 		};	
 
 		Control _control;

@@ -59,8 +59,13 @@ BaseTransaction::BaseTransaction(Controller* controller, std::string transaction
 
 void BaseTransaction::loadControlFile() {
 	std::string controlFile = _mainTransactionLog ? "main.trc": *_transactionId + ".trc";
+	std::string logFileName = _mainTransactionLog ? "main.log": *_transactionId + ".log";
+
 	std::string controlFileName = _dataDir + FILESEPARATOR + controlFile;
+	logFileName = _dataDir + FILESEPARATOR + logFileName;
+
 	bool existControl = existFile(controlFileName.c_str());
+	bool existLogFile = existFile(logFileName.c_str());
 
 	char* flags;
 	if (existControl) {
@@ -70,32 +75,46 @@ void BaseTransaction::loadControlFile() {
 	}
 	_controlFile = new FileInputOutputStream(controlFileName.c_str(), flags); 
 	_controlFile->seek(0);
+
+	if (existLogFile) {
+		flags = "rb+";
+	} else {
+		flags = "wb+";
+	}
+	FileInputOutputStream* logFile = new FileInputOutputStream(logFileName.c_str(), flags); 
+
 	if (existControl) {
 		_control.startPos 	  = _controlFile->readLong();
 		_control.lastValidPos  = _controlFile->readLong();
+		_control.logFile = logFile;
 
-		int files = _controlFile->readInt();
-		for (int i = 0; i < files; i++) {
-			std::string* fileName = _controlFile->readString();
-			std::string logFileName = _dataDir + FILESEPARATOR + *fileName;
-			FileInputOutputStream* logFile = new FileInputOutputStream(logFileName, "rb+");
-			_control.logFiles.push_back(logFile);
-			_control.currentFile = logFile;
-			delete fileName;
+		_control.maximumBufferSize = _controlFile->readInt();
+
+		__int32 buffers = _controlFile->readInt();
+		for (__int32 i = 0; i < buffers; i++) {
+			TransactionBuffer* buffer = new TransactionBuffer();
+			buffer.startPos = _controlFile->readLong();
+			buffer.length = _controlFile->readLong();
+
+			_control.logBuffers.push_back(buffer);
 		}
 	} else {
 		_control.startPos = 0;
 		_controlFile->writeLong(0);
 		_control.lastValidPos = 0;
 		_controlFile->writeLong(0);
+		
+		_control.maximumBufferSize = 64*1024*1024;
 
-		std::string logfile = (_transactionId == NULL)? "main.tlo": *_transactionId + ".tlo";
-		std::string logFileName = _dataDir + FILESEPARATOR + logfile;
-		FileInputOutputStream* fios = new FileInputOutputStream(logFileName, "wb+");
-		_control.logFiles.push_back(fios);
-		_control.currentFile = fios;
+		TransactionBuffer* buffer = new TransactionBuffer();
+		buffer.startPos = 0;
+		buffer.length = 0;
+		_control.logBuffers.push_back(buffer);
+
+		// 1 buffer will be initialized
 		_controlFile->writeInt(1);
-		_controlFile->writeString(logfile);
+		_controlFile->writeLong(0);
+		_controlFile->writeLong(0);
 	}
 }
 
@@ -108,24 +127,26 @@ BaseTransaction::BaseTransaction(const BaseTransaction& orig) {
 
 BaseTransaction::~BaseTransaction() {
 	_controlFile->close();
-	_control.currentFile->close();
+	_control.logFile->close();
 	if (_controlFile) delete _controlFile;
-	if (_control.currentFile) delete _control.currentFile;
+	if (_control.logFile) delete _control.logFile;
 	if (_transactionId) delete _transactionId;
 }
 
 void BaseTransaction::writeOperationToRegister(char* db, char* ns, const TransactionOperation& operation) {
-	long statusPos = _control.currentFile->currentPos();
+	__int64 statusPos = _control.logFile->currentPos();
 
-	_control.currentFile->writeChar(TXOS_DIRTY); // it's not a valid state yet, cannot be used
-	_control.currentFile->writeChars(db, strlen(db));
-	_control.currentFile->writeChars(ns, strlen(ns));
+	MemoryStream buffer;
+
+	buffer->writeChar(TXOS_NORMAL);
+	buffer.writeChars(db, strlen(db));
+	buffer.writeChars(ns, strlen(ns));
 	MemoryStream ms;
 	ms.writeInt(operation.code);
 	ms.writeString(db);
 	ms.writeString(ns);
 	BSONOutputStream bos(&ms);
-	int code = operation.code;
+	__int32 code = operation.code;
 	switch (code) {
 		case TXO_INSERT: 
 		case TXO_UPDATE: {
@@ -146,38 +167,40 @@ void BaseTransaction::writeOperationToRegister(char* db, char* ns, const Transac
 							  break;
 	};
 	// writing the length will allow to jump the command if does not match the db and ns
-	_control.currentFile->writeInt(ms.size());
+	buffer.writeInt(ms.size());
 	char* chrs = ms.toChars();
-	_control.currentFile->writeChars(chrs, ms.size());
+	buffer.writeChars(chrs, ms.size());
 	free(chrs);
 
-	long endFile = _control.currentFile->currentPos();
+	__int64 lastValidPos = statusPos; // the pos of the last valid record //flag is the start
 
-	long lastValidPos = statusPos; // the pos of the last valid record //flag is the start
 
-	_control.currentFile->seek(statusPos);
-	_control.currentFile->writeChar(TXOS_NORMAL); // Now the operation is ready to be used
-	_control.currentFile->seek(endFile);
+	if buffer + size is greater than buffer allowed size create a new buffer
+	chrs = buffer.toChars();
+	_control.logFile->writeChars(chrs, buffer.size());
+	free(chrs);
 
 	// jumps the "startpos" to the "lastpos"
-	_controlFile->seek(sizeof(long));
+	_controlFile->seek(sizeof(__int64));
 	_controlFile->writeLong(lastValidPos);
 	_control.lastValidPos = lastValidPos;
-	_control.currentFile->flush();
+	_control.logFile->flush();
+
+	_control.currentBuffer->length += ....(_control.lastValidPos - statusPos);
 }
 
 TransactionOperation* BaseTransaction::readOperationFromRegister(char* db, char* ns) {
-	OPERATION_STATUS status = (OPERATION_STATUS)_control.currentFile->readChar();
-	char* rdb = _control.currentFile->readChars();
-	char* rns = _control.currentFile->readChars();
+	OPERATION_STATUS status = (OPERATION_STATUS)_control.logFile->readChar();
+	char* rdb = _control.logFile->readChars();
+	char* rns = _control.logFile->readChars();
 
 	TransactionOperation* result = NULL;
-	int length = _control.currentFile->readInt();
-	if (!(status && TXOS_NORMAL)) {
+	__int32 length = _control.logFile->readInt();
+	if (!(status & TXOS_NORMAL)) {
 		goto jumpoperation;
 	};
 	if ((strcmp(rdb, db) == 0) && (strcmp(rns, ns) == 0)) {
-		char* stream = _control.currentFile->readChars();
+		char* stream = _control.logFile->readChars();
 		MemoryStream ms(stream, length);
 		ms.seek(0);
 		TRANSACTION_OPER code = (TRANSACTION_OPER)ms.readInt();
@@ -216,25 +239,25 @@ TransactionOperation* BaseTransaction::readOperationFromRegister(char* db, char*
 		};
 	} else {
 jumpoperation:
-		_control.currentFile->seek(_control.currentFile->currentPos() + length);
+		_control.logFile->seek(_control.logFile->currentPos() + length);
 	}
 	return result;
 }
 
 std::list<TransactionOperation*>* BaseTransaction::findOperations(char* db, char* ns) {
 	std::list<TransactionOperation*>* result = new std::list<TransactionOperation*>();
-	for (std::vector<FileInputOutputStream*>::iterator i = _control.logFiles.begin(); i != _control.logFiles.end(); i++) {
-		FileInputOutputStream* file = *i;
-		_control.currentFile = file;
-		int currentPos = _control.currentFile->currentPos();
-		_control.currentFile->seek(0);
-		while (!_control.currentFile->eof()) {
+	for (std::queue<TransactionBuffer*>::iterator i = _control.logBuffers.begin(); i != _control.logBuffers.end(); i++) {
+		TransactionBuffer* buffer = *i;
+		__int32 lastPos = _control.logFile->currentPos();
+		_control.logFile->seek(buffer->startPos);
+		__int32 currentPos = lastPos;
+		while (!_control.logFile->eof() && (currentPos < buffer->length)) {
 			TransactionOperation* operation = readOperationFromRegister(db, ns);
 			if (operation != NULL) {
 				result->push_back(operation);
 			}
 		}
-		_control.currentFile->seek(currentPos);
+		_control.logFile->seek(lastPos);
 	}
 	return result;
 }
@@ -408,3 +431,18 @@ std::vector<std::string>* BaseTransaction::namespaces(const char* db) const {
 	return _controller->namespaces(db);
 }
 
+void BaseTransaction::validateCurrentFile() {
+	// 64Mb
+	if (_control.lastValidPos >= 64*1024*1024) {
+		createNewCurrentFile();
+	}
+}
+
+void BaseTransaction::createNewCurrentFile() {
+	// Jumps start and last valid pos
+	_controlFile->seek(sizeof(__int64) * 2);
+
+	std::string logfile = (_transactionId == NULL)? "main.tlo": *_transactionId + ".tlo";
+	std::string logFileName = _dataDir + FILESEPARATOR + logfile;
+	FileInputOutputStream* logFile = new FileInputOutputStream(logFileName, "rb+");
+}

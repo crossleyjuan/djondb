@@ -70,5 +70,10 @@ struct TransactionOperation {
 	void* operation; // Oper Structs
 };
 
+struct TransactionBuffer {
+	__int64 startPos;
+	__int64 lastValidPos;
+	__int64 length;
+};
 
 #endif /* TRANSACTIONDEFS_INCLUDED_H */
