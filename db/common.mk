@@ -3,8 +3,9 @@ AM_CPPFLAGS = -fPIC # -Wall -Wextra
 AM_CXXFLAGS = -fPIC 
 
 if DEBUG
-AM_CPPFLAGS += -g3 -O3
-AM_CXXFLAGS += -g3 -O3
+   AM_CFLAGS += -g3 -O0
+   AM_CPPFLAGS += -g3 -O0
+   AM_CXXFLAGS += -g3 -O0
 endif
 
 if PROFILE

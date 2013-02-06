@@ -47,7 +47,8 @@ class TestTXSuite: public Test::Suite
 			tx->dropNamespace("db", "txns");
 
 			BSONObj o;
-			o.add("_id", *uuid());
+			std::string* id = uuid();
+			o.add("_id", const_cast<char*>(id->c_str()));
 			o.add("name", "John");
 			tx->insert("db", "txns", &o);
 
@@ -70,6 +71,7 @@ class TestTXSuite: public Test::Suite
 
 			delete tx;
 			delete _controller;
+			delete id;
 		}
 
 };

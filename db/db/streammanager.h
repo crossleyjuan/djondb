@@ -16,6 +16,9 @@
  * =====================================================================================
  */
 
+#ifndef STREAMMANAGER_INCLUDE_H
+#define STREAMMANAGER_INCLUDE_H
+
 #include "dbfilestream.h"
 #include "util.h"
 #include <map>
@@ -66,3 +69,4 @@ class StreamManager {
 		bool _initializing;
 };
 
+#endif // STREAMMANAGER_INCLUDE_H

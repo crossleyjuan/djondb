@@ -32,20 +32,26 @@ const int MEMORY_BUFFER_SIZE = 1024;
 MemoryStream::MemoryStream() {
     _open = true;
 	 _currentBuffer = NULL;
+	 _currentBufferPos = 0;
 	 _currentIndex = -1;
 	 _buffer = NULL;
 	 _length = 0;
 	 _bufferSize = MEMORY_BUFFER_SIZE;
+	 _pos = 0;
+	 _maxIndexes = 0;
 	 allocate(_bufferSize);
 }
 
 MemoryStream::MemoryStream(char* buffer, __int32 len) {
     _open = true;
 	 _currentBuffer = NULL;
+	 _currentBufferPos = 0;
 	 _currentIndex = -1;
 	 _buffer = NULL;
 	 _length = 0;
 	 _bufferSize = MEMORY_BUFFER_SIZE;
+	 _pos = 0;
+	 _maxIndexes = 0;
 	 allocate(_bufferSize);
 
 	 write(buffer, len);

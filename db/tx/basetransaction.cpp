@@ -146,9 +146,9 @@ void BaseTransaction::writeOperationToRegister(char* db, char* ns, const Transac
 							  break;
 	};
 	// writing the length will allow to jump the command if does not match the db and ns
-	_control.currentFile->writeInt(ms.length());
+	_control.currentFile->writeInt(ms.size());
 	char* chrs = ms.toChars();
-	_control.currentFile->writeChars(chrs, ms.length());
+	_control.currentFile->writeChars(chrs, ms.size());
 	free(chrs);
 
 	long endFile = _control.currentFile->currentPos();
@@ -179,6 +179,7 @@ TransactionOperation* BaseTransaction::readOperationFromRegister(char* db, char*
 	if ((strcmp(rdb, db) == 0) && (strcmp(rns, ns) == 0)) {
 		char* stream = _control.currentFile->readChars();
 		MemoryStream ms(stream, length);
+		ms.seek(0);
 		TRANSACTION_OPER code = (TRANSACTION_OPER)ms.readInt();
 		BSONInputStream bis(&ms);
 
@@ -257,11 +258,10 @@ bool BaseTransaction::dropNamespace(char* db, char* ns) {
 	TransactionOperation oper;
 	oper.code = TXO_DROPNAMESPACE;
 	oper.operation = NULL;
+	oper.db = NULL;
+	oper.ns = NULL;
 
 	writeOperationToRegister(db, ns, oper);
-
-	delete oper.db;
-	delete oper.ns;
 }
 
 void BaseTransaction::update(char* db, char* ns, BSONObj* bson) {
@@ -323,8 +323,8 @@ BSONArrayObj* BaseTransaction::find(char* db, char* ns, const char* select, cons
 					bool match = false;
 					ExpressionResult* expresult = parser->eval(*bson);
 					if (expresult->type() == ExpressionResult::RT_BOOLEAN) {
-						bool* bres = (bool*)expresult->value();
-						match = *bres;
+						bool bres = *expresult;
+						match = bres;
 					}
 					delete expresult;
 
@@ -341,8 +341,8 @@ BSONArrayObj* BaseTransaction::find(char* db, char* ns, const char* select, cons
 					bool match = false;
 					ExpressionResult* expresult = parser->eval(*bson);
 					if (expresult->type() == ExpressionResult::RT_BOOLEAN) {
-						bool* bres = (bool*)expresult->value();
-						match = *bres;
+						bool bres = *expresult;
+						match = bres;
 					}
 					delete expresult;
 
