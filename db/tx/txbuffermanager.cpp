@@ -28,8 +28,8 @@
 #include <stdlib.h>
 
 
-TxBufferManager::TxBufferManager(InputOuputStream* stream) {
-	this->_stream = stream;
+TxBufferManager::TxBufferManager(const char* fileName) {
+	this->_stream = new FileInputOutputStream(fileName, ;
 	stream->seek(0, SEEK_END);
 	_buffersSize = 64*1024*1024;
 	_buffersCount = 0;
@@ -45,6 +45,8 @@ TxBufferManager::~TxBufferManager() {
 		delete _reusableBuffers.front();
 		_reusableBuffers.pop();
 	}
+	_stream->close();
+	delete _stream;
 }
 
 TXBuffer* TxBufferManager::getBuffer(__int32 minimumSize) {
@@ -63,4 +65,47 @@ TXBuffer* TxBufferManager::getBuffer(__int32 minimumSize) {
 		_buffersCount++;
 	}
 	return result;
+}
+		
+void TxBufferManager::openLogFile(const char* fileName) {
+	bool existLogFile = existFile(fileName);
+	if (existLogFile) {
+		flags = "rb+";
+	} else {
+		flags = "wb+";
+	}
+	_stream = new FileInputOutputStream(fileName, flags); 
+}
+
+TxBufferManager* TxBufferManager::loadBufferManager(const char* logFilePath) {
+
+	logFile->seek(0);
+	TxBufferManager* bufferManager = new TxBufferManager((InputOuputStream*)logFile);
+
+	while (!logFile->eof()) {
+		char flag = log->readChar();
+		__int64 startOffset = logFile->currentPos();
+		TransactionBuffer* buffer = new TransactionBuffer(bufferManager, logFile, startOffset);
+
+		if (flag & 0x01) {
+			bufferManager->addBuffer(buffer);
+		} else {
+			bufferManager->addUnusedBuffer(buffer);
+		}
+	}
+
+	return bufferManager;
+}
+
+void TxBufferManager::addBuffer(TxBuffer* buffer) {
+	_activeBuffers.push(buffer);
+	_vactiveBuffers.push_back(buffer);
+}
+
+void TxBufferManager::addReusable(TxBuffer* buffer) {
+	_reusableBuffers.push(buffer);
+}
+
+std::vector<TxBuffer*> TxBufferManager::getActiveBuffers() const {
+	return _vactiveBuffers;
 }

@@ -34,10 +34,16 @@ class TestTXSuite: public Test::Suite
 	public:
 		TestTXSuite()
 		{
+			TEST_ADD(TestTXSuite::testBuffers);
 			TEST_ADD(TestTXSuite::testTransaction);
 		}
 
 	private:
+
+		void testBuffers() {
+			MemoryStream ms;
+			TXBufferManager manager(&ms);
+		}
 
 		void testTransaction()
 		{

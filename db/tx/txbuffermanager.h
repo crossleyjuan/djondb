@@ -34,19 +34,28 @@
 
 class InputOuputStream;
 
-class TXBufferManager
+class TxBufferManager
 {
 	public:
-		TxBufferManager(InputOuputStream* stream);
+		TxBufferManager(const char* fileName);
 		// This prevents copying the buffer manager
 		TxBufferManager(const TxBufferManager& orig);
 		~TxBufferManager();
 
-		TXBuffer* getBuffer(__int32 minimumSize);
+		TxBuffer* getBuffer(__int32 minimumSize);
+		std::vector<TxBuffer*> getActiveBuffers() const;
+
+		static TxBufferManager* loadBufferManager(const char* logFilePath);
 
 	private:
-		std::queue<TXBuffer*> _activeBuffers;
-		std::queue<TXBuffer*> _reusableBuffers;
+		void addBuffer(TxBuffer* buffer);
+		void addReusable(TxBuffer* buffer);
+		void openLogFile(const char* fileName);;
+
+	private:
+		std::queue<TxBuffer*>  _activeBuffers;
+		std::vector<TxBuffer*> _vactiveBuffers;
+		std::queue<TxBuffer*>  _reusableBuffers;
 
 		InputOuputStream* _stream;
 

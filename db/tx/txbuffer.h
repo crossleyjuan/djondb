@@ -32,13 +32,13 @@
 #include <queue>
 
 class InputOuputStream;
-class TXBufferManager;
+class TxBufferManager;
 
-class TXBuffer: public InputOutputStream {
+class TxBuffer: public InputOutputStream {
     public:
-        TXBuffer(const TxBufferManager* manager, const InputOuputStream* stream, __int64 offset);
-        TXBuffer(const TXBuffer& other);
-        virtual ~TXBuffer();
+        TxBuffer(const TxBufferManager* manager, const InputOuputStream* stream, __int64 offset);
+        TxBuffer(const TxBuffer& other);
+        virtual ~TxBuffer();
 
         virtual unsigned char readChar();
         /* Reads 2 bytes in the input (little endian order) */

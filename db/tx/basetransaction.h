@@ -44,6 +44,7 @@ class FileInputOutputStream;
 class FileInputStream;
 class FileOutputStream;
 class Command;
+class TxBufferManager;
 
 class BaseTransaction: public Controller 
 {
