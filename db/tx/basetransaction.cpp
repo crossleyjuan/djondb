@@ -35,6 +35,8 @@
 #include "linkedmap.hpp"
 #include "filterparser.h"
 #include "expressionresult.h"
+#include "txbuffermanager.h"
+#include "txbuffer.h"
 #include <stdlib.h>
 
 BaseTransaction::BaseTransaction(Controller* controller) {
@@ -174,10 +176,11 @@ void BaseTransaction::writeOperationToRegister(char* db, char* ns, const Transac
 
 	__int64 lastValidPos = statusPos; // the pos of the last valid record //flag is the start
 
+	__int64 bufferSize = buffer.size();
+	TxBuffer* txBuffer = _bufferManager->getBuffer(bufferSize);	
+	char* chrs = buffer.toChars();
+	txBuffer->writeChars(chrs, bufferSize);
 
-	if buffer + size is greater than buffer allowed size create a new buffer
-	chrs = buffer.toChars();
-	_control.logFile->writeChars(chrs, buffer.size());
 	free(chrs);
 
 	// jumps the "startpos" to the "lastpos"
@@ -185,8 +188,6 @@ void BaseTransaction::writeOperationToRegister(char* db, char* ns, const Transac
 	_controlFile->writeLong(lastValidPos);
 	_control.lastValidPos = lastValidPos;
 	_control.logFile->flush();
-
-	_control.currentBuffer->length += ....(_control.lastValidPos - statusPos);
 }
 
 TransactionOperation* BaseTransaction::readOperationFromRegister(char* db, char* ns) {

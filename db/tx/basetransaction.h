@@ -78,9 +78,7 @@ class BaseTransaction: public Controller
 			__int64 startPos; // Contains the first valid position to be used on the first logFile
 			__int64 lastValidPos; // this is a reference to the last valid position in the last logFile
 			__int32 maximumBufferSize;
-			std::queue<TransactionBuffer*> logBuffers;
-			InputOutputStream* logFile;
-			TransactionBuffer* currentBuffer;
+			TxBufferManager* bufferManager;
 		};	
 
 		Control _control;

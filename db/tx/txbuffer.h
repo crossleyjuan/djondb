@@ -32,10 +32,11 @@
 #include <queue>
 
 class InputOuputStream;
+class TXBufferManager;
 
 class TXBuffer: public InputOutputStream {
     public:
-        TXBuffer(const InputOuputStream* stream);
+        TXBuffer(const TxBufferManager* manager, const InputOuputStream* stream, __int64 offset);
         TXBuffer(const TXBuffer& other);
         virtual ~TXBuffer();
 
@@ -85,12 +86,11 @@ class TXBuffer: public InputOutputStream {
 
 		  virtual bool isClosed();
 
+
 	 private:
 		  InputOuputStream* _stream;
-		  __int32 startPos;
-		  __int32 endPos;
-		  __int32 _pos;
-		  TXBUFFER* _manager;
+		  __int64 _startOffset;
+		  TxBufferManager* _manager;
 };
 
 #endif // TXBUFFER_INCLUDED_H

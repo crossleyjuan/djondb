@@ -28,7 +28,12 @@
 #include <stdlib.h>
 
 
-TxBufferManager::TxBufferManager() {
+TxBufferManager::TxBufferManager(InputOuputStream* stream) {
+	this->_stream = stream;
+	stream->seek(0, SEEK_END);
+	_buffersSize = 64*1024*1024;
+	_buffersCount = 0;
+	this->_maxPos = stream->currentPos();
 }
 
 TxBufferManager::~TxBufferManager() {
@@ -43,4 +48,19 @@ TxBufferManager::~TxBufferManager() {
 }
 
 TXBuffer* TxBufferManager::getBuffer(__int32 minimumSize) {
+	TXBuffer* result = NULL;
+	if (!_activeBuffers.empty()) {
+		result = _activeBuffers.back();
+	}
+	if ((_buffersSize - result->currentPos()) < minimumSize) {
+		if (_reusableBuffers.empty()) {
+			result = new TXBuffer(_stream, _buffersCount * _buffersSize);
+			_activeBuffers.push_back(result);
+		} else {
+			result = _reusableBuffers.front();
+			_reusableBuffers.pop();
+		}
+		_buffersCount++;
+	}
+	return result;
 }

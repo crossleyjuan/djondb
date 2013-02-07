@@ -26,13 +26,17 @@
  */
 #include "txbuffermanager.h"
 #include <stdlib.h>
+#include "txbuffermanager.h"
 
-TXBuffer::TXBuffer(const InputOuputStream* stream) {
+TXBuffer::TXBuffer(const TXBufferManager* manager, const InputOuputStream* stream, __int64 offset) {
 	_stream = stream;
+	_startOffset = offset;
 };
 
 TXBuffer::TXBuffer(const TXBuffer& other) {
 	this->_stream = other._stream;
+	this->_startOffset = other._startOffset;
+	this->_manager = other._manager;
 };
 
 TXBuffer::~TXBuffer() {
@@ -130,11 +134,16 @@ void TXBuffer::writeString(const std::string& text) {
 };
 
 void TXBuffer::seek(__int64 pos, SEEK_DIRECTION direction) {
-	_input->seek(pos, direction);
+	if (direction == FROMSTART_SEEK) {
+		_stream->seek(_startOffset + i, direction);
+	} else {
+		_stream->seek(i, direction);
+	}
 };
 
 __int64 TXBuffer::currentPos() const {
-	return _input->currentPos();
+	__int64 pos = _stream->currentPos();
+	return pos - _versionOffset;
 };
 
 const std::string TXBuffer::fileName() const {

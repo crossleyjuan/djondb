@@ -37,7 +37,7 @@ class InputOuputStream;
 class TXBufferManager
 {
 	public:
-		TxBufferManager();
+		TxBufferManager(InputOuputStream* stream);
 		// This prevents copying the buffer manager
 		TxBufferManager(const TxBufferManager& orig);
 		~TxBufferManager();
@@ -47,6 +47,12 @@ class TXBufferManager
 	private:
 		std::queue<TXBuffer*> _activeBuffers;
 		std::queue<TXBuffer*> _reusableBuffers;
+
+		InputOuputStream* _stream;
+
+		__int64 _buffersSize;
+		__int64 _maxPos;
+		__int32 _buffersCount;
 };
 
 #endif // TXBUFFERMANAGER_INCLUDED_H
