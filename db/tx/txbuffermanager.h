@@ -45,22 +45,25 @@ class TxBufferManager
 		TxBuffer* getBuffer(__int32 minimumSize);
 		std::vector<TxBuffer*> getActiveBuffers() const;
 
-		static TxBufferManager* loadBufferManager(const char* logFilePath);
-
 	private:
+		void initialize(const char* file);
+		void loadBuffers(const char* logFilePath);
 		void addBuffer(TxBuffer* buffer);
 		void addReusable(TxBuffer* buffer);
 		void openLogFile(const char* fileName);;
+		TxBuffer* createNewBuffer();
 
 	private:
 		std::queue<TxBuffer*>  _activeBuffers;
 		std::vector<TxBuffer*> _vactiveBuffers;
 		std::queue<TxBuffer*>  _reusableBuffers;
 
-		InputOuputStream* _stream;
+		InputOutputStream* _stream;
+		InputOutputStream* _controlFile;
+
+		std::string _dataDir;
 
 		__int64 _buffersSize;
-		__int64 _maxPos;
 		__int32 _buffersCount;
 };
 

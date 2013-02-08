@@ -45,6 +45,7 @@ class FileInputStream;
 class FileOutputStream;
 class Command;
 class TxBufferManager;
+class TxBuffer;
 
 class BaseTransaction: public Controller 
 {
@@ -67,28 +68,18 @@ class BaseTransaction: public Controller
 	protected:
 		Controller* _controller;
 		std::string* _transactionId;
-		std::string _dataDir;
 		bool _mainTransactionLog;
 
 		// This contains all the NORMAL records
 		std::map<std::string, std::map<std::string, std::vector<BSONObj*> > > _elements;
 
-		FileInputOutputStream* _controlFile;
-
-		struct Control {
-			__int64 startPos; // Contains the first valid position to be used on the first logFile
-			__int64 lastValidPos; // this is a reference to the last valid position in the last logFile
-			__int32 maximumBufferSize;
-			TxBufferManager* bufferManager;
-		};	
-
-		Control _control;
+		TxBufferManager* _bufferManager;
 
 
 	private:
 		void checkState();
 		void writeOperationToRegister(char* db, char* ns, const TransactionOperation& operation);
-		TransactionOperation* readOperationFromRegister(char* db, char* ns);
+		TransactionOperation* readOperationFromRegister(TxBuffer* buffer, char* db, char* ns);
 		std::list<TransactionOperation*>* findOperations(char* db, char* ns);
 };
 

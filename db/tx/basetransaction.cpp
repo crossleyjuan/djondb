@@ -44,8 +44,6 @@ BaseTransaction::BaseTransaction(Controller* controller) {
 	_controller = controller;
 	_transactionId = NULL;
 
-	_dataDir = getSetting("DATA_DIR");
-
 	loadControlFile();
 }
 
@@ -54,73 +52,33 @@ BaseTransaction::BaseTransaction(Controller* controller, std::string transaction
 	_controller = controller;
 	_transactionId = new std::string(transactionId);
 
-	_dataDir = getSetting("DATA_DIR");
-
 	loadControlFile();
 }
 
 void BaseTransaction::loadControlFile() {
-	std::string controlFile = _mainTransactionLog ? "main.trc": *_transactionId + ".trc";
-	std::string logFileName = _mainTransactionLog ? "main.log": *_transactionId + ".log";
+	std::string file = _mainTransactionLog ? "main": *_transactionId;
 
-	std::string controlFileName = _dataDir + FILESEPARATOR + controlFile;
-	logFileName = _dataDir + FILESEPARATOR + logFileName;
-
-	bool existControl = existFile(controlFileName.c_str());
-
-	char* flags;
-	if (existControl) {
-		flags = "rb+";
-	} else {
-		flags = "wb+";
-	}
-	_controlFile = new FileInputOutputStream(controlFileName.c_str(), flags); 
-	_controlFile->seek(0);
-
-	bool existLogFile = existFile(logFileName.c_str());
-	if (existLogFile) {
-		flags = "rb+";
-	} else {
-		flags = "wb+";
-	}
-
-	if (existControl) {
-		_control.startPos 	  = _controlFile->readLong();
-		_control.lastValidPos  = _controlFile->readLong();
-		_control.maximumBufferSize = _controlFile->readInt();
-		_control.bufferManager = TxBufferManager::loadBufferManager(logFileName.c_str());
-	} else {
-		_control.startPos = 0;
-		_controlFile->writeLong(0);
-		_control.lastValidPos = 0;
-		_controlFile->writeLong(0);
-		
-		_control.maximumBufferSize = 64*1024*1024;
-
-		_control.bufferManager = new TxBufferManager(logFileName.c_str());
-	}
+	_bufferManager = new TxBufferManager(file.c_str());
 }
 
 BaseTransaction::BaseTransaction(const BaseTransaction& orig) {
 	this->_controller = orig._controller;
 	this->_transactionId = orig._transactionId;
-	_controlFile = orig._controlFile; 
-	_control = orig._control;
+	this->_bufferManager = orig._bufferManager;
 }
 
 BaseTransaction::~BaseTransaction() {
-	_controlFile->close();
-	delete _control.bufferManager;
-	if (_controlFile) delete _controlFile;
+	delete _bufferManager;
 	if (_transactionId) delete _transactionId;
 }
 
 void BaseTransaction::writeOperationToRegister(char* db, char* ns, const TransactionOperation& operation) {
 	MemoryStream buffer;
 
-	buffer->writeChar(TXOS_NORMAL);
+	buffer.writeChar(TXOS_NORMAL);
 	buffer.writeChars(db, strlen(db));
 	buffer.writeChars(ns, strlen(ns));
+
 	MemoryStream ms;
 	ms.writeInt(operation.code);
 	ms.writeString(db);
@@ -152,34 +110,28 @@ void BaseTransaction::writeOperationToRegister(char* db, char* ns, const Transac
 	buffer.writeChars(chrs, ms.size());
 	free(chrs);
 
-	__int64 lastValidPos = statusPos; // the pos of the last valid record //flag is the start
-
 	__int64 bufferSize = buffer.size();
 	TxBuffer* txBuffer = _bufferManager->getBuffer(bufferSize);	
-	char* chrs = buffer.toChars();
+	chrs = buffer.toChars();
 	txBuffer->writeChars(chrs, bufferSize);
 
 	txBuffer->flush();
 
 	free(chrs);
-
-	// jumps the "startpos" to the "lastpos"
-	_controlFile->seek(sizeof(__int64));
-	_control.lastValidPos = lastValidPos;
 }
 
-TransactionOperation* BaseTransaction::readOperationFromRegister(char* db, char* ns) {
-	OPERATION_STATUS status = (OPERATION_STATUS)_control.logFile->readChar();
-	char* rdb = _control.logFile->readChars();
-	char* rns = _control.logFile->readChars();
+TransactionOperation* BaseTransaction::readOperationFromRegister(TxBuffer* buffer, char* db, char* ns) {
+	OPERATION_STATUS status = (OPERATION_STATUS)buffer->readChar();
+	char* rdb = buffer->readChars();
+	char* rns = buffer->readChars();
 
 	TransactionOperation* result = NULL;
-	__int32 length = _control.logFile->readInt();
+	__int32 length = buffer->readInt();
 	if (!(status & TXOS_NORMAL)) {
 		goto jumpoperation;
 	};
 	if ((strcmp(rdb, db) == 0) && (strcmp(rns, ns) == 0)) {
-		char* stream = _control.logFile->readChars();
+		char* stream = buffer->readChars();
 		MemoryStream ms(stream, length);
 		ms.seek(0);
 		TRANSACTION_OPER code = (TRANSACTION_OPER)ms.readInt();
@@ -218,26 +170,23 @@ TransactionOperation* BaseTransaction::readOperationFromRegister(char* db, char*
 		};
 	} else {
 jumpoperation:
-		_control.logFile->seek(_control.logFile->currentPos() + length);
+		buffer->seek(buffer->currentPos() + length);
 	}
 	return result;
 }
 
 std::list<TransactionOperation*>* BaseTransaction::findOperations(char* db, char* ns) {
 	std::list<TransactionOperation*>* result = new std::list<TransactionOperation*>();
-	std::vector<TxBuffer*> buffers = _control.bufferManager->getActiveBuffers();
+	std::vector<TxBuffer*> buffers = _bufferManager->getActiveBuffers();
 	for (std::vector<TxBuffer*>::iterator i = buffers.begin(); i != buffers.end(); i++) {
 		TxBuffer* buffer = *i;
-		__int32 lastPos = _control.logFile->currentPos();
-		_control.logFile->seek(buffer->startPos);
-		__int32 currentPos = lastPos;
-		while (!_control.logFile->eof() && (currentPos < buffer->length)) {
-			TransactionOperation* operation = readOperationFromRegister(db, ns);
+		buffer->seek(0);
+		while (!buffer->eof()) {
+			TransactionOperation* operation = readOperationFromRegister(buffer, db, ns);
 			if (operation != NULL) {
 				result->push_back(operation);
 			}
 		}
-		_control.logFile->seek(lastPos);
 	}
 	return result;
 }
@@ -411,18 +360,3 @@ std::vector<std::string>* BaseTransaction::namespaces(const char* db) const {
 	return _controller->namespaces(db);
 }
 
-void BaseTransaction::validateCurrentFile() {
-	// 64Mb
-	if (_control.lastValidPos >= 64*1024*1024) {
-		createNewCurrentFile();
-	}
-}
-
-void BaseTransaction::createNewCurrentFile() {
-	// Jumps start and last valid pos
-	_controlFile->seek(sizeof(__int64) * 2);
-
-	std::string logfile = (_transactionId == NULL)? "main.tlo": *_transactionId + ".tlo";
-	std::string logFileName = _dataDir + FILESEPARATOR + logfile;
-	FileInputOutputStream* logFile = new FileInputOutputStream(logFileName, "rb+");
-}

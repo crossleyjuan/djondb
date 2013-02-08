@@ -25,15 +25,72 @@
  * =====================================================================================
  */
 #include "txbuffermanager.h"
+#include "fileinputoutputstream.h"
 #include <stdlib.h>
 
 
-TxBufferManager::TxBufferManager(const char* fileName) {
-	this->_stream = new FileInputOutputStream(fileName, ;
-	stream->seek(0, SEEK_END);
+TxBufferManager::TxBufferManager(const char* file) {
+	_stream = NULL;
 	_buffersSize = 64*1024*1024;
 	_buffersCount = 0;
-	this->_maxPos = stream->currentPos();
+	_dataDir = getSetting("DATA_DIR");
+	initialize(file);
+}
+
+void TxBufferManager::initialize(const char* file) {
+	std::string controlFileName = _dataDir + FILESEPARATOR + std::string(file) + ".trc";
+	std::string bufferFile = _dataDir + FILESEPARATOR + std::string(file) + ".log";
+
+	bool existControl = existFile(controlFileName.c_str());
+
+	char* flags;
+	if (existControl) {
+		flags = "rb+";
+	} else {
+		flags = "wb+";
+	}
+	_controlFile = (InputOutputStream*)new FileInputOutputStream(controlFileName.c_str(), flags); 
+	_controlFile->seek(0);
+
+	bool existLogFile = existFile(bufferFile.c_str());
+	if (existLogFile) {
+		flags = "rb+";
+	} else {
+		flags = "wb+";
+	}
+
+	if (existControl) {
+		_buffersSize = _controlFile->readInt();
+		
+		loadBuffers(bufferFile.c_str());
+	} else {
+		_controlFile->writeLong(_buffersSize);
+		__int64 pos = _controlFile->currentPos();
+		_controlFile->writeInt(0);
+		_controlFile->seek(pos);
+		loadBuffers(bufferFile.c_str());
+	}
+}
+
+void TxBufferManager::loadBuffers(const char* logFilePath) {
+	openLogFile(logFilePath);
+
+	TxBufferManager* bufferManager = new TxBufferManager(logFilePath);
+
+	__int32 buffers = _controlFile->readInt();
+
+	for (__int32 x = 0; x < buffers; x++) {
+		char flag = _controlFile->readChar();
+		__int64 startOffset = _controlFile->readLong();
+		__int64 bufferLen = _controlFile->readLong();
+		TxBuffer* buffer = new TxBuffer(bufferManager, _stream, startOffset, bufferLen);
+
+		if (flag & 0x01) {
+			bufferManager->addBuffer(buffer);
+		} else {
+			bufferManager->addReusable(buffer);
+		}
+	}
 }
 
 TxBufferManager::~TxBufferManager() {
@@ -49,52 +106,50 @@ TxBufferManager::~TxBufferManager() {
 	delete _stream;
 }
 
-TXBuffer* TxBufferManager::getBuffer(__int32 minimumSize) {
-	TXBuffer* result = NULL;
+TxBuffer* TxBufferManager::createNewBuffer() {
+	TxBuffer* result = new TxBuffer(this, _stream, _buffersCount * _buffersSize, (__int64)0);
+	_activeBuffers.push(result);
+	return result;
+}
+
+TxBuffer* TxBufferManager::getBuffer(__int32 minimumSize) {
+	TxBuffer* result = NULL;
 	if (!_activeBuffers.empty()) {
 		result = _activeBuffers.back();
 	}
-	if ((_buffersSize - result->currentPos()) < minimumSize) {
+	if ((result == NULL) 
+			|| ((_buffersSize - result->currentPos()) < minimumSize)) {
+
+		_controlFile->seek(sizeof(__int64)); 
+		_controlFile->writeInt(_buffersCount + 1);
+		// Active buffer
 		if (_reusableBuffers.empty()) {
-			result = new TXBuffer(_stream, _buffersCount * _buffersSize);
-			_activeBuffers.push_back(result);
+			_controlFile->seek(0, FROMEND_SEEK);
+			__int32 controlPos = _controlFile->currentPos();
+			result = createNewBuffer();
+			result->setControlPosition(controlPos);
 		} else {
 			result = _reusableBuffers.front();
 			_reusableBuffers.pop();
+			_controlFile->seek(result->controlPosition());
 		}
+		_controlFile->writeChar((char)0x01);
+		_controlFile->writeLong(result->startOffset());
+		_controlFile->writeLong(0);
 		_buffersCount++;
 	}
 	return result;
 }
-		
+
 void TxBufferManager::openLogFile(const char* fileName) {
 	bool existLogFile = existFile(fileName);
+	char* flags = NULL;
 	if (existLogFile) {
 		flags = "rb+";
 	} else {
 		flags = "wb+";
 	}
 	_stream = new FileInputOutputStream(fileName, flags); 
-}
-
-TxBufferManager* TxBufferManager::loadBufferManager(const char* logFilePath) {
-
-	logFile->seek(0);
-	TxBufferManager* bufferManager = new TxBufferManager((InputOuputStream*)logFile);
-
-	while (!logFile->eof()) {
-		char flag = log->readChar();
-		__int64 startOffset = logFile->currentPos();
-		TransactionBuffer* buffer = new TransactionBuffer(bufferManager, logFile, startOffset);
-
-		if (flag & 0x01) {
-			bufferManager->addBuffer(buffer);
-		} else {
-			bufferManager->addUnusedBuffer(buffer);
-		}
-	}
-
-	return bufferManager;
 }
 
 void TxBufferManager::addBuffer(TxBuffer* buffer) {

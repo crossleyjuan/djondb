@@ -30,13 +30,13 @@
 #define TXBUFFER_INCLUDED_H
 
 #include <queue>
+#include "inputoutputstream.h"
 
-class InputOuputStream;
 class TxBufferManager;
 
 class TxBuffer: public InputOutputStream {
     public:
-        TxBuffer(const TxBufferManager* manager, const InputOuputStream* stream, __int64 offset);
+        TxBuffer(const TxBufferManager* manager, InputOutputStream* stream, __int64 offset, __int64 bufferLen);
         TxBuffer(const TxBuffer& other);
         virtual ~TxBuffer();
 
@@ -86,10 +86,16 @@ class TxBuffer: public InputOutputStream {
 
 		  virtual bool isClosed();
 
+		  __int32 controlPosition() const;
+		  void setControlPosition(__int32 pos);
+		  __int64 startOffset() const;
+		  __int64 bufferLength() const;
 
 	 private:
-		  InputOuputStream* _stream;
+		  InputOutputStream* _stream;
 		  __int64 _startOffset;
+		  __int64 _bufferLength;
+		  __int32 _controlPosition;
 		  TxBufferManager* _manager;
 };
 
