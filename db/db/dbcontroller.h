@@ -6,6 +6,7 @@
 #include <string>
 #include "filterdefs.h"
 #include "streammanager.h"
+#include "controller.h"
 
 class FileInputOutputStream;
 class FileInputStream;
@@ -16,7 +17,7 @@ class Logger;
 class FilterParser;
 class Index;
 
-class DBController
+class DBController: public Controller
 {
     public:
         DBController();

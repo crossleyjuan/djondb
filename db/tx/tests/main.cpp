@@ -19,6 +19,7 @@
 #include <iostream>
 #include "basetransaction.h"
 #include "controllertest.h"
+#include "dbcontroller.h"
 #include "bson.h"
 #include "util.h"
 #include "command.h"
@@ -35,13 +36,15 @@ class TestTXSuite: public Test::Suite
 		TestTXSuite()
 		{
 			TEST_ADD(TestTXSuite::testTransaction);
+			TEST_ADD(TestTXSuite::testTransactionCommit);
 		}
 
 	private:
 
 		void testTransaction()
 		{
-			Controller* _controller = new DummyController();
+			DummyController* _controller = new DummyController();
+
 			BaseTransaction* tx = new BaseTransaction(_controller);
 
 			tx->dropNamespace("db", "txns");
@@ -72,6 +75,46 @@ class TestTXSuite: public Test::Suite
 			delete tx;
 			delete _controller;
 			delete id;
+		}
+
+		void testTransactionCommit()
+		{
+			DBController* _controller = new DBController();
+			_controller->initialize();
+
+			std::string* txId = uuid();
+			BaseTransaction* tx = new BaseTransaction(_controller, *txId);
+
+			tx->dropNamespace("db", "txns");
+
+			BSONObj o;
+			std::string* id = uuid();
+			o.add("_id", const_cast<char*>(id->c_str()));
+			o.add("name", "John");
+			tx->insert("db", "txns", &o);
+
+			BSONArrayObj* res = tx->find("db", "txns", "*", "");
+
+			TEST_ASSERT(res->length() == 1);
+			BSONObj* test1 = *res->begin();
+			TEST_ASSERT(test1->getString("name").compare("John") == 0);
+
+			test1->add("name", "Peter");
+			tx->update("db", "txns", test1);
+
+			delete res;
+
+			res = tx->find("db", "txns", "*", "");
+
+			TEST_ASSERT(res->length() == 1);
+			BSONObj* test2 = *res->begin();
+			TEST_ASSERT(test2->getString("name").compare("Peter") == 0);
+
+			delete tx;
+			_controller->shutdown();
+			delete _controller;
+			delete id;
+			delete txId;
 		}
 
 };

@@ -111,8 +111,10 @@ void BaseTransaction::writeOperationToRegister(char* db, char* ns, const Transac
 	free(chrs);
 
 	__int64 bufferSize = buffer.size();
-	TxBuffer* txBuffer = _bufferManager->getBuffer(bufferSize);	
+
+	TxBuffer* txBuffer = _bufferManager->getBuffer(bufferSize + sizeof(__int64));	
 	chrs = buffer.toChars();
+	txBuffer->writeLong(bufferSize);
 	txBuffer->writeChars(chrs, bufferSize);
 
 	txBuffer->flush();
@@ -121,18 +123,24 @@ void BaseTransaction::writeOperationToRegister(char* db, char* ns, const Transac
 }
 
 TransactionOperation* BaseTransaction::readOperationFromRegister(TxBuffer* buffer, char* db, char* ns) {
-	OPERATION_STATUS status = (OPERATION_STATUS)buffer->readChar();
-	char* rdb = buffer->readChars();
-	char* rns = buffer->readChars();
+	__int64 size = buffer->readLong();
+
+	MemoryStream* stream = new MemoryStream(buffer->readChars(), size);
+
+	stream->seek(0);
+
+	OPERATION_STATUS status = (OPERATION_STATUS)stream->readChar();
+	char* rdb = stream->readChars();
+	char* rns = stream->readChars();
 
 	TransactionOperation* result = NULL;
-	__int32 length = buffer->readInt();
+	__int32 length = stream->readInt();
 	if (!(status & TXOS_NORMAL)) {
 		goto jumpoperation;
 	};
 	if ((strcmp(rdb, db) == 0) && (strcmp(rns, ns) == 0)) {
-		char* stream = buffer->readChars();
-		MemoryStream ms(stream, length);
+		char* cstream = stream->readChars();
+		MemoryStream ms(cstream, length);
 		ms.seek(0);
 		TRANSACTION_OPER code = (TRANSACTION_OPER)ms.readInt();
 		BSONInputStream bis(&ms);
@@ -170,8 +178,10 @@ TransactionOperation* BaseTransaction::readOperationFromRegister(TxBuffer* buffe
 		};
 	} else {
 jumpoperation:
-		buffer->seek(buffer->currentPos() + length);
+		stream->seek(stream->currentPos() + length);
 	}
+
+	delete stream;
 	return result;
 }
 

@@ -75,32 +75,32 @@ void TxBufferManager::initialize(const char* file) {
 void TxBufferManager::loadBuffers(const char* logFilePath) {
 	openLogFile(logFilePath);
 
-	TxBufferManager* bufferManager = new TxBufferManager(logFilePath);
-
 	__int32 buffers = _controlFile->readInt();
 
 	for (__int32 x = 0; x < buffers; x++) {
 		char flag = _controlFile->readChar();
 		__int64 startOffset = _controlFile->readLong();
 		__int64 bufferLen = _controlFile->readLong();
-		TxBuffer* buffer = new TxBuffer(bufferManager, _stream, startOffset, bufferLen);
+		TxBuffer* buffer = new TxBuffer(this, _stream, startOffset, bufferLen);
 
 		if (flag & 0x01) {
-			bufferManager->addBuffer(buffer);
+			addBuffer(buffer);
 		} else {
-			bufferManager->addReusable(buffer);
+			addReusable(buffer);
 		}
 	}
 }
 
 TxBufferManager::~TxBufferManager() {
 	while (!_activeBuffers.empty()) {
-		delete _activeBuffers.front();
+		TxBuffer* buffer =  _activeBuffers.front();
 		_activeBuffers.pop();
+		delete buffer;
 	}
 	while (!_reusableBuffers.empty()) {
-		delete _reusableBuffers.front();
+		TxBuffer* buffer = _reusableBuffers.front();
 		_reusableBuffers.pop();
+		delete buffer;
 	}
 	_stream->close();
 	delete _stream;
@@ -108,7 +108,6 @@ TxBufferManager::~TxBufferManager() {
 
 TxBuffer* TxBufferManager::createNewBuffer() {
 	TxBuffer* result = new TxBuffer(this, _stream, _buffersCount * _buffersSize, (__int64)0);
-	_activeBuffers.push(result);
 	return result;
 }
 
@@ -128,6 +127,7 @@ TxBuffer* TxBufferManager::getBuffer(__int32 minimumSize) {
 			__int32 controlPos = _controlFile->currentPos();
 			result = createNewBuffer();
 			result->setControlPosition(controlPos);
+			addBuffer(result);
 		} else {
 			result = _reusableBuffers.front();
 			_reusableBuffers.pop();
