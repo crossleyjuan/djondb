@@ -1,7 +1,7 @@
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
 
-all_includes = -I$(srcdir)/../util -I$(srcdir)/../bson -I$(srcdir)/../filesystem -I$(srcdir)/../cache -I$(srcdir)/../command -I$(srcdir)/../db -I$(srcdir)/third_party/include 
+all_includes = -I$(srcdir)/../util -I$(srcdir)/../bson -I$(srcdir)/../filesystem -I$(srcdir)/../cache -I$(srcdir)/../command -I$(srcdir)/../db -I$(srcdir)/../tx -I$(srcdir)/third_party/include 
 
 include $(top_srcdir)/common.mk
 

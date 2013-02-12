@@ -1,7 +1,7 @@
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
 
-all_includes = -I$(srcdir)/../util -I$(srcdir)/../bson -I$(srcdir)/../filesystem -I$(srcdir)/../command -I$(srcdir)/../db
+all_includes = -I$(srcdir)/../util -I$(srcdir)/../bson -I$(srcdir)/../filesystem -I$(srcdir)/../command -I$(srcdir)/../db -I$(srcdir)/../tx
 
 include $(top_srcdir)/common.mk
 
@@ -20,7 +20,7 @@ library_include_HEADERS = network.h
 
 TESTS = test-network
 check_PROGRAMS = test-network
-test_network_LDADD = libdjon-network.la -ldjon-command -ldjon-filesystem -ldjon-util -ldjon-bson -ldjon-db -ldjon-cache -lrt -luuid -lcpptest
+test_network_LDADD = libdjon-network.la -ldjon-tx -ldjon-command -ldjon-db -ldjon-filesystem -ldjon-util -ldjon-bson -ldjon-cache -lrt -luuid -lcpptest
 test_network_SOURCES = tests/main.cpp
 
 djon_network_libincludedir = $(libdir)/djon-network-1.0/include

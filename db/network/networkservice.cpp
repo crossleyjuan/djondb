@@ -29,6 +29,7 @@
 #include "command.h"
 #include "commandreader.h"
 #include "dbcontroller.h"
+#include "basetransaction.h"
 #include <stdlib.h>
 #include <boost/shared_ptr.hpp>
 #include <memory>
@@ -66,6 +67,7 @@ Logger* log;
 Thread* m_thread; // Main thread
 
 DBController* __dbController;
+BaseTransaction* _baseTransaction;
 std::map<int, NetworkInputStream*>  __mapInput;
 std::map<int, NetworkOutputStream*> __mapOutput;
 
@@ -92,6 +94,7 @@ void NetworkService::start() { //throw (NetworkException*) {
 
 	__dbController = new DBController();
 	__dbController->initialize();
+	_baseTransaction = new BaseTransaction(__dbController);
 	setRunning(true);
 	m_thread = new Thread(&startSocketListener);
 	m_thread->start(this);
@@ -115,6 +118,7 @@ void NetworkService::stop() { //throw (NetworkException*) {
 			break;
 		}
 	}
+	_baseTransaction->flushBuffer();
 	__dbController->shutdown();
 	setRunning(false);
 #ifndef WINDOWS
@@ -129,6 +133,8 @@ void NetworkService::stop() { //throw (NetworkException*) {
 	m_thread->join();
 
 	if (m_thread) delete(m_thread);
+	delete _baseTransaction;
+	delete __dbController;
 }
 
 bool NetworkService::running() const {
@@ -279,6 +285,7 @@ void *startSocketListener(void* arg) {
 				}
 			}
 		}
+		_baseTransaction->flushBuffer();
 	}
 
 #ifdef WINDOWS
@@ -350,7 +357,7 @@ int processRequest(NetworkService* service, void *arg) {
 	// Reads command
 	std::auto_ptr<Command> cmd(reader->readCommand());
 	commands++;
-	cmd->setDBController(__dbController);
+	cmd->setDBController(_baseTransaction);
 	try {
 		if (cmd->commandType() != CLOSECONNECTION) {
 			cmd->execute();
