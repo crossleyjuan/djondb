@@ -65,6 +65,8 @@ class BaseTransaction: public Controller
 		virtual std::vector<std::string>* dbs() const;
 		virtual std::vector<std::string>* namespaces(const char* db) const;
 
+		virtual void flushBuffer();
+
 	protected:
 		Controller* _controller;
 		std::string* _transactionId;
@@ -79,6 +81,7 @@ class BaseTransaction: public Controller
 	private:
 		void checkState();
 		void writeOperationToRegister(char* db, char* ns, const TransactionOperation& operation);
+		TransactionOperation* readOperationFromRegister(TxBuffer* buffer);
 		TransactionOperation* readOperationFromRegister(TxBuffer* buffer, char* db, char* ns);
 		std::list<TransactionOperation*>* findOperations(char* db, char* ns);
 };

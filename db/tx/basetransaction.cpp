@@ -122,6 +122,10 @@ void BaseTransaction::writeOperationToRegister(char* db, char* ns, const Transac
 	free(chrs);
 }
 
+TransactionOperation* BaseTransaction::readOperationFromRegister(TxBuffer* buffer) {
+	return readOperationFromRegister(buffer, NULL, NULL);
+}
+
 TransactionOperation* BaseTransaction::readOperationFromRegister(TxBuffer* buffer, char* db, char* ns) {
 	__int64 size = buffer->readLong();
 
@@ -138,7 +142,7 @@ TransactionOperation* BaseTransaction::readOperationFromRegister(TxBuffer* buffe
 	if (!(status & TXOS_NORMAL)) {
 		goto jumpoperation;
 	};
-	if ((strcmp(rdb, db) == 0) && (strcmp(rns, ns) == 0)) {
+	if ((db == NULL) || (ns == NULL) || ((strcmp(rdb, db) == 0) && (strcmp(rns, ns) == 0))) {
 		char* cstream = stream->readChars();
 		MemoryStream ms(cstream, length);
 		ms.seek(0);
@@ -370,3 +374,46 @@ std::vector<std::string>* BaseTransaction::namespaces(const char* db) const {
 	return _controller->namespaces(db);
 }
 
+void BaseTransaction::flushBuffer() {
+	if (_bufferManager->buffersCount() > 1) {
+		TxBuffer* buffer = _bufferManager->pop();
+
+		TransactionOperation* operation = NULL;
+		while ((operation = readOperationFromRegister(buffer)) != NULL) {
+			std::string* db = operation->db;
+			std::string* ns = operation->ns;
+			switch (operation->code) {
+				case TXO_INSERT: 
+					{
+						BsonOper* insert = (BsonOper*)operation->operation;
+						BSONObj* bson = insert->bson;
+						_controller->insert(const_cast<char*>(db->c_str()), const_cast<char*>(ns->c_str()), bson);
+						delete bson;
+					};
+					break;
+				case TXO_UPDATE: 
+					{
+						BsonOper* update = (BsonOper*)operation->operation;
+						BSONObj* bson = update->bson;
+						_controller->update(const_cast<char*>(db->c_str()), const_cast<char*>(ns->c_str()), bson);
+						delete bson;
+					};
+					break;
+				case TXO_REMOVE: 
+					{
+						RemoveOper* remove = (RemoveOper*)operation->operation;
+						const std::string id = remove->key;
+						const std::string revision = remove->revision;
+						_controller->remove(const_cast<char*>(db->c_str()), const_cast<char*>(ns->c_str()), id.c_str(), revision.c_str());
+					};
+					break;
+				case TXO_DROPNAMESPACE:
+					{
+						_controller->dropNamespace(const_cast<char*>(db->c_str()), const_cast<char*>(ns->c_str()));
+					};
+					break;
+			}
+			delete operation;
+		}
+	}
+}

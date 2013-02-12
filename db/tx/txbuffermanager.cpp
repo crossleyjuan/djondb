@@ -164,3 +164,20 @@ void TxBufferManager::addReusable(TxBuffer* buffer) {
 std::vector<TxBuffer*> TxBufferManager::getActiveBuffers() const {
 	return _vactiveBuffers;
 }
+
+TxBuffer* TxBufferManager::pop() {
+	TxBuffer* buffer = _activeBuffers.front();
+	_activeBuffers.pop();
+
+	__int64 controlPos = buffer->controlPosition();
+	_controlFile->seek(controlPos);
+	_controlFile->writeChar((char)0x02); // reusable
+	_buffersCount--;
+
+	_reusableBuffers.push(buffer);
+	return buffer;
+}
+
+__int32 TxBufferManager::buffersCount() const {
+	return _buffersCount;
+}

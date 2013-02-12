@@ -44,6 +44,8 @@ class TxBufferManager
 
 		TxBuffer* getBuffer(__int32 minimumSize);
 		std::vector<TxBuffer*> getActiveBuffers() const;
+		TxBuffer* pop();
+		__int32 buffersCount() const;
 
 	private:
 		void initialize(const char* file);
