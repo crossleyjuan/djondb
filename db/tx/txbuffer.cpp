@@ -32,127 +32,167 @@ TxBuffer::TxBuffer(const TxBufferManager* manager, InputOutputStream* stream, __
 	_stream = stream;
 	_startOffset = offset;
 	_bufferLength = bufferLen;
+	_currentPos = 0;
+	stream->seek(0);
 };
 
 TxBuffer::TxBuffer(const TxBuffer& other) {
 	this->_stream = other._stream;
 	this->_startOffset = other._startOffset;
 	this->_manager = other._manager;
+	this->_bufferLength = other._bufferLength;
+	this->_currentPos = other._currentPos;
+	seek(_currentPos);
 };
 
 TxBuffer::~TxBuffer() {
 };
 
+void TxBuffer::reset() {
+	_bufferLength = 0;
+	seek(0);
+}
 
 unsigned char TxBuffer::readChar() {
-	return _stream->readChar();
+	char c = _stream->readChar();
+	_currentPos += sizeof(char);
+	return c;
 };
 
 /* Reads 2 bytes in the input (little endian order) */
 __int16 TxBuffer::readShortInt() {
-	return _stream->readShortInt();
+	__int16 r = _stream->readShortInt();
+	_currentPos += sizeof(__int16);
+	return r;
 };
 
 /* Reads 4 bytes in the input (little endian order) */
 __int32 TxBuffer::readInt() {
-	return _stream->readInt();
+	__int32 r = _stream->readInt();
+	_currentPos += sizeof(__int32);
+	return r;
 };
 
 /* Reads 8 bytes in the input (little endian order) */
 __int64 TxBuffer::readLong() {
-	return _stream->readLong();
+	__int64 r =  _stream->readLong();
+	_currentPos += sizeof(__int64);
+	return r;
 };
 
 /* Reads a 16 byte long in the input */
 __int64 TxBuffer::readLong64() {
-	return _stream->readLong64();
+	__int64 r = _stream->readLong64();
+	_currentPos += sizeof(__int64);
+	return r;
 };
 
 /* Reads a 4 byte float in the input */
 float TxBuffer::readFloatIEEE() {
-	return _stream->readFloatIEEE();
+	float r = _stream->readFloatIEEE();
+	_currentPos += sizeof(float);
+	return r;
 };
 
 /* Reads a 8 byte double in the input */
 double TxBuffer::readDoubleIEEE() {
-	return _stream->readDoubleIEEE();
+	double r = _stream->readDoubleIEEE();
+	_currentPos += sizeof(double);
+	return r;
 };
 
 /* Read a chars */
 char* TxBuffer::readChars() {
-	return _stream->readChars();
+	char* r = _stream->readChars();
+	_currentPos = _stream->currentPos() - _startOffset;
+	return r;
 };
 
 char* TxBuffer::readChars(__int32 length) {
-	return _stream->readChars();
+	char* r = _stream->readChars(length);
+	_currentPos = _stream->currentPos() - _startOffset;
+	return r;
 };
 
 const char* TxBuffer::readFull() {
-	return _stream->readFull();
+	const char* r = _stream->readFull();
+	_currentPos = _stream->currentPos() - _startOffset;
+	return r;
 };
 
 
 std::string* TxBuffer::readString() {
-	return _stream->readString();
+	std::string* r = _stream->readString();
+	_currentPos = _stream->currentPos() - _startOffset;
+	return r;
 };
 
 void TxBuffer::writeChar(unsigned char v) {
 	_stream->writeChar(v);
 	_bufferLength += sizeof(unsigned char);
+	_currentPos = _bufferLength;
 };
 
 /* Write 2 bytes in the output (little endian order) */
 void TxBuffer::writeShortInt(__int16 v) {
 	_stream->writeShortInt(v);
 	_bufferLength += sizeof(__int16);
+	_currentPos = _bufferLength;
 };
 
 /* Write 4 bytes in the output (little endian order) */
 void TxBuffer::writeInt(__int32 v) {
 	_stream->writeInt(v);
 	_bufferLength += sizeof(__int32);
+	_currentPos = _bufferLength;
 };
 
 /* Write 4 bytes in the output (little endian order) */
 void TxBuffer::writeLong(__int64 v) {
 	_stream->writeLong(v);
 	_bufferLength += sizeof(__int64);
+	_currentPos = _bufferLength;
 };
 
 /* Write a 4 byte float in the output */
 void TxBuffer::writeFloatIEEE(float v) {
 	_stream->writeFloatIEEE(v);
 	_bufferLength += sizeof(float);
+	_currentPos = _bufferLength;
 };
 
 /* Write a 8 byte double in the output */
 void TxBuffer::writeDoubleIEEE(double v) {
 	_stream->writeDoubleIEEE(v);
 	_bufferLength += sizeof(double);
+	_currentPos = _bufferLength;
 };
 
 /* Write a char */
 void TxBuffer::writeChars(const char* text, __int32 len) {
 	_stream->writeChars(text, len);
 	_bufferLength = _stream->currentPos() - _startOffset;
+	_currentPos = _bufferLength;
 };
 
 void TxBuffer::writeString(const std::string& text) {
 	_stream->writeString(text);
 	_bufferLength = _stream->currentPos() - _startOffset;
+	_currentPos = _bufferLength;
 };
 
 void TxBuffer::seek(__int64 pos, SEEK_DIRECTION direction) {
 	if (direction == FROMSTART_SEEK) {
 		_stream->seek(_startOffset + pos, direction);
+		_currentPos = pos;
 	} else {
 		_stream->seek(pos, direction);
+		_currentPos = _stream->currentPos() - _startOffset;
 	}
 };
 
 __int64 TxBuffer::currentPos() const {
-	__int64 pos = _stream->currentPos();
-	return pos - _startOffset;
+	return _currentPos;
 };
 
 const std::string TxBuffer::fileName() const {
@@ -160,7 +200,7 @@ const std::string TxBuffer::fileName() const {
 };
 
 bool TxBuffer::eof() {
-	return (_bufferLength - currentPos()) == 0; 
+	return (_bufferLength - _currentPos) == 0; 
 };
 
 void TxBuffer::close() {
@@ -171,7 +211,6 @@ void TxBuffer::close() {
 void TxBuffer::flush() {
 	_stream->flush();
 };
-
 
 bool TxBuffer::isClosed() {
 	return _stream->isClosed();
@@ -192,3 +231,4 @@ __int64 TxBuffer::startOffset() const {
 __int64 TxBuffer::bufferLength() const {
 	return _bufferLength;
 }
+

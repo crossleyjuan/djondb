@@ -104,6 +104,8 @@ TxBufferManager::~TxBufferManager() {
 	}
 	_stream->close();
 	delete _stream;
+	_controlFile->close();
+	delete _controlFile;
 }
 
 TxBuffer* TxBufferManager::createNewBuffer() {
@@ -115,6 +117,9 @@ TxBuffer* TxBufferManager::getBuffer(__int32 minimumSize) {
 	TxBuffer* result = NULL;
 	if (!_activeBuffers.empty()) {
 		result = _activeBuffers.back();
+		// because some other action could change the currentPos
+		// we should ensure its in the right place before returning the buffer
+		result->seek(result->currentPos());
 	}
 	if ((result == NULL) 
 			|| ((_buffersSize - result->currentPos()) < minimumSize)) {
@@ -127,12 +132,14 @@ TxBuffer* TxBufferManager::getBuffer(__int32 minimumSize) {
 			__int32 controlPos = _controlFile->currentPos();
 			result = createNewBuffer();
 			result->setControlPosition(controlPos);
-			addBuffer(result);
 		} else {
 			result = _reusableBuffers.front();
 			_reusableBuffers.pop();
 			_controlFile->seek(result->controlPosition());
+			result->reset();
 		}
+		addBuffer(result);
+		result->seek(0);
 		_controlFile->writeChar((char)0x01);
 		_controlFile->writeLong(result->startOffset());
 		_controlFile->writeLong(0);

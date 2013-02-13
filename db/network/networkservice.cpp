@@ -133,7 +133,6 @@ void NetworkService::stop() { //throw (NetworkException*) {
 	m_thread->join();
 
 	if (m_thread) delete(m_thread);
-	delete _baseTransaction;
 	delete __dbController;
 }
 
