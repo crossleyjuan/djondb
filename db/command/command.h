@@ -6,7 +6,7 @@
 using namespace std;
 
 class BSONObj;
-class DBController;
+class Controller;
 class OutputStream;
 class InputStream;
 
@@ -36,11 +36,11 @@ class Command {
         virtual void writeResult(OutputStream* out) const = 0;
         virtual void readResult(InputStream* is) = 0;
 
-        DBController* dbController() const {
+        Controller* dbController() const {
             return  _dbController;
         }
 
-        void setDBController(DBController* dbController) {
+        void setDBController(Controller* dbController) {
             _dbController = dbController;
         }
 
@@ -67,7 +67,7 @@ class Command {
 
     private:
         COMMANDTYPE _commandType;
-        DBController* _dbController;
+        Controller* _dbController;
 };
 
 class CloseCommand: public Command {

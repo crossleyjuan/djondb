@@ -90,11 +90,13 @@ class TxBuffer: public InputOutputStream {
 		  void setControlPosition(__int32 pos);
 		  __int64 startOffset() const;
 		  __int64 bufferLength() const;
+		  void reset();
 
 	 private:
 		  InputOutputStream* _stream;
 		  __int64 _startOffset;
 		  __int64 _bufferLength;
+		  __int64 _currentPos;
 		  __int32 _controlPosition;
 		  TxBufferManager* _manager;
 };

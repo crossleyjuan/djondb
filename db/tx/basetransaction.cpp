@@ -127,6 +127,9 @@ TransactionOperation* BaseTransaction::readOperationFromRegister(TxBuffer* buffe
 }
 
 TransactionOperation* BaseTransaction::readOperationFromRegister(TxBuffer* buffer, char* db, char* ns) {
+	if (buffer->eof()) {
+		return NULL;
+	}
 	__int64 size = buffer->readLong();
 
 	MemoryStream* stream = new MemoryStream(buffer->readChars(), size);
@@ -218,6 +221,8 @@ BSONObj* BaseTransaction::insert(char* db, char* ns, BSONObj* bson) {
 
 	delete oper.db;
 	delete oper.ns;
+	delete insertOper->bson;
+	delete insertOper;
 }
 
 bool BaseTransaction::dropNamespace(char* db, char* ns) {
@@ -258,6 +263,7 @@ void BaseTransaction::remove(char* db, char* ns, const std::string& documentId, 
 
 	delete oper.db;
 	delete oper.ns;
+	delete removeOper;
 }
 
 bool compareStrings(std::string s1, std::string s2) {
@@ -338,6 +344,7 @@ BSONArrayObj* BaseTransaction::find(char* db, char* ns, const char* select, cons
 				};
 				break;
 		}
+		delete operation;
 	}
 
 	BSONArrayObj* result = new BSONArrayObj();
@@ -379,6 +386,7 @@ void BaseTransaction::flushBuffer() {
 		TxBuffer* buffer = _bufferManager->pop();
 
 		TransactionOperation* operation = NULL;
+		buffer->seek(0);
 		while ((operation = readOperationFromRegister(buffer)) != NULL) {
 			std::string* db = operation->db;
 			std::string* ns = operation->ns;
