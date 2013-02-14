@@ -258,6 +258,7 @@ void BaseTransaction::remove(char* db, char* ns, const std::string& documentId, 
 	RemoveOper* removeOper = new RemoveOper();
 	removeOper->key = std::string(documentId);
 	removeOper->revision = std::string(revision);
+	oper.operation = removeOper;
 
 	writeOperationToRegister(db, ns, oper);
 

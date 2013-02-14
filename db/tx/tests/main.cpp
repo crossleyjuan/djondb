@@ -36,13 +36,15 @@ class TestTXSuite: public Test::Suite
 		TestTXSuite()
 		{
 			TEST_ADD(TestTXSuite::testTransaction);
-			TEST_ADD(TestTXSuite::testTransactionCommit);
+			TEST_ADD(TestTXSuite::testTransactionFlush);
 		}
 
 	private:
 
 		void testTransaction()
 		{
+			Logger* log = getLogger(NULL);
+			log->info("testTransaction");
 			DummyController* _controller = new DummyController();
 
 			BaseTransaction* tx = new BaseTransaction(_controller);
@@ -77,44 +79,33 @@ class TestTXSuite: public Test::Suite
 			delete id;
 		}
 
-		void testTransactionCommit()
+		void testTransactionFlush()
 		{
+			Logger* log = getLogger(NULL);
+			log->info("testTransactionFlush");
 			DBController* _controller = new DBController();
 			_controller->initialize();
 
-			std::string* txId = uuid();
-			BaseTransaction* tx = new BaseTransaction(_controller, *txId);
+			BaseTransaction* tx = new BaseTransaction(_controller);
 
 			tx->dropNamespace("db", "txns");
 
-			BSONObj o;
-			std::string* id = uuid();
-			o.add("_id", const_cast<char*>(id->c_str()));
-			o.add("name", "John");
-			tx->insert("db", "txns", &o);
-
-			BSONArrayObj* res = tx->find("db", "txns", "*", "");
-
-			TEST_ASSERT(res->length() == 1);
-			BSONObj* test1 = *res->begin();
-			TEST_ASSERT(test1->getString("name").compare("John") == 0);
-
-			test1->add("name", "Peter");
-			tx->update("db", "txns", test1);
-
-			delete res;
-
-			res = tx->find("db", "txns", "*", "");
-
-			TEST_ASSERT(res->length() == 1);
-			BSONObj* test2 = *res->begin();
-			TEST_ASSERT(test2->getString("name").compare("Peter") == 0);
+			for (int y = 0; y < 3; y++) {
+				for (int x= 0; x < 10000; x++) {
+					BSONObj o;
+					std::string* id = uuid();
+					o.add("_id", const_cast<char*>(id->c_str()));
+					o.add("name", "John");
+					tx->insert("db", "txns", &o);
+					delete id;
+				}
+				tx->flushBuffer();
+			}
+			tx->flushBuffer();
 
 			delete tx;
 			_controller->shutdown();
 			delete _controller;
-			delete id;
-			delete txId;
 		}
 
 };
