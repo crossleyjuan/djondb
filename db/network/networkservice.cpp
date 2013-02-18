@@ -79,7 +79,6 @@ NetworkService::NetworkService() {
 }
 
 NetworkService::~NetworkService() {
-	delete(log);
 }
 
 void NetworkService::start() { //throw (NetworkException*) {

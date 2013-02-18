@@ -144,7 +144,8 @@ class TestFileSystemSuite: public Test::Suite
 
 
 			// testing with buffer initializer
-			MemoryStream ms3(ms2.toChars(), ms2.size());
+			char* c = ms2.toChars();
+			MemoryStream ms3(c, ms2.size());
 			ms3.seek(0);
 			ms3.readInt();
 			ms3.readInt();
@@ -157,6 +158,8 @@ class TestFileSystemSuite: public Test::Suite
 			pos = ms3.currentPos();
 			TEST_ASSERT(pos == sizeof(__int32) * 2);
 
+			free(c);
+			free(res);
 		}
 
 		void testFileInputOutputStreams()
@@ -226,9 +229,9 @@ class TestFileSystemSuite: public Test::Suite
 			TEST_ASSERT(obj->has("int"));
 			TEST_ASSERT(obj->getInt("int") == INT_MAX);
 
-			TEST_ASSERT(strcmp(obj->getString("string"), "test") == 0);
+			TEST_ASSERT(obj->getString("string").compare("test") == 0);
 
-			TEST_ASSERT(strcmp(obj->getString("char*"), "char*") == 0);
+			TEST_ASSERT(obj->getString("char*").compare("char*") == 0);
 
 			TEST_ASSERT(obj->has("long"));
 			TEST_ASSERT(obj->getLong("long") == 100000000L);
@@ -243,7 +246,7 @@ class TestFileSystemSuite: public Test::Suite
 			TEST_ASSERT(innerR != NULL);
 
 			TEST_ASSERT(innerR->has("name"));
-			TEST_ASSERT(strcmp(innerR->getString("name"), "John") == 0);
+			TEST_ASSERT(innerR->getString("name").compare("John") == 0);
 
 			TEST_ASSERT(innerR->has("int"));
 			TEST_ASSERT(innerR->getInt("int") == 1);
@@ -252,7 +255,6 @@ class TestFileSystemSuite: public Test::Suite
 			TEST_ASSERT(innerR->getLong("long") == LONG_MAX);
 
 			fis->close();
-
 		}
 
 		void testBSONSelect() {
@@ -325,14 +327,14 @@ class TestFileSystemSuite: public Test::Suite
 			BSONObj* obj = bsonIn->readBSON();
 			TEST_ASSERT(obj->has("age"));
 			TEST_ASSERT(obj->getInt("age") == 1);
-			TEST_ASSERT(strcmp(obj->getString("name"), "John") == 0);
+			TEST_ASSERT(obj->getString("name").compare("John") == 0);
 
 			TEST_ASSERT(obj->has("salary"));
 			TEST_ASSERT(obj->getDouble("salary") == 3500.25);
 
 			TEST_ASSERT(obj->has("rel1"));
 			TEST_ASSERT(obj->getBSONArray("rel1")->length() == 4);
-			TEST_ASSERT(strcmp(obj->getBSONArray("rel1")->get(0)->getString("innertext"), "inner text") == 0);
+			TEST_ASSERT(obj->getBSONArray("rel1")->get(0)->getString("innertext").compare("inner text") == 0);
 
 			delete obj;
 
@@ -376,9 +378,9 @@ class TestFileSystemSuite: public Test::Suite
 			TEST_ASSERT(obj->has("int"));
 			TEST_ASSERT(obj->getInt("int") == 1);
 
-			TEST_ASSERT(strcmp(obj->getString("string"), "test") == 0);
+			TEST_ASSERT(obj->getString("string").compare("test") == 0);
 
-			TEST_ASSERT(strcmp(obj->getString("char*"), "char*") == 0);
+			TEST_ASSERT(obj->getString("char*").compare("char*") == 0);
 
 			TEST_ASSERT(obj->has("long"));
 			TEST_ASSERT(obj->getLong("long") == 1L);
@@ -392,9 +394,9 @@ class TestFileSystemSuite: public Test::Suite
 			TEST_ASSERT(innerTest->has("int"));
 			TEST_ASSERT(innerTest->getInt("int") == 1);
 
-			TEST_ASSERT(strcmp(innerTest->getString("string"), "test") == 0);
+			TEST_ASSERT(innerTest->getString("string").compare("test") == 0);
 
-			TEST_ASSERT(strcmp(innerTest->getString("char*"), "char*") == 0);
+			TEST_ASSERT(innerTest->getString("char*").compare("char*") == 0);
 
 			TEST_ASSERT(innerTest->has("long"));
 			TEST_ASSERT(innerTest->getLong("long") == 1L);
@@ -441,9 +443,9 @@ class TestFileSystemSuite: public Test::Suite
 				TEST_ASSERT(obj->has("int"));
 				TEST_ASSERT(obj->getInt("int") == 1);
 
-				TEST_ASSERT(strcmp(obj->getString("string"), "test") == 0);
+				TEST_ASSERT(obj->getString("string").compare("test") == 0);
 
-				TEST_ASSERT(strcmp(obj->getString("char*"), "char*") == 0);
+				TEST_ASSERT(obj->getString("char*").compare("char*") == 0);
 
 				TEST_ASSERT(obj->has("long"));
 				TEST_ASSERT(obj->getLong("long") == 1L);
@@ -481,7 +483,7 @@ class TestFileSystemSuite: public Test::Suite
 		void testBSONBuffered() {
 			cout << "\ntestBSONBuffered\n" << endl;
 
-			MemoryStream ms;
+			MemoryStream* ms = new MemoryStream();
 			BSONObj o;
 			o.add("int", 10);
 			o.add("long", (__int64)1000000);
@@ -503,31 +505,33 @@ class TestFileSystemSuite: public Test::Suite
 			delete o1;
 			delete o2;
 
-			BSONOutputStream bos(&ms);
+			BSONOutputStream bos(ms);
 			bos.writeBSON(o);
 
-			char* c = ms.toChars();
+			char* c = ms->toChars();
 
-			BSONBufferedObj buffered(c, ms.size());
+			BSONBufferedObj* buffered = new BSONBufferedObj(c, ms->size());
 
-			TEST_ASSERT(buffered.getInt("int") == 10);
-			TEST_ASSERT(buffered.getLong("long") == (__int64)1000000);
-			TEST_ASSERT(strcmp(buffered.getString("char"), "Test Char") == 0);
-			TEST_ASSERT(buffered.getDouble("double") == (double)2.14159);
+			TEST_ASSERT(buffered->getInt("int") == 10);
+			TEST_ASSERT(buffered->getLong("long") == (__int64)1000000);
+			TEST_ASSERT(buffered->getString("char").compare("Test Char") == 0);
+			TEST_ASSERT(buffered->getDouble("double") == (double)2.14159);
 
-			BSONObj* or2 = buffered.select("$'int', $'long'");
+			BSONObj* or2 = buffered->select("$'int', $'long'");
 			TEST_ASSERT(or2->getInt("int") == 10);
 			TEST_ASSERT(or2->getLong("long") == (__int64)1000000);
 
-			BSONBufferedArrayObj* arrayR = (BSONBufferedArrayObj*)buffered.getBSONArray("array");
+			BSONBufferedArrayObj* arrayR = (BSONBufferedArrayObj*)buffered->getBSONArray("array");
 			TEST_ASSERT(arrayR->length() == 2);
 			BSONBufferedObj* obj1 = (BSONBufferedObj*)arrayR->get(0);
 			TEST_ASSERT(obj1->getInt("a") == 1);
 			BSONBufferedObj* obj2 = (BSONBufferedObj*)arrayR->get(1);
 			TEST_ASSERT(obj2->getInt("a") == 2);
 
-			free(c);
+			delete buffered;
 			delete or2;
+			delete ms;
+			free(c);
 		}
 };
 

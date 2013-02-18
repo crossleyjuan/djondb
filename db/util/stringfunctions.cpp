@@ -71,6 +71,8 @@ std::string djondb::string::str() const {
 	strncpy(chr, (char*)*_holder, length());
 	chr[length()] = 0;
 	std::string result(chr);
+
+	free(chr);
 	return result;
 }
 
