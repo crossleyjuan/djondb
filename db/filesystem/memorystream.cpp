@@ -73,7 +73,7 @@ MemoryStream::~MemoryStream() {
 		 char* r = _buffer[x];
 		 free(r);
 	 }
-
+	 free(_buffer);
 }
 
 void MemoryStream::allocate(size_t size) {
