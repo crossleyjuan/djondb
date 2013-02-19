@@ -85,7 +85,7 @@ namespace djondb {
 			__int32 length() const;
 
 			int compare(const djondb::string s2) const;
-			int compare(const char* s2) const;
+			int compare(const char* s2, __int32 len) const;
 
 			operator const char*() const;
 			operator char*() const;
