@@ -778,7 +778,7 @@ std::string readLine(char* prompt) {
 void RunShell(v8::Handle<v8::Context> context) {
 	printf("djondb shell version %s\n", VERSION);
 	printf("Welcome to djondb shell.\n");
-	printf("Use help(); to get the commands available. \n(hint: The first command should be \"connect\" to playing with a server)\n");
+	printf("Use help(); to get the commands available. \n(hint: The first command should be \"connect\" to start playing with a server)\n");
 
 	static const int kBufferSize = 256;
 	// Enter the execution environment before evaluating any code.

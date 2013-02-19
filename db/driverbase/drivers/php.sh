@@ -8,11 +8,11 @@ while getopts j:d:u o
 	esac
 done
 
-sh update.sh
 
-rm -rf php
+#rm -rf php
 mkdir php
 
+sh update-php.sh
 OS=`uname -s`
 if test "$OS" = "Darwin"; then
 cp ../../obj/usr/lib/libdjon-client.0.dylib ../../obj/usr/lib/libdjon-client.dylib php/

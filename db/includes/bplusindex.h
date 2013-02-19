@@ -67,7 +67,7 @@ class BPlusIndex: public IndexAlgorithm
 		void insertIndexElement(IndexPage* page, Index* index);
 		void dispose(IndexPage* page);
 		void createRoot(Index* element, IndexPage* left, IndexPage* right);
-		int addElement(IndexPage* page, Index* element, IndexPage* rightPointer);
+		void addElement(IndexPage* page, Index* element, IndexPage* rightPointer);
 		void splitAdd(IndexPage* page, Index* index, IndexPage* rightPointer);
 		void splitAddLeaf(IndexPage* page, Index* index);
 		void splitAddInner(IndexPage* page, Index* index, IndexPage* rightPointer);
