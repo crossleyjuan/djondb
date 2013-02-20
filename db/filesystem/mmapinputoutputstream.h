@@ -34,35 +34,57 @@ public:
     virtual char* readChars(__int32 length);
     virtual void readChars(__int32 length, char* res);
     virtual const char* readFull();
-    virtual __int64 currentPos() const;
-	virtual void seek(__int64 pos, SEEK_DIRECTION direction = FROMSTART_SEEK);
-    virtual __int64 crc32();
 
+	 virtual __int64 currentPos() const;
+	 virtual void seek(__int64 pos, SEEK_DIRECTION direction = FROMSTART_SEEK);
+	 virtual __int64 crc32();
 	 virtual __int64 length() const;
-    virtual std::string* readString();
-    virtual const std::string fileName() const;
-    virtual bool eof();
+	 virtual std::string* readString();
+	 virtual const std::string fileName() const;
+	 virtual bool eof();
 
-    virtual void close();
+	 virtual void close();
 
-    virtual bool isClosed();
+	 virtual bool isClosed();
+
+	 virtual void writeChar (unsigned char v);
+	 /* Write 2 bytes in the output (little endian order) */
+	 virtual void writeShortInt (__int16 v);
+	 /* Write 4 bytes in the output (little endian order) */
+	 virtual void writeInt (__int32 v);
+	 /* Write 4 bytes in the output (little endian order) */
+	 virtual void writeLong (__int64 v);
+	 /* Write a 4 byte float in the output */
+	 virtual void writeFloatIEEE (float v);
+	 /* Write a 8 byte double in the output */
+	 virtual void writeDoubleIEEE (double v);
+	 /* Write a char */
+	 virtual void writeChars(const char* text, __int32 len);
+	 virtual void writeString(const std::string& text);
+
+
+	 virtual void flush();
 
 	 char* pointer();
 private:
 	 void read(char* dest, int len);
+	 void checkAvailableSpace();
+	 void resize(__int32 len);
+
 
 private:
 #ifndef WINDOWS
-    int _pFile;
+	 int _pFile;
 #else
-    HANDLE _pFile;
+	 HANDLE _pFile;
 #endif
 	 char* _initaddr;
 	 char* _addr;
 	 __int64 _pos;
 	 __int64 _len;
-    std::string _fileName;
-    bool _open;
+	 __int64 _maxLen;
+	 std::string _fileName;
+	 bool _open;
 };
 
 #endif // MMAPINPUTOUTPUTSTREAM_H
