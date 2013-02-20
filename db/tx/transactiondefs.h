@@ -58,15 +58,15 @@ struct BsonOper {
 };
 
 struct RemoveOper {
-	std::string key;
-	std::string revision;
+	char* key;
+	char* revision;
 };
 
 struct TransactionOperation {
 	TRANSACTION_OPER code;
 	OPERATION_STATUS status;
-	std::string* db;
-	std::string* ns;
+	char* db;
+	char* ns;
 	void* operation; // Oper Structs
 };
 
