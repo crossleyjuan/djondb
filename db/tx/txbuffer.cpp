@@ -238,6 +238,7 @@ __int64 TxBuffer::bufferLength() const {
 
 void TxBuffer::acquireLock() {
 	_lock->lock();
+	_stream->seek(_currentPos);
 }
 
 void TxBuffer::releaseLock() {

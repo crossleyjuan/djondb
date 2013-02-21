@@ -47,9 +47,9 @@ TxBufferManager::TxBufferManager(Controller* controller, const char* file) {
 	_controller = controller;
 	_lockActiveBuffers = new Lock();
 	_monitorThread = new Thread(&TxBufferManager::monitorBuffers);
+	_monitorThread->start(this);
 
 	initialize(file);
-	_monitorThread->start(this);
 }
 
 void TxBufferManager::initialize(const char* file) {
@@ -122,6 +122,7 @@ TxBufferManager::~TxBufferManager() {
 	_controlFile->close();
 	delete _controlFile;
 	delete _lockActiveBuffers;
+	_monitorThread->stop();
 	delete _monitorThread;
 }
 
@@ -217,7 +218,7 @@ void* TxBufferManager::monitorBuffers(void* arg) {
 }
 
 void TxBufferManager::flushBuffer() {
-	_lockActiveBuffers->wait();
+	_lockActiveBuffers->wait(3);
 	if (buffersCount() > 1) {
 		TxBuffer* buffer = pop();
 
@@ -330,6 +331,7 @@ TransactionOperation* TxBufferManager::readOperationFromRegister(TxBuffer* buffe
 	__int64 size = buffer->readLong();
 
 	MemoryStream* stream = new MemoryStream(buffer->readChars(), size);
+	buffer->releaseLock();
 
 	stream->seek(0);
 
@@ -385,7 +387,6 @@ jumpoperation:
 		stream->seek(stream->currentPos() + length);
 	}
 
-	buffer->releaseLock();
 
 	delete stream;
 	return result;

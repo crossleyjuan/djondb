@@ -26,6 +26,7 @@
  */ 
 #ifndef LOCK_INCLUDED_H
 #define LOCK_INCLUDED_H 
+#include "defs.h"
 #include <pthread.h>
 
 class Lock {
@@ -41,6 +42,7 @@ class Lock {
 		void unlock();
 
 		void wait();
+		void wait(__int32 timeout);
 		void notify();
 	private:
 		pthread_mutex_t _mutex;

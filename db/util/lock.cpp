@@ -48,6 +48,17 @@ void Lock::wait() {
 	pthread_cond_wait(&_cond, &_mutex);
 }
 
+void Lock::wait(__int32 timeout) {
+	struct timespec timeToWait;
+	time_t now;
+	int rt;
+
+	time(&now);
+
+	timeToWait.tv_sec = now+timeout;
+	pthread_cond_timedwait(&_cond, &_mutex, &timeToWait);
+}
+
 void Lock::notify() {
 	pthread_cond_signal(&_cond);
 }

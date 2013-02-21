@@ -32,6 +32,7 @@
   #include <sys/socket.h>
   #include <netinet/in.h>
   #include <sys/ioctl.h>
+  #include <unistd.h>
 #else
   #include <winsock.h>         // For socket(), connect(), send(), and recv()
   typedef int socklen_t;

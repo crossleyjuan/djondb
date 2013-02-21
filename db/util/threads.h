@@ -14,9 +14,12 @@ class Thread {
 private:
     pthread_t internal;
     int m_threadId;
+	 bool _attached;
 
     static bool m_mutexInitalized;
     static pthread_mutex_t m_mutex_t;
+
+	 void detach();
 
 public:
     void *(*runFunction)(void* arg);
@@ -26,6 +29,7 @@ public:
     ~Thread();
 
 	 void start(void* arg);
+	 void stop();
 
 	 void join();
 
