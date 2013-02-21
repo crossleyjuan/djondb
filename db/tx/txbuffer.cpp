@@ -27,6 +27,7 @@
 #include "txbuffermanager.h"
 #include <stdlib.h>
 #include "txbuffermanager.h"
+#include "lock.h"
 
 TxBuffer::TxBuffer(const TxBufferManager* manager, InputOutputStream* stream, __int64 offset, __int64 bufferLen) {
 	_stream = stream;
@@ -34,6 +35,7 @@ TxBuffer::TxBuffer(const TxBufferManager* manager, InputOutputStream* stream, __
 	_bufferLength = bufferLen;
 	_currentPos = 0;
 	stream->seek(0);
+	_lock = new Lock();
 };
 
 TxBuffer::TxBuffer(const TxBuffer& other) {
@@ -42,10 +44,12 @@ TxBuffer::TxBuffer(const TxBuffer& other) {
 	this->_manager = other._manager;
 	this->_bufferLength = other._bufferLength;
 	this->_currentPos = other._currentPos;
+	this->_lock = other._lock;
 	seek(_currentPos);
 };
 
 TxBuffer::~TxBuffer() {
+	delete _lock;
 };
 
 void TxBuffer::reset() {
@@ -232,3 +236,10 @@ __int64 TxBuffer::bufferLength() const {
 	return _bufferLength;
 }
 
+void TxBuffer::acquireLock() {
+	_lock->lock();
+}
+
+void TxBuffer::releaseLock() {
+	_lock->unlock();
+}

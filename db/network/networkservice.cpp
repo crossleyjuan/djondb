@@ -117,7 +117,6 @@ void NetworkService::stop() { //throw (NetworkException*) {
 			break;
 		}
 	}
-	_baseTransaction->flushBuffer();
 	__dbController->shutdown();
 	setRunning(false);
 #ifndef WINDOWS
@@ -283,7 +282,6 @@ void *startSocketListener(void* arg) {
 				}
 			}
 		}
-		_baseTransaction->flushBuffer();
 	}
 
 #ifdef WINDOWS

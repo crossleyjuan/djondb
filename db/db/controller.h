@@ -42,7 +42,7 @@ class Controller
 		virtual BSONObj* insert(char* db, char* ns, BSONObj* bson) = 0;
 		virtual bool dropNamespace(char* db, char* ns) = 0;
 		virtual void update(char* db, char* ns, BSONObj* bson) = 0;
-		virtual void remove(char* db, char* ns, const std::string& documentId, const std::string& revision) = 0;
+		virtual void remove(char* db, char* ns, char* documentId, char* revision) = 0;
 		virtual BSONArrayObj* find(char* db, char* ns, const char* select, const char* filter) throw (ParseException) = 0;
 		virtual BSONObj* findFirst(char* db, char* ns, const char* select, const char* filter) throw (ParseException) = 0;
 		virtual std::vector<std::string>* dbs() const = 0;

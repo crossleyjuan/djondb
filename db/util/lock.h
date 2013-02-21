@@ -45,7 +45,6 @@ class Lock {
 	private:
 		pthread_mutex_t _mutex;
 		pthread_cond_t  _cond;
-
 };
 
 #endif /* LOCK_INCLUDED_H */

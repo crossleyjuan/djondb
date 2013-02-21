@@ -90,7 +90,7 @@ class TestTXSuite: public Test::Suite
 
 			tx->dropNamespace("db", "txns");
 
-			for (int y = 0; y < 3; y++) {
+			for (int y = 0; y < 300; y++) {
 				for (int x= 0; x < 10000; x++) {
 					BSONObj o;
 					std::string* id = uuid();
@@ -99,9 +99,7 @@ class TestTXSuite: public Test::Suite
 					tx->insert("db", "txns", &o);
 					delete id;
 				}
-				tx->flushBuffer();
 			}
-			tx->flushBuffer();
 
 			delete tx;
 			_controller->shutdown();

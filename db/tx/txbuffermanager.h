@@ -33,35 +33,46 @@
 #include <queue>
 
 class InputOuputStream;
+class TransactionOperation;
+class Controller;
+class Thread;
 
 class TxBufferManager
 {
 	public:
-		TxBufferManager(const char* fileName);
+		TxBufferManager(Controller* controller, const char* fileName);
 		// This prevents copying the buffer manager
 		TxBufferManager(const TxBufferManager& orig);
 		~TxBufferManager();
 
 		TxBuffer* getBuffer(__int32 minimumSize);
 		std::vector<TxBuffer*> getActiveBuffers() const;
-		TxBuffer* pop();
 		__int32 buffersCount() const;
 
+		void writeOperationToRegister(char* db, char* ns, const TransactionOperation& operation);
+		TransactionOperation* readOperationFromRegister(TxBuffer* buffer);
+		TransactionOperation* readOperationFromRegister(TxBuffer* buffer, char* db, char* ns);
 	private:
 		void initialize(const char* file);
 		void loadBuffers(const char* logFilePath);
 		void addBuffer(TxBuffer* buffer);
 		void addReusable(TxBuffer* buffer);
-		void openLogFile(const char* fileName);;
+		void openLogFile(const char* fileName);
+		static void *monitorBuffers(void* arg);
+		virtual void flushBuffer();
 		TxBuffer* createNewBuffer();
+		TxBuffer* pop();
 
 	private:
 		std::queue<TxBuffer*>  _activeBuffers;
 		std::vector<TxBuffer*> _vactiveBuffers;
 		std::queue<TxBuffer*>  _reusableBuffers;
+		Lock* _lockActiveBuffers;
+		Thread* _monitorThread;
 
 		InputOutputStream* _stream;
 		InputOutputStream* _controlFile;
+		Controller* _controller;
 
 		std::string _dataDir;
 

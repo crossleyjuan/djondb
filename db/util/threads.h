@@ -25,13 +25,13 @@ public:
 
     ~Thread();
 
-    void start(void* arg);
+	 void start(void* arg);
 
-    void join();
+	 void join();
 
-    static void mutex_lock();
-    static void mutex_unlock();
-	static void sleep(int milisecs);
+	 static void mutex_lock();
+	 static void mutex_unlock();
+	 static void sleep(int milisecs);
 };
 
 

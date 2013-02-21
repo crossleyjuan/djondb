@@ -42,7 +42,7 @@ class DummyController: public Controller
 		virtual BSONObj* insert(char* db, char* ns, BSONObj* bson);
 		virtual bool dropNamespace(char* db, char* ns);
 		virtual void update(char* db, char* ns, BSONObj* bson);
-		virtual void remove(char* db, char* ns, const std::string& documentId, const std::string& revision);
+		virtual void remove(char* db, char* ns, char* documentId, char* revision);
 		virtual BSONArrayObj* find(char* db, char* ns, const char* select, const char* filter) throw (ParseException);
 		virtual BSONObj* findFirst(char* db, char* ns, const char* select, const char* filter) throw (ParseException);
 		virtual std::vector<std::string>* dbs() const;

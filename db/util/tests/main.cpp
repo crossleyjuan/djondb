@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include "util.h"
+#include "lock.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -38,6 +39,8 @@ class TestUtilSuite : public Test::Suite
 			TEST_ADD(TestUtilSuite::testFileUtils);
 			TEST_ADD(TestUtilSuite::testCircularQueue);
 			TEST_ADD(TestUtilSuite::testDjonStrings);
+
+			TEST_ADD(TestUtilSuite::testThreads);
 		}
 
 	private:
@@ -308,6 +311,87 @@ class TestUtilSuite : public Test::Suite
 			djondb::string s15("aa", 2);
 			djondb::string s16("aabb", 4);
 			TEST_ASSERT(s15.compare(s16) < 0);                 
+		}
+
+		void testThreads() {
+			cout << "\ntestThreads" << endl;
+			Thread* thread = new Thread(&threadMethodTest);
+			thread->start(NULL);
+
+			Thread* thread2 = new Thread(&threadMethodTest);
+			thread2->start(NULL);
+
+			thread->join();
+			thread2->join();
+
+			delete thread;
+			delete thread2;
+
+			cout << "\nTesting locks" << endl;
+
+			Thread* t1 = new Thread(threadMethodTestLock);
+			Thread* t2 = new Thread(threadMethodTestLock);
+
+			Lock* lock = new Lock();
+			t1->start(lock);
+			t2->start(lock);
+
+			t1->join();
+			t2->join();
+			
+			delete lock;
+			delete t1;
+			delete t2;
+
+			Lock* lwait = new Lock();
+			Thread* t3 = new Thread(&testMethodProduce);
+			Thread* t4 = new Thread(&testMethodConsume);
+
+			t3->start(lwait);
+			t4->start(lwait);
+
+			t3->join();
+			t4->join();
+		}
+
+		static void* threadMethodTest(void* val) {
+			cout << "\ntestMethodTest" << endl;
+
+			Thread::sleep(10000);
+			cout << "\ntestMethodTest finished" << endl;
+		}
+
+		static void* threadMethodTestLock(void* val) {
+			cout << "\ntestMethodTestLock" << endl;
+
+			Lock* lock = (Lock*)val;
+			cout << "Locking" << endl;
+			lock->lock();
+			Thread::sleep(5000);
+			lock->unlock();
+			cout << "Unlocking" << endl;
+			cout << "\ntestMethodTestLock finished" << endl;
+		}
+
+		static void* testMethodProduce(void* val) {
+			cout << "\nProduce method started" << endl;
+			Lock* lock = (Lock*)val;
+
+			cout << "Produce: Sleeping for 3 segs" << endl;
+			Thread::sleep(3000);
+
+			lock->notify();
+			cout << "Produce: notification sent" << endl;
+		}
+
+		static void* testMethodConsume(void* val) {
+			cout << "\nConsume method started" << endl;
+			Lock* lock = (Lock*)val;
+
+			cout << "Consume method waiting" << endl;
+			lock->wait();
+
+			cout << "Consume received notification" << endl;
 		}
 };
 //// Tests unconditional fail TEST_ASSERTs

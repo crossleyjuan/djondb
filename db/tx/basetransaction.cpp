@@ -58,7 +58,7 @@ BaseTransaction::BaseTransaction(Controller* controller, std::string transaction
 void BaseTransaction::loadControlFile() {
 	std::string file = _mainTransactionLog ? "main": *_transactionId;
 
-	_bufferManager = new TxBufferManager(file.c_str());
+	_bufferManager = new TxBufferManager(_controller, file.c_str());
 }
 
 BaseTransaction::BaseTransaction(const BaseTransaction& orig) {
@@ -72,126 +72,6 @@ BaseTransaction::~BaseTransaction() {
 	if (_transactionId) delete _transactionId;
 }
 
-void BaseTransaction::writeOperationToRegister(char* db, char* ns, const TransactionOperation& operation) {
-	MemoryStream buffer;
-
-	buffer.writeChar(TXOS_NORMAL);
-	buffer.writeChars(db, strlen(db));
-	buffer.writeChars(ns, strlen(ns));
-
-	MemoryStream ms;
-	ms.writeInt(operation.code);
-	ms.writeString(db);
-	ms.writeString(ns);
-	BSONOutputStream bos(&ms);
-	__int32 code = operation.code;
-	switch (code) {
-		case TXO_INSERT: 
-		case TXO_UPDATE: {
-								  BsonOper* bsonOper = (BsonOper*)operation.operation;
-								  bos.writeBSON(*bsonOper->bson);
-							  };
-							  break;
-		case TXO_DROPNAMESPACE:
-							  // Nothing needs to be done
-							  break;
-		case TXO_REMOVE:
-							  {
-								  RemoveOper* removeOper = (RemoveOper*)operation.operation;
-								  ms.writeString(removeOper->key);
-								  ms.writeString(removeOper->revision);
-								  // Nothing needs to be done
-							  };
-							  break;
-	};
-	// writing the length will allow to jump the command if does not match the db and ns
-	buffer.writeInt(ms.size());
-	char* chrs = ms.toChars();
-	buffer.writeChars(chrs, ms.size());
-	free(chrs);
-
-	__int64 bufferSize = buffer.size();
-
-	TxBuffer* txBuffer = _bufferManager->getBuffer(bufferSize + sizeof(__int64));	
-	chrs = buffer.toChars();
-	txBuffer->writeLong(bufferSize);
-	txBuffer->writeChars(chrs, bufferSize);
-
-	txBuffer->flush();
-
-	free(chrs);
-}
-
-TransactionOperation* BaseTransaction::readOperationFromRegister(TxBuffer* buffer) {
-	return readOperationFromRegister(buffer, NULL, NULL);
-}
-
-TransactionOperation* BaseTransaction::readOperationFromRegister(TxBuffer* buffer, char* db, char* ns) {
-	if (buffer->eof()) {
-		return NULL;
-	}
-	__int64 size = buffer->readLong();
-
-	MemoryStream* stream = new MemoryStream(buffer->readChars(), size);
-
-	stream->seek(0);
-
-	OPERATION_STATUS status = (OPERATION_STATUS)stream->readChar();
-	char* rdb = stream->readChars();
-	char* rns = stream->readChars();
-
-	TransactionOperation* result = NULL;
-	__int32 length = stream->readInt();
-	if (!(status & TXOS_NORMAL)) {
-		goto jumpoperation;
-	};
-	if ((db == NULL) || (ns == NULL) || ((strcmp(rdb, db) == 0) && (strcmp(rns, ns) == 0))) {
-		char* cstream = stream->readChars();
-		MemoryStream ms(cstream, length);
-		ms.seek(0);
-		TRANSACTION_OPER code = (TRANSACTION_OPER)ms.readInt();
-		BSONInputStream bis(&ms);
-
-		result = new TransactionOperation();
-		result->status = status;
-		result->code = code;
-		result->db = ms.readString();
-		result->ns = ms.readString();
-		result->operation = NULL;
-		switch (code) {
-			case TXO_INSERT: 
-			case TXO_UPDATE: {
-									  BsonOper* bsonOper = new BsonOper();
-									  bsonOper->bson = bis.readBSON();
-									  result->operation = bsonOper;
-									  break;
-								  };
-			case TXO_DROPNAMESPACE:
-								  {
-									  break;
-								  };
-			case TXO_REMOVE:
-								  {
-									  RemoveOper* removeOper = new RemoveOper();
-									  std::string* key = ms.readString();
-									  removeOper->key = *key;
-									  delete key;
-									  std::string* revision = ms.readString();
-									  removeOper->revision = *revision;
-									  delete revision;
-									  result->operation = removeOper;
-									  break;
-								  };
-		};
-	} else {
-jumpoperation:
-		stream->seek(stream->currentPos() + length);
-	}
-
-	delete stream;
-	return result;
-}
-
 std::list<TransactionOperation*>* BaseTransaction::findOperations(char* db, char* ns) {
 	std::list<TransactionOperation*>* result = new std::list<TransactionOperation*>();
 	std::vector<TxBuffer*> buffers = _bufferManager->getActiveBuffers();
@@ -199,7 +79,7 @@ std::list<TransactionOperation*>* BaseTransaction::findOperations(char* db, char
 		TxBuffer* buffer = *i;
 		buffer->seek(0);
 		while (!buffer->eof()) {
-			TransactionOperation* operation = readOperationFromRegister(buffer, db, ns);
+			TransactionOperation* operation = _bufferManager->readOperationFromRegister(buffer, db, ns);
 			if (operation != NULL) {
 				result->push_back(operation);
 			}
@@ -211,17 +91,14 @@ std::list<TransactionOperation*>* BaseTransaction::findOperations(char* db, char
 BSONObj* BaseTransaction::insert(char* db, char* ns, BSONObj* bson) {
 	TransactionOperation oper;
 	oper.code = TXO_INSERT;
-	oper.db = new std::string(db);
-	oper.ns = new std::string(ns);
+	oper.db = db;
+	oper.ns = ns;
 	BsonOper* insertOper = new BsonOper();
-	insertOper->bson = new BSONObj(*bson); 
+	insertOper->bson = bson; 
 	oper.operation = insertOper;
 
-	writeOperationToRegister(db, ns, oper);
+	_bufferManager->writeOperationToRegister(db, ns, oper);
 
-	delete oper.db;
-	delete oper.ns;
-	delete insertOper->bson;
 	delete insertOper;
 }
 
@@ -232,38 +109,33 @@ bool BaseTransaction::dropNamespace(char* db, char* ns) {
 	oper.db = NULL;
 	oper.ns = NULL;
 
-	writeOperationToRegister(db, ns, oper);
+	_bufferManager->writeOperationToRegister(db, ns, oper);
 }
 
 void BaseTransaction::update(char* db, char* ns, BSONObj* bson) {
 	TransactionOperation oper;
 	oper.code = TXO_UPDATE;
-	oper.db = new std::string(db);
-	oper.ns = new std::string(ns);
+	oper.db = db;
+	oper.ns = ns;
 	BsonOper* bsonOper = new BsonOper();
-	bsonOper->bson = new BSONObj(*bson); 
+	bsonOper->bson = bson; 
 	oper.operation = bsonOper;
 
-	writeOperationToRegister(db, ns, oper);
-
-	delete oper.db;
-	delete oper.ns;
+	_bufferManager->writeOperationToRegister(db, ns, oper);
 }
 
-void BaseTransaction::remove(char* db, char* ns, const std::string& documentId, const std::string& revision) {
+void BaseTransaction::remove(char* db, char* ns, char* documentId, char* revision) {
 	TransactionOperation oper;
 	oper.code = TXO_REMOVE;
-	oper.db = new std::string(db);
-	oper.ns = new std::string(ns);
+	oper.db = db;
+	oper.ns = ns;
 	RemoveOper* removeOper = new RemoveOper();
-	removeOper->key = std::string(documentId);
-	removeOper->revision = std::string(revision);
+	removeOper->key = documentId;
+	removeOper->revision = revision;
 	oper.operation = removeOper;
 
-	writeOperationToRegister(db, ns, oper);
+	_bufferManager->writeOperationToRegister(db, ns, oper);
 
-	delete oper.db;
-	delete oper.ns;
 	delete removeOper;
 }
 
@@ -382,47 +254,3 @@ std::vector<std::string>* BaseTransaction::namespaces(const char* db) const {
 	return _controller->namespaces(db);
 }
 
-void BaseTransaction::flushBuffer() {
-	if (_bufferManager->buffersCount() > 1) {
-		TxBuffer* buffer = _bufferManager->pop();
-
-		TransactionOperation* operation = NULL;
-		buffer->seek(0);
-		while ((operation = readOperationFromRegister(buffer)) != NULL) {
-			std::string* db = operation->db;
-			std::string* ns = operation->ns;
-			switch (operation->code) {
-				case TXO_INSERT: 
-					{
-						BsonOper* insert = (BsonOper*)operation->operation;
-						BSONObj* bson = insert->bson;
-						_controller->insert(const_cast<char*>(db->c_str()), const_cast<char*>(ns->c_str()), bson);
-						delete bson;
-					};
-					break;
-				case TXO_UPDATE: 
-					{
-						BsonOper* update = (BsonOper*)operation->operation;
-						BSONObj* bson = update->bson;
-						_controller->update(const_cast<char*>(db->c_str()), const_cast<char*>(ns->c_str()), bson);
-						delete bson;
-					};
-					break;
-				case TXO_REMOVE: 
-					{
-						RemoveOper* remove = (RemoveOper*)operation->operation;
-						const std::string id = remove->key;
-						const std::string revision = remove->revision;
-						_controller->remove(const_cast<char*>(db->c_str()), const_cast<char*>(ns->c_str()), id.c_str(), revision.c_str());
-					};
-					break;
-				case TXO_DROPNAMESPACE:
-					{
-						_controller->dropNamespace(const_cast<char*>(db->c_str()), const_cast<char*>(ns->c_str()));
-					};
-					break;
-			}
-			delete operation;
-		}
-	}
-}

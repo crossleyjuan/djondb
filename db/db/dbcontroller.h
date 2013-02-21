@@ -31,7 +31,7 @@ class DBController: public Controller
         BSONObj* insert(char* db, char* ns, BSONObj* bson);
 		  bool dropNamespace(char* db, char* ns);
         void update(char* db, char* ns, BSONObj* bson);
-        void remove(char* db, char* ns, const std::string& documentId, const std::string& revision);
+        void remove(char* db, char* ns, char* documentId, char* revision);
         BSONArrayObj* find(char* db, char* ns, const char* select, const char* filter) throw (ParseException);
         BSONObj* findFirst(char* db, char* ns, const char* select, const char* filter) throw (ParseException);
         BSONObj* readBSON(StreamType* stream);

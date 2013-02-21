@@ -59,13 +59,12 @@ class BaseTransaction: public Controller
 		virtual BSONObj* insert(char* db, char* ns, BSONObj* bson);
 		virtual bool dropNamespace(char* db, char* ns);
 		virtual void update(char* db, char* ns, BSONObj* bson);
-		virtual void remove(char* db, char* ns, const std::string& documentId, const std::string& revision);
+		virtual void remove(char* db, char* ns, char* documentId, char* revision);
 		virtual BSONArrayObj* find(char* db, char* ns, const char* select, const char* filter) throw (ParseException);
 		virtual BSONObj* findFirst(char* db, char* ns, const char* select, const char* filter) throw (ParseException);
 		virtual std::vector<std::string>* dbs() const;
 		virtual std::vector<std::string>* namespaces(const char* db) const;
 
-		virtual void flushBuffer();
 
 	protected:
 		Controller* _controller;
@@ -77,12 +76,8 @@ class BaseTransaction: public Controller
 
 		TxBufferManager* _bufferManager;
 
-
 	private:
 		void checkState();
-		void writeOperationToRegister(char* db, char* ns, const TransactionOperation& operation);
-		TransactionOperation* readOperationFromRegister(TxBuffer* buffer);
-		TransactionOperation* readOperationFromRegister(TxBuffer* buffer, char* db, char* ns);
 		std::list<TransactionOperation*>* findOperations(char* db, char* ns);
 };
 

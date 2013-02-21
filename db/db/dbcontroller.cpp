@@ -254,14 +254,14 @@ void DBController::update(char* db, char* ns, BSONObj* obj) {
 	//CacheManager::objectCache()->add(id, new BSONObj(*obj));
 }
 
-void DBController::remove(char* db, char* ns, const std::string& documentId, const std::string& revision) {
-	if (_logger->isDebug()) _logger->debug(2, "DBController::update db: %s, ns: %s, documentId: %s, revision: %s", db, ns, documentId.c_str(), revision.c_str());
+void DBController::remove(char* db, char* ns, char* documentId, char* revision) {
+	if (_logger->isDebug()) _logger->debug(2, "DBController::update db: %s, ns: %s, documentId: %s, revision: %s", db, ns, documentId, revision);
 	StreamType* streamData = StreamManager::getStreamManager()->open(std::string(db), std::string(ns), DATA_FTYPE);
 
 	IndexAlgorithm* impl = IndexFactory::indexFactory.index(db, ns, "_id");
 
 	BSONObj indexBSON;
-	indexBSON.add("_id", const_cast<char*>(documentId.c_str()));
+	indexBSON.add("_id", documentId);
 	Index* index = impl->find(&indexBSON);
 	if (index != NULL) {
 

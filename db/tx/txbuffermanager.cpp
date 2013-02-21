@@ -26,15 +26,30 @@
  */
 #include "txbuffermanager.h"
 #include "fileinputoutputstream.h"
+#include "transactiondefs.h"
+#include "controller.h"
+#include "memorystream.h"
+#include "bsoninputstream.h"
+#include "bsonoutputstream.h"
+#include "lock.h"
+#include "bson.h"
+#include "util.h"
+#include <string.h>
 #include <stdlib.h>
 
+__int64 TX_DEFAULT_BUFFER_SIZE = 64*1024*1024;
 
-TxBufferManager::TxBufferManager(const char* file) {
+TxBufferManager::TxBufferManager(Controller* controller, const char* file) {
 	_stream = NULL;
-	_buffersSize = 64*1024*1024;
+	_buffersSize = TX_DEFAULT_BUFFER_SIZE;
 	_buffersCount = 0;
 	_dataDir = getSetting("DATA_DIR");
+	_controller = controller;
+	_lockActiveBuffers = new Lock();
+	_monitorThread = new Thread(&TxBufferManager::monitorBuffers);
+
 	initialize(file);
+	_monitorThread->start(this);
 }
 
 void TxBufferManager::initialize(const char* file) {
@@ -106,6 +121,8 @@ TxBufferManager::~TxBufferManager() {
 	delete _stream;
 	_controlFile->close();
 	delete _controlFile;
+	delete _lockActiveBuffers;
+	delete _monitorThread;
 }
 
 TxBuffer* TxBufferManager::createNewBuffer() {
@@ -162,6 +179,8 @@ void TxBufferManager::openLogFile(const char* fileName) {
 void TxBufferManager::addBuffer(TxBuffer* buffer) {
 	_activeBuffers.push(buffer);
 	_vactiveBuffers.push_back(buffer);
+	// Notify that a new buffer is available
+	_lockActiveBuffers->notify();
 }
 
 void TxBufferManager::addReusable(TxBuffer* buffer) {
@@ -187,4 +206,187 @@ TxBuffer* TxBufferManager::pop() {
 
 __int32 TxBufferManager::buffersCount() const {
 	return _buffersCount;
+}
+
+void* TxBufferManager::monitorBuffers(void* arg) {
+	TxBufferManager* manager = (TxBufferManager*)arg;
+	while (true) {
+		// Waiting for notifications on new buffers
+		manager->flushBuffer();
+	}
+}
+
+void TxBufferManager::flushBuffer() {
+	_lockActiveBuffers->wait();
+	if (buffersCount() > 1) {
+		TxBuffer* buffer = pop();
+
+		TransactionOperation* operation = NULL;
+		buffer->seek(0);
+		while (true) {
+			operation = readOperationFromRegister(buffer);
+			if (operation == NULL) {
+				break;
+			}
+			char* db = operation->db;
+			char* ns = operation->ns;
+			switch (operation->code) {
+				case TXO_INSERT: 
+					{
+						BsonOper* insert = (BsonOper*)operation->operation;
+						BSONObj* bson = insert->bson;
+						_controller->insert(db, ns, bson);
+						delete bson;
+					};
+					break;
+				case TXO_UPDATE: 
+					{
+						BsonOper* update = (BsonOper*)operation->operation;
+						BSONObj* bson = update->bson;
+						_controller->update(db, ns, bson);
+						delete bson;
+					};
+					break;
+				case TXO_REMOVE: 
+					{
+						RemoveOper* remove = (RemoveOper*)operation->operation;
+						char* id = remove->key;
+						char* revision = remove->revision;
+						_controller->remove(db, ns, id, revision);
+					};
+					break;
+				case TXO_DROPNAMESPACE:
+					{
+						_controller->dropNamespace(db, ns);
+					};
+					break;
+			}
+			delete operation;
+		}
+	}
+}
+
+void TxBufferManager::writeOperationToRegister(char* db, char* ns, const TransactionOperation& operation) {
+	MemoryStream buffer;
+
+	buffer.writeChar(TXOS_NORMAL);
+	buffer.writeChars(db, strlen(db));
+	buffer.writeChars(ns, strlen(ns));
+
+	MemoryStream ms;
+	ms.writeInt(operation.code);
+	ms.writeString(db);
+	ms.writeString(ns);
+	BSONOutputStream bos(&ms);
+	__int32 code = operation.code;
+	switch (code) {
+		case TXO_INSERT: 
+		case TXO_UPDATE: {
+								  BsonOper* bsonOper = (BsonOper*)operation.operation;
+								  bos.writeBSON(*bsonOper->bson);
+							  };
+							  break;
+		case TXO_DROPNAMESPACE:
+							  // Nothing needs to be done
+							  break;
+		case TXO_REMOVE:
+							  {
+								  RemoveOper* removeOper = (RemoveOper*)operation.operation;
+								  ms.writeString(removeOper->key);
+								  ms.writeString(removeOper->revision);
+								  // Nothing needs to be done
+							  };
+							  break;
+	};
+	// writing the length will allow to jump the command if does not match the db and ns
+	buffer.writeInt(ms.size());
+	char* chrs = ms.toChars();
+	buffer.writeChars(chrs, ms.size());
+	free(chrs);
+
+	__int64 bufferSize = buffer.size();
+
+	TxBuffer* txBuffer = getBuffer(bufferSize + sizeof(__int64));	
+	txBuffer->acquireLock();
+	chrs = buffer.toChars();
+	txBuffer->writeLong(bufferSize);
+	txBuffer->writeChars(chrs, bufferSize);
+
+	txBuffer->flush();
+	txBuffer->releaseLock();
+
+	free(chrs);
+}
+
+TransactionOperation* TxBufferManager::readOperationFromRegister(TxBuffer* buffer) {
+	return readOperationFromRegister(buffer, NULL, NULL);
+}
+
+TransactionOperation* TxBufferManager::readOperationFromRegister(TxBuffer* buffer, char* db, char* ns) {
+	if (buffer->eof()) {
+		return NULL;
+	}
+	buffer->acquireLock();
+	__int64 size = buffer->readLong();
+
+	MemoryStream* stream = new MemoryStream(buffer->readChars(), size);
+
+	stream->seek(0);
+
+	OPERATION_STATUS status = (OPERATION_STATUS)stream->readChar();
+	char* rdb = stream->readChars();
+	char* rns = stream->readChars();
+
+	TransactionOperation* result = NULL;
+	__int32 length = stream->readInt();
+	if (!(status & TXOS_NORMAL)) {
+		goto jumpoperation;
+	};
+	if ((db == NULL) || (ns == NULL) || ((strcmp(rdb, db) == 0) && (strcmp(rns, ns) == 0))) {
+		char* cstream = stream->readChars();
+		MemoryStream ms(cstream, length);
+		ms.seek(0);
+		TRANSACTION_OPER code = (TRANSACTION_OPER)ms.readInt();
+		BSONInputStream bis(&ms);
+
+		result = new TransactionOperation();
+		result->status = status;
+		result->code = code;
+		result->db = ms.readChars();
+		result->ns = ms.readChars();
+		result->operation = NULL;
+		switch (code) {
+			case TXO_INSERT: 
+			case TXO_UPDATE: {
+									  BsonOper* bsonOper = new BsonOper();
+									  bsonOper->bson = bis.readBSON();
+									  result->operation = bsonOper;
+									  break;
+								  };
+			case TXO_DROPNAMESPACE:
+								  {
+									  break;
+								  };
+			case TXO_REMOVE:
+								  {
+									  RemoveOper* removeOper = new RemoveOper();
+									  char* key = ms.readChars();
+									  removeOper->key = key;
+									  free(key);
+									  char* revision = ms.readChars();
+									  removeOper->revision = revision;
+									  free(revision);
+									  result->operation = removeOper;
+									  break;
+								  };
+		};
+	} else {
+jumpoperation:
+		stream->seek(stream->currentPos() + length);
+	}
+
+	buffer->releaseLock();
+
+	delete stream;
+	return result;
 }

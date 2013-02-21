@@ -17,23 +17,11 @@ libdjon_util_la_SOURCES = util.cpp \
 			  errorhandle.cpp \
 			  logger.cpp \
 			  datetime.cpp \
-			  util.h \
-			  config.h \
-			  datetime.h \
-			  errorhandle.h \
-			  dtime.h \
-			  fileutil.h \
-			  logger.h \
-			  version.h \
-			  stringfunctions.h \
-			  threads.h \
-			  settings.h \
 			  settings.cpp \
-			  defs.h \
-			  circular_queue.h 
+			  lock.cpp
 
 library_includedir=$(includedir)/djondb
-library_include_HEADERS=util.h datetime.h errorhandle.h dtime.h fileutil.h logger.h version.h stringfunctions.h threads.h settings.h defs.h circular_queue.h errors.h
+library_include_HEADERS=util.h datetime.h errorhandle.h dtime.h fileutil.h logger.h version.h stringfunctions.h threads.h settings.h defs.h circular_queue.h errors.h lock.h
 
 
 TESTS = test-util

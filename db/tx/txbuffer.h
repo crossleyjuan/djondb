@@ -33,6 +33,7 @@
 #include "inputoutputstream.h"
 
 class TxBufferManager;
+class Lock;
 
 class TxBuffer: public InputOutputStream {
     public:
@@ -92,6 +93,9 @@ class TxBuffer: public InputOutputStream {
 		  __int64 bufferLength() const;
 		  void reset();
 
+		  void acquireLock();
+		  void releaseLock();
+
 	 private:
 		  InputOutputStream* _stream;
 		  __int64 _startOffset;
@@ -99,6 +103,7 @@ class TxBuffer: public InputOutputStream {
 		  __int64 _currentPos;
 		  __int32 _controlPosition;
 		  TxBufferManager* _manager;
+		  Lock* _lock;
 };
 
 #endif // TXBUFFER_INCLUDED_H

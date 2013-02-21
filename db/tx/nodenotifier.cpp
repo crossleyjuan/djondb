@@ -71,8 +71,8 @@ void NodeNotifier::sendTransactionOperation(TransactionOperation* operation) {
 		NetworkOutputStream* nos = *iter;
 		ms->writeInt(operation->code);
 		ms->writeInt(operation->status);
-		ms->writeString(*operation->db);
-		ms->writeString(*operation->ns);
+		ms->writeString(operation->db);
+		ms->writeString(operation->ns);
 		switch (operation->code) {
 			case TXO_INSERT: 
 			case TXO_UPDATE: {
