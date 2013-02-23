@@ -27,6 +27,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
+#include <unistd.h>
 #ifndef WINDOWS
 #include <dirent.h>
 #include <errno.h>
@@ -236,4 +237,10 @@ __int64 fileSize(const char* file) {
 		log->error("Error getting the file: %s size: %d", file, errno); 
 
 	return ret;
+}
+
+
+long pageSize() {
+	long res = sysconf(_SC_PAGE_SIZE);
+	return res;
 }

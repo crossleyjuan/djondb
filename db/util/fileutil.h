@@ -21,6 +21,7 @@ bool makeDir(const char* dir);
 bool checkFileCreation(const char* dir);
 bool removeFile(const char* file);
 __int64 fileSize(const char* file);
+long pageSize();
 
 #ifndef WINDOWS
 #define FILESEPARATOR "/"

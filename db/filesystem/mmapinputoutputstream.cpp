@@ -37,7 +37,7 @@
 #else
 #endif
 
-MMapInputOutputStream::MMapInputOutputStream(const char* fileName, const char* flags)
+MMapInputOutputStream::MMapInputOutputStream(const char* fileName, __int32 offset, __int32 pages)
 {
 	Logger* log = getLogger(NULL);
 	_fileName = fileName;
@@ -50,17 +50,21 @@ MMapInputOutputStream::MMapInputOutputStream(const char* fileName, const char* f
 	_pFile = ::open(fileName, O_RDWR | O_CREAT, "wb+");
 	if (_pFile > -1) {
 		_len = fileSize(fileName);
-		if (_len == 0) {
-			_maxLen = 64 * 1024 * 1024;
-		} else {
-			_maxLen = _len;
+		long psize = pageSize();
+		__int64 maxLen = (pages * psize) + offset;
+		if (_len < maxLen) {
+			_len = maxLen;
 		}
+		lseek(_pFile, _len, SEEK_SET);
+		write(_pFile, "", 1);
+		lseek(_pFile, 0, SEEK_SET);
+
 		bool shared = false;
 		bool advise = true;
 #ifdef LINUX
-		_addr = reinterpret_cast<char *>(mmap(NULL, _maxLen, PROT_READ | PROT_WRITE, MAP_FILE | (shared?MAP_SHARED:MAP_PRIVATE) | MAP_POPULATE , _pFile, 0));
+		_addr = reinterpret_cast<char *>(mmap(NULL, _len, PROT_READ | PROT_WRITE, MAP_FILE | (shared?MAP_SHARED:MAP_PRIVATE) | MAP_POPULATE , _pFile, offset));
 #else
-		_addr = reinterpret_cast<char *>(mmap(NULL, _maxLen, PROT_READ | PROT_WRITE, MAP_FILE | (shared?MAP_SHARED:MAP_PRIVATE), _pFile, 0));
+		_addr = reinterpret_cast<char *>(mmap(NULL, _len, PROT_READ | PROT_WRITE, MAP_FILE | (shared?MAP_SHARED:MAP_PRIVATE), _pFile, offset));
 #endif
 		_initaddr = _addr;    
 		if (_addr == MAP_FAILED) {
@@ -303,19 +307,20 @@ void MMapInputOutputStream::writeChar (unsigned char v) {
 }
 
 void MMapInputOutputStream::checkAvailableSpace() {
-	if ((_maxLen - _len) < 64*1024) {
-		__int32 newLength = _maxLen + 64*1024*1024;
+	if ((_len - _pos) < 64*1024) {
+		long psize = pageSize();
+		__int32 newLength = _len + (psize*10*1024*1024);
 		resize(newLength);
 	}
 }
 
 void MMapInputOutputStream::resize(__int32 len) {
-	void* p = mremap (_addr, _maxLen, len, MREMAP_MAYMOVE);
+	void* p = mremap (_addr, _len, len, MREMAP_MAYMOVE);
 	if (p == MAP_FAILED)
 		_addr = NULL;
 	else
 		_addr = (char*)p;
-	_maxLen = len;
+	_len = len;
 }
 
 /* Write 2 bytes in the output (little endian order) */

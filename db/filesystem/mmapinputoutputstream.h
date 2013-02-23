@@ -13,7 +13,7 @@
 class MMapInputOutputStream: public InputOutputStream
 {
 public:
-    MMapInputOutputStream(const char* fileName, const char* flags);
+    MMapInputOutputStream(const char* fileName, __int32 offset, __int32 pages);
     virtual ~MMapInputOutputStream();
 
     virtual unsigned char readChar();
@@ -82,7 +82,6 @@ private:
 	 char* _addr;
 	 __int64 _pos;
 	 __int64 _len;
-	 __int64 _maxLen;
 	 std::string _fileName;
 	 bool _open;
 };

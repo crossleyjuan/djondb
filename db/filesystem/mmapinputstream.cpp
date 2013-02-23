@@ -37,7 +37,7 @@
 #else
 #endif
 
-MMapInputStream::MMapInputStream(const char* fileName, const char* flags)
+MMapInputStream::MMapInputStream(const char* fileName, __int32 offset)
 {
 	Logger* log = getLogger(NULL);
 	_fileName = fileName;
@@ -53,9 +53,9 @@ MMapInputStream::MMapInputStream(const char* fileName, const char* flags)
 		bool shared = false;
 		bool advise = true;
 #ifdef LINUX
-		_addr = reinterpret_cast<char *>(mmap(NULL, _len, PROT_READ, MAP_FILE | (shared?MAP_SHARED:MAP_PRIVATE) | MAP_POPULATE , _pFile, 0));
+		_addr = reinterpret_cast<char *>(mmap(NULL, _len, PROT_READ, MAP_FILE | (shared?MAP_SHARED:MAP_PRIVATE) | MAP_POPULATE , _pFile, offset));
 #else
-		_addr = reinterpret_cast<char *>(mmap(NULL, _len, PROT_READ, MAP_FILE | (shared?MAP_SHARED:MAP_PRIVATE), _pFile, 0));
+		_addr = reinterpret_cast<char *>(mmap(NULL, _len, PROT_READ, MAP_FILE | (shared?MAP_SHARED:MAP_PRIVATE), _pFile, offset));
 #endif
 		_initaddr = _addr;    
 		if (_addr == MAP_FAILED) {

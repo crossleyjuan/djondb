@@ -13,7 +13,7 @@
 class MMapInputStream: public InputStream
 {
 public:
-    MMapInputStream(const char* fileName, const char* flags);
+    MMapInputStream(const char* fileName, __int32 offset);
     virtual ~MMapInputStream();
 
     virtual unsigned char readChar();

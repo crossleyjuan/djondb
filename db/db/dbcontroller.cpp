@@ -391,7 +391,7 @@ BSONObj* DBController::findFirst(char* db, char* ns, const char* select, const c
 	// Execute open on streammanager, just to check that the file was alrady opened
 	StreamManager::getStreamManager()->open(db, ns, DATA_FTYPE);
 
-	MMapInputStream* mmis = new MMapInputStream(filename.c_str(), "rb");
+	MMapInputStream* mmis = new MMapInputStream(filename.c_str(), 0);
 	DBFileInputStream* dbStream = new DBFileInputStream(mmis);
 	BSONArrayObj result;
 
@@ -449,7 +449,7 @@ BSONArrayObj* DBController::findFullScan(char* db, char* ns, const char* select,
 	// Execute open on streammanager, just to check that the file was alrady opened
 	StreamManager::getStreamManager()->open(db, ns, DATA_FTYPE);
 	//FileInputStream* fis = new FileInputStream(filename.c_str(), "rb");
-	MMapInputStream* mmis = new MMapInputStream(filename.c_str(), "rb");
+	MMapInputStream* mmis = new MMapInputStream(filename.c_str(), 0);
 	DBFileInputStream* dbStream = new DBFileInputStream(mmis);
 	BSONArrayObj* result = new BSONArrayObj();
 

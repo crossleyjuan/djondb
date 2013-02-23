@@ -103,7 +103,7 @@ class TestFileSystemSuite: public Test::Suite
 			//streamo.writeChars(test, strlen(test));
 			streamo.close();
 
-			MMapInputStream streami("test.txt", "rb");
+			MMapInputStream streami("test.txt", 0);
 			char* text = streami.readChars();
 			TEST_ASSERT(strcmp(text, "Hello World!") == 0);
 			int i1 = streami.readShortInt();
@@ -124,12 +124,45 @@ class TestFileSystemSuite: public Test::Suite
 		void testMMapIO()
 		{
 			cout << "\ntestMMapIO\n" << endl;
-			MMapInputOutputStream streamo("testmmap.dat", "wb");
+			MMapInputOutputStream streamo("testmmap.dat", 0, 4);
 			streamo.writeChars("Hello World!", 12);
 			streamo.writeShortInt(2);
 			streamo.writeShortInt(127);
 			streamo.writeInt(200000);
 			streamo.writeLong(LONG_MAX);
+
+			streamo.seek(0);
+
+			char* text = streamo.readChars();
+			TEST_ASSERT(strcmp(text, "Hello World!") == 0);
+			int i1 = streamo.readShortInt();
+			TEST_ASSERT(i1 == 2);
+			int si1 = streamo.readShortInt();
+			TEST_ASSERT(si1 == 127);
+			int i2 = streamo.readInt();
+			TEST_ASSERT(i2 == 200000);
+			long l = streamo.readLong();
+			TEST_ASSERT(l == LONG_MAX);
+
+			//char* tchar = streamo.readChars();
+			//TEST_ASSERT(strcmp(test, tchar) == 0);
+			streamo.close();
+		}
+
+		void testMMapIOOffset()
+		{
+			cout << "\ntestMMapIOOffset\n" << endl;
+			long ps = pageSize();
+
+			__int32 offset = 4 * ps * 1024 * 1024;
+			MMapInputOutputStream streamo("testmmap.dat", offset, 10);
+			streamo.writeChars("Hello World!", 12);
+			streamo.writeShortInt(2);
+			streamo.writeShortInt(127);
+			streamo.writeInt(200000);
+			streamo.writeLong(LONG_MAX);
+
+			streamo.seek(0);
 
 			char* text = streamo.readChars();
 			TEST_ASSERT(strcmp(text, "Hello World!") == 0);
