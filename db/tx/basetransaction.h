@@ -51,7 +51,6 @@ class BaseTransaction: public Controller
 {
 	public:
 		BaseTransaction(Controller* controller);
-		BaseTransaction(Controller* controller, std::string transactionId);
 		BaseTransaction(const BaseTransaction& orig);
 		~BaseTransaction();
 
@@ -65,6 +64,8 @@ class BaseTransaction: public Controller
 		virtual std::vector<std::string>* dbs() const;
 		virtual std::vector<std::string>* namespaces(const char* db) const;
 
+	protected:
+		BaseTransaction(Controller* controller, std::string transactionId);
 
 	protected:
 		Controller* _controller;

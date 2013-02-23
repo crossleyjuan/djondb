@@ -37,7 +37,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-__int64 TX_DEFAULT_BUFFER_SIZE = pageSize() * 10 * 1024;
+__int64 TX_DEFAULT_BUFFER_SIZE = pageSize() * 20;
 
 TxBufferManager::TxBufferManager(Controller* controller, const char* file) {
 	_buffersSize = TX_DEFAULT_BUFFER_SIZE;
