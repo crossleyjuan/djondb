@@ -27,14 +27,16 @@
 #include "txbuffermanager.h"
 #include <stdlib.h>
 #include "txbuffermanager.h"
+#include "mmapinputoutputstream.h"
 #include "lock.h"
 
-TxBuffer::TxBuffer(const TxBufferManager* manager, InputOutputStream* stream, __int64 offset, __int64 bufferLen) {
-	_stream = stream;
-	_startOffset = offset;
+TxBuffer::TxBuffer(const TxBufferManager* manager, const char* file, __int64 offset, __int64 bufferLen, __int64 maxLen) {
+	_stream = new MMapInputOutputStream(file, offset, maxLen);
+	_startOffset = 0;
 	_bufferLength = bufferLen;
+	_maxLength = maxLen;
 	_currentPos = 0;
-	stream->seek(0);
+	_stream->seek(0);
 	_lock = new Lock();
 };
 
@@ -49,6 +51,8 @@ TxBuffer::TxBuffer(const TxBuffer& other) {
 };
 
 TxBuffer::~TxBuffer() {
+	_stream->close();
+	delete _stream;
 	delete _lock;
 };
 

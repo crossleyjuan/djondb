@@ -37,7 +37,7 @@ class Lock;
 
 class TxBuffer: public InputOutputStream {
     public:
-        TxBuffer(const TxBufferManager* manager, InputOutputStream* stream, __int64 offset, __int64 bufferLen);
+        TxBuffer(const TxBufferManager* manager, const char* fileName, __int64 offset, __int64 bufferLen, __int64 maxLength);
         TxBuffer(const TxBuffer& other);
         virtual ~TxBuffer();
 
@@ -100,6 +100,7 @@ class TxBuffer: public InputOutputStream {
 		  InputOutputStream* _stream;
 		  __int64 _startOffset;
 		  __int64 _bufferLength;
+		  __int64 _maxLength;
 		  __int64 _currentPos;
 		  __int32 _controlPosition;
 		  TxBufferManager* _manager;

@@ -54,10 +54,10 @@ class TxBufferManager
 		TransactionOperation* readOperationFromRegister(TxBuffer* buffer, char* db, char* ns);
 	private:
 		void initialize(const char* file);
-		void loadBuffers(const char* logFilePath);
+		void loadBuffers();
 		void addBuffer(TxBuffer* buffer);
 		void addReusable(TxBuffer* buffer);
-		void openLogFile(const char* fileName);
+		void openLogFile();
 		static void *monitorBuffers(void* arg);
 		virtual void flushBuffer();
 		TxBuffer* createNewBuffer();
@@ -70,7 +70,7 @@ class TxBufferManager
 		Lock* _lockActiveBuffers;
 		Thread* _monitorThread;
 
-		InputOutputStream* _stream;
+		char* _logFileName;
 		InputOutputStream* _controlFile;
 		Controller* _controller;
 
