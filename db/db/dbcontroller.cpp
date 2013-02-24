@@ -88,7 +88,7 @@ void DBController::initialize() {
 }
 
 void DBController::initialize(std::string dataDir) {
-	if (_logger->isInfo()) _logger->info("DBController initializing. Data dir");
+	if (_logger->isInfo()) _logger->info("DBController initializing. Data dir: %s", dataDir.c_str());
 
 	_dataDir = dataDir;
 
@@ -478,7 +478,7 @@ BSONArrayObj* DBController::findFullScan(char* db, char* ns, const char* select,
 	BSONBufferedObj* obj = NULL;
 
 	std::string smax = getSetting("max_results");
-	__int64 maxResults = 30;
+	__int64 maxResults = 3000;
 	if (smax.length() > 0) {
 #ifdef WINDOWS
 		maxResults = _atoi64(smax.c_str());

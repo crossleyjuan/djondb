@@ -83,14 +83,18 @@ const char* djondb::string::c_str() const {
 }
 
 int djondb::string::compare(const djondb::string s2) const {
-	return compare(s2.c_str());
+	return compare(s2.c_str(), s2.length());
 }
 
-int djondb::string::compare(const char* s2) const {
+int djondb::string::compare(const char* s2, __int32 len) const {
     const char* s1 = (const char*)*_holder;
     // the null char should not be compared to avoid unexpected results on buffers
-    int lenWithoutNull = _len - 1;
-    return strncmp(s1, s2, lenWithoutNull);
+	 if (_len < len) {
+		 return -1;
+	 } else if (_len > len) {
+		 return 1;
+	 }
+    return strncmp(s1, s2, _len);
 }
 
 __int32 djondb::string::length() const {

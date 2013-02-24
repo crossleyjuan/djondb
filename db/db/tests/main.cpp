@@ -102,6 +102,7 @@ class TestDBSuite: public Test::Suite
 			//TEST_ADD(TestDBSuite::testManualIndex);
 			TEST_ADD(TestDBSuite::testInsertComplexBSON);
 			TEST_ADD(TestDBSuite::testIndexFactory);
+			TEST_ADD(TestDBSuite::testDropIndexes);
 			TEST_ADD(TestDBSuite::testExpressions);
 			TEST_ADD(TestDBSuite::testFilterExpressionParser);
 			TEST_ADD(TestDBSuite::testFilterExpressionParserEquals);
@@ -629,7 +630,7 @@ cout << "testing array" << endl;
 					return;
 				}
 				djondb::string id2 = res->getDJString("_id");
-				if (id2.compare(id->c_str()) != 0)
+				if (id2.compare(id->c_str(), id->length()) != 0)
 				{
 					TEST_FAIL("id not found");
 					return;
@@ -748,7 +749,7 @@ cout << "testing array" << endl;
 			BSONArrayObj* found = controller->find("dbtest", "find.filter2","*", filter.c_str());
 			TEST_ASSERT(found->length() == 1); 
 			djondb::string name = found->get(0)->getDJString("lastName");
-			TEST_ASSERT(name.compare("Smith") == 0);
+			TEST_ASSERT(name.compare("Smith", 5) == 0);
 
 			filter = "";
 			delete found;
@@ -760,9 +761,9 @@ cout << "testing array" << endl;
 			found = controller->find("dbtest", "find.filter2","*", filter.c_str());
 			TEST_ASSERT(found->length() == 2); 
 			name = found->get(0)->getDJString("lastName");
-			TEST_ASSERT(name.compare("Crossley") == 0);
+			TEST_ASSERT(name.compare("Crossley", 8) == 0);
 			name = found->get(1)->getDJString("lastName");
-			TEST_ASSERT(name.compare("Clark") == 0);
+			TEST_ASSERT(name.compare("Clark", 5) == 0);
 			delete found;
 		}
 
@@ -848,45 +849,36 @@ cout << "testing array" << endl;
 
 		void testIndexPage() {
 			std::vector<std::string> ids;
-			/* 
-				FileInputStream fis("guids.txt", "rb");
-				const char* full = fis.readFull();
-				std::vector<std::string> tids = split(full, "\n");
-				for (std::vector<std::string>::iterator i = tids.begin(); i != tids.end(); i++) {
-				ids.push_back(*i);
-				}
-				fis.close();
-				testIndex(ids);
-				*/
-			ids.push_back("1");
-			ids.push_back("2");
-			ids.push_back("3");
-			ids.push_back("4");
-			ids.push_back("5");
+
+			ids.push_back("1\0");
+			ids.push_back("2\0");
+			ids.push_back("3\0");
+			ids.push_back("4\0");
+			ids.push_back("5\0");
 
 			testIndex(ids);
 
-			ids.push_back("6");
+			ids.push_back("6\0");
 			testIndex(ids);
-			ids.push_back("7");
-			ids.push_back("8");
-			ids.push_back("9");
-			ids.push_back("91");
-			ids.push_back("92");
+			ids.push_back("7\0");
+			ids.push_back("8\0");
+			ids.push_back("9\0");
+			ids.push_back("91\0");
+			ids.push_back("92\0");
 			testIndex(ids);
 
-			ids.push_back("11");
-			ids.push_back("12");
-			ids.push_back("13");
+			ids.push_back("11\0");
+			ids.push_back("12\0");
+			ids.push_back("13\0");
 			testIndex(ids);
 
 			ids.clear();
-			ids.push_back("1f0d2a02-e812-433c-8615-0db9dbad0eae");
-			ids.push_back("803bbd79-b897-4a68-b8bb-ca54eb52b8ec");
-			ids.push_back("9012e35d-b117-4669-a8f7-b3418033cebb");
-			ids.push_back("c840c949-3509-46d8-8503-d203646913a4");
-			ids.push_back("dd4339cd-d5d4-4e53-9165-e7410b4d42c5");
-			ids.push_back("a9594d16-2358-4e38-a42c-2c61ddd88c36");
+			ids.push_back("1f0d2a02-e812-433c-8615-0db9dbad0eae\0");
+			ids.push_back("803bbd79-b897-4a68-b8bb-ca54eb52b8ec\0");
+			ids.push_back("9012e35d-b117-4669-a8f7-b3418033cebb\0");
+			ids.push_back("c840c949-3509-46d8-8503-d203646913a4\0");
+			ids.push_back("dd4339cd-d5d4-4e53-9165-e7410b4d42c5\0");
+			ids.push_back("a9594d16-2358-4e38-a42c-2c61ddd88c36\0");
 			testIndex(ids);
 
 			ids.clear();
@@ -993,8 +985,8 @@ cout << "testing array" << endl;
 				TEST_ASSERT_MSG(index != NULL, ("guid not found: " + guid).c_str());
 				if (index != NULL) {
 					BSONObj* key = index->key;
-					TEST_ASSERT(key != NULL);
-					TEST_ASSERT(key->getString("_id").compare(guid.c_str()) == 0);
+					TEST_ASSERT_MSG(key != NULL, format("Error searching for %s", guid.c_str()).c_str() );
+					TEST_ASSERT_MSG(key->getString("_id").compare(guid.c_str()) == 0, format("Error searching for %s", guid.c_str()).c_str() );
 				} else {
 					log->debug("id: %s not found", guid.c_str());
 				}
@@ -1097,6 +1089,45 @@ cout << "testing array" << endl;
 
 			bool res2 = IndexFactory::indexFactory.containsIndex("dbtest", "ns.a", "nkey");
 			TEST_ASSERT(!res2);
+		}
+
+		void testDropIndexes() {
+			cout << "\ntestDropIndexes" << endl;
+
+			IndexAlgorithm* index = IndexFactory::indexFactory.index("dbtest", "ns.a", "_id");
+			TEST_ASSERT(index != NULL);
+
+			// Let's check if the factory returns the same instance for the same key
+			IndexAlgorithm* indexCompare = IndexFactory::indexFactory.index("dbtest", "ns.a", "_id");
+			TEST_ASSERT(index == indexCompare);
+
+			// Let's change the keys and test if a new IndexAlgorithm will be returned
+			IndexAlgorithm* indexCompare2 = IndexFactory::indexFactory.index("dbtest", "ns.a", "key");
+			TEST_ASSERT(index != indexCompare2);
+
+			// Checking the contains method
+			bool res = IndexFactory::indexFactory.containsIndex("dbtest", "ns.a", "_id");
+			TEST_ASSERT(res);
+
+			bool res2 = IndexFactory::indexFactory.containsIndex("dbtest", "ns.a", "nkey");
+			TEST_ASSERT(!res2);
+
+			IndexFactory::indexFactory.dropIndex("dbtest", "ns.a", "_id");
+
+			res = IndexFactory::indexFactory.containsIndex("dbtest", "ns.a", "_id");
+			TEST_ASSERT(!res);
+
+			IndexFactory::indexFactory.index("dbtest", "ns.a", "test");
+			IndexFactory::indexFactory.index("dbtest", "ns.a", "next");
+			IndexFactory::indexFactory.dropIndexes("dbtest", "ns.a");
+			res = IndexFactory::indexFactory.containsIndex("dbtest", "ns.a", "_id");
+			TEST_ASSERT(!res);
+			res = IndexFactory::indexFactory.containsIndex("dbtest", "ns.a", "key");
+			TEST_ASSERT(!res);
+			res = IndexFactory::indexFactory.containsIndex("dbtest", "ns.a", "test");
+			TEST_ASSERT(!res);
+			res = IndexFactory::indexFactory.containsIndex("dbtest", "ns.a", "next");
+			TEST_ASSERT(!res);
 		}
 
 		void testDropnamespace()
