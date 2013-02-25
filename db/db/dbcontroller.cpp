@@ -87,7 +87,7 @@ void DBController::initialize() {
 }
 
 void DBController::initialize(std::string dataDir) {
-	if (_logger->isInfo()) _logger->info("DBController initializing. Data dir");
+	if (_logger->isInfo()) _logger->info("DBController initializing. Data dir: %s", dataDir.c_str());
 
 	_dataDir = dataDir;
 
