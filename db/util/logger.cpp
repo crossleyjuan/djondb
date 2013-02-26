@@ -43,18 +43,18 @@ Logger* __logger = NULL;
 
 #define PRINT(TYPE, CLAZZ) \
 	const char* cmessage = message.c_str(); \
-	int bufferSize = 10000; \
-	char* buffer = (char*)malloc(bufferSize + 1); \
-   buffer[bufferSize] = '\0'; \
+	int log_Print_bufferSize = 10000; \
+	char* log_Print_buffer = (char*)malloc(log_Print_bufferSize + 1); \
+   log_Print_buffer[log_Print_bufferSize] = '\0'; \
 va_list args; \
 va_start (args, message); \
-vsprintf (buffer, cmessage, args); \
+vsprintf (log_Print_buffer, cmessage, args); \
 va_end(args); \
 std::string result; \
 std::stringstream ss; \
-ss << buffer; \
+ss << log_Print_buffer; \
 result = ss.str(); \
-free(buffer); \
+free(log_Print_buffer); \
 print(TYPE, result);
 
 #ifdef LINUX

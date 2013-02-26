@@ -59,6 +59,9 @@ void BaseTransaction::loadControlFile() {
 	std::string file = _mainTransactionLog ? "main": *_transactionId;
 
 	_bufferManager = new TxBufferManager(_controller, file.c_str());
+	if (_mainTransactionLog) {
+		_bufferManager->startMonitor();
+	}
 }
 
 BaseTransaction::BaseTransaction(const BaseTransaction& orig) {
@@ -68,6 +71,10 @@ BaseTransaction::BaseTransaction(const BaseTransaction& orig) {
 }
 
 BaseTransaction::~BaseTransaction() {
+	_bufferManager->stopMonitor();
+	while (_bufferManager->runningMonitor()) {
+		Thread::sleep(30);
+	}
 	delete _bufferManager;
 	if (_transactionId) delete _transactionId;
 }
@@ -176,6 +183,8 @@ BSONArrayObj* BaseTransaction::find(char* db, char* ns, const char* select, cons
 					if (match) {
 						map.add(bson->getString("_id"), bson->select(select));
 					}
+					delete insert;
+					delete bson;
 				};
 				break;
 			case TXO_UPDATE: 
@@ -194,6 +203,8 @@ BSONArrayObj* BaseTransaction::find(char* db, char* ns, const char* select, cons
 					if (match) {
 						map.add(bson->getString("_id"), bson->select(select));
 					}
+					delete update;
+					delete bson;
 				};
 				break;
 			case TXO_REMOVE: 
@@ -209,6 +220,7 @@ BSONArrayObj* BaseTransaction::find(char* db, char* ns, const char* select, cons
 							// Error?
 						}
 					}
+					delete remove;
 				};
 				break;
 			case TXO_DROPNAMESPACE:
@@ -217,13 +229,18 @@ BSONArrayObj* BaseTransaction::find(char* db, char* ns, const char* select, cons
 				};
 				break;
 		}
+		free(operation->db);
+		free(operation->ns);
 		delete operation;
 	}
 
 	BSONArrayObj* result = new BSONArrayObj();
 	for (LinkedMap<std::string, BSONObj*>::iterator it = map.begin(); it != map.end(); it++) {
-		result->add(*it->second);
+		BSONObj* r = it->second;
+		result->add(*r);
+		delete r;
 	}
+	map.clear();
 	delete parser;
 	delete operations;
 	delete origList;
@@ -254,3 +271,6 @@ std::vector<std::string>* BaseTransaction::namespaces(const char* db) const {
 	return _controller->namespaces(db);
 }
 
+Controller* BaseTransaction::controller() const {
+	return _controller;
+}

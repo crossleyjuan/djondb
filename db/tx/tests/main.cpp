@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include "basetransaction.h"
+#include "stdtransaction.h"
 #include "controllertest.h"
 #include "dbcontroller.h"
 #include "bson.h"
@@ -36,7 +37,7 @@ class TestTXSuite: public Test::Suite
 		TestTXSuite()
 		{
 			TEST_ADD(TestTXSuite::testTransaction);
-			TEST_ADD(TestTXSuite::testTransactionFlush);
+			TEST_ADD(TestTXSuite::testTransactionCommit);
 		}
 
 	private:
@@ -74,35 +75,51 @@ class TestTXSuite: public Test::Suite
 			BSONObj* test2 = *res->begin();
 			TEST_ASSERT(test2->getString("name").compare("Peter") == 0);
 
+			delete res;
 			delete tx;
 			delete _controller;
 			delete id;
 		}
 
-		void testTransactionFlush()
+		void testTransactionCommit()
 		{
 			Logger* log = getLogger(NULL);
-			log->info("testTransactionFlush");
+			log->info("testTransactionCommit");
 			DBController* _controller = new DBController();
 			_controller->initialize();
 
 			BaseTransaction* tx = new BaseTransaction(_controller);
+			std::string* tuid = uuid();
+			StdTransaction* stx = new StdTransaction(tx, *tuid);
 
-			tx->dropNamespace("db", "txns");
+			stx->dropNamespace("db", "testcommit");
 
+			std::vector<std::string> idsCheck;
 			for (int y = 0; y < 300; y++) {
-				for (int x= 0; x < 10000; x++) {
-					BSONObj o;
-					std::string* id = uuid();
-					o.add("_id", const_cast<char*>(id->c_str()));
-					o.add("name", "John");
-					tx->insert("db", "txns", &o);
-					delete id;
+				BSONObj o;
+				std::string* id = uuid();
+				o.add("_id", const_cast<char*>(id->c_str()));
+				o.add("name", "John");
+				stx->insert("db", "testcommit", &o);
+				if ((y % 10) == 0) {
+					idsCheck.push_back(*id);
 				}
+				delete id;
 			}
+
+			for (std::vector<std::string>::iterator i = idsCheck.begin(); i != idsCheck.end(); i++) {
+				std::string id = *i;
+				std::string filter = format("$'_id' == '%s'", id.c_str());
+				BSONObj* res = stx->findFirst("db", "testcommit", "", filter.c_str());
+				delete res;
+			}
+			stx->commit();
+			delete stx;
+
 
 			delete tx;
 			_controller->shutdown();
+			delete tuid;
 			delete _controller;
 		}
 
