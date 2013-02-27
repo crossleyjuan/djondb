@@ -1,10 +1,10 @@
 /*
  * =====================================================================================
  *
- *       Filename:  transactioncontroller.h
+ *       Filename:  basetransaction.h
  *
- *    Description: This class work as a front controller and bridge for any controller
- *                 operation that needs a transaction 
+ *    Description: This class contains the implementation for the main log and it's the
+ *                 base implementation for any other transaction element 
  *
  *        Version:  1.0
  *        Created:  09/26/2012 08:26:29 PM
@@ -26,8 +26,8 @@
  * =====================================================================================
  */
 
-#ifndef BASECONTROLLER_INCLUDED_H
-#define BASECONTROLLER_INCLUDED_H
+#ifndef BASETRANSACTION_INCLUDED_H
+#define BASETRANSACTION_INCLUDED_H
 
 #include "filterdefs.h"
 #include "memorystream.h"
@@ -52,7 +52,7 @@ class BaseTransaction: public Controller
 	public:
 		BaseTransaction(Controller* controller);
 		BaseTransaction(const BaseTransaction& orig);
-		~BaseTransaction();
+		virtual ~BaseTransaction();
 
 		void loadControlFile();
 		virtual BSONObj* insert(char* db, char* ns, BSONObj* bson);
@@ -80,6 +80,7 @@ class BaseTransaction: public Controller
 	private:
 		void checkState();
 		std::list<TransactionOperation*>* findOperations(char* db, char* ns);
+
 };
 
-#endif // BASECONTROLLER_INCLUDED_H
+#endif // BASETRANSACTION_INCLUDED_H

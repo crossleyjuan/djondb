@@ -52,6 +52,12 @@ class TxBufferManager
 		void writeOperationToRegister(char* db, char* ns, const TransactionOperation& operation);
 		TransactionOperation* readOperationFromRegister(TxBuffer* buffer);
 		TransactionOperation* readOperationFromRegister(TxBuffer* buffer, char* db, char* ns);
+		void addBuffers(std::vector<TxBuffer*> buffers);
+		void startMonitor();
+		void stopMonitor();
+		bool runningMonitor() const;
+		std::vector<TxBuffer*> popAll();
+
 	private:
 		void initialize(const char* file);
 		void loadBuffers();
@@ -69,6 +75,7 @@ class TxBufferManager
 		std::queue<TxBuffer*>  _reusableBuffers;
 		Lock* _lockActiveBuffers;
 		Thread* _monitorThread;
+		bool _runningMonitor;
 
 		char* _logFileName;
 		InputOutputStream* _controlFile;
@@ -78,6 +85,7 @@ class TxBufferManager
 
 		__int64 _buffersSize;
 		__int32 _buffersCount;
+		bool _flushingBuffers;
 };
 
 #endif // TXBUFFERMANAGER_INCLUDED_H

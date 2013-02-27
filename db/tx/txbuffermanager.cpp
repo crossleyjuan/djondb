@@ -45,8 +45,9 @@ TxBufferManager::TxBufferManager(Controller* controller, const char* file) {
 	_dataDir = getSetting("DATA_DIR");
 	_controller = controller;
 	_lockActiveBuffers = new Lock();
-	_monitorThread = new Thread(&TxBufferManager::monitorBuffers);
-	_monitorThread->start(this);
+	_flushingBuffers = false;
+	_runningMonitor = false;
+	_monitorThread = NULL;
 
 	initialize(file);
 }
@@ -107,21 +108,28 @@ void TxBufferManager::loadBuffers() {
 }
 
 TxBufferManager::~TxBufferManager() {
+	stopMonitor();
+
+	// Wait until flushBuffers finished its work
+	while (_flushingBuffers) {
+		Thread::sleep(30);
+	}
 	while (!_activeBuffers.empty()) {
 		TxBuffer* buffer =  _activeBuffers.front();
 		_activeBuffers.pop();
+		buffer->close();
 		delete buffer;
 	}
 	while (!_reusableBuffers.empty()) {
 		TxBuffer* buffer = _reusableBuffers.front();
 		_reusableBuffers.pop();
+		buffer->close();
 		delete buffer;
 	}
 	_controlFile->close();
 	delete _controlFile;
 	delete _lockActiveBuffers;
-	_monitorThread->stop();
-	delete _monitorThread;
+	if (_monitorThread) delete _monitorThread;
 	free(_logFileName);
 }
 
@@ -176,9 +184,23 @@ void TxBufferManager::openLogFile() {
 }
 
 void TxBufferManager::addBuffer(TxBuffer* buffer) {
+	_lockActiveBuffers->lock();
 	_activeBuffers.push(buffer);
 	_vactiveBuffers.push_back(buffer);
+	_lockActiveBuffers->unlock();
 	// Notify that a new buffer is available
+	_lockActiveBuffers->notify();
+}
+
+void TxBufferManager::addBuffers(std::vector<TxBuffer*> buffers) {
+	_lockActiveBuffers->lock();
+	for (std::vector<TxBuffer*>::iterator it = buffers.begin(); it != buffers.end(); it++) {
+		TxBuffer* buffer = *it;
+		_activeBuffers.push(buffer);
+		_vactiveBuffers.push_back(buffer);
+	}
+	_lockActiveBuffers->unlock();
+	// Notify that a new buffers are available
 	_lockActiveBuffers->notify();
 }
 
@@ -190,6 +212,14 @@ std::vector<TxBuffer*> TxBufferManager::getActiveBuffers() const {
 	return _vactiveBuffers;
 }
 
+std::vector<TxBuffer*> TxBufferManager::popAll() {
+	std::vector<TxBuffer*> result;
+	while (buffersCount() > 0) {
+		result.push_back(pop());
+	}
+	return result;
+}
+
 TxBuffer* TxBufferManager::pop() {
 	TxBuffer* buffer = _activeBuffers.front();
 	_activeBuffers.pop();
@@ -199,7 +229,6 @@ TxBuffer* TxBufferManager::pop() {
 	_controlFile->writeChar((char)0x02); // reusable
 	_buffersCount--;
 
-	_reusableBuffers.push(buffer);
 	return buffer;
 }
 
@@ -207,9 +236,25 @@ __int32 TxBufferManager::buffersCount() const {
 	return _buffersCount;
 }
 
+void TxBufferManager::startMonitor() {
+	_monitorThread = new Thread(&TxBufferManager::monitorBuffers);
+	_runningMonitor = true;
+	_monitorThread->start(this);
+}
+
+bool TxBufferManager::runningMonitor() const {
+	return _runningMonitor;
+}
+
+void TxBufferManager::stopMonitor() {
+	_runningMonitor = false;
+	// Sends a notification to release the inner wait
+	_lockActiveBuffers->notify();
+}
+
 void* TxBufferManager::monitorBuffers(void* arg) {
 	TxBufferManager* manager = (TxBufferManager*)arg;
-	while (true) {
+	while (manager->runningMonitor()) {
 		// Waiting for notifications on new buffers
 		manager->flushBuffer();
 	}
@@ -217,6 +262,7 @@ void* TxBufferManager::monitorBuffers(void* arg) {
 
 void TxBufferManager::flushBuffer() {
 	_lockActiveBuffers->wait(3);
+	_flushingBuffers = true;
 	if (buffersCount() > 1) {
 		TxBuffer* buffer = pop();
 
@@ -236,6 +282,7 @@ void TxBufferManager::flushBuffer() {
 						BSONObj* bson = insert->bson;
 						_controller->insert(db, ns, bson);
 						delete bson;
+						delete insert;
 					};
 					break;
 				case TXO_UPDATE: 
@@ -244,6 +291,7 @@ void TxBufferManager::flushBuffer() {
 						BSONObj* bson = update->bson;
 						_controller->update(db, ns, bson);
 						delete bson;
+						delete update;
 					};
 					break;
 				case TXO_REMOVE: 
@@ -252,6 +300,7 @@ void TxBufferManager::flushBuffer() {
 						char* id = remove->key;
 						char* revision = remove->revision;
 						_controller->remove(db, ns, id, revision);
+						delete remove;
 					};
 					break;
 				case TXO_DROPNAMESPACE:
@@ -262,7 +311,9 @@ void TxBufferManager::flushBuffer() {
 			}
 			delete operation;
 		}
+		addReusable(buffer);
 	}
+	_flushingBuffers = false;
 }
 
 void TxBufferManager::writeOperationToRegister(char* db, char* ns, const TransactionOperation& operation) {
@@ -328,7 +379,8 @@ TransactionOperation* TxBufferManager::readOperationFromRegister(TxBuffer* buffe
 	buffer->acquireLock();
 	__int64 size = buffer->readLong();
 
-	MemoryStream* stream = new MemoryStream(buffer->readChars(), size);
+	char* fullBuffer = buffer->readChars();
+	MemoryStream* stream = new MemoryStream(fullBuffer, size);
 	buffer->releaseLock();
 
 	stream->seek(0);
@@ -380,12 +432,15 @@ TransactionOperation* TxBufferManager::readOperationFromRegister(TxBuffer* buffe
 									  break;
 								  };
 		};
+		free(cstream);
 	} else {
 jumpoperation:
 		stream->seek(stream->currentPos() + length);
 	}
 
-
+	free(rdb);
+	free(rns);
 	delete stream;
+	free(fullBuffer);
 	return result;
 }
