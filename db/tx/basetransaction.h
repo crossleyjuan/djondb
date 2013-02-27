@@ -64,6 +64,8 @@ class BaseTransaction: public Controller
 		virtual std::vector<std::string>* dbs() const;
 		virtual std::vector<std::string>* namespaces(const char* db) const;
 
+		Controller* controller() const;
+
 	protected:
 		BaseTransaction(Controller* controller, std::string transactionId);
 
