@@ -31,3 +31,6 @@ Debug
 *.ncb
 *.suo
 *.obj
+
+db/third_party/boost
+db/third_party

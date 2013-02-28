@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <cpptest.h> 
+#include <limits.h> 
 
 using namespace std; 
 using namespace djondb;
@@ -63,6 +64,7 @@ class TestDriverBaseSuite: public Test::Suite {
 			TEST_ADD(TestDriverBaseSuite::testInsert);
 			TEST_ADD(TestDriverBaseSuite::testInsertComplex);
 			TEST_ADD(TestDriverBaseSuite::testUpdate);
+			TEST_ADD(TestDriverBaseSuite::testRemove);
 			TEST_ADD(TestDriverBaseSuite::testFindByFilter);
 			TEST_ADD(TestDriverBaseSuite::testDbsNamespaces);
 
@@ -71,7 +73,7 @@ class TestDriverBaseSuite: public Test::Suite {
 		}
 
 		void testDbsNamespaces() {
-			Connection* conn = ConnectionManager::getConnection("localhost");
+			DjondbConnection* conn = DjondbConnectionManager::getConnection("localhost");
 
 			if (!conn->open()) {
 				cout << "\nCannot connect to localhost" << endl;
@@ -91,7 +93,7 @@ class TestDriverBaseSuite: public Test::Suite {
 		}
 
 		void testDropNamespace() {
-			Connection* conn = ConnectionManager::getConnection("localhost");
+			DjondbConnection* conn = DjondbConnectionManager::getConnection("localhost");
 
 			if (!conn->open()) {
 				cout << "\nCannot connect to localhost" << endl;
@@ -104,15 +106,15 @@ class TestDriverBaseSuite: public Test::Suite {
 
 			TEST_ASSERT(result);
 
-			std::vector<BSONObj*>* testresult = conn->find("db", "testdrop.namespace", "*", std::string(""));
+			BSONArrayObj* testresult = conn->find("db", "testdrop.namespace", "*", std::string(""));
 
-			TEST_ASSERT(testresult->size() == 0);
+			TEST_ASSERT(testresult->length() == 0);
 			delete testresult;
 		}
 
 		void testInsertComplex() {
 			cout << "\nTesting complex" << endl;
-			Connection* conn = ConnectionManager::getConnection("localhost");
+			DjondbConnection* conn = DjondbConnectionManager::getConnection("localhost");
 
 			if (!conn->open()) {
 				cout << "\nCould not connect to " << _host << endl;
@@ -123,7 +125,7 @@ class TestDriverBaseSuite: public Test::Suite {
 
 			BSONObj obj;
 			std::string* id = uuid();
-			obj.add("_id", *id);
+			obj.add("_id", const_cast<char*>(id->c_str()));
 			obj.add("name", "John");
 			BSONObj inner;
 			inner.add("innername", "Test");
@@ -131,8 +133,8 @@ class TestDriverBaseSuite: public Test::Suite {
 
 			conn->insert("test", "ns", obj);
 
-			std::vector<BSONObj*>* res = conn->find("test", "ns", "*", "$'_id' == '" + *id + "'");
-			TEST_ASSERT(res->size() == 1);
+			BSONArrayObj* res = conn->find("test", "ns", "*", "$'_id' == '" + *id + "'");
+			TEST_ASSERT(res->length() == 1);
 			BSONObj* bres = *res->begin();
 			TEST_ASSERT(bres->has("inner"));
 			BSONObj* innerres = bres->getBSON("inner");
@@ -145,13 +147,12 @@ class TestDriverBaseSuite: public Test::Suite {
 			std::string* id2 = uuid();
 			conn->insert("test", "ns", "{ '_id': '" + *id2 + "', 'array': [ { 'x': 'test', 'y': 3},  { 'x': 'test2', 'y': 4}]  }");
 
-			std::vector<BSONObj*>* res2 = conn->find("test", "ns", "*", "$'_id' == '" + *id2 + "'");
-			TEST_ASSERT(res2->size() == 1);
+			BSONArrayObj* res2 = conn->find("test", "ns", "*", "$'_id' == '" + *id2 + "'");
+			TEST_ASSERT(res2->length() == 1);
 			BSONObj* o2 = *res2->begin();
 			TEST_ASSERT(o2 != NULL);
 
 			TEST_ASSERT(o2->has("array"));
-
 
 			delete res;
 			delete res2;
@@ -163,12 +164,11 @@ class TestDriverBaseSuite: public Test::Suite {
 			delete customer;
 
 			res2 = conn->find("db", "testcustomer", "*", "$'name' == 'Martin'");
-			TEST_ASSERT(res2->size() == 1);
-			if (res2->size() == 1) {
+			TEST_ASSERT(res2->length() == 1);
+			if (res2->length() == 1) {
 				BSONObj* objCustomer = *res2->begin();
-				int d = objCustomer->getXpath("finantial.salary");
+				int d = *objCustomer->getXpath("finantial.salary");
 				TEST_ASSERT(d == 150000);
-				delete objCustomer;
 			}
 			delete res2;
 		}
@@ -183,7 +183,7 @@ class TestDriverBaseSuite: public Test::Suite {
 			log->startTimeRecord();
 			__running = true;
 
-			Connection* conn = ConnectionManager::getConnection(std::string(_host));
+			DjondbConnection* conn = DjondbConnectionManager::getConnection(std::string(_host));
 
 			if (!conn->open()) {
 				cout << "\nCould not connect to " << _host << endl;
@@ -194,7 +194,7 @@ class TestDriverBaseSuite: public Test::Suite {
 
 				BSONObj obj;
 				std::auto_ptr<std::string> guid(uuid());
-				obj.add("_id", *guid.get());
+				obj.add("_id", const_cast<char*>(guid->c_str()));
 				int test = rand() % 10;
 				if (test > 0) {
 					ids.push_back(*guid.get());
@@ -241,7 +241,6 @@ class TestDriverBaseSuite: public Test::Suite {
 			//    conn->close();
 			//
 			//    delete conn;
-			delete(log);
 		}
 
 		void testFinds() {
@@ -251,7 +250,7 @@ class TestDriverBaseSuite: public Test::Suite {
 			cout << "\nStarting testFinds" << endl;
 
 			__running = true;
-			Connection* conn = ConnectionManager::getConnection("localhost");
+			DjondbConnection* conn = DjondbConnectionManager::getConnection("localhost");
 
 			if (!conn->open()) {
 				cout << "\nCannot connect to localhost" << endl;
@@ -260,9 +259,10 @@ class TestDriverBaseSuite: public Test::Suite {
 
 			BSONObj test;
 			std::string* guid = uuid();
-			test.add("_id", *guid);
+			test.add("_id", const_cast<char*>(guid->c_str()));
 			test.add("int", 1);
-			test.add("long", 10L);
+			test.add("long", (__int64) 10L);
+			test.add("longmax",(__int64) LONG_MAX);
 			test.add("char", "testing");
 
 			conn->insert("db", "driver.test", test);
@@ -273,15 +273,16 @@ class TestDriverBaseSuite: public Test::Suite {
 
 			TEST_ASSERT(objResult != NULL);
 			TEST_ASSERT(objResult->has("int"));
-			TEST_ASSERT(*objResult->getInt("int") == 1);
+			TEST_ASSERT(objResult->getInt("int") == 1);
 			TEST_ASSERT(objResult->has("long"));
-			TEST_ASSERT(*objResult->getLong("long") == 10);
+			TEST_ASSERT(objResult->getLong("long") == 10);
+			TEST_ASSERT(objResult->has("longmax"));
+			TEST_ASSERT(objResult->getLong("longmax") == LONG_MAX);
 			TEST_ASSERT(objResult->has("char"));
 			TEST_ASSERT(objResult->getString("char").compare("testing") == 0);
 
 			__running = false;
 
-			delete(log);
 		}
 
 		void testFindByFilter() {
@@ -291,7 +292,7 @@ class TestDriverBaseSuite: public Test::Suite {
 
 			//delete id;
 
-			Connection* conn = ConnectionManager::getConnection("localhost");
+			DjondbConnection* conn = DjondbConnectionManager::getConnection("localhost");
 
 			if (!conn->open()) {
 				cout << "\nCannot connect to localhost" << endl;
@@ -309,12 +310,12 @@ class TestDriverBaseSuite: public Test::Suite {
 
 			cout << "\nTestbyfilter" << endl;
 			std::string filter = "";
-			std::vector<BSONObj*>* result = conn->find("db", "test.filter2", "*", filter);			
-			TEST_ASSERT(result->size() > 0);
+			BSONArrayObj* result = conn->find("db", "test.filter2", "*", filter);			
+			TEST_ASSERT(result->length() > 0);
 			filter = "$'name' == 'Test'";
 			delete result;
 			result = conn->find("db", "test.filter2", filter);			
-			TEST_ASSERT(result->size() > 0);
+			TEST_ASSERT(result->length() > 0);
 
 			BSONObj* objR = *result->begin();
 			TEST_ASSERT(objR != NULL);
@@ -325,16 +326,16 @@ class TestDriverBaseSuite: public Test::Suite {
 			cout << "\nobj: " << temp << endl;
 
 			result = conn->find("db", "test.filter2", "*", "$'name' == 'Test'");
-			TEST_ASSERT(result->size() == 1);
+			TEST_ASSERT(result->length() == 1);
 
 			result = conn->find("db", "test.filter2", "$'inner.x' == 1");
-			TEST_ASSERT(result->size() == 1);
+			TEST_ASSERT(result->length() == 1);
 
 			result = conn->find("db", "test.filter2", "*", "$'inner.x' > 0");
-			TEST_ASSERT(result->size() == 1);
+			TEST_ASSERT(result->length() == 1);
 
 			result = conn->find("db", "test.filter2", "$'inner.x' > 1");
-			TEST_ASSERT(result->size() == 0);
+			TEST_ASSERT(result->length() == 0);
 
 			delete objR;
 			delete result;
@@ -350,7 +351,7 @@ class TestDriverBaseSuite: public Test::Suite {
 			log->startTimeRecord();
 			__running = true;
 
-			Connection* conn = ConnectionManager::getConnection("localhost");
+			DjondbConnection* conn = DjondbConnectionManager::getConnection("localhost");
 
 			if (!conn->open()) {
 				cout << "\nCannot connect to localhost" << endl;
@@ -369,7 +370,7 @@ class TestDriverBaseSuite: public Test::Suite {
 				std::auto_ptr<std::string> guid(fisIds->readString());
 
 				BSONObj obj;
-				obj.add("_id", *guid.get());
+				obj.add("_id", const_cast<char*>(guid->c_str()));
 
 				idsUpdated.push_back(*guid.get());
 				char* temp = (char*)malloc(100);
@@ -422,9 +423,38 @@ class TestDriverBaseSuite: public Test::Suite {
 			//    conn->close();
 			//
 			//    delete conn;
-			delete(log);
 		}
 
+		void testRemove() {
+			cout << "\ntestRemove\n" << endl;
+			
+			DjondbConnection* conn = DjondbConnectionManager::getConnection("localhost");
+
+			if (!conn->open()) {
+				cout << "\nCannot connect to localhost" << endl;
+				exit(0);
+			}
+
+			conn->dropNamespace("testdb", "deletens");
+
+			BSONObj obj;
+			std::string* id = uuid();
+			std::string* revision = uuid();
+			obj.add("_id", const_cast<char*>(id->c_str())); 
+			obj.add("_revision", const_cast<char*>(revision->c_str())); 
+
+			conn->insert("testdb", "deletens", obj);
+
+			conn->remove("testdb", "deletens", *id, *revision);
+
+			BSONObj* res = conn->findByKey("testdb", "deletend", *id);
+			TEST_ASSERT(res == NULL);
+
+			DjondbConnectionManager::releaseConnection(conn);
+
+			delete id;
+			delete revision;
+		}
 
 };
 

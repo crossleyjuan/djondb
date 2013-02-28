@@ -27,6 +27,7 @@
 #include "filterparser.h"
 #include "expressionresult.h"
 #include "bson.h"
+#include <stdlib.h>
 
 SimpleExpression::SimpleExpression(const char* expression)
 	:BaseExpression(ET_SIMPLE)
@@ -45,39 +46,50 @@ SimpleExpression::~SimpleExpression() {
 }
 
 ExpressionResult* SimpleExpression::eval(const BSONObj& bson) {
-	BSONContent content = bson.getXpath(_expression);
+	BSONContent* content = bson.getXpath(_expression);
+	if (content == NULL) {
+		return new ExpressionResult();
+	}
 
 	ExpressionResult::RESULT_TYPE type;
 	ExpressionResult* result = NULL;
-	switch (content.type()) {
+	switch (content->type()) {
 		case INT_TYPE:
 			{
-				type = ExpressionResult::RT_INT;
-				int i = (int)content;
-				result = new ExpressionResult(type, &i);
+				__int32 i = (__int32)*content;
+				result = new ExpressionResult(i);
+				break;
+			}
+		case LONG_TYPE:
+		case LONG64_TYPE:
+			{
+				__int64 i = (__int64)*content;
+				result = new ExpressionResult(i);
 				break;
 			}
 		case DOUBLE_TYPE:
 			{
-				type = ExpressionResult::RT_DOUBLE;
-				double d = (double)content;
-				result = new ExpressionResult(type, &d);
+				double d = (double)*content;
+				result = new ExpressionResult(d);
 				break;
 			}
+		case PTRCHAR_TYPE:
 		case STRING_TYPE:
 			{
-				type = ExpressionResult::RT_STRINGDB;
-				std::string s = (std::string)content;
-				result = new ExpressionResult(type, &s);
+				djondb::string str = *content;
+				result = new ExpressionResult(str);
 				break;
 			}
 		case NULL_TYPE:
 			{
-				type = ExpressionResult::RT_NULL;
-				result = new ExpressionResult(type, NULL);
+				result = new ExpressionResult();
 				break;
 			}
+		default:
+			throw BSONException("Unsupported type");
+
 	}
+	delete content;
 	return result;
 }
 

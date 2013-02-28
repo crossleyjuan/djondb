@@ -29,7 +29,7 @@ Structure::~Structure()
     //dtor
 }
 
-void Structure::add(t_keytype name)
+void Structure::add(std::string name)
 {
     _elements.push_back(name);
     _id = 0;
@@ -41,9 +41,9 @@ long Structure::crc()
     {
         std::stringstream structure;
 
-        for (std::vector<t_keytype>::const_iterator i = _elements.begin(); i != _elements.end(); i++)
+        for (std::vector<std::string>::const_iterator i = _elements.begin(); i != _elements.end(); i++)
         {
-            t_keytype key = *i;
+            std::string key = *i;
             structure << key << ";";
         }
 

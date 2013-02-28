@@ -72,7 +72,7 @@
 
 using namespace djondb;
 
-Connection* __djonConnection;
+DjondbConnection* __djonConnection;
 
 CircularQueue<std::string> _commands(10);
 
@@ -93,6 +93,8 @@ v8::Handle<v8::Value> Load(const v8::Arguments& args);
 v8::Handle<v8::Value> Quit(const v8::Arguments& args);
 v8::Handle<v8::Value> Version(const v8::Arguments& args);
 v8::Handle<v8::Value> insert(const v8::Arguments& args);
+v8::Handle<v8::Value> update(const v8::Arguments& args);
+v8::Handle<v8::Value> remove(const v8::Arguments& args);
 v8::Handle<v8::Value> shutdown(const v8::Arguments& args);
 v8::Handle<v8::Value> fuuid(const v8::Arguments& args);
 v8::Handle<v8::Value> connect(const v8::Arguments& args);
@@ -113,12 +115,23 @@ char* commands[] = {
 	"quit",
 	"version",
 	"insert",
+	"update",
+	"remove",
 	"shutdown",
 	"fuuid",
 	"connect",
 	"help",
 	"readfile"
 };
+
+char* getHistoryFilename() {
+	std::string* homeDir = getHomeDir();
+	char* file = (char*)malloc(2048);
+	memset(file, 0, 2048);
+	sprintf(file, "%s%s.djonshell", homeDir->c_str(), FILESEPARATOR);
+	delete homeDir;
+	return file;
+}
 
 int main(int argc, char* argv[]) {
 	v8::V8::SetFlagsFromCommandLine(&argc, argv, true);
@@ -179,6 +192,10 @@ v8::Persistent<v8::Context> CreateShellContext() {
 	global->Set(v8::String::New("version"), v8::FunctionTemplate::New(Version));
 	// Bind the 'db.insert' function
 	global->Set(v8::String::New("insert"), v8::FunctionTemplate::New(insert));
+	// Bind the 'db.update' function
+	global->Set(v8::String::New("update"), v8::FunctionTemplate::New(update));
+	// Bind the 'db.remove' function
+	global->Set(v8::String::New("remove"), v8::FunctionTemplate::New(remove));
 	// Bind the 'db.uuid' function
 	global->Set(v8::String::New("uuid"), v8::FunctionTemplate::New(fuuid));
 	// Bind the 'connect' function
@@ -232,7 +249,7 @@ v8::Handle<v8::Value> parseJSON(v8::Handle<v8::Value> object)
 	return scope.Close(JSON_parse->Call(JSON, 1, &object));
 }
 
-v8::Handle<v8::Value> toJson(v8::Handle<v8::Value> object)
+v8::Handle<v8::Value> toJson(v8::Handle<v8::Value> object, bool beautify = false)
 {
 	v8::HandleScope scope;
 
@@ -242,7 +259,15 @@ v8::Handle<v8::Value> toJson(v8::Handle<v8::Value> object)
 	v8::Handle<v8::Object> JSON = global->Get(v8::String::New("JSON"))->ToObject();
 	v8::Handle<v8::Function> JSON_stringify = v8::Handle<v8::Function>::Cast(JSON->Get(v8::String::New("stringify")));
 
-	return scope.Close(JSON_stringify->Call(JSON, 1, &object));
+	if (!beautify) {
+		return scope.Close(JSON_stringify->Call(JSON, 1, &object));
+	} else {
+		v8::Handle<v8::Value> args[3];
+		args[0] = object;
+		args[1] = v8::Null();
+		args[2] = v8::Integer::New(4);
+		return scope.Close(JSON_stringify->Call(JSON, 3, args));
+	}
 }
 
 v8::Handle<v8::Value> insert(const v8::Arguments& args) {
@@ -268,6 +293,56 @@ v8::Handle<v8::Value> insert(const v8::Arguments& args) {
 		return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
 	}
 	__djonConnection->insert(db, ns, json);
+
+	return v8::String::New("");
+}
+
+v8::Handle<v8::Value> update(const v8::Arguments& args) {
+	if (args.Length() < 3) {
+		return v8::ThrowException(v8::String::New("usage: update(db, namespace, json)"));
+	}
+
+	v8::HandleScope handle_scope;
+	v8::String::Utf8Value str(args[0]);
+	std::string db = ToCString(str);
+	v8::String::Utf8Value str2(args[1]);
+	std::string ns = ToCString(str2);
+	std::string json;
+	if (args[2]->IsObject()) {
+		v8::String::Utf8Value strValue(toJson(args[2]));
+		json = ToCString(strValue);
+	} else {
+		v8::String::Utf8Value sjson(args[2]);
+		json = ToCString(sjson);
+	}
+
+	if (__djonConnection == NULL) {
+		return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
+	}
+	__djonConnection->update(db, ns, json);
+
+	return v8::String::New("");
+}
+
+v8::Handle<v8::Value> remove(const v8::Arguments& args) {
+	if (args.Length() < 4) {
+		return v8::ThrowException(v8::String::New("usage: remove(db, namespace, id, revision)"));
+	}
+
+	v8::HandleScope handle_scope;
+	v8::String::Utf8Value str(args[0]);
+	std::string db = ToCString(str);
+	v8::String::Utf8Value str2(args[1]);
+	std::string ns = ToCString(str2);
+	v8::String::Utf8Value str3(args[2]);
+	std::string id = ToCString(str3);
+	v8::String::Utf8Value str4(args[3]);
+	std::string revision = ToCString(str4);
+
+	if (__djonConnection == NULL) {
+		return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
+	}
+	__djonConnection->remove(db, ns, id, revision);
 
 	return v8::String::New("");
 }
@@ -365,19 +440,21 @@ v8::Handle<v8::Value> help(const v8::Arguments& args) {
 		std::string cmd = ToCString(str);
 	} else {
 		printf("connect('hostname', [port])\n\tEstablish a connection with a server.\n");
-		printf("dropNamespace('db', 'namespace');\n\tDrops a namespace from the db.\n");
-		printf("find('db', 'namespace'[, 'select'][, 'filter']);\n\tExecutes a find using the provided filter.\n");
-		printf("help();\n\tThis help\n");
-		printf("insert('db', 'namespace', { json...object});\n\tInserts a new document.\n");
-		printf("load('file');\n\tLoads and executes a script.\n");
-		printf("print(data);\n\tPrint console messages.\n");
-		printf("quit();\n\tBye bye fellow.\n");
-		printf("read('file');\n\tReads the contents of a file.\n");
-		printf("showDbs();\n\tReturns a list of the available databases.\n");
-		printf("showNamespaces('db');\n\tReturns the namespaces in that database.\n");
-		printf("shutdown();\n\tRemotely shutdowns the server (Are you sure?).\n");
+			printf("dropNamespace('db', 'namespace');\n\tDrops a namespace from the db.\n");
+			printf("find('db', 'namespace'[, 'select'][, 'filter']);\n\tExecutes a find using the provided filter.\n");
+			printf("help();\n\tThis help\n");
+			printf("insert('db', 'namespace', { json...object});\n\tInserts a new document.\n");
+			printf("update('db', 'namespace', { json...object});\n\tUpdates a document.\n");
+			printf("remove('db', 'namespace', 'id', 'revision');\n\tRemoves a document.\n");
+			printf("load('file');\n\tLoads and executes a script.\n");
+			printf("print(data);\n\tPrint console messages.\n");
+			printf("quit();\n\tBye bye fellow.\n");
+			printf("read('file');\n\tReads the contents of a file.\n");
+			printf("showDbs();\n\tReturns a list of the available databases.\n");
+			printf("showNamespaces('db');\n\tReturns the namespaces in that database.\n");
+			printf("shutdown();\n\tRemotely shutdowns the server (Are you sure?).\n");
 		printf("uuid();\n\tGenerates a new UUID (Universal Unique Identifier).\n");
-		printf("version();\n\tReturns the current shell version.\n");
+			printf("version();\n\tReturns the current shell version.\n");
 	}
 	return v8::Undefined();
 }
@@ -417,38 +494,27 @@ v8::Handle<v8::Value> find(const v8::Arguments& args) {
 		*/
 
 	try {
-		std::vector<BSONObj*>* result = __djonConnection->find(db, ns, select, filter);
+		BSONArrayObj* result = __djonConnection->find(db, ns, select, filter);
 
-		std::stringstream ss;
-		ss << "[";
-		if (result->size() > 0) {
-			for (std::vector<BSONObj*>::const_iterator i = result->begin(); i != result->end(); i++) {
-				BSONObj* obj = *i;
-				if (i != result->begin()) {
-					ss << ", ";
-				}
-				ss << obj->toChar();
-			}
-		}
-		ss << "]";
+		char* str = result->toChar();
 
-		std::string sresult = ss.str();
-
+		v8::Handle<v8::Value> jsonValue = parseJSON(v8::String::New(str));
+		free(str);
 		delete result;
-		return parseJSON(v8::String::New(sresult.c_str()));
+		return jsonValue;
 	} catch (ParseException e) {
 		return v8::ThrowException(v8::String::New("the filter expression contains an error\n"));
 	}
-/* 
-	v8::Handle<v8::Context> context = v8::Context::GetCurrent();
-	v8::Handle<v8::Object> global = context->Global();
+	/* 
+		v8::Handle<v8::Context> context = v8::Context::GetCurrent();
+		v8::Handle<v8::Object> global = context->Global();
 
-	v8::Handle<v8::Object> objresult = global->Get(v8::String::New(sresult.c_str()))->ToObject();
+		v8::Handle<v8::Object> objresult = global->Get(v8::String::New(sresult.c_str()))->ToObject();
 
 
-	return objresult;
+		return objresult;
 	//return v8::String::New(sresult.c_str());
-*/
+	*/
 }
 
 v8::Handle<v8::Value> fuuid(const v8::Arguments& args) {
@@ -481,7 +547,7 @@ v8::Handle<v8::Value> connect(const v8::Arguments& args) {
 	if (args.Length() == 2) {
 		port = args[1]->Int32Value();	
 	}
-	__djonConnection = ConnectionManager::getConnection(server, port);
+	__djonConnection = DjondbConnectionManager::getConnection(server, port);
 	if (__djonConnection->open()) {
 		printf("Connected to %s\n", server.c_str());
 	} else {
@@ -490,6 +556,22 @@ v8::Handle<v8::Value> connect(const v8::Arguments& args) {
 		__djonConnection = NULL;
 	}
 	return v8::String::New("");
+}
+
+// The callback that is invoked by v8 whenever the JavaScript 'print'
+// function is called.  Prints its arguments on stdout separated by
+// spaces and ending with a newline.
+void internalPrint(const v8::Handle<v8::Value> arg) {
+	v8::HandleScope handle_scope;
+	std::string cstr;
+	if (arg->IsObject()) {
+		v8::String::Utf8Value str(toJson(arg->ToObject(), true));
+		cstr = ToCString(str);
+	} else {
+		v8::String::Utf8Value str(arg);
+		cstr = ToCString(str);
+	}
+	printf("%s", cstr.c_str());
 }
 
 // The callback that is invoked by v8 whenever the JavaScript 'print'
@@ -504,9 +586,7 @@ v8::Handle<v8::Value> Print(const v8::Arguments& args) {
 		} else {
 			printf(" ");
 		}
-		v8::String::Utf8Value str(args[i]);
-		std::string cstr = ToCString(str);
-		printf("%s", cstr.c_str());
+		internalPrint(args[i]);
 	}
 	printf("\n");
 	fflush(stdout);
@@ -560,12 +640,20 @@ v8::Handle<v8::Value> Load(const v8::Arguments& args) {
 v8::Handle<v8::Value> Quit(const v8::Arguments& args) {
 	// If not arguments are given args[0] will yield undefined which
 	// converts to the integer value 0.
+	if (__djonConnection != NULL) {
+		__djonConnection->close();
+		delete __djonConnection;
+		__djonConnection = 0;
+	}
+
 	int exit_code = args[0]->Int32Value();
 	fflush(stdout);
 	fflush(stderr);
 
 #ifndef WINDOWS
-	linenoiseHistorySave(".djonshell_history");
+	char* file = getHistoryFilename();
+	linenoiseHistorySave(file);
+	free(file);
 #endif
 	exit(exit_code);
 	return v8::Undefined();
@@ -690,7 +778,7 @@ std::string readLine(char* prompt) {
 void RunShell(v8::Handle<v8::Context> context) {
 	printf("djondb shell version %s\n", VERSION);
 	printf("Welcome to djondb shell.\n");
-	printf("Use help(); to get the commands available. \n(hint: The first command should be \"connect\" to playing with a server)\n");
+	printf("Use help(); to get the commands available. \n(hint: The first command should be \"connect\" to start playing with a server)\n");
 
 	static const int kBufferSize = 256;
 	// Enter the execution environment before evaluating any code.
@@ -698,7 +786,9 @@ void RunShell(v8::Handle<v8::Context> context) {
 	v8::Local<v8::String> name(v8::String::New("(shell)"));
 
 #ifndef WINDOWS
-	linenoiseHistoryLoad(".djonshell_history");
+	char* file = getHistoryFilename();
+	linenoiseHistoryLoad(file);
+	free(file);
 	linenoiseSetCompletionCallback(completion);
 #endif
 	std::stringstream ss;
@@ -740,6 +830,14 @@ void RunShell(v8::Handle<v8::Context> context) {
 				ss.str("");
 				lastCmd = cmd;
 				_commands.push_back(std::string(cmd));
+				if ((startsWith(cmd, "exit")) || (startsWith(cmd, "quit"))) {
+					if (strlen(cmd) < 5)
+						cmd = "quit();";
+				}
+				if (startsWith(cmd, "help")) {
+					if (strlen(cmd) < 5)
+						cmd = "help();";
+				}
 				ExecuteString(v8::String::New(cmd), name, true, true);
 			}
 		}
@@ -774,9 +872,16 @@ bool ExecuteString(v8::Handle<v8::String> source,
 			if (print_result && !result->IsUndefined()) {
 				// If all went well and the result wasn't undefined then print
 				// the returned value.
-				v8::String::Utf8Value str(result);
-				std::string cstr = ToCString(str);
-				printf("%s\n", cstr.c_str());
+				if (result->IsObject()) {
+					v8::Handle<v8::Value> val = toJson(result);
+					v8::String::Utf8Value sval(val);
+					std::string temp = ToCString(sval);
+					printf("%s\n", temp.c_str());
+				} else {
+					v8::String::Utf8Value str(result);
+					std::string cstr = ToCString(str);
+					printf("%s\n", cstr.c_str());
+				}
 			}
 			return true;
 		}

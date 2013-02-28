@@ -19,103 +19,195 @@
 #include "fileinputoutputstream.h"
 
 #include "util.h"
+#include "filesystemdefs.h"
 #include <string.h>
 #include <boost/crc.hpp>
 #include <stdlib.h>
 #include <errno.h>
 #include <sstream>
+#include <limits.h>
+#include <assert.h>
 
 FileInputOutputStream::FileInputOutputStream(const std::string& fileName, const char* flags) {
 	Logger* log = getLogger(NULL);
+#ifndef A
     _pFile = fopen(fileName.c_str(), flags);
-
-    // Position the cursor at the end of the file
-	 if (_pFile == NULL) {
-		 log->error("Error opening the file: %s. Error: %s", fileName.c_str(), strerror(errno));
-		 exit(1);
-	 }
+	 setvbuf (_pFile, NULL , _IOFBF , 1024*4 ); // large buffer
     fseek(_pFile, 0, SEEK_END);
+#else
+	if (existFile(fileName.c_str())) {
+		_pFile = CreateFile(fileName.c_str(),                // name of the write
+			GENERIC_WRITE | GENERIC_READ,          // open for writing
+			FILE_SHARE_READ | FILE_SHARE_WRITE,        // do not share
+			NULL,                   // default security
+			OPEN_EXISTING,             // create new file only
+			FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS  | FILE_FLAG_NO_BUFFERING,  // normal file
+			NULL);                  // no attr. template
+	} else {
+		_pFile = CreateFile(fileName.c_str(),                // name of the write
+			GENERIC_WRITE | GENERIC_READ,          // open for writing
+			FILE_SHARE_READ | FILE_SHARE_WRITE,        // do not share
+			NULL,                   // default security
+			CREATE_NEW,             // create new file only
+			FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS  | FILE_FLAG_NO_BUFFERING,  // normal file
+                       NULL);                  // no attr. template
+	}
+    if (_pFile == INVALID_HANDLE_VALUE) 
+    { 
+		assert(false);
+    }
+	LARGE_INTEGER liOffset = {0};
+	LARGE_INTEGER liPos = {0};
+
+	bool res = SetFilePointerEx(_pFile, liOffset, NULL, FILE_END);
+
+	if (res == 0) {
+		cout << GetLastError() << endl;
+		exit(1);
+	}
+#endif
+
     _fileName = fileName;
     _open = true;
-	 delete log;
 }
 
 FileInputOutputStream::~FileInputOutputStream() {
     close();
 }
 
+__int64 FileInputOutputStream::read(char* buffer, __int32 len) {
+	int readed = 0;
+#ifndef A
+	readed = fread(buffer, 1, len, _pFile);
+#else
+	DWORD dwreaded = 0;
+	bool res = ReadFile(_pFile, buffer, len, &dwreaded, NULL);
+	if ((dwreaded == 0) && res) {
+		_eof = true;
+	} else {
+		_eof = false;
+	}
+	readed = (__int64)dwreaded;
+#endif
+	return readed;
+}
+
+void FileInputOutputStream::write(char* buffer, __int32 len) {
+#ifndef A
+	fwrite(buffer, 1, len, _pFile);
+#else
+	DWORD numberOfBytesWritten;
+	WriteFile(_pFile, buffer, len, &numberOfBytesWritten, NULL);
+#endif
+}
+
+
 /* Write 1 byte in the output */
 void FileInputOutputStream::writeChar (unsigned char v)
 {
-    fwrite(&v, 1, 1, _pFile);
+	write((char*)&v, 1);
 }
 
 /* Write 2 bytes in the output (little endian order) */
-void FileInputOutputStream::writeShortInt (short int v)
+void FileInputOutputStream::writeShortInt (__int16 v)
 {
-    unsigned char c = (v & 255);
-    unsigned char c2= ((v >> 8) & 255);
-    writeChar (c);
-    writeChar (c2);
+	writeData<__int16>(v);
 }
 
 /* Write 4 bytes in the output (little endian order) */
-void FileInputOutputStream::writeInt (int v)
+void FileInputOutputStream::writeInt (__int32 v)
 {
-    writeShortInt ((v) & 0xffff);
-    writeShortInt ((v >> 16) & 0xffff);
+	writeData<__int32>(v);
 }
 
 /* Write 4 bytes in the output (little endian order) */
-void FileInputOutputStream::writeLong (long v)
+void FileInputOutputStream::writeLong (__int64 v)
 {
-    writeShortInt ((v) & 0xffff);
-    writeShortInt ((v >> 16) & 0xffff);
+	writeData<__int64>(v);
 }
 
 /* Write a 4 byte float in the output */
 void FileInputOutputStream::writeFloatIEEE (float v)
 {
-    fwrite(&v, 1, sizeof(v), _pFile);
+	write((char*)&v, sizeof(v));
 }
 
 /* Write a 8 byte double in the output */
 void FileInputOutputStream::writeDoubleIEEE (double v)
 {
-    fwrite(&v, 1, sizeof(v), _pFile);
+	write((char*)&v, sizeof(v));
 }
 
-void FileInputOutputStream::writeChars(const char *text, int len) {
+void FileInputOutputStream::writeChars(const char *text, __int32 len) {
     writeInt(len);
-    fwrite(text, 1, len, _pFile);
+	write(const_cast<char*>(text), len);
 }
 
 void FileInputOutputStream::writeString(const std::string& text) {
     const char* c = text.c_str();
-    int l = strlen(c);
+    __int32 l = strlen(c);
     writeChars(c, l);
 }
 
-void FileInputOutputStream::seek(long i) {
+void FileInputOutputStream::seek(__int64 i, SEEK_DIRECTION direction) {
+#ifndef A
     fflush(_pFile);
-    fseek (_pFile, i, SEEK_SET);
+	if (direction == FROMSTART_SEEK) {
+		fseek(_pFile, i, SEEK_SET);
+	} else {
+		fseek(_pFile, i, SEEK_END);
+	}
+#else
+	flush();
+	LARGE_INTEGER liOffset = {0};
+	liOffset.QuadPart = i;
+	LARGE_INTEGER liPos = {0};
+
+	bool res = SetFilePointerEx(_pFile, liOffset, NULL, FILE_BEGIN);
+
+	if (res == 0) {
+		cout << GetLastError() << endl;
+		exit(1);
+	}
+#endif
 }
 
-long FileInputOutputStream::currentPos() const {
-    return ftell(_pFile);
+__int64 FileInputOutputStream::currentPos() const {
+#ifndef A
+	return ftell(_pFile);
+#else
+	LARGE_INTEGER liOffset = {0};
+	LARGE_INTEGER liPos = {0};
+
+	bool res = SetFilePointerEx(_pFile, liOffset, &liPos, FILE_CURRENT);
+
+	if (res == 0) {
+		cout << GetLastError() << endl;
+		exit(1);
+	}
+	return (__int64)liPos.QuadPart;
+#endif
 }
 
 void FileInputOutputStream::close() {
     if (_pFile) {
         flush();
+#ifndef A
         fclose(_pFile);
         _pFile = 0;
+#else
+		CloseHandle(_pFile);
+#endif
         _open = false;
     }
 }
 
 void FileInputOutputStream::flush() {
+#ifndef A
     fflush(_pFile);
+#else
+	FlushFileBuffers(_pFile);
+#endif
 }
 
 const std::string FileInputOutputStream::fileName() const {
@@ -124,47 +216,53 @@ const std::string FileInputOutputStream::fileName() const {
 
 unsigned char FileInputOutputStream::readChar() {
     unsigned char v = 0;
-    fread(&v, 1, 1, _pFile);
+	read((char*)&v, 1);
     return v;
 }
 
 /* Reads 2 bytes in the input (little endian order) */
-short int FileInputOutputStream::readShortInt () {
+__int16 FileInputOutputStream::readShortInt () {
+	__int32 v = readData<__int16>();
+	return v;
+	/*
     int v = readChar() | readChar() << 8;
     return v;
+	 */
 }
 
 /* Reads 4 bytes in the input (little endian order) */
-int FileInputOutputStream::readInt () {
-    int v = readShortInt() | readShortInt() << 16;
-
-    return v;
+__int32 FileInputOutputStream::readInt () {
+	__int32 v = readData<__int32>();
+	return v;
 }
 
 /* Reads 4 bytes in the input (little endian order) */
-long FileInputOutputStream::readLong () {
-    long v = readShortInt() | readShortInt() << 16;
+__int64 FileInputOutputStream::readLong () {
+	return readData<__int64>();
+}
 
-    return v;
+/* Reads 4 bytes in the input (little endian order) */
+__int64 FileInputOutputStream::readLong64() {
+	return readData<__int64>();
 }
 
 /* Reads a 4 byte float in the input */
 float FileInputOutputStream::readFloatIEEE () {
     float f;
-    fread(&f, 1, sizeof(f), _pFile);
+	read((char*)&f, sizeof(f));
     return f;
 }
 
 /* Reads a 8 byte double in the input */
 double FileInputOutputStream::readDoubleIEEE () {
     double d;
-    fread(&d, 1, sizeof(d), _pFile);
+	read((char*)&d, sizeof(d));
     return d;
 }
 
 /* Read a chars */
 char* FileInputOutputStream::readChars() {
-    int len = readInt();
+    __int32 len = readInt();
     char* res = readChars(len);
     return res;
 }
@@ -176,21 +274,21 @@ std::string* FileInputOutputStream::readString() {
     return res;
 }
 
-char* FileInputOutputStream::readChars(int length) {
+char* FileInputOutputStream::readChars(__int32 length) {
     char* res = (char*)malloc(length+1);
     memset(res, 0, length+1);
-    fread(res, 1, length, _pFile);
+	read(res, length);
     return res;
 }
 
 const char* FileInputOutputStream::readFull() {
-    fseek(_pFile, 0, SEEK_SET);
+	seek(0);
     std::stringstream ss;
     char buffer[1024];
-    int readed = 0;
-    while (!feof(_pFile)) {
+    __int32 readed = 0;
+    while (!eof()) {
         memset(buffer, 0, 1024);
-        readed = fread(buffer, 1, 1023, _pFile);
+		readed = read(buffer, 1023);
         ss << buffer;
     }
     std::string str = ss.str();
@@ -198,16 +296,20 @@ const char* FileInputOutputStream::readFull() {
 }
 
 bool FileInputOutputStream::eof() {
-    if (_pFile == NULL) {
-        return true;
-    }
-    long pos = currentPos();
-    // Force reading the last char to check the feof flag
-    readChar();
-    bool res = feof(_pFile);
-    // Back to the original position
-    seek(pos);
-    return res;
+	if (_pFile == NULL) {
+		return true;
+	}
+	__int64 pos = currentPos();
+	// Force reading the last char to check the feof flag
+	readChar();
+#ifndef A
+	bool res = feof(_pFile);
+#else
+	bool res = _eof;
+#endif
+	// Back to the original position
+	seek(pos);
+	return res;
 }
 
 bool FileInputOutputStream::isClosed() {

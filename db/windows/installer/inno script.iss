@@ -21,7 +21,7 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
-OutputBaseFilename=setup
+OutputBaseFilename=setup_djondb
 Compression=lzma
 SolidCompression=yes
 
@@ -37,15 +37,14 @@ Name: "{app}\"; Permissions: everyone-modify
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\workspace\personal\djondb\db\windows\Release\djondb_win.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\workspace\personal\djondb\db\windows\libs\driverbase.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\workspace\personal\djondb\db\windows\Release\msvcm90.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\workspace\personal\djondb\db\windows\Release\msvcp90.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\workspace\personal\djondb\db\windows\Release\msvcr90.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\workspace\personal\djondb\db\windows\Release\pthreadVC2.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\workspace\personal\djondb\db\windows\Release\djondb_shell.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\workspace\personal\djondb\db\windows\djondb.conf"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\workspace\personal\djondb\db\windows\installer\vcredist_x86_vs2010.exe"; DestDir: {tmp}
+Source: "..\Release\djondb_win.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Release\msvcm90.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Release\msvcp90.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Release\msvcr90.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Release\pthreadVC2.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Release\djondb_shell.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\djondb.conf"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\installer\vcredist_x86_vs2010.exe"; DestDir: {tmp}
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Run]

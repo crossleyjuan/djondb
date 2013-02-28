@@ -7,14 +7,18 @@ options {
 @parser::includes {
 //#include <stdlib.h>
    #include "filterparser.h"
+   #include "util.h"
    #include "filterdefs.h"
    #include "constantexpression.h"
    #include "unaryexpression.h"
    #include "simpleexpression.h"
    #include "binaryexpression.h"
    #include <stdlib.h>
+   #include <limits.h>
    #include <stdio.h>
+#ifndef WINDOWS
    #include <strings.h>
+#endif
    #include <string>
    #include <iostream>
    #include <set>
@@ -143,10 +147,25 @@ xpath_expr returns [BaseExpression* val]
 	};
 
 constant_expr returns [BaseExpression* val]
-	: (INT
+	: (NUMBER
 	{
-	    int i = atoi((char*)$INT.text->chars);
-	    $val = new ConstantExpression(i);
+		 // tries the maximum allowed value, then downsize it to the correct type
+#ifdef WINDOWS
+		__int64 d = (__int64)_atoi64((char*)$NUMBER.text->chars);
+#else
+      __int64 d = atoll((char*)$NUMBER.text->chars);
+#endif
+	    if (d < INT_MAX) {
+	          $val = new ConstantExpression((__int32)d);
+	    } else if (d < LONG_MAX)  {
+	          $val = new ConstantExpression((__int64)d);
+	    } else {
+	         if (abs((__int64)d) == d) {
+	                $val = new ConstantExpression((__int64)d);
+	         } else {
+	               $val = new ConstantExpression(d);
+                                   }
+	 }
 	} | STRING{
 	    char* ptext = (char*)$STRING.text->chars;
 	    char* text = (char*)malloc(strlen(ptext) - 1);
@@ -166,12 +185,12 @@ OPER	:	('==' | '>' | '>=' | '<' | '<=' );
 OR	:	'or';
 AND	:	'and';
 
-INT :	'0'..'9'+;
+NUMBER :	'0'..'9'+;
 
 FLOAT
-    :   ('0'..'9')+ '.' ('0'..'9')* EXPONENT?
-    |   '.' ('0'..'9')+ EXPONENT?
-    |   ('0'..'9')+ EXPONENT
+    :   NUMBER '.' (NUMBER)* EXPONENT?
+    |   '.' (NUMBER)+ EXPONENT?
+    |   (NUMBER)+ EXPONENT
     ;
 
 COMMENT

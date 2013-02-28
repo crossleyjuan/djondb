@@ -30,109 +30,124 @@
 #include <boost/shared_ptr.hpp>
 #include <vector>
 
-bool compareIndex(INDEXPOINTERTYPE ix1, INDEXPOINTERTYPE ix2) {
-	return COMPAREKEYS(ix1, ix2);
+void shiftRightArray(void** array, int startPoint, int count, int size) {
+	for (int i = 0; i < count; i++) {
+		for (int x = size - 2; x > startPoint - 1; x--) {
+			array[x + 1] = array[x]; array[x] = NULL;
+		}
+	}
 }
 
-BPlusIndex::BPlusIndex(std::set<std::string> keys)
-	: IndexAlgorithm(keys)
+void shiftLeftArray(void** array, int startPoint, int count, int size) {
+	for (int i = 0; i < count; i++) {
+		for (int x = startPoint + 1; x < size; x++) {
+			array[x - 1] = array[x];
+			array[x] = NULL;
+		}
+	}
+}
+
+void insertArray(void** array, void* element, int pos, int length) {
+	shiftRightArray(array, pos, 1, length);
+	array[pos] = element;
+}
+
+int findInsertPositionArray(Index** elements, Index* index, int len, int size) {
+	Logger* log = getLogger(NULL);
+	int indexPositionResult = 0;
+	if (len == 0) {
+		return 0;
+	} else {
+		int res;
+//		INDEXPOINTERTYPE key = index->key->toChar();
+		djondb::string key = index->key->getDJString("_id");
+		bool found = false;
+		for (int x = 0; x < size; x++) {
+			Index* current = elements[x];
+			indexPositionResult = x;
+			if (current == NULL) {
+				found = true;
+				break;
+			} else {
+	djondb::string currentKey = current->key->getDJString("_id");
+	//			INDEXPOINTERTYPE currentKey = current->key->toChar();
+				int res = currentKey.compare(key); 
+				//free(currentKey);
+				if (res < 0) {
+					found = true;
+					break;
+				}
+			}
+		}
+		if (!found) {
+			indexPositionResult++;
+		}
+		//free(key);
+	}
+	return indexPositionResult;
+}
+
+void initializeArray(void** array, int size) {
+	for (int x = 0; x < size; x++) {
+		array[x] = NULL;
+	}
+}	
+
+void copyArray(void** source, void** destination, int startIndex, int endIndex, int offset) {
+	int i = offset;
+	for (int x = startIndex; x <= endIndex; x++) {
+		destination[i] = source[x];
+		i++;
+	}
+}
+
+void removeArray(void** source, int startIndex, int endIndex) {
+	for (int x = startIndex; x <= endIndex; x++) {
+		source[x] = NULL;
+	}
+}
+
+Index::~Index() {
+	delete key;
+}
+
+Index::Index(const Index& orig) {
+	this->key = new BSONObj(*orig.key);
+	this->documentId = orig.documentId;
+	this->posData = orig.posData;
+	this->indexPos = orig.indexPos;
+}
+
+BPlusIndex::BPlusIndex(std::set<std::string> keys): IndexAlgorithm(keys)
 {
-    _head = new Bucket();
-	 //_priorityCache = new PriorityCache<INDEXPOINTERTYPE, Index*>(1000, compareIndex);
-	 //_priorityCache = new PriorityCache<INDEXPOINTERTYPE, Index*>(1000);
-    initializeBucket(_head);
-}
-
-
-void cascadeDelete(Bucket* bucket) {
-    BucketElement* element = bucket->root;
-    while (element != NULL) {
-        BucketElement* next = element->next;
-        if (next != NULL)
-            next->previous = NULL;
-        if (element->index != NULL) {
-            if (element->index->key != NULL) {
-                delete (element->index->key);
-                element->index->key = 0;
-            }
-            delete element->index;
-            element->index = 0;
-        }
-        if (element->key != NULL) {
-            free(element->key);
-            element->key = 0;
-        }
-        delete element;
-        element = next;
-    }
-    bucket->root = NULL;
-    bucket->tail = NULL;
-    if (bucket->left != NULL) {
-        cascadeDelete(bucket->left);
-    }
-    if (bucket->right != NULL) {
-        cascadeDelete(bucket->right);
-    }
-    delete bucket;
+	_head = new IndexPage();
 }
 
 BPlusIndex::~BPlusIndex()
 {
-    if (_head)
-    {
-        cascadeDelete(_head);
-    }
+	if (_head)
+	{
+		delete _head;
+	}
 }
 
-void BPlusIndex::add(const BSONObj& elem, const std::string documentId, long filePos, long indexPos)
+void BPlusIndex::add(const BSONObj& elem, const djondb::string documentId, long filePos, long indexPos)
 {
-    Index index;
-	 index.documentId = documentId;
-    index.key = new BSONObj(elem);
-    index.posData = filePos;
-	 index.indexPos = indexPos;
-
-    insertElement(index);
-
-	 delete index.key;
+	Index* index = new Index();
+	index->key = new BSONObj(elem);
+	index->documentId = documentId;
+	index->posData = filePos;
+	index->indexPos = indexPos;
+	insertIndexElement(_head, index);
 }
 
-Index* BPlusIndex::find(const BSONObj& elem)
+Index* BPlusIndex::find(BSONObj* const elem)
 {
-//    char* key = elem->toChar();
-//    boost::crc_32_type crc32;
-//    crc32.process_bytes(key, strlen(key));
-//    long value = crc32.checksum();
+	//INDEXPOINTERTYPE key = elem->toChar();
+	djondb::string key = elem->getDJString("_id");
+	Index* result = findIndex(_head, key);
 
-	Logger* log = getLogger(NULL);
-	
-	Index* result = NULL;
-	INDEXPOINTERTYPE key = elem.toChar();
-	/* 
-	PriorityCache<INDEXPOINTERTYPE, Index*>::iterator it = _priorityCache->get(key);
-	if (it != _priorityCache->end()) {
-		result = it->second;
-	}
-	*/
-	if (log->isDebug()) {
-		if (result != NULL) {
-			log->debug(3, "BPlusIndex::find %s found in priority cache");
-		}
-	}
-	if (result == NULL) {
-		Index index;
-		index.key = new BSONObj(elem);
-		BucketElement* element = findBucketElement(_head, index, false);
-		if (element != NULL) {
-			result = element->index;
-		}
-		if (index.key) {
-			delete index.key;
-			index.key = NULL;
-		}
-	}
-	free(key);
-	delete log;
+	//free(key);
 	return result;
 }
 
@@ -140,349 +155,379 @@ void BPlusIndex::remove(const BSONObj& elem)
 {
 }
 
-void BPlusIndex::initializeBucketElement(BucketElement* const elem)
-{
-	//    elem->index = NULL;
-	elem->next = NULL;
-	elem->previous = NULL;
+void BPlusIndex::debug() {
+	_head->debug();
 }
 
-void BPlusIndex::initializeBucket(Bucket* const bucket)
-{
-	bucket->minKey = NULL;
-	bucket->maxKey = NULL;
-	bucket->root = NULL;
-	bucket->size = 0;
-	bucket->tail = NULL;
-	bucket->parentBucket = NULL;
+bool IndexPage::isLeaf() const {
+	for (int x = 0; x <= size; x++) {
+		if (pointers[x] != NULL) {
+			return false;
+		}
+	}
+	return true;
 }
 
-void debugInfo(Bucket* bucket) {
+void IndexPage::movePointers(int startPoint, int count) {
+	shiftRightArray((void**)pointers, startPoint, count, BUCKET_MAX_ELEMENTS + 1);
+}
+
+void IndexPage::moveElements(int startPoint, int count) {
+	shiftRightArray((void**)elements, startPoint, count, BUCKET_MAX_ELEMENTS);
+}
+
+bool IndexPage::isFull() const {
+	return size >= BUCKET_MAX_ELEMENTS;
+}
+
+Index* BPlusIndex::findIndex(IndexPage* start, djondb::string key) const {
+	Logger* log = getLogger(NULL);
+	for (int x = 0; x < start->size; x++) {
+		Index* current = start->elements[x];
+		//INDEXPOINTERTYPE testKey = current->key->toChar();
+		djondb::string testKey = current->key->getDJString("_id");
+		int result = testKey.compare(key);
+		//free(testKey);
+
+		if (result < 0) {
+			if (start->pointers[x] != NULL) {
+				return findIndex(start->pointers[x], key);
+			} else {
+				return NULL;
+			}
+		} if (result == 0) {
+			return current;
+		}
+	}
+	if (start->pointers[start->size] != NULL) {
+		return findIndex(start->pointers[start->size], key);
+	} else {
+		return NULL;
+	}
+}
+
+IndexPage* BPlusIndex::findIndexPage(IndexPage* start, djondb::string key) const {
+	Logger* log = getLogger(NULL);
+	if (start->isLeaf()) {
+		return start;
+	} else {
+		for (int x = 0; x < start->size; x++) {
+			Index* current = start->elements[x];
+			//INDEXPOINTERTYPE testKey = current->key->toChar();
+			djondb::string testKey = current->key->getDJString("_id");
+			int result = testKey.compare(key);
+			//free(testKey);
+
+			if (result < 0) {
+				if (start->pointers[x] != NULL) {
+					return findIndexPage(start->pointers[x], key);
+				} else {
+					return start;
+				}
+			}
+		}
+		if (start->pointers[start->size] != NULL) {
+			return findIndexPage(start->pointers[start->size], key);
+		} else {
+			return start;
+		}
+	}
+}
+
+
+void refreshParentRelationship(IndexPage* page) {
+	for (int x = 0; x < BUCKET_MAX_ELEMENTS + 1; x++) {
+		if (page->pointers[x] != NULL) {
+			IndexPage* child = page->pointers[x];
+			child->parentElement = page;
+		}
+	}
+}
+
+void BPlusIndex::insertIndexElement(IndexPage* page, Index* index) {
 	Logger* log = getLogger(NULL);
 
-	log->debug(0, "bucket root: %s", bucket->root->key);
-	BucketElement* c = bucket->root;
-	std::stringstream ss;
-	while (c != NULL) {
-		ss << c->key << ", ";
-		c = c->next;
-	}
-	log->debug(0, "elements: %s", ss.str().c_str());
+	djondb::string key = index->key->getDJString("_id");
+	//char* key = index->key->toChar();
+	IndexPage* pageFound = findIndexPage(_head, key);
 
-	if (bucket->left != NULL) {
-		log->debug(0, "printing left of: %s", bucket->root->key);
-		debugInfo(bucket->left);
-	}	
-	if (bucket->right != NULL) {
-		log->debug(0, "printing right of: %s", bucket->root->key);
-		debugInfo(bucket->right);
-	}
-
-	delete log;
-
+	addElement(pageFound, index, NULL);
+	//free(key);
 }
 
-void BPlusIndex::debug() {
-	debugInfo(_head);
-}
-
-void BPlusIndex::checkBucket(Bucket* const bucket)
-{
-	while (bucket->size > BUCKET_MAX_ELEMENTS) {
-		std::auto_ptr<Logger> log(getLogger(NULL));
-		// The bucked will be split
-		Bucket* leftBucket;
-		if (bucket->left != NULL) {
-			leftBucket = bucket->left;
-		} else {
-			leftBucket = new Bucket();
-			leftBucket->parentBucket = bucket;
-			initializeBucket(leftBucket);
-			bucket->left = leftBucket;
-		};	 
-
-		BucketElement* leftElement = bucket->root;
-		BucketElement* rightElement = bucket->tail;
-
-		// Move 2nd element
-		bucket->root = leftElement->next;
-		bucket->minKey = bucket->root->key;
-		// Disconnects last element
-		bucket->tail = rightElement->previous;
-		bucket->tail->next = NULL;
-		bucket->maxKey = bucket->tail->key;
-
-		// Disconnects the leaf
-		leftElement->next = NULL;
-		leftElement->previous = NULL;
-		rightElement->next = NULL;
-		rightElement->previous = NULL;
-
-		// Creates buckets
-		Bucket* rightBucket;
-		if (bucket->right != NULL) {
-			rightBucket = bucket->right;
-		} else {
-			rightBucket = new Bucket();
-			rightBucket->parentBucket = bucket;
-			initializeBucket(rightBucket);
-			bucket->right = rightBucket;
-		}
-
-		insertBucketElement(leftBucket, leftElement);
-		insertBucketElement(rightBucket, rightElement);
-
-		bucket->size -= 2;
-#ifdef DEBUG
-		log->debug("Sucessful split of the bucket. min: %s, max: %s, size: %d. Left: %s, Right: %s", bucket->minKey, bucket->maxKey, bucket->size, leftBucket->minKey, rightBucket->minKey);
-#endif
+IndexPage::IndexPage() {
+	parentElement = NULL;
+	size = 0;
+	_leaf = true;
+	leftSibling = NULL;
+	rightSibling = NULL;
+	elements = (Index**)malloc(BUCKET_MAX_ELEMENTS * sizeof(Index*));
+	for (int x = 0; x < BUCKET_MAX_ELEMENTS; x++) {
+		elements[x] = NULL;
+	}
+	pointers = (IndexPage**)malloc((BUCKET_MAX_ELEMENTS + 1) * sizeof(IndexPage*));
+	for (int x = 0; x < BUCKET_MAX_ELEMENTS + 1; x++) {
+		pointers[x] = NULL;
 	}
 }
 
-// This method will insert the element into the currentBucket
-void BPlusIndex::insertBucketElement(Bucket* bucket, BucketElement* element)
-{
-	std::auto_ptr<Logger> log(getLogger(NULL));
-#ifdef DEBUG
-	log->debug("inserting element. key: %s", element->key);
-	log->debug("current bucket. min: %s, max: %s, size: %d", bucket->minKey, bucket->maxKey, bucket->size);
-#endif
+IndexPage::~IndexPage() {
+	Logger* log = getLogger(NULL);
+	if (log->isDebug()) {
+		log->debug("Deleting page: %d", (long)this);
 
-	INDEXPOINTERTYPE key = element->key;
-	BucketElement* currentElement = bucket->root;
-	if (currentElement == NULL) {
-		bucket->root = element;
-		bucket->tail = element;
-		bucket->size++;
-		bucket->minKey = element->key;
-		bucket->maxKey = element->key;
-		return;
-	}
-	INDEXPOINTERTYPE testKey = currentElement->key;
-	int compMinKey = strcmp(bucket->minKey, testKey);
-	// the element should be inserted on the parent, because it's lesser than the
-	// root element
-	if ((compMinKey < 0) && (bucket->parentBucket != NULL)) {
-		insertBucketElement(bucket->parentBucket, element);
-		return;
-	}
-
-	// Insert in the current bucket
-	while (true) {
-		INDEXPOINTERTYPE testKey = currentElement->key;
-		int comp = strcmp(key, testKey);
-		if (comp == 0)
-		{
-			return;
-		}
-		else
-		{
-			// The value is lesser than the current, should be inserted in front
-			// if there's enough space
-			if (comp < 0)
-			{
-				if (currentElement == bucket->root)
-				{
-					// if the element is lesser than the root, then check the left child and insert it there
-					if (bucket->left != NULL) {
-						insertBucketElement(bucket->left, element);
-					} else  {
-						element->next = currentElement;
-						currentElement->previous = element;
-						bucket->root = element;
-						bucket->minKey = element->key;
-						bucket->size++;
-					}
-				}
-				else
-				{
-					element->next = currentElement;
-					element->previous = currentElement->previous;
-					currentElement->previous->next = element;
-					currentElement->previous = element;
-					bucket->size++;
-				}
-				break;
-			}
-			else
-			{
-				// the value is greater and should be added to the next
-				if (currentElement == bucket->tail)
-				{
-					if (bucket->right != NULL) {
-						insertBucketElement(bucket->right, element);
-					} else {
-						currentElement->next = element;
-						element->previous = currentElement;
-						bucket->maxKey = element->key;
-						bucket->tail = element;
-						bucket->size++;
-					}
-					break;
-				} else {
-					// Moves to the next node
-					assert(currentElement->next != NULL);
-					currentElement = currentElement->next;
-				}
+		for (int x = 0; x < size; x++) {
+			if (elements[x] != NULL) {
+				log->debug("Deleting element: %d", (long)elements[x]);
+				delete elements[x];
+				elements[x] = NULL;
 			}
 		}
+		for (int x = 0; x < size + 1; x++) {
+			if (pointers[x] != NULL) {
+				IndexPage* page = pointers[x];
+				delete page;
+				pointers[x] = NULL;
+			}
+		}
+		free(elements);
+		free(pointers);
 	}
-	checkBucket(bucket);
-#ifdef DEBUG
-	log->debug("bucket after insert. min: %s, max: %s, size: %d", bucket->minKey, bucket->maxKey, bucket->size);
-#endif
 }
 
-int compKey(BucketElement* element, INDEXPOINTERTYPE key) {
-	INDEXPOINTERTYPE testKey = element->key;
-	return strcmp(testKey, key);
+void BPlusIndex::splitAddLeaf(IndexPage* page, Index* index) {
+	Logger* log = getLogger(NULL);
+
+	//temporal arrays
+	Index** tmpelements = (Index**)malloc(sizeof(Index*) * (BUCKET_MAX_ELEMENTS + 1));
+	//IndexPage** tmppointers = (IndexPage**)malloc(sizeof(IndexPage*) * (BUCKET_MAX_ELEMENTS + 2));
+
+	initializeArray((void**)tmpelements, BUCKET_MAX_ELEMENTS);
+	copyArray((void**)page->elements, (void**)tmpelements, 0, BUCKET_MAX_ELEMENTS - 1, 0);
+
+	int posToInsert = findInsertPositionArray(tmpelements, index, page->size, BUCKET_MAX_ELEMENTS);
+
+	insertArray((void**)tmpelements, index, posToInsert, BUCKET_MAX_ELEMENTS + 1);
+
+	// clean the previous "left"
+	initializeArray((void**)page->elements, BUCKET_MAX_ELEMENTS);
+
+	IndexPage* rightPage = new IndexPage();
+	int midPoint = (BUCKET_MAX_ELEMENTS / 2);
+	copyArray((void**)tmpelements, (void**)page->elements, 0, midPoint, 0);
+	page->size = (BUCKET_MAX_ELEMENTS / 2) + 1;
+	//copyArray((void**)tmppointers, (void**)page->pointers, 0, midPoint + 1, 0);
+	copyArray((void**)tmpelements, (void**)rightPage->elements, midPoint + 1, BUCKET_MAX_ELEMENTS, 0);
+	rightPage->size = (BUCKET_MAX_ELEMENTS / 2) + 1;
+	refreshParentRelationship(rightPage);
+	//copyArray((void**)tmppointers, (void**)rightPage->pointers, midPoint + 2, BUCKET_MAX_ELEMENTS + 2, 0);
+
+	// Promotion
+	IndexPage* parentElement = page->parentElement;
+	Index* copyElement = new Index(*rightPage->elements[0]);
+	if (parentElement == NULL) {
+		createRoot(copyElement, page, rightPage);
+		parentElement = _head;
+	} else {
+		addElement(parentElement, copyElement, rightPage);
+	}
+
+	free(tmpelements);
+	refreshParentRelationship(parentElement);
 }
 
-/***
-  This will find the bucket in which the key should be in
-  */
-BucketElement* BPlusIndex::findBucketElement(Bucket* start, const Index& idx, bool create)
-{
-	Index* index = new Index();
-	index->key = new BSONObj(*idx.key);
-	index->documentId = idx.documentId;
-	index->indexPos = idx.indexPos;
-	index->posData = idx.posData;
+void BPlusIndex::splitAddInner(IndexPage* page, Index* index, IndexPage* rightPage) {
+	Logger* log = getLogger(NULL);
 
-	BSONObj* bkey = idx.key;
-	Bucket* currentBucket = start;
-	INDEXPOINTERTYPE key = bkey->toChar();
-	BucketElement* result = NULL;
-	bool created = false;
+	//temporal arrays
+	Index** tmpelements = (Index**)malloc(sizeof(Index*) * (BUCKET_MAX_ELEMENTS + 1));
+	IndexPage** tmppointers = (IndexPage**)malloc(sizeof(IndexPage*) * (BUCKET_MAX_ELEMENTS + 2));
 
-	if (currentBucket->size == 0)
-	{
-		if (!create) {
-			result = result;
-		} else {
-			BucketElement* element = new BucketElement();
-			initializeBucketElement(element);
-			element->index = index;
-			element->key = key;
-			insertBucketElement(currentBucket, element);
-			result = element;
-			created = true;
+	initializeArray((void**)tmpelements, BUCKET_MAX_ELEMENTS);
+	initializeArray((void**)tmppointers, BUCKET_MAX_ELEMENTS + 1);
+
+	copyArray((void**)page->elements, (void**)tmpelements, 0, BUCKET_MAX_ELEMENTS - 1, 0);
+	copyArray((void**)page->pointers, (void**)tmppointers, 0, BUCKET_MAX_ELEMENTS, 0);
+
+	int posToInsert = findInsertPositionArray(tmpelements, index, page->size, BUCKET_MAX_ELEMENTS);
+
+	insertArray((void**)tmpelements, index, posToInsert, BUCKET_MAX_ELEMENTS + 1);
+	insertArray((void**)tmppointers, rightPage, posToInsert + 1, BUCKET_MAX_ELEMENTS + 2);
+
+	// clean the previous "left"
+	initializeArray((void**)page->elements, BUCKET_MAX_ELEMENTS);
+	initializeArray((void**)page->pointers, BUCKET_MAX_ELEMENTS + 1);
+
+	IndexPage* newRightPage = new IndexPage();
+	int midPoint = (BUCKET_MAX_ELEMENTS / 2);
+	copyArray((void**)tmpelements, (void**)page->elements, 0, midPoint, 0);
+	copyArray((void**)tmppointers, (void**)page->pointers, 0, midPoint + 1, 0);
+
+	page->size = (BUCKET_MAX_ELEMENTS / 2) + 1;
+	copyArray((void**)tmpelements, (void**)newRightPage->elements, midPoint + 1, BUCKET_MAX_ELEMENTS, 0);
+	copyArray((void**)tmppointers, (void**)newRightPage->pointers, midPoint + 2, BUCKET_MAX_ELEMENTS + 1, 1);
+
+	newRightPage->size = (BUCKET_MAX_ELEMENTS / 2) + 1;
+	refreshParentRelationship(newRightPage);
+
+	// Promotion
+	IndexPage* parentElement = page->parentElement;
+	Index* element = newRightPage->elements[0];
+
+	if (parentElement == NULL) {
+		createRoot(element, page, newRightPage);
+		parentElement = _head;
+	} else {
+		addElement(parentElement, element, newRightPage);
+	}
+	shiftLeftArray((void**)newRightPage->elements, 0, 1, BUCKET_MAX_ELEMENTS - 1);
+	shiftLeftArray((void**)newRightPage->pointers, 0, 1, BUCKET_MAX_ELEMENTS);
+	newRightPage->size--;
+
+	refreshParentRelationship(parentElement);
+	free(tmpelements);
+	free(tmppointers);
+}
+
+void BPlusIndex::splitAdd(IndexPage* page, Index* index, IndexPage* rightPointer) {
+	Logger* log = getLogger(NULL);
+
+	if (page->isLeaf()) {
+		assert(rightPointer == NULL);
+		splitAddLeaf(page, index);
+	} else {
+		splitAddInner(page, index, rightPointer);
+	}
+}
+
+void BPlusIndex::addElement(IndexPage* page, Index* index, IndexPage* rightPointer) {
+	if (!page->isFull()) {
+		int pos = page->findInsertPosition(index);
+		page->moveElements(pos, 1);
+		page->movePointers(pos + 1, 1);
+		page->elements[pos] = index;
+		page->pointers[pos + 1] = rightPointer;
+		page->size++;
+		if (rightPointer != NULL) {
+			rightPointer->parentElement = page;
 		}
 	} else {
-		while (true)
-		{
-			int comp = strcmp(key, currentBucket->minKey);
-
-			// Lucky the min is the one we're looking for
-			if (comp == 0)
-			{
-				result = currentBucket->root;
-				break;
-			}
-			else if (comp < 0)
-			{
-				// If the value is less than current left element in bucket and there's leaf then should test on that
-				if (currentBucket->left != NULL)
-				{
-					currentBucket = currentBucket->left;
-					continue;
-				}
-			}
-
-			comp = strcmp(key, currentBucket->maxKey);
-			if (comp == 0) {
-				result = currentBucket->tail;
-				break;
-			} else if (comp > 0) {
-				if (currentBucket->right != NULL) {
-					currentBucket = currentBucket->right;
-					continue;
-				}
-			}
-			BucketElement* element = currentBucket->root;
-			while (element != NULL) {
-				comp = strcmp(key, element->key);
-				if (comp == 0) {
-					result = element;
-					break;
-				} else if (comp > 0) {
-					element = element->next;
-				} else {
-					break;
-				}
-			}
-			if (result) {
-				break;
-			}
-			if (create) {
-				BucketElement* element = new BucketElement();
-				initializeBucketElement(element);
-				element->index = index;
-				element->key = key;
-				insertBucketElement(currentBucket, element);
-				result = element;
-				created = true;
-			}
-			break;
-		}
+		splitAdd(page, index, rightPointer);
 	}
-	if (!created) {
-		free(key);
-		delete index->key;
-		delete index;
-	} else {
-		//_priorityCache->add(key, index);
-	}
-
-	return result;
 }
 
-bool BPlusIndex::insertElement(const Index& elem)
-{
-	BucketElement* res = findBucketElement(_head, elem, true);
-
-	return (res != NULL);
+int IndexPage::findInsertPosition(Index* index) const {
+	return findInsertPositionArray(elements, index, size, BUCKET_MAX_ELEMENTS);
 }
 
-std::list<Index*> BPlusIndex::findElements(FilterParser* parser, Bucket* bucket) {
-	BucketElement* element = bucket->root;
-
-	std::list<Index*> result;
-
-	while (element != NULL) {
-		Index* index = element->index;
-		BSONObj* obj = index->key;
-		ExpressionResult* eresult = parser->eval(*obj);
-		if (eresult->type() == ExpressionResult::RT_BOOLEAN) {
-			bool* bres = (bool*)eresult->value();
-			if (*bres) {
-				result.push_back(index);
-			}
-		}
-		delete eresult;
-		element = element->next;
-	}
-	return result;
+void BPlusIndex::moveElements(IndexPage* source, IndexPage* destination, int startIndex, int endIndex) {
+	copyElements(source, destination, startIndex, endIndex);
+	removeElements(source, startIndex, endIndex);
 }
 
-std::list<Index*> BPlusIndex::find(FilterParser* parser, Bucket* bucket) {
-	std::list<Index*> result;
+void BPlusIndex::copyElements(IndexPage* source, IndexPage* destination, int startIndex, int endIndex) {
+	copyArray((void**)source->elements, (void**)destination->elements, startIndex, endIndex, 0);
+	copyArray((void**)source->pointers, (void**)destination->pointers, startIndex, endIndex, 0);
+	destination->size += (endIndex - startIndex);
+}
 
-	std::list<Index*> i = findElements(parser, bucket);
-	result.insert(result.end(), i.begin(), i.end());
+void BPlusIndex::removeElements(IndexPage* source, int startIndex, int endIndex) {
+	removeArray((void**)source, startIndex, endIndex);
+	source->size -= (endIndex - startIndex);
+}
 
-	if (bucket->left != NULL) {
-		i = find(parser, bucket->left);
-		result.insert(result.end(), i.begin(), i.end());
-	}
-	if (bucket->right != NULL) {
-		i = find(parser, bucket->right);
-		result.insert(result.end(), i.begin(), i.end());
-	}
-
-	return result;
+void BPlusIndex::createRoot(Index* element, IndexPage* left, IndexPage* right) {
+	// Move all the elements to the right leaf
+	IndexPage* rootPage = new IndexPage();
+	_head = rootPage;
+	_head->pointers[0] = left;
+	left->parentElement = _head;
+	_head->pointers[1] = right;
+	right->parentElement = _head;
+	_head->elements[0] = element;
+	_head->_leaf = false;
+	_head->size = 1;
 }
 
 std::list<Index*> BPlusIndex::find(FilterParser* parser) {
-	return find(parser, _head);
+	std::list<Index*> result;
+
+	if (_head != NULL) {
+		std::list<Index*> partial = _head->find(parser);
+		result.insert(result.begin(), partial.begin(), partial.end());
+	}
+
+	return result;
 }
+
+void IndexPage::debugElements() const {
+	Logger* log = getLogger(NULL);
+	if (log->isDebug()) {
+
+		std::stringstream ss;
+		for (int x = 0; x < size; x++) {
+			if (pointers[x] == NULL) {
+				ss << " (NULL) ";
+			} else {
+				ss << " (" << (long)pointers[x] << ") ";
+			}
+			if (elements[x] != NULL) {
+				ss << " <<" << (long) elements[x] << ">> " << (const char*)elements[x]->key->getDJString("_id");
+			} else {
+				ss << " << NULL >> ";
+			}
+		}
+		if (pointers[size] != NULL) {
+			ss << " (" << (long)pointers[size] << ") ";
+		} else {
+			ss << " (NULL) ";
+		}
+		std::string s = ss.str();
+		log->debug("%s", s.c_str());
+	}
+}
+
+void IndexPage::debug() const {
+	Logger* log = getLogger(NULL);
+	if (log->isDebug()) {
+
+		if (parentElement != NULL) {
+			log->debug("Page: %d, parentPage: %d", this, parentElement);
+		} else {
+			log->debug("Page: %d", this);
+		}
+
+		debugElements();
+
+		for (int x = 0; x <= size; x++) {
+			if (pointers[x] != NULL)
+				pointers[x]->debug();
+		}
+	}
+}
+
+
+std::list<Index*> IndexPage::find(FilterParser* parser) const {
+	std::list<Index*> result;
+	for (int x = 0; x < size; x++) {
+		BSONObj* key = elements[x]->key;
+		bool match = false;
+		ExpressionResult* expresult = parser->eval(*key);
+		if (expresult->type() == ExpressionResult::RT_BOOLEAN) {
+			match = *expresult;
+		}
+		delete expresult;
+		if (match) {
+			result.push_back(elements[x]);
+		}
+	}
+	for (int x = 0; x <= size; x++) {
+		IndexPage* innerPage = pointers[x];
+		if (innerPage != NULL) {
+			std::list<Index*> inner = innerPage->find(parser);
+			result.insert(result.begin(), inner.begin(), inner.end());
+		}
+	}
+	return result;
+}
+

@@ -37,6 +37,7 @@ class TestUtilSuite : public Test::Suite
 			TEST_ADD(TestUtilSuite::testSettings);
 			TEST_ADD(TestUtilSuite::testFileUtils);
 			TEST_ADD(TestUtilSuite::testCircularQueue);
+			TEST_ADD(TestUtilSuite::testDjonStrings);
 		}
 
 	private:
@@ -236,6 +237,77 @@ class TestUtilSuite : public Test::Suite
 			TEST_ASSERT(checkFileCreation(home));
 			// test directory fail
 			TEST_ASSERT(!checkFileCreation("/"));
+		}
+
+		void testFunction(const char* x) {
+			djondb::string s("test", 4);
+			TEST_ASSERT(strcmp(s.c_str(), x) == 0);
+		}
+
+		const char* testFunctionWithReturn(djondb::string s) {
+			djondb::string s2 = s;
+                        return s2.c_str();
+                }
+
+		void testDjonStrings() {
+			djondb::string s("test", 4);
+
+			const char* c = s.c_str();
+			__int32 l = s.length();
+			TEST_ASSERT(strcmp(c, "test") == 0);
+			TEST_ASSERT(l == 4);
+
+			djondb::string s2("test", 4);
+			TEST_ASSERT(s == s2);
+
+			djondb::string s3("other", 5);
+			TEST_ASSERT(s != s3);
+
+
+			// Testing copy smart references
+			char* cx = strcpy("Testing", 7);
+			djondb::string s4(cx, 7);
+			djondb::string s5(s4);
+			const char* c4 = s4.c_str();
+			const char* c5 = s5.c_str();
+			// Compare the references, they should be the same
+			TEST_ASSERT(c4 == c5);
+
+			// testing simple copying
+			djondb::string s6(strcpy("Otra", 4), 4);
+			djondb::string* s7 = new djondb::string(s6);
+			delete s7;
+			const char* c6 = s6.c_str();
+			TEST_ASSERT(strcmp(c6, "Otra") == 0);
+
+
+			djondb::string s8(strcpy("Otra", 4), 4);
+			{
+				djondb::string s9 = s8;
+				const char* c9 = s9.c_str();
+				TEST_ASSERT(strcmp(s8.c_str(), c9) == 0);
+			};
+			TEST_ASSERT(strcmp(s8.c_str(), "Otra") == 0);
+
+			// Test null strings
+			djondb::string s10;
+			djondb::string s11(s10);
+
+
+			djondb::string s12("test", 4);
+			const char* cs12 = testFunctionWithReturn(s12);
+			testFunction(s12.c_str());
+			TEST_ASSERT(strcmp(s12.c_str(), cs12) == 0);
+
+
+			djondb::string s13("aaaa", 4);
+			djondb::string s14("bbbb", 4);
+			TEST_ASSERT(s13.compare(s14) < 0);                 
+			TEST_ASSERT(s13.compare(s14.c_str(), 4) < 0);                 
+
+			djondb::string s15("aa", 2);
+			djondb::string s16("aabb", 4);
+			TEST_ASSERT(s15.compare(s16) < 0);                 
 		}
 };
 //// Tests unconditional fail TEST_ASSERTs

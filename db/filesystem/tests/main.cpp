@@ -18,15 +18,19 @@
 
 #include <iostream>
 #include <fileinputstream.h>
+#include <mmapinputstream.h>
 #include <fileoutputstream.h>
 #include <fileinputoutputstream.h>
 #include <memorystream.h>
 #include "bsonoutputstream.h"
 #include "bsoninputstream.h"
+#include "bsonbufferedobj.h"
+#include "bsonbufferedarrayobj.h"
 #include "bson.h"
 #include <string.h>
 #include <memory>
 #include <cpptest.h>
+#include <limits.h>
 
 using namespace std;
 
@@ -37,6 +41,7 @@ class TestFileSystemSuite: public Test::Suite
 		TestFileSystemSuite()
 		{
 			TEST_ADD(TestFileSystemSuite::testFileStreams);
+			TEST_ADD(TestFileSystemSuite::testMMap);
 			TEST_ADD(TestFileSystemSuite::testFileInputOutputStreams);
 			TEST_ADD(TestFileSystemSuite::testBSONStreams);
 			TEST_ADD(TestFileSystemSuite::testBSONStreamsComplex);
@@ -44,6 +49,8 @@ class TestFileSystemSuite: public Test::Suite
 			TEST_ADD(TestFileSystemSuite::testInnerArrays);
 			TEST_ADD(TestFileSystemSuite::testMemoryStream);
 			TEST_ADD(TestFileSystemSuite::testBSONSelect);
+			TEST_ADD(TestFileSystemSuite::testBSONBufferedArray);
+			TEST_ADD(TestFileSystemSuite::testBSONBuffered);
 		}
 
 	private:
@@ -55,9 +62,10 @@ class TestFileSystemSuite: public Test::Suite
 			memset(test, 'a', 200000);
 			streamo.writeChars("Hello World!", 12);
 			streamo.writeShortInt(2);
+			streamo.writeShortInt(127);
 			streamo.writeInt(200000);
-			streamo.writeLong(200000L);
-			streamo.writeChars(test, strlen(test));
+			streamo.writeLong(LONG_MAX);
+			//streamo.writeChars(test, strlen(test));
 			streamo.close();
 
 			FileInputStream streami("test.txt", "rb");
@@ -65,17 +73,54 @@ class TestFileSystemSuite: public Test::Suite
 			TEST_ASSERT(strcmp(text, "Hello World!") == 0);
 			int i1 = streami.readShortInt();
 			TEST_ASSERT(i1 == 2);
+			int si1 = streami.readShortInt();
+			TEST_ASSERT(si1 == 127);
 			int i2 = streami.readInt();
 			TEST_ASSERT(i2 == 200000);
 			long l = streami.readLong();
-			TEST_ASSERT(l == 200000);
-			char* tchar = streami.readChars();
-			TEST_ASSERT(strcmp(test, tchar) == 0);
+			TEST_ASSERT(l == LONG_MAX);
+
+			//char* tchar = streami.readChars();
+			//TEST_ASSERT(strcmp(test, tchar) == 0);
+			streami.close();
+			free(test);
+		}
+
+		void testMMap()
+		{
+			cout << "\ntestMMap\n" << endl;
+			FileOutputStream streamo("test.txt", "wb");
+			char* test = (char*)malloc(200001);
+			memset(test, 0, 200001);
+			memset(test, 'a', 200000);
+			streamo.writeChars("Hello World!", 12);
+			streamo.writeShortInt(2);
+			streamo.writeShortInt(127);
+			streamo.writeInt(200000);
+			streamo.writeLong(LONG_MAX);
+			//streamo.writeChars(test, strlen(test));
+			streamo.close();
+
+			MMapInputStream streami("test.txt", "rb");
+			char* text = streami.readChars();
+			TEST_ASSERT(strcmp(text, "Hello World!") == 0);
+			int i1 = streami.readShortInt();
+			TEST_ASSERT(i1 == 2);
+			int si1 = streami.readShortInt();
+			TEST_ASSERT(si1 == 127);
+			int i2 = streami.readInt();
+			TEST_ASSERT(i2 == 200000);
+			long l = streami.readLong();
+			TEST_ASSERT(l == LONG_MAX);
+
+			//char* tchar = streami.readChars();
+			//TEST_ASSERT(strcmp(test, tchar) == 0);
 			streami.close();
 			free(test);
 		}
 
 		void testMemoryStream() {
+			cout << "\ntestMemoryStream\n" << endl;
 			MemoryStream ms(10);
 			char* text = "test1234567890darn0987654321";
 			ms.writeChars(text, strlen(text));
@@ -84,51 +129,92 @@ class TestFileSystemSuite: public Test::Suite
 			char* res = ms.readChars();
 
 			TEST_ASSERT(strcmp(res, text) == 0);
+
+			MemoryStream ms2;
+			ms2.writeInt(1);
+			ms2.writeInt(2);
+			int pos = ms2.currentPos();
+			TEST_ASSERT(pos == sizeof(__int32) * 2);
+			ms2.seek(4);
+			pos = ms2.currentPos();
+			TEST_ASSERT(pos == sizeof(__int32));
+			ms2.readInt();
+			pos = ms2.currentPos();
+			TEST_ASSERT(pos == sizeof(__int32) * 2);
+
+
+			// testing with buffer initializer
+			MemoryStream ms3(ms2.toChars(), ms2.size());
+			ms3.seek(0);
+			ms3.readInt();
+			ms3.readInt();
+			pos = ms3.currentPos();
+			TEST_ASSERT(pos == sizeof(__int32) * 2);
+			ms3.seek(4);
+			pos = ms3.currentPos();
+			TEST_ASSERT(pos == sizeof(__int32));
+			ms3.readInt();
+			pos = ms3.currentPos();
+			TEST_ASSERT(pos == sizeof(__int32) * 2);
+
 		}
 
 		void testFileInputOutputStreams()
 		{
-			FileInputOutputStream streamo("test.txt", "rwb");
+			FileInputOutputStream streamo("test2.txt", "w+b");
+			streamo.writeInt(INT_MAX);
 			char* test = (char*)malloc(200001);
 			memset(test, 0, 200001);
 			memset(test, 'a', 200000);
 			streamo.writeChars("Hello World!", 12);
 			streamo.writeShortInt(2);
-			streamo.writeInt(200000);
-			streamo.writeLong(200000L);
+			streamo.writeInt(2);
+			streamo.writeLong((__int64)200000L);
 			streamo.writeChars(test, strlen(test));
 
 			streamo.seek(0);
+			int i2 = streamo.readInt();
+			TEST_ASSERT(i2 == INT_MAX);
 			char* text = streamo.readChars();
 			TEST_ASSERT(strcmp(text, "Hello World!") == 0);
-			int i1 = streamo.readShortInt();
+			__int16 i16 = streamo.readShortInt();
+			TEST_ASSERT(i16 == 2);
+			int i1 = streamo.readInt();
 			TEST_ASSERT(i1 == 2);
-			int i2 = streamo.readInt();
-			TEST_ASSERT(i2 == 200000);
-			long l = streamo.readLong();
-			TEST_ASSERT(l == 200000);
+			__int64 l = streamo.readLong();
+			TEST_ASSERT(l == (__int64)200000L);
 			char* tchar = streamo.readChars();
 			TEST_ASSERT(strcmp(test, tchar) == 0);
-			streamo.close();
 			free(test);
+			streamo.close();
 		}
 
 		void testBSONStreams()
 		{
+			cout << "\ntestBSONStreams\n" << endl;
+
 			std::auto_ptr<FileOutputStream> fos(new FileOutputStream("bson.txt", "wb"));
 			std::auto_ptr<BSONOutputStream> bsonOut(new BSONOutputStream(fos.get()));
 
 			std::auto_ptr<BSONObj> obj(new BSONObj());
 			// Add in
-			obj->add("int", 1);
-			obj->add("string", std::string("test"));
+			obj->add("int", INT_MAX);
+			obj->add("string", (char*)"test");
 			obj->add("char*", (char*)"char*");
-			obj->add("long", 1L);
+			obj->add("long", (__int64)100000000L);
+			obj->add("long64", (__int64)LLONG_MAX);
 			obj->add("double", 1.1);
+
+			BSONObj inner;
+			inner.add("name", "John");
+			inner.add("long", (__int64)LONG_MAX);
+			inner.add("int", (__int32)1);
+			obj->add("inner", inner);
 
 			bsonOut->writeBSON(*obj);
 
 			fos->close();
+			fos.release();
 
 			obj.release();
 
@@ -137,24 +223,40 @@ class TestFileSystemSuite: public Test::Suite
 
 			obj = std::auto_ptr<BSONObj>(bsonIn->readBSON());
 
-			TEST_ASSERT(obj->getInt("int") != NULL);
-			TEST_ASSERT(*obj->getInt("int") == 1);
+			TEST_ASSERT(obj->has("int"));
+			TEST_ASSERT(obj->getInt("int") == INT_MAX);
 
-			TEST_ASSERT(obj->getString("string").compare("test") == 0);
+			TEST_ASSERT(strcmp(obj->getString("string"), "test") == 0);
 
-			TEST_ASSERT(obj->getString("char*").compare("char*") == 0);
+			TEST_ASSERT(strcmp(obj->getString("char*"), "char*") == 0);
 
-			TEST_ASSERT(obj->getLong("long") != NULL);
-			TEST_ASSERT(*obj->getLong("long") == 1L);
+			TEST_ASSERT(obj->has("long"));
+			TEST_ASSERT(obj->getLong("long") == 100000000L);
 
-			TEST_ASSERT(obj->getDouble("double") != NULL);
-			TEST_ASSERT(*obj->getDouble("double") == 1.1);
+			TEST_ASSERT(obj->has("long64"));
+			TEST_ASSERT(obj->getLong("long64") == LLONG_MAX);
+
+			TEST_ASSERT(obj->has("double"));
+			TEST_ASSERT(obj->getDouble("double") == 1.1);
+
+			BSONObj* innerR = obj->getBSON("inner");
+			TEST_ASSERT(innerR != NULL);
+
+			TEST_ASSERT(innerR->has("name"));
+			TEST_ASSERT(strcmp(innerR->getString("name"), "John") == 0);
+
+			TEST_ASSERT(innerR->has("int"));
+			TEST_ASSERT(innerR->getInt("int") == 1);
+
+			TEST_ASSERT(innerR->has("long"));
+			TEST_ASSERT(innerR->getLong("long") == LONG_MAX);
 
 			fis->close();
 
 		}
 
 		void testBSONSelect() {
+			cout << "\ntestBSONSelect\n" << endl;
 			std::auto_ptr<BSONObj> objTest(BSONParser::parse("{age: 1, name: 'John', salary: 3500.25, simplerel: {test: 'inner value', test2: 'inner value2', test3: 3, test4: 3.5}, rel1: [{innertext: 'inner text', test2: 'text2'}, {innertext: 'inner text', test2: 'text333'}, {innertext: 'inner text', test2: 'text4'}, {innertext: 'inner text'} ] }"));
 			MemoryStream ms;
 			BSONOutputStream bos(&ms);
@@ -221,16 +323,16 @@ class TestFileSystemSuite: public Test::Suite
 			std::auto_ptr<BSONInputStream> bsonIn(new BSONInputStream(fis.get()));
 
 			BSONObj* obj = bsonIn->readBSON();
-			TEST_ASSERT(obj->getInt("age") != NULL);
-			TEST_ASSERT(*obj->getInt("age") == 1);
-			TEST_ASSERT(obj->getString("name").compare("John") == 0);
+			TEST_ASSERT(obj->has("age"));
+			TEST_ASSERT(obj->getInt("age") == 1);
+			TEST_ASSERT(strcmp(obj->getString("name"), "John") == 0);
 
-			TEST_ASSERT(obj->getDouble("salary") != NULL);
-			TEST_ASSERT(*obj->getDouble("salary") == 3500.25);
+			TEST_ASSERT(obj->has("salary"));
+			TEST_ASSERT(obj->getDouble("salary") == 3500.25);
 
-			TEST_ASSERT(obj->getBSONArray("rel1") != NULL);
+			TEST_ASSERT(obj->has("rel1"));
 			TEST_ASSERT(obj->getBSONArray("rel1")->length() == 4);
-			TEST_ASSERT(obj->getBSONArray("rel1")->get(0)->getString("innertext").compare("inner text") == 0);
+			TEST_ASSERT(strcmp(obj->getBSONArray("rel1")->get(0)->getString("innertext"), "inner text") == 0);
 
 			delete obj;
 
@@ -244,16 +346,18 @@ class TestFileSystemSuite: public Test::Suite
 			std::auto_ptr<BSONObj> obj(new BSONObj());
 			// Add in
 			obj->add("int", 1);
-			obj->add("string", std::string("test"));
+			obj->add("string", "test");
 			obj->add("char*", (char*)"char*");
-			obj->add("long", 1L);
+			obj->add("long", (__int64)1L);
+			obj->add("long64", (__int64)10000000000000L);
 			obj->add("double", 1.1);
 
 			BSONObj inner;
 			inner.add("int", 1);
-			inner.add("string", std::string("test"));
+			inner.add("string", "test");
 			inner.add("char*", (char*)"char*");
-			inner.add("long", 1L);
+			inner.add("long", (__int64)1L);
+			inner.add("long64", (__int64)10000000000000L);
 			inner.add("double", 1.1);
 
 			obj->add("inner", inner);
@@ -269,34 +373,37 @@ class TestFileSystemSuite: public Test::Suite
 
 			obj = std::auto_ptr<BSONObj>(bsonIn->readBSON());
 
-			TEST_ASSERT(obj->getInt("int") != NULL);
-			TEST_ASSERT(*obj->getInt("int") == 1);
+			TEST_ASSERT(obj->has("int"));
+			TEST_ASSERT(obj->getInt("int") == 1);
 
-			TEST_ASSERT(obj->getString("string").compare("test") == 0);
+			TEST_ASSERT(strcmp(obj->getString("string"), "test") == 0);
 
-			TEST_ASSERT(obj->getString("char*").compare("char*") == 0);
+			TEST_ASSERT(strcmp(obj->getString("char*"), "char*") == 0);
 
-			TEST_ASSERT(obj->getLong("long") != NULL);
-			TEST_ASSERT(*obj->getLong("long") == 1L);
+			TEST_ASSERT(obj->has("long"));
+			TEST_ASSERT(obj->getLong("long") == 1L);
 
-			TEST_ASSERT(obj->getDouble("double") != NULL);
-			TEST_ASSERT(*obj->getDouble("double") == 1.1);
+			TEST_ASSERT(obj->has("double"));
+			TEST_ASSERT(obj->getDouble("double") == 1.1);
 
 			BSONObj* innerTest = obj->getBSON("inner");
 			TEST_ASSERT(innerTest != NULL);
 
-			TEST_ASSERT(innerTest->getInt("int") != NULL);
-			TEST_ASSERT(*innerTest->getInt("int") == 1);
+			TEST_ASSERT(innerTest->has("int"));
+			TEST_ASSERT(innerTest->getInt("int") == 1);
 
-			TEST_ASSERT(innerTest->getString("string").compare("test") == 0);
+			TEST_ASSERT(strcmp(innerTest->getString("string"), "test") == 0);
 
-			TEST_ASSERT(innerTest->getString("char*").compare("char*") == 0);
+			TEST_ASSERT(strcmp(innerTest->getString("char*"), "char*") == 0);
 
-			TEST_ASSERT(innerTest->getLong("long") != NULL);
-			TEST_ASSERT(*innerTest->getLong("long") == 1L);
+			TEST_ASSERT(innerTest->has("long"));
+			TEST_ASSERT(innerTest->getLong("long") == 1L);
 
-			TEST_ASSERT(innerTest->getDouble("double") != NULL);
-			TEST_ASSERT(*innerTest->getDouble("double") == 1.1);
+			TEST_ASSERT(innerTest->has("long64"));
+			TEST_ASSERT(innerTest->getLong("long64") == 10000000000000L);
+
+			TEST_ASSERT(innerTest->has("double"));
+			TEST_ASSERT(innerTest->getDouble("double") == 1.1);
 
 			fis->close();
 		}
@@ -311,9 +418,9 @@ class TestFileSystemSuite: public Test::Suite
 				BSONObj* obj = new BSONObj();
 				// Add in
 				obj->add("int", 1);
-				obj->add("string", std::string("test"));
+				obj->add("string", (char*)"test");
 				obj->add("char*", (char*)"char*");
-				obj->add("long", 1L);
+				obj->add("long", (__int64)1L);
 				obj->add("double", 1.1);
 
 				elements.push_back(obj);
@@ -326,23 +433,23 @@ class TestFileSystemSuite: public Test::Suite
 			std::auto_ptr<FileInputStream> fis(new FileInputStream("bson.txt", "rb"));
 			std::auto_ptr<BSONInputStream> bsonIn(new BSONInputStream(fis.get()));
 
-			std::vector<BSONObj*>* result = bsonIn->readBSONArray();
+			BSONArrayObj* result = bsonIn->readBSONArray();
 
-			TEST_ASSERT(result->size() == 10);
-			for (std::vector<BSONObj*>::const_iterator i = result->begin(); i != result->end(); i++) {
+			TEST_ASSERT(result->length() == 10);
+			for (BSONArrayObj::iterator i = result->begin(); i != result->end(); i++) {
 				BSONObj* obj = *i;
-				TEST_ASSERT(obj->getInt("int") != NULL);
-				TEST_ASSERT(*obj->getInt("int") == 1);
+				TEST_ASSERT(obj->has("int"));
+				TEST_ASSERT(obj->getInt("int") == 1);
 
-				TEST_ASSERT(obj->getString("string").compare("test") == 0);
+				TEST_ASSERT(strcmp(obj->getString("string"), "test") == 0);
 
-				TEST_ASSERT(obj->getString("char*").compare("char*") == 0);
+				TEST_ASSERT(strcmp(obj->getString("char*"), "char*") == 0);
 
-				TEST_ASSERT(obj->getLong("long") != NULL);
-				TEST_ASSERT(*obj->getLong("long") == 1L);
+				TEST_ASSERT(obj->has("long"));
+				TEST_ASSERT(obj->getLong("long") == 1L);
 
-				TEST_ASSERT(obj->getDouble("double") != NULL);
-				TEST_ASSERT(*obj->getDouble("double") == 1.1);
+				TEST_ASSERT(obj->has("double"));
+				TEST_ASSERT(obj->getDouble("double") == 1.1);
 
 			}
 
@@ -350,6 +457,78 @@ class TestFileSystemSuite: public Test::Suite
 			delete result;
 		}
 
+		void testBSONBufferedArray() {
+			cout << "\ntestBSONBufferedArray" << endl;
+
+			MemoryStream ms;
+			BSONArrayObj array;
+			BSONObj* o1 = BSONParser::parse("{ 'a': 1}");
+			array.add(*o1);
+			BSONObj* o2 = BSONParser::parse("{ 'a': 2}");
+			array.add(*o1);
+
+			BSONOutputStream bos(&ms);
+			bos.writeBSONArray(&array);
+
+			char* c = ms.toChars();
+
+			BSONBufferedArrayObj bufferedarray(c, ms.size());
+
+			TEST_ASSERT(bufferedarray.length() == 2);
+
+		}
+
+		void testBSONBuffered() {
+			cout << "\ntestBSONBuffered\n" << endl;
+
+			MemoryStream ms;
+			BSONObj o;
+			o.add("int", 10);
+			o.add("long", (__int64)1000000);
+			o.add("char", "Test Char");
+			o.add("double", 2.14159);
+
+			BSONObj inner;
+			inner.add("name", "John");
+			inner.add("int", 1);
+			o.add("inner", inner);
+
+			BSONArrayObj array;
+			BSONObj* o1 = BSONParser::parse("{ 'a': 1}");
+			array.add(*o1);
+			BSONObj* o2 = BSONParser::parse("{ 'a': 2}");
+			array.add(*o2);
+			o.add("array", array);
+
+			delete o1;
+			delete o2;
+
+			BSONOutputStream bos(&ms);
+			bos.writeBSON(o);
+
+			char* c = ms.toChars();
+
+			BSONBufferedObj buffered(c, ms.size());
+
+			TEST_ASSERT(buffered.getInt("int") == 10);
+			TEST_ASSERT(buffered.getLong("long") == (__int64)1000000);
+			TEST_ASSERT(strcmp(buffered.getString("char"), "Test Char") == 0);
+			TEST_ASSERT(buffered.getDouble("double") == (double)2.14159);
+
+			BSONObj* or2 = buffered.select("$'int', $'long'");
+			TEST_ASSERT(or2->getInt("int") == 10);
+			TEST_ASSERT(or2->getLong("long") == (__int64)1000000);
+
+			BSONBufferedArrayObj* arrayR = (BSONBufferedArrayObj*)buffered.getBSONArray("array");
+			TEST_ASSERT(arrayR->length() == 2);
+			BSONBufferedObj* obj1 = (BSONBufferedObj*)arrayR->get(0);
+			TEST_ASSERT(obj1->getInt("a") == 1);
+			BSONBufferedObj* obj2 = (BSONBufferedObj*)arrayR->get(1);
+			TEST_ASSERT(obj2->getInt("a") == 2);
+
+			free(c);
+			delete or2;
+		}
 };
 
 enum OutputType

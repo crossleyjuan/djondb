@@ -15,14 +15,14 @@ class Structure
     public:
         Structure();
         virtual ~Structure();
-        void add(t_keytype name);
+        void add(std::string name);
 
         long crc();
 
     protected:
     private:
         long _id; // CRC Code
-        vector<t_keytype> _elements;
+        vector<std::string> _elements;
 };
 
 

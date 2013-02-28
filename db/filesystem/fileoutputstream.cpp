@@ -17,10 +17,12 @@
 // *********************************************************************************************************************
 
 #include "fileoutputstream.h"
+#include "util.h"
 #include <string.h>
 #include <cstdio>
 #include <iostream>
 #include <boost/crc.hpp>
+#include <limits.h>
 
 FileOutputStream::FileOutputStream(char* fileName, const char* flags) {
     _pFile = fopen(fileName, flags);
@@ -29,7 +31,6 @@ FileOutputStream::FileOutputStream(char* fileName, const char* flags) {
 
 FileOutputStream::~FileOutputStream() {
     close();
-    free(_pFile);
 }
 
 bool FileOutputStream::isOpen() const {
@@ -43,95 +44,100 @@ void FileOutputStream::writeChar (unsigned char v)
 }
 
 /* Write 2 bytes in the output (little endian order) */
-void FileOutputStream::writeShortInt (short int v)
+void FileOutputStream::writeShortInt (__int16 v)
 {
-    unsigned char c = (v & 255);
-    unsigned char c2= ((v >> 8) & 255);
-    writeChar (c);
-    writeChar (c2);
+	writeData<__int16>(v);
 }
 
 /* Write 4 bytes in the output (little endian order) */
-void FileOutputStream::writeInt (int v)
+void FileOutputStream::writeInt (__int32 v)
 {
-    writeShortInt ((v) & 0xffff);
-    writeShortInt ((v >> 16) & 0xffff);
+	writeData<__int32>(v);
 }
 
 /* Write 4 bytes in the output (little endian order) */
-void FileOutputStream::writeLong (long v)
+void FileOutputStream::writeLong (__int64 v)
 {
-    writeShortInt ((v) & 0xffff);
-    writeShortInt ((v >> 16) & 0xffff);
+	writeData<__int64>(v);
+}
+
+/* Write 8 bytes in the output (little endian order) */
+void FileOutputStream::writeLong64 (__LONG64 v)
+{
+	writeData<__LONG64>(v);
 }
 
 /* Write a 4 byte float in the output */
 void FileOutputStream::writeFloatIEEE (float v)
 {
-    fwrite(&v, 1, sizeof(v), _pFile);
+	fwrite(&v, 1, sizeof(v), _pFile);
 }
 
 /* Write a 8 byte double in the output */
 void FileOutputStream::writeDoubleIEEE (double v)
 {
-    fwrite(&v, 1, sizeof(v), _pFile);
+	fwrite(&v, 1, sizeof(v), _pFile);
 }
 
-void FileOutputStream::writeChars(const char *text, int len) {
-    writeInt(len);
-    fwrite(text, 1, len, _pFile);
+void FileOutputStream::writeChars(const char *text, __int32 len) {
+	writeInt(len);
+	fwrite(text, 1, len, _pFile);
 }
 
 void FileOutputStream::writeString(const std::string& text) {
-    const char* c = text.c_str();
-    int l = strlen(c);
-    writeChars(c, l);
+	const char* c = text.c_str();
+	__int32 l = strlen(c);
+	writeChars(c, l);
 }
 
-long FileOutputStream::crc32(int pos) {
-    fflush(_pFile);
-    long originalPos = currentPos();
-    fseek(_pFile, 0, SEEK_END);
-    int bufferSize = currentPos();
-    bufferSize -= pos;
-    seek(pos);
+__int64 FileOutputStream::crc32(__int32 pos) {
+	fflush(_pFile);
+	__int64 originalPos = currentPos();
+	fseek(_pFile, 0, SEEK_END);
+	__int64 bufferSize = currentPos();
+	bufferSize -= pos;
+	seek(pos);
 
-    char* buffer = (char*)malloc(bufferSize+1);
-    memset(buffer, 0, bufferSize + 1);
-    fread(buffer, 1, bufferSize, _pFile);
+	char* buffer = (char*)malloc(bufferSize+1);
+	memset(buffer, 0, bufferSize + 1);
+	fread(buffer, 1, bufferSize, _pFile);
 
-    boost::crc_32_type crc;
-    crc.process_bytes(buffer, bufferSize);
-    long result = crc.checksum();
-    std::cout << "CRC: Output" << result << std::endl;
+	boost::crc_32_type crc;
+	crc.process_bytes(buffer, bufferSize);
+	__int64 result = crc.checksum();
+	std::cout << "CRC: Output" << result << std::endl;
 
-    // back to the original position
-    seek(originalPos);
+	// back to the original position
+	seek(originalPos);
 	free(buffer);
-    return result;
+	return result;
 }
 
-void FileOutputStream::seek(long i) {
-    fflush(_pFile);
-    fseek (_pFile, i, SEEK_SET);
+void FileOutputStream::seek(__int64 i, SEEK_DIRECTION direction) {
+	fflush(_pFile);
+	if (direction == FROMSTART_SEEK) {
+		fseek (_pFile, i, SEEK_SET);
+	} else {
+		fseek (_pFile, i, SEEK_END);
+	}
 }
 
-long FileOutputStream::currentPos() const {
-    return ftell(_pFile);
+__int64 FileOutputStream::currentPos() const {
+	return ftell(_pFile);
 }
 
 void FileOutputStream::close() {
-    if (_pFile) {
-        flush();
-        fclose(_pFile);
-        _pFile = 0;
-    }
+	if (_pFile) {
+		flush();
+		fclose(_pFile);
+		_pFile = 0;
+	}
 }
 
 void FileOutputStream::flush() {
-    fflush(_pFile);
+	fflush(_pFile);
 }
 
 const char* FileOutputStream::fileName() const {
-    return _fileName;
+	return _fileName;
 }

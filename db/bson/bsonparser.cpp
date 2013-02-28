@@ -21,10 +21,12 @@
 #include "bsonobj.h"
 #include "bsonarrayobj.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
 
 struct BSONStruct {
 	char* name;
-	int type;
+	__int32 type;
 	void* value; struct BSONStruct* next;
 };
 
@@ -58,15 +60,15 @@ BSONObj* convertStruct(struct BSONStruct* param) {
 	BSONStruct* head = s;
 	while (s != NULL) {
 		std::string name(s->name);
-		int type = s->type;
+		__int32 type = s->type;
 		void* value = s->value;
-		int* val;
+		__int32* val;
 		float* val2;
 		char* val3;
 		BSONObj* inner;
 		switch (type) {
 			case 1:
-				val = (int*)value;
+				val = (__int32*)value;
 				obj->add(name, *val);
 				break;
 			case 2:
@@ -89,19 +91,19 @@ BSONObj* convertStruct(struct BSONStruct* param) {
 	return obj;
 }
 
-BSONObj* BSONParser::parseBSON(const char* c, int& pos) {
+BSONObj* BSONParser::parseBSON(const char* c, __int32& pos) throw(BSONException) {
 	BSONObj* res = new BSONObj();
-	int state = 0; // 0 - nothing, 1 - name, 2- value
-	int lenBuffer = strlen(c);
+	__int32 state = 0; // 0 - nothing, 1 - name, 2- value
+	__int32 lenBuffer = strlen(c);
 	char* buffer = (char*)malloc(lenBuffer);
 	char* name = NULL;
 	void* value = NULL;
-	int len = 0;
+	__int32 len = 0;
 	BSONTYPE type;
-	int stringOpen = 0; // 0 - closed
+	__int32 stringOpen = 0; // 0 - closed
 	// 1 - Single quote opened
 	// 2 - Double quote opened	
-	int x;
+	__int32 x;
 	for (x= pos; x < strlen(c); x++) {
 		if (c[x] == '{') {
 			if (state == 2) {
@@ -110,7 +112,7 @@ BSONObj* BSONParser::parseBSON(const char* c, int& pos) {
 			} else if (state == 0) {
 				memset(buffer, 0, lenBuffer);
 				state = 1;// name
-				type = INT_TYPE;
+				type = LONG64_TYPE;
 			} else { // state == 1
 				throw "json value is not allowed as name";
 			}
@@ -131,10 +133,30 @@ BSONObj* BSONParser::parseBSON(const char* c, int& pos) {
 				memset(buffer, 0, lenBuffer);
 				switch (type) {
 					case INT_TYPE:{
-										  int iVal = atoi((char*)value);
+										  __int32 iVal = atoi((char*)value);
 										  res->add(name, iVal);
 										  break;
 									  }
+					case LONG_TYPE: {
+												__int64 lVal = atol((char*)value);
+												res->add(name, lVal);
+												break;
+											}
+					case LONG64_TYPE: {
+#ifdef WINDOWS
+												__LONG64 lVal = _atoi64((char*)value);
+#else
+												__LONG64 lVal = atoll((char*)value);
+#endif
+												if (lVal <= INT_MAX) {
+													res->add(name, (__int32)lVal);
+												} else if (lVal <= LONG_MAX) {
+													res->add(name, (__int64)lVal);
+												} else {
+													res->add(name, lVal);
+												}
+												break;
+											}
 					case DOUBLE_TYPE: {
 												double dVal = atof((char*)value);
 												res->add(name, dVal);
@@ -169,7 +191,7 @@ BSONObj* BSONParser::parseBSON(const char* c, int& pos) {
 					break;
 				else {
 					state = 1; // name
-					type = INT_TYPE;
+					type = LONG64_TYPE;
 					continue;
 				}
 			}
@@ -182,7 +204,7 @@ BSONObj* BSONParser::parseBSON(const char* c, int& pos) {
 			memset(buffer, 0, lenBuffer);
 			state = 2; //value
 			// default type
-			type = INT_TYPE;
+			type = LONG64_TYPE;
 		} else {
 			if (c[x] == '\'' || (c[x] == '\"')) {
 				// Collect all the characters
@@ -190,7 +212,7 @@ BSONObj* BSONParser::parseBSON(const char* c, int& pos) {
 				char stringChar = c[x];
 				bool escaped = false;
 				x++;
-				int startPos = x;
+				__int32 startPos = x;
 				while ((x < strlen(c)) && ((c[x] != stringChar) || (escaped))) {
 					if (c[x] == '\\') {
 						escaped = true;
@@ -205,7 +227,7 @@ BSONObj* BSONParser::parseBSON(const char* c, int& pos) {
 					char c[100];
 					sprintf(c, "An error ocurred parsing the bson. Error: unclosed string at %d",  startPos);
 
-					throw new BSONParseException(c);
+					throw new BSONException(c);
 				}
 				continue;
 			}
@@ -231,11 +253,11 @@ BSONObj* BSONParser::parseBSON(const char* c, int& pos) {
 }
 
 BSONArrayObj* BSONParser::parseArray(const std::string& sbson) {
-	int pos = 0;
+	__int32 pos = 0;
 	return parseArray(sbson.c_str(), pos);
 }
 
-BSONArrayObj* BSONParser::parseArray(const char* chrs, int& pos) {
+BSONArrayObj* BSONParser::parseArray(const char* chrs, __int32& pos) {
 	BSONArrayObj* result = NULL;
 	while (chrs[pos] == ' ') {
 		pos++;

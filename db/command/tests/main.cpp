@@ -26,6 +26,7 @@
 #include "commandreader.h"
 #include "insertcommand.h"
 #include "updatecommand.h"
+#include "removecommand.h"
 #include "findcommand.h"
 #include "dropnamespacecommand.h"
 #include "showdbscommand.h"
@@ -40,6 +41,7 @@ class TestCommandSuite: public Test::Suite {
 		TestCommandSuite() {
 			TEST_ADD(TestCommandSuite::testInsertCommand);	
 			TEST_ADD(TestCommandSuite::testUpdateCommand);	
+			TEST_ADD(TestCommandSuite::testRemoveCommand);	
 			TEST_ADD(TestCommandSuite::testFindCommand);	
 			TEST_ADD(TestCommandSuite::testDropnamespaceCommand);	
 			TEST_ADD(TestCommandSuite::testShownamespacesCommand);	
@@ -53,7 +55,7 @@ class TestCommandSuite: public Test::Suite {
 			cmd.setDB("testdb");
 			cmd.setNameSpace("test.namespace.db");
 			BSONObj obj;
-			obj.add("name", std::string("Cross"));
+			obj.add("name", "Cross");
 			obj.add("age", 18);
 			cmd.setBSON(obj);
 
@@ -72,7 +74,7 @@ class TestCommandSuite: public Test::Suite {
 			BSONObj* objResult = rdCmd->bson();
 			TEST_ASSERT(objResult != NULL);
 			TEST_ASSERT(objResult->has("name"));	
-			TEST_ASSERT(objResult->getString("name").compare("Cross") == 0);
+			TEST_ASSERT(strcmp(objResult->getString("name"), "Cross") == 0);
 		}
 
 		void testShowdbs() {
@@ -135,9 +137,9 @@ class TestCommandSuite: public Test::Suite {
 			cmd.setNameSpace("test.namespace.db");
 			BSONObj obj;
 			std::string* uid = uuid();
-			obj.add("_id", *uid);
+			obj.add("_id", const_cast<char*>(uid->c_str()));
 			delete uid;
-			obj.add("name", std::string("Cross"));
+			obj.add("name", "Cross");
 			obj.add("age", 18);
 			cmd.setBSON(obj);
 
@@ -156,7 +158,39 @@ class TestCommandSuite: public Test::Suite {
 			BSONObj* objResult = rdCmd->bson();
 			TEST_ASSERT(objResult  != NULL);
 			TEST_ASSERT(objResult->has("name"));	
-			TEST_ASSERT(objResult->getString("name").compare("Cross") == 0);
+			TEST_ASSERT(strcmp(objResult->getString("name"), "Cross") == 0);
+		}
+
+		void testRemoveCommand() {
+			FileOutputStream* fos = new FileOutputStream("test.dat", "wb");
+
+			CommandWriter* commandWriter = new CommandWriter(fos);
+			RemoveCommand cmd;
+			cmd.setDB("testdb");
+			cmd.setNameSpace("test.namespace.db");
+			std::string* uid = uuid();
+			cmd.setId(*uid);
+			std::string* revision = uuid();
+			cmd.setRevision(*revision);
+
+			commandWriter->writeCommand(&cmd);
+
+			fos->close();
+			delete fos;
+			delete commandWriter;
+
+			FileInputStream* fis = new FileInputStream("test.dat", "rb");
+			CommandReader* reader = new CommandReader(fis);
+			RemoveCommand* rdCmd = (RemoveCommand*) reader->readCommand();
+			TEST_ASSERT(rdCmd != NULL);
+			TEST_ASSERT(rdCmd->nameSpace()->compare("test.namespace.db") == 0);
+			TEST_ASSERT(rdCmd->DB()->compare("testdb") == 0);
+			TEST_ASSERT(rdCmd->id()->compare(*uid) == 0);
+			TEST_ASSERT(rdCmd->revision()->compare(*revision) == 0);
+
+			delete fis;
+			delete reader;
+			delete rdCmd;
 		}
 
 		void testFindCommand() {

@@ -48,7 +48,7 @@ BSONArrayObj::BSONArrayObj(const BSONArrayObj& orig) {
 	}
 }
 
-int BSONArrayObj::length() const {
+__int32 BSONArrayObj::length() const {
 	return _elements.size();
 }
 
@@ -56,7 +56,7 @@ void BSONArrayObj::add(const BSONObj& obj) {
 	_elements.push_back(new BSONObj(obj));
 }
 
-BSONObj* BSONArrayObj::get(int index) const {
+BSONObj* BSONArrayObj::get(__int32 index) const {
 	return _elements.at(index);
 }
 

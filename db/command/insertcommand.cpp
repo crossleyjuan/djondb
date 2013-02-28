@@ -23,6 +23,7 @@
 #include "dbcontroller.h"
 #include "inputstream.h"
 #include "outputstream.h"
+#include <memory>
 
 InsertCommand::InsertCommand()
     : Command(INSERT)

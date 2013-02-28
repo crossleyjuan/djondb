@@ -24,8 +24,11 @@
 #include "shutdowncommand.h"
 #include "shownamespacescommand.h"
 #include "showdbscommand.h"
+#include "removecommand.h"
 #include "bsoninputstream.h"
 #include "util.h"
+#include <memory>
+#include <assert.h>
 
 CommandReader::CommandReader(InputStream* is)
 {
@@ -57,8 +60,6 @@ InsertCommand* parseInsert(InputStream* is)  {
     BSONObj* obj = bsonis->readBSON();
     command->setBSON(*obj);
 	 
-	 delete log;
-
     delete ns;
     delete db;
     delete obj;
@@ -111,6 +112,24 @@ UpdateCommand* parseUpdate(InputStream* is)  {
     delete ns;
     delete db;
     delete obj;
+    return command;
+}
+
+RemoveCommand* parseRemove(InputStream* is)  {
+    RemoveCommand* command = new RemoveCommand();
+    std::string* db = is->readString();
+    command->setDB(*db);
+    std::string* ns = is->readString();
+    command->setNameSpace(*ns);
+    std::string* id = is->readString();
+    command->setId(*id);
+    std::string* revision = is->readString();
+    command->setRevision(*revision);
+
+    delete ns;
+    delete db;
+    delete id;
+    delete revision;
     return command;
 }
 
@@ -174,12 +193,14 @@ Command* CommandReader::readCommand() {
         case SHOWNAMESPACES: // Shownamepsaces
 				cmd = parseShownamespacesCommand(_stream);
             break;
+        case REMOVE: // Remove
+				cmd = parseRemove(_stream);
+            break;
         default:
             cout << "unknown command type " << type << endl;
             break;
     }
     assert(cmd != NULL);
-	 delete log;
     return cmd;
 }
 

@@ -23,6 +23,7 @@
 #include "outputstream.h"
 #include "bsoninputstream.h"
 #include "dbcontroller.h"
+#include <memory>
 
 UpdateCommand::UpdateCommand()
     : Command(UPDATE)

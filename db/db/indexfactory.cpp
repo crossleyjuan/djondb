@@ -111,6 +111,37 @@ IndexAlgorithm* IndexFactory::findIndex(const listAlgorithmsTypePtr& algs, const
 	return result;
 }
 
+void IndexFactory::dropIndex(const listAlgorithmsTypePtr& algs, const std::set<std::string>& keys) {
+	IndexAlgorithm* result = NULL;
+
+	for (listAlgorithmsType::iterator i = algs->begin(); i != algs->end(); i++) {
+		IndexAlgorithm* impl = *i;
+		std::set<std::string> implKeys = impl->keys();
+
+		std::set<std::string>::const_iterator iKeys = keys.begin();
+		std::set<std::string>::const_iterator implItKeys = implKeys.begin();
+
+		while (true) {
+			if ((iKeys != keys.end()) && (implItKeys != implKeys.end())) {
+				std::string key1 = *iKeys;
+				std::string key2 = *implItKeys;
+
+				if (key1.compare(key2) != 0) {
+					break;
+				}
+				iKeys++;
+				implItKeys++;
+				// get to the end of both sides and all the keys are equal
+				if ((iKeys == keys.end()) && (implItKeys == implKeys.end())) {
+					algs->erase(i);
+					delete impl;
+					break;
+				}
+			}
+		}
+	}
+}
+
 bool IndexFactory::containsIndex(const char* db, const char* ns, const std::set<std::string>& keys) {
 	bool result = false;
 	listByDbType::const_iterator itIndexes = _indexes.find(std::string(db));
@@ -135,8 +166,8 @@ IndexAlgorithm* IndexFactory::index(const char* db, const char* ns, const std::s
 	return index(db, ns, skeys);
 }
 
-IndexAlgorithm* IndexFactory::index(const char* db, const char* ns, const std::set<std::string>& keys) {
-	listByDbType::iterator itIndexesByDB = _indexes.find(db);
+listAlgorithmsTypePtr IndexFactory::findAlgorithms(const char* db, const char* ns) {
+	listByDbType::iterator itIndexesByDB = _indexes.find(std::string(db));
 	listByNSTypePtr indexesByNs;
 	if (itIndexesByDB == _indexes.end()) {
 		indexesByNs = new listByNSType();
@@ -155,6 +186,12 @@ IndexAlgorithm* IndexFactory::index(const char* db, const char* ns, const std::s
 		algorithms = itNs->second;
 	}
 
+	return algorithms;
+}
+
+IndexAlgorithm* IndexFactory::index(const char* db, const char* ns, const std::set<std::string>& keys) {
+	listAlgorithmsTypePtr algorithms = findAlgorithms(db, ns);
+
 	IndexAlgorithm* indexImpl = findIndex(algorithms, keys);
 	if (indexImpl == NULL) {
 		indexImpl = new BPlusIndex(keys);
@@ -162,4 +199,46 @@ IndexAlgorithm* IndexFactory::index(const char* db, const char* ns, const std::s
 	}
 
 	return indexImpl;
+}
+
+void IndexFactory::dropIndex(const char* db, const char* ns, const std::string& key) {
+	std::set<std::string> skeys;
+	skeys.insert(key);
+	dropIndex(db, ns, skeys);
+}
+
+void IndexFactory::dropIndex(const char* db, const char* ns, const std::set<std::string>& keys) {
+	listAlgorithmsTypePtr algorithms = findAlgorithms(db, ns);
+
+	dropIndex(algorithms, keys);
+	
+}
+
+
+void IndexFactory::dropIndexes(const char* db, const char* ns) {
+
+	listByDbType::iterator itIndexesByDB = _indexes.find(std::string(db));
+	listByNSTypePtr indexesByNs;
+	if (itIndexesByDB == _indexes.end()) {
+		indexesByNs = new listByNSType();
+		_indexes.insert(pair<std::string, listByNSTypePtr >(std::string(db), indexesByNs));
+	} else {
+		indexesByNs = itIndexesByDB->second;
+	}
+
+	listByNSType::iterator itNs = indexesByNs->find(std::string(ns));
+
+	listAlgorithmsTypePtr algorithms;
+	if (itNs != indexesByNs->end()) {
+		algorithms = itNs->second;
+	} else {
+		return;
+	}
+
+	for (listAlgorithmsType::iterator i = algorithms->begin(); i != algorithms->end(); i++) {
+		IndexAlgorithm* impl = *i;
+		delete impl;
+	}
+	algorithms->clear();
+	indexesByNs->erase(itNs);
 }

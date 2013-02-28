@@ -29,3 +29,16 @@ using the support group https://groups.google.com/forum/#!forum/djondb-support o
 at the right hand of the djondb.com site.
 
 
+Compiling
+---------
+
+To do the compilation you will need the following dependencies:
+
+antlr3c Ant C runtime 3.2
+google v8 javascript engine
+boost libraries
+
+to compile the google v8 use:
+
+make --component=shared native
+

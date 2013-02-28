@@ -1,5 +1,12 @@
 #!/bin/sh
 
+while getopts j:d:u o
+   do case "$o" in
+		d)  DIR="$OPTARG";;
+		\?)  echo "Usage: $0 -d dist_dir" && exit 1;;
+	esac
+done
+
 ## find packages
 ## dpkg -S 
 
@@ -20,3 +27,10 @@ strip --strip-unneeded debian/usr/lib/*.so*
 fakeroot dpkg-deb --build debian djondb.deb
 lintian djondb.deb
 
+debfile="djondb_`uname`_`uname -i`.deb"
+mv djondb.deb $debfile
+
+if [ ! -z "${DIR}" ]; 
+then
+	cp $debfile $DIR
+fi

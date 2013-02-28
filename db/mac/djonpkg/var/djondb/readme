@@ -1,0 +1,3 @@
+djondb datafiles are going to be stored here.
+
+If you're running djondbd you will need write permissions on this folder

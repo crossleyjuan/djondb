@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="djondb_win"
 	ProjectGUID="{6CE5F68C-E601-4021-9E44-5A0575BC87D2}"
 	RootNamespace="djondb_win"
@@ -11,6 +11,9 @@
 	<Platforms>
 		<Platform
 			Name="Win32"
+		/>
+		<Platform
+			Name="x64"
 		/>
 	</Platforms>
 	<ToolFiles>
@@ -63,10 +66,85 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="util.lib pthreadVC2.lib Rpcrt4.lib Ws2_32.lib antlr3c.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="../windows/lib;../windows/libs;../windows/libs/x86;../third_party/libs"
+				AdditionalLibraryDirectories="../windows/libs;../windows/libs/x86;../third_party/libs/$(PlatformName)"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Debug|x64"
+			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories="../util;../service;../windows/includes"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="util.lib pthreadVC2.lib Rpcrt4.lib Ws2_32.lib antlr3c.lib"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories="../windows/libs;../windows/libs/x86;../third_party/libs/$(PlatformName)"
+				GenerateDebugInformation="true"
+				SubSystem="1"
+				TargetMachine="17"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -138,12 +216,94 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="util.lib pthreadVC2.lib Rpcrt4.lib Ws2_32.lib antlr3c.lib"
 				LinkIncremental="1"
+<<<<<<< HEAD
 				AdditionalLibraryDirectories="../windows/lib;../windows/libs;../windows/libs/x86;../third_party/libs"
+=======
+				AdditionalLibraryDirectories="../windows/libs;../windows/libs/x86;../third_party/libs/$(PlatformName)"
+>>>>>>> a50efd3529ab5a9e331b3f4b4723487ce73ba405
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|x64"
+			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="1"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="2"
+				EnableIntrinsicFunctions="true"
+				AdditionalIncludeDirectories="../util;../service;../windows/includes"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="util.lib pthreadVC2.lib Rpcrt4.lib Ws2_32.lib antlr3c.lib"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="../windows/libs;../windows/libs/x86;../third_party/libs/$(PlatformName)"
+				GenerateDebugInformation="true"
+				SubSystem="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				TargetMachine="17"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -200,6 +360,14 @@
 		<ProjectReference
 			ReferencedProjectIdentifier="{62FF06CD-7090-4A69-9CAE-21470F09B447}"
 			RelativePathToProject="..\cache\cache.vcproj"
+		/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{0F0FE03A-78F3-4B34-9DCE-0CDFF1FB5C40}"
+			RelativePathToProject="..\third_party\libantlr3c-3.2\Ctem.vcproj"
+		/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{170ACC28-1420-4318-91CE-441706C8A3AD}"
+			RelativePathToProject="..\third_party\pthreads.2\pthread.vcproj"
 		/>
 	</References>
 	<Files>

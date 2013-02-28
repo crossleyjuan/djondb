@@ -20,6 +20,7 @@
 #include "djondb_client.h"
 #include <unistd.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 using namespace std; 
 using namespace djondb;
@@ -31,7 +32,7 @@ class TestPerfomance {
 		}
 
 		void testPerfomance(int port, int top = 10000000) {
-			Connection* conn = ConnectionManager::getConnection("localhost", port);
+			DjondbConnection* conn = DjondbConnectionManager::getConnection("localhost", port);
 
 			if (!conn->open()) {
 				cout << "Not connected" << endl;
@@ -49,16 +50,15 @@ class TestPerfomance {
 				}
 				cout << "Testing performance over: " << tests[i] << " inserts" << endl;
 				for (int x = 0; x < tests[i]; x++) {
-					std::string* uid = uuid();
 					BSONObj obj;
 					char* text = (char*)malloc(1001);
 					memset(text, 0, 1001);
 					memset(text, 'a', 1000);
 
+					obj.add("t", x);
+
 					obj.add("text", text);
 
-					obj.add("_id", *uid);
-					delete uid;
 					conn->insert("db", "test.performance", obj);
 					free(text);
 				}
@@ -78,7 +78,7 @@ class TestPerfomance {
 				}
 			}
 
-			conn->shutdown();
+//			conn->shutdown();
 
 			conn->close();
 

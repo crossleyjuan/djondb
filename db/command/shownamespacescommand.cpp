@@ -26,6 +26,7 @@ ShownamespacesCommand::ShownamespacesCommand()
     : Command(SHOWNAMESPACES)
 {
 	_results = NULL;
+	_db = NULL;
 }
 
 ShownamespacesCommand::ShownamespacesCommand(const ShownamespacesCommand& orig)
@@ -37,9 +38,14 @@ ShownamespacesCommand::ShownamespacesCommand(const ShownamespacesCommand& orig)
 			this->_results->push_back(*i);
 		}
 	}
+	this->_db = NULL;
+	if (orig._db != NULL) {
+		this->_db = new std::string(*orig._db);
+	}
 }
 
 ShownamespacesCommand::~ShownamespacesCommand() {
+	if (_db != NULL) delete _db;
 }
 
 void ShownamespacesCommand::execute() {

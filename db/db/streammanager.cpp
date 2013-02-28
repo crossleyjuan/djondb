@@ -16,7 +16,12 @@
  * =====================================================================================
  */
 #include "streammanager.h"
+#include "dbfilestream.h"
+#include "fileinputoutputstream.h"
 #include "fileoutputstream.h"
+#include "bsoninputstream.h"
+#include "bsonoutputstream.h"
+#include "fileinputstreamw32.h"
 #include <stdlib.h>
 #include <memory>
 #include <cstring>
@@ -32,10 +37,10 @@ StreamManager* StreamManager::getStreamManager() {
 
 StreamManager::StreamManager() {
 	_logger = getLogger(NULL);
+	_initializing = false;
 }
 
 StreamManager::~StreamManager() {
-	delete _logger;
 }
 
 void StreamManager::setDataDir(const std::string& dataDir) {
@@ -63,8 +68,74 @@ std::string StreamManager::fileName(std::string ns, FILE_TYPE type) const {
 	return result;
 }
 
+StreamType* migrate20121216(StreamType* stream) {
+	stream->close();
+	std::string fileName = stream->fileName();
+	FileInputStreamW32* origStream = new FileInputStreamW32(fileName.c_str(), "rb+");
+	std::string tempDir = getTempDir();
+	std::stringstream sfile;
+	sfile << tempDir;
+	if (!endsWith(tempDir.c_str(), FILESEPARATOR)) {
+		sfile << FILESEPARATOR;
+	}
+	sfile << "tempdb";
+	FILE_TYPE fileType;
+	if (endsWith(fileName.c_str(), ".dat")) {
+		// Data file
+		fileType = DATA_FTYPE;
+		sfile << ".dat";
+	} else if (endsWith(fileName.c_str(), ".idx")) {
+		fileType = INDEX_FTYPE;
+		sfile << ".idx";
+	}
+
+	std::string tempFileName = sfile.str();
+	FileOutputStream* fos = new FileOutputStream(const_cast<char*>(tempFileName.c_str()), "wb+");
+
+	fos->writeChars("djondb_dat", 10);
+	std::string sversion = Version("0.120121216");
+	fos->writeChars(sversion.c_str(), sversion.length());
+	BSONOutputStream bos(fos);
+	BSONInputStream bis(origStream);
+
+	origStream->seek(0);
+	while (!origStream->eof()) {
+		BSONObj* obj = bis.readBSON();
+		bos.writeBSON(*obj);
+		delete obj;
+		if (fileType == INDEX_FTYPE) {
+			__int64 iCurrentPos = origStream->readLong();
+			fos->writeLong(iCurrentPos);
+			__int64 iFilePos = origStream->readLong();
+			fos->writeLong(iFilePos);
+		}
+	}
+
+	fos->close();
+	delete fos;
+	origStream->close();
+
+	removeFile(fileName.c_str());
+	rename(tempFileName.c_str(), fileName.c_str());
+
+	FileInputOutputStream* fios = new FileInputOutputStream(fileName, "rb+");
+	StreamType* result = new StreamType(fios);
+	stream->close();
+	delete stream;
+	delete origStream;
+	return result;
+}
+
+StreamType* StreamManager::checkVersion(StreamType* stream) {
+	StreamType* result = stream;
+	if (*stream->version() < Version("0.120121216")) {
+		stream = migrate20121216(stream);
+	}
+	return stream;
+}
+
 StreamType* StreamManager::open(std::string db, std::string ns, FILE_TYPE type) {
-	std::auto_ptr<Logger> log(getLogger(NULL));
+	Logger* log = getLogger(NULL);
 	StreamType* stream = NULL;
 
 	map<std::string, SpacesType>* spaces = NULL;
@@ -100,7 +171,16 @@ StreamType* StreamManager::open(std::string db, std::string ns, FILE_TYPE type) 
 	}
 	std::string file = fileName(ns, type);
 	std::string streamfile = concatStrings(filedir, file);
-	StreamType* output = new StreamType(streamfile, "ab+");
+	char* flags;
+	if (existFile(streamfile.c_str())) {
+		flags = "rb+";
+	} else {
+		flags = "wb+";
+	}
+	FileInputOutputStream* fios = new FileInputOutputStream(streamfile, flags);
+	StreamType* output;
+	output = new StreamType(fios);
+	output = checkVersion(output);
 	if (streams) {
 		streams->insert(pair<FILE_TYPE, StreamType*>(type, output));
 	} else {
@@ -109,6 +189,10 @@ StreamType* StreamManager::open(std::string db, std::string ns, FILE_TYPE type) 
 		space.streams = new map<FILE_TYPE, StreamType*>();
 		space.streams->insert(pair<FILE_TYPE, StreamType*>(type, output));
 		spaces->insert(pair<std::string, SpacesType>(ns, space));
+	}
+
+	if (!_initializing) {
+		saveDatabases();
 	}
 
 	return output;
@@ -135,8 +219,8 @@ bool StreamManager::close(char* db, char* ns) {
 	return true;
 }
 
-void StreamManager::saveDatabases() {
-	if (_logger->isDebug()) _logger->debug(2, "StreamManager::saveDatabases");
+void StreamManager::closeDatabases() {
+	if (_logger->isDebug()) _logger->debug(2, "StreamManager::closeDatabases");
 
 	std::auto_ptr<FileOutputStream> fos(new FileOutputStream(const_cast<char*>( (_dataDir + "djondb.dat").c_str()), "wb"));
 	for (std::map<std::string, std::map<std::string, SpacesType>* >::iterator idb = _spaces.begin(); idb != _spaces.end(); idb++) {
@@ -158,6 +242,28 @@ void StreamManager::saveDatabases() {
 			delete space.streams;
 		}
 		delete spaces;
+	}
+	fos->close();
+}
+
+void StreamManager::saveDatabases() {
+	if (_logger->isDebug()) _logger->debug(2, "StreamManager::saveDatabases");
+
+	std::auto_ptr<FileOutputStream> fos(new FileOutputStream(const_cast<char*>( (_dataDir + "djondb.dat").c_str()), "wb"));
+	for (std::map<std::string, std::map<std::string, SpacesType>* >::iterator idb = _spaces.begin(); idb != _spaces.end(); idb++) {
+		std::string db = idb->first;
+		std::map<std::string, SpacesType>* spaces = idb->second;
+		for (std::map<std::string, SpacesType>::iterator i = spaces->begin(); i != spaces->end(); i++) {
+			SpacesType space = i->second;
+			std::string ns = space.ns;
+			fos->writeString(db);
+			fos->writeString(ns);
+			fos->writeInt(space.streams->size());
+			for (std::map<FILE_TYPE, StreamType*>::iterator istream = space.streams->begin(); istream != space.streams->end(); istream++) {
+				FILE_TYPE type = istream->first;
+				fos->writeInt(static_cast<int>(type));
+			}
+		}
 	}
 	fos->close();
 }
@@ -185,6 +291,8 @@ bool StreamManager::dropNamespace(char* db, char* ns) {
 				FILE_TYPE type = istream->first;
 				std::string file = fileName(std::string(ns), type);
 
+				StreamType* stream = istream->second;
+				stream->close();
 				// drops the file
 				if (remove((filedir + file).c_str()) != 0) {
 					result = false;
@@ -210,6 +318,10 @@ std::vector<std::string>* StreamManager::dbs() const {
 		result->push_back(db);
 	}
 	return result;
+}
+
+void StreamManager::setInitializing(bool initializing) {
+	_initializing = initializing;
 }
 
 std::vector<std::string>* StreamManager::namespaces(const char* db) const {

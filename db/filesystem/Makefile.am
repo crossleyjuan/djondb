@@ -13,8 +13,13 @@ lib_LTLIBRARIES = libdjon-filesystem.la
 libdjon_filesystem_la_LDFLAGS = -static
 libdjon_filesystem_la_SOURCES = bsoninputstream.cpp \
 										  bsonoutputstream.cpp \
+										  bsonbufferedobj.cpp \
+										  bsonbufferedarrayobj.cpp \
+										  bsonbufferedcontent.hpp \
 										  fileinputoutputstream.cpp \
 										  fileinputstream.cpp \
+										  fileinputstreamw32.cpp \
+										  mmapinputstream.cpp \
 										  fileoutputstream.cpp \
 										  networkinputstream.cpp \
 										  networkoutputstream.cpp \
@@ -22,14 +27,18 @@ libdjon_filesystem_la_SOURCES = bsoninputstream.cpp \
 
 TESTS = test-filesystem
 check_PROGRAMS = test-filesystem
-test_filesystem_LDADD = libdjon-filesystem.la $(top_builddir)/bson/libdjon-bson.la $(top_builddir)/util/libdjon-util.la -lpthread -lX11 -lXss -lcpptest
+test_filesystem_LDADD = libdjon-filesystem.la $(top_builddir)/bson/libdjon-bson.la $(top_builddir)/util/libdjon-util.la -lpthread -lcpptest
 if !MAC
-   test_filesystem_LDADD += -lrt -luuid 
-else
-   test_filesystem_LDFLAGS = -framework CoreFoundation -framework IOKit
+test_filesystem_LDADD += -lrt -luuid 
 endif
 test_filesystem_SOURCES = tests/main.cpp
 
+bin_PROGRAMS = testfile
+testfile_LDADD = libdjon-filesystem.la $(top_builddir)/bson/libdjon-bson.la $(top_builddir)/util/libdjon-util.la -lpthread -lcpptest
+if !MAC
+testfile_LDADD += -lrt -luuid 
+endif
+testfile_SOURCES = tests/testfile.cpp
 
 djon_filesystem_libincludedir = $(libdir)/djon-filesystem-1.0/include
 #nodist_djon_filesystem_libinclude_HEADERS = config.h

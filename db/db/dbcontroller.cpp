@@ -21,7 +21,10 @@
 #include "util.h"
 #include "fileinputoutputstream.h"
 #include "fileinputstream.h"
+#include "bsonbufferedobj.h"
+#include "mmapinputstream.h"
 #include "fileoutputstream.h"
+#include "dbfileinputstream.h"
 
 #include "bsonoutputstream.h"
 #include "bsoninputstream.h"
@@ -36,6 +39,7 @@
 #include <iostream>
 #include <sstream>
 #include <string.h>
+#include <assert.h>
 
 using namespace std;
 
@@ -51,7 +55,7 @@ DBController::~DBController()
 
 void DBController::shutdown() {
 	if (_logger->isInfo()) _logger->info("DBController shutting down");
-	StreamManager::getStreamManager()->saveDatabases();
+	StreamManager::getStreamManager()->closeDatabases();
 	clearCache();
 }
 
@@ -76,7 +80,7 @@ void DBController::initialize() {
 	if ((dataDir.length() > 0) && !endsWith(dataDir.c_str(), FILESEPARATOR)) {
 		dataDir = dataDir + FILESEPARATOR;
 	} else {
-		dataDir = dataDir;
+		dataDir = std::string("\0");
 	}
 
 	initialize(dataDir);
@@ -84,7 +88,7 @@ void DBController::initialize() {
 }
 
 void DBController::initialize(std::string dataDir) {
-	if (_logger->isInfo()) _logger->info("DBController initializing. Data dir");
+	if (_logger->isInfo()) _logger->info("DBController initializing. Data dir: %s", dataDir.c_str());
 
 	_dataDir = dataDir;
 
@@ -100,6 +104,7 @@ void DBController::initialize(std::string dataDir) {
 	}
 
 	StreamManager::getStreamManager()->setDataDir(_dataDir);
+	StreamManager::getStreamManager()->setInitializing(true);
 
 	std::auto_ptr<FileInputStream> fis(new FileInputStream((_dataDir + "djondb.dat").c_str(), "rb"));
 	while (!fis->eof()) {
@@ -114,16 +119,7 @@ void DBController::initialize(std::string dataDir) {
 				long currentPos = stream->currentPos();
 				stream->seek(0);
 
-
-				std::string mark = stream->readChars(10);
-				// check if the file is marked as versioned version (0.1 version does not have this mark)
-				Version dbversion("0.1");
-				if (mark.compare("1234") == 0) {
-					char* version = stream->readChars(11);
-					dbversion = Version(version);
-				} else {
-					stream->seek(0);
-				}
+				int records = 0;
 				IndexAlgorithm* impl = NULL;
 				while (!stream->eof()) {
 					BSONObj* obj = readBSON(stream);
@@ -138,19 +134,25 @@ void DBController::initialize(std::string dataDir) {
 					}
 					long indexPos = stream->readLong();
 					long posData = stream->readLong();
-					impl->add(*obj, obj->getString("_id"), posData, indexPos);
+					if (obj->has("_id")) {
+						impl->add(*obj, obj->getDJString("_id"), posData, indexPos);
+						records++;
+					}
 					delete obj;
 				}
 				stream->seek(currentPos);
+
+				if (_logger->isInfo()) _logger->info("db: %s, ns: %s, Index initialized. Records: %d", db->c_str(), ns->c_str(), records);
 			}
 		}
 	}
 	fis->close();
+	StreamManager::getStreamManager()->setInitializing(false);
 }
 
 long DBController::checkStructure(BSONObj* obj) {
 	Structure* structure = new Structure();
-	for (std::map<t_keytype, BSONContent* >::const_iterator i = obj->begin(); i != obj->end(); i++) {
+	for (std::map<std::string, BSONContent* >::const_iterator i = obj->begin(); i != obj->end(); i++) {
 		structure->add(i->first);
 	}
 
@@ -190,28 +192,23 @@ BSONObj* DBController::insert(char* db, char* ns, BSONObj* obj) {
 		if (_logger->isDebug()) _logger->debug(2, "BSON does not contain an id, DBController is creating one");
 		string* tid = uuid();
 		std::string key("_id");
-		obj->add(key, *tid);
+		obj->add(key, const_cast<char*>(tid->c_str()));
 		result = new BSONObj();
-		result->add("_id", *tid);
+		result->add("_id", const_cast<char*>(tid->c_str()));
 		delete tid;
 	}
 	if (!obj->has("_revision")) {
 		if (_logger->isDebug()) _logger->debug(2, "BSON does not contain revision, DBController is creating one");
 		string* trev = uuid();
 		std::string key("_revision");
-		obj->add(key, *trev);
+		obj->add(key, const_cast<char*>(trev->c_str()));
 		result = new BSONObj();
-		result->add("_revision", *trev);
+		result->add("_revision", const_cast<char*>(trev->c_str()));
 		delete trev;
 	}
 	// _status flag
-	obj->add("_status", 1);
+	obj->add("_status", 1); // Active
 
-	std::string id;
-	if (obj->type("_id") == STRING_TYPE) {
-		id = obj->getString("_id");
-	}
-	assert(id.length() > 0);
 	//    long crcStructure = checkStructure(obj);
 
 	//    char* text = obj->toChar();
@@ -231,36 +228,42 @@ void DBController::update(char* db, char* ns, BSONObj* obj) {
 	if (_logger->isDebug()) _logger->debug(2, "DBController::update ns: %s, bson: %s", ns, obj->toChar());
 	StreamType* streamData = StreamManager::getStreamManager()->open(std::string(db), std::string(ns), DATA_FTYPE);
 
-	//    long crcStructure = checkStructure(obj);
+	Index* index = findIndex(db, ns, obj);
 
-	//    char* text = obj->toChar();
-	//    streamData->writeChars(text, strlen(text));
-	//    free(text);
+	long currentPos = streamData->currentPos();
 
-	updateIndex(db, ns, obj, streamData->currentPos());
+	// Moves to the record to update
+	streamData->seek(index->posData);
+
+	BSONObj* previous = readBSON(streamData);
+	previous->add("_status", 3); // Updated
+
+	streamData->seek(index->posData);
+	writeBSON(streamData, previous);
+
+	// Back to the end of the stream
+	streamData->seek(currentPos);
+
+	updateIndex(db, ns, index, streamData->currentPos());
+
+	obj->add("_status", 1); // Active
 
 	writeBSON(streamData, obj);
 
-	std::string id = obj->getString("_id");
+	//std::string id = obj->getDJString("_id");
 
-	CacheManager::objectCache()->add(id, new BSONObj(*obj));
+	//CacheManager::objectCache()->add(id, new BSONObj(*obj));
 }
 
-void DBController::deleteRecord(char* db, char* ns, const std::string& documentId, const std::string& revision) {
+void DBController::remove(char* db, char* ns, const std::string& documentId, const std::string& revision) {
 	if (_logger->isDebug()) _logger->debug(2, "DBController::update db: %s, ns: %s, documentId: %s, revision: %s", db, ns, documentId.c_str(), revision.c_str());
 	StreamType* streamData = StreamManager::getStreamManager()->open(std::string(db), std::string(ns), DATA_FTYPE);
-
-	//    long crcStructure = checkStructure(obj);
-
-	//    char* text = obj->toChar();
-	//    streamData->writeChars(text, strlen(text));
-	//    free(text);
 
 	IndexAlgorithm* impl = IndexFactory::indexFactory.index(db, ns, "_id");
 
 	BSONObj indexBSON;
-	indexBSON.add("_id", documentId);
-	Index* index = impl->find(indexBSON);
+	indexBSON.add("_id", const_cast<char*>(documentId.c_str()));
+	Index* index = impl->find(&indexBSON);
 	if (index != NULL) {
 
 		// TODO check the revision id
@@ -274,24 +277,31 @@ void DBController::deleteRecord(char* db, char* ns, const std::string& documentI
 		BSONObj* obj = readBSON(out);
 		obj->add("_status", 2); // DELETED
 
+		// Get back to the record start
+		out->seek(index->posData);
 		writeBSON(out, obj);
 
+		// restores the last position
 		out->seek(currentPos);
 
-		std::string id = obj->getString("_id");
+		//std::string id = obj->getDJString("_id");
 
-		CacheManager::objectCache()->add(id, new BSONObj(*obj));
+		//CacheManager::objectCache()->remove(id);
+		delete obj;
 	}
 }
 
-void DBController::updateIndex(char* db, char* ns, BSONObj* bson, long filePos) {
-
+Index* DBController::findIndex(char* db, char* ns, BSONObj* bson) {
 	IndexAlgorithm* impl = IndexFactory::indexFactory.index(db, ns, "_id");
 
 	BSONObj indexBSON;
-	indexBSON.add("_id", bson->getString("_id"));
-	Index* index = impl->find(indexBSON);
+	indexBSON.add("_id", bson->getDJString("_id"));
+	Index* index = impl->find(&indexBSON);
 
+	return index;
+}
+
+void DBController::updateIndex(char* db, char* ns, Index* index, long filePos) {
 	index->posData = filePos;
 
 	StreamType* out = StreamManager::getStreamManager()->open(db, ns, INDEX_FTYPE);
@@ -306,8 +316,8 @@ void DBController::updateIndex(char* db, char* ns, BSONObj* bson, long filePos) 
 
 void DBController::insertIndex(char* db, char* ns, BSONObj* bson, long filePos) {
 	BSONObj indexBSON;
-	std::string id = bson->getString("_id");
-	indexBSON.add("_id", id);
+	djondb::string id = bson->getDJString("_id");
+	indexBSON.add("_id", (char*)id);
 
 	IndexAlgorithm* impl = IndexFactory::indexFactory.index(db, ns, "_id");
 
@@ -320,10 +330,10 @@ void DBController::insertIndex(char* db, char* ns, BSONObj* bson, long filePos) 
 	out->writeLong(filePos);
 }
 
-std::vector<BSONObj*>* DBController::find(char* db, char* ns, const char* select, const char* filter) throw(ParseException) {
+BSONArrayObj* DBController::find(char* db, char* ns, const char* select, const char* filter) throw(ParseException) {
 	if (_logger->isDebug()) _logger->debug(2, "DBController::find db: %s, ns: %s, select: %s, filter: %s", db, ns, select, filter);
 
-	std::vector<BSONObj*>* result;
+	BSONArrayObj* result;
 
 	FilterParser* parser = FilterParser::parse(filter);
 
@@ -341,27 +351,31 @@ std::vector<BSONObj*>* DBController::find(char* db, char* ns, const char* select
 		ss << filedir << ns << ".dat";
 
 		std::string filename = ss.str();
-		result = new std::vector<BSONObj*>();
+		result = new BSONArrayObj();
 		FileInputStream* fis = new FileInputStream(filename.c_str(), "rb");
+		DBFileInputStream* dbStream = new DBFileInputStream(fis);
 
-		BSONInputStream* bis = new BSONInputStream(fis);
+		BSONInputStream* bis = new BSONInputStream(dbStream);
 		for (std::list<Index*>::iterator it = elements.begin(); it != elements.end(); it++) {
 			Index* index = *it;
 
 			long posData = index->posData;
-			fis->seek(posData);
+			dbStream->seek(posData);
 
 			BSONObj* obj = bis->readBSON(select);
 
-			result->push_back(obj);
+			result->add(*obj);
+
+			delete obj;
 		}
 		delete bis;
-		delete fis;
+		delete dbStream;
 
 	} else {
 		result = findFullScan(db, ns, select, parser);
 	}
 
+	delete parser;
 	return result;
 }
 
@@ -375,38 +389,53 @@ BSONObj* DBController::findFirst(char* db, char* ns, const char* select, const c
 
 	std::string filename = ss.str();
 
-	FileInputStream* fis = new FileInputStream(filename.c_str(), "rb");
-	std::vector<BSONObj*> result;
+	// Execute open on streammanager, just to check that the file was alrady opened
+	StreamManager::getStreamManager()->open(db, ns, DATA_FTYPE);
 
-	BSONInputStream* bis = new BSONInputStream(fis);
+	MMapInputStream* mmis = new MMapInputStream(filename.c_str(), "rb");
+	DBFileInputStream* dbStream = new DBFileInputStream(mmis);
+	BSONArrayObj result;
+
+	BSONInputStream* bis = new BSONInputStream(mmis);
 
 	FilterParser* parser = FilterParser::parse(filter);
 
+	BSONBufferedObj* obj = NULL;
 	BSONObj* bsonResult = NULL;
-	while (!fis->eof()) {
-		BSONObj* obj = bis->readBSON();
-
-		ExpressionResult* result = parser->eval(*obj);
-		if (result->type() == ExpressionResult::RT_BOOLEAN) {
-			bool* bres = (bool*)result->value();
-			if (*bres) {
-				bsonResult = obj->select(select);
-				delete obj;
-				break;
-			}
+	mmis->seek(29);
+	while (!mmis->eof()) {
+		if (obj == NULL) {
+			obj = new BSONBufferedObj(mmis->pointer(), mmis->length() - mmis->currentPos());
+		} else {
+			obj->reset(mmis->pointer(), mmis->length() - mmis->currentPos());
 		}
-		delete result;
-		delete obj;
+		mmis->seek(mmis->currentPos() + obj->bufferLength());
+		// Only "active" Records
+		if (obj->getInt("_status") == 1) {
+			ExpressionResult* result = parser->eval(*obj);
+			if (result->type() == ExpressionResult::RT_BOOLEAN) {
+				bool bres = *result;
+				if (bres) {
+					bsonResult = obj->select(select);
+					break;
+				}
+			}
+			delete result;
+		}
 		if (bsonResult) {
 			break;
 		}
 	}
 
+	if (obj != NULL) delete obj;
+	dbStream->close();
+	delete dbStream;
+
 	delete parser;
 	return bsonResult;
 }
 
-std::vector<BSONObj*>* DBController::findFullScan(char* db, char* ns, const char* select, FilterParser* parser) throw(ParseException) {
+BSONArrayObj* DBController::findFullScan(char* db, char* ns, const char* select, FilterParser* parser) throw(ParseException) {
 	if (_logger->isDebug()) _logger->debug(2, "DBController::findFullScan with parser db: %s, ns: %s", db, ns);
 	std::string filedir = _dataDir + db;
 	filedir = filedir + FILESEPARATOR;
@@ -416,31 +445,76 @@ std::vector<BSONObj*>* DBController::findFullScan(char* db, char* ns, const char
 
 	std::string filename = ss.str();
 
-	FileInputStream* fis = new FileInputStream(filename.c_str(), "rb");
-	std::vector<BSONObj*>* result = new std::vector<BSONObj*>();
+	// Execute open on streammanager, just to check that the file was alrady opened
+	StreamManager::getStreamManager()->open(db, ns, INDEX_FTYPE);
+	// Execute open on streammanager, just to check that the file was alrady opened
+	StreamManager::getStreamManager()->open(db, ns, DATA_FTYPE);
+	//FileInputStream* fis = new FileInputStream(filename.c_str(), "rb");
+	MMapInputStream* mmis = new MMapInputStream(filename.c_str(), "rb");
+	DBFileInputStream* dbStream = new DBFileInputStream(mmis);
+	BSONArrayObj* result = new BSONArrayObj();
 
-	BSONInputStream* bis = new BSONInputStream(fis);
+	BSONInputStream* bis = new BSONInputStream(dbStream);
 
-	while (!fis->eof()) {
-		BSONObj* obj = bis->readBSON();
+	std::set<std::string> tokens = parser->xpathTokens();
+	std::string filterSelect;
 
-		bool match = false;
-		ExpressionResult* expresult = parser->eval(*obj);
-		if (expresult->type() == ExpressionResult::RT_BOOLEAN) {
-			bool* bres = (bool*)expresult->value();
-			match = *bres;
+	if (tokens.size() > 0) {
+		// this will reserve enough space to concat the filter tokens
+		filterSelect.reserve(tokens.size() * 100);
+		filterSelect.append("$'_status'");
+		for (std::set<std::string>::iterator i = tokens.begin(); i != tokens.end(); i++) {
+			std::string token = *i;
+			filterSelect.append(", ");
+			filterSelect.append("$'");
+			filterSelect.append(token);
+			filterSelect.append("'");
 		}
-		if (match) {
-			result->push_back(obj->select(select));
-		} else {
-		}
-		delete obj;
-		delete expresult;
+	} else {
+		filterSelect = "*";
 	}
 
-	delete parser;
+	mmis->seek(29);
+	BSONBufferedObj* obj = NULL;
+
+	std::string smax = getSetting("max_results");
+	__int64 maxResults = 3000;
+	if (smax.length() > 0) {
+#ifdef WINDOWS
+		maxResults = _atoi64(smax.c_str());
+#else
+		maxResults = atoll(smax.c_str());
+#endif
+	}
+	__int64 count = 0;
+	while (!mmis->eof() && (count < maxResults)) {
+		if (obj == NULL) {
+			obj = new BSONBufferedObj(mmis->pointer(), mmis->length() - mmis->currentPos());
+		} else {
+			obj->reset(mmis->pointer(), mmis->length() - mmis->currentPos());
+		}
+		mmis->seek(mmis->currentPos() + obj->bufferLength());
+		// Only "active" Records
+		if (obj->getInt("_status") == 1) {
+			bool match = false;
+			ExpressionResult* expresult = parser->eval(*obj);
+			if (expresult->type() == ExpressionResult::RT_BOOLEAN) {
+				match = *expresult;
+			}
+			delete expresult;
+			if (match) {
+				BSONObj* objSubselect = obj->select(select);
+				result->add(*objSubselect);
+				delete objSubselect;
+				count++;
+			}
+		}
+	}
+
+	if (obj != NULL) delete obj;
 	delete bis;
-	delete fis;
+	dbStream->close();
+	delete dbStream;
 
 	return result;
 }
