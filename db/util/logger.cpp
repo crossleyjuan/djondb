@@ -28,7 +28,49 @@
 #include "settings.h"
 #include "defs.h"
 #ifndef WINDOWS
-#include <syslog.h>
+	#include <syslog.h>
+#else
+	#using <mscorlib.dll> 
+	#include <vcclr.h> 
+	using namespace System; 
+
+	struct WinString {
+		gcroot<String ^> str;
+
+		WinString(const char* c) {
+			str = gcnew String(c);
+		}
+
+		~WinString() {
+			delete str;
+		}
+	};
+
+	struct LogWrapper {
+		static gcroot<System::Diagnostics::EventLog ^> log;
+		LogWrapper() {
+		}
+
+		~LogWrapper() {
+		}
+
+		static void writeLog(const char* ctype, const char* c) {
+			WinString sLogEntry(c);
+			
+			System::Diagnostics::EventLogEntryType type;
+			if (strcmp(ctype, "DEBUG") == 0) {
+				type = System::Diagnostics::EventLogEntryType::Information;
+			} else if (strcmp(ctype, "INFO") == 0) {
+				type = System::Diagnostics::EventLogEntryType::Information;
+			} else if (strcmp(ctype, "WARN") == 0) {
+				type = System::Diagnostics::EventLogEntryType::Warning;
+			} else if (strcmp(ctype, "ERROR") == 0) {
+				type = System::Diagnostics::EventLogEntryType::Error;
+			}
+			System::Diagnostics::EventLog::WriteEntry("djondb", sLogEntry.str, type);
+		}
+	};
+
 #endif
 #ifdef MAC
 #include <mach/clock.h>
@@ -210,7 +252,11 @@ void Logger::print(std::string type, std::string text) {
 		cout << type << ": " << text << endl;
 	}
 #else
-	cout << type << ": " << text << endl;
+#ifdef WINDOWS_SERVICE
+	LogWrapper::writeLog(type.c_str(), text.c_str());
+#else
+		cout << type << ": " << text << endl;
+#endif
 #endif
 }
 

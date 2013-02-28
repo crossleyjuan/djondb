@@ -2,8 +2,8 @@
 //
 
 #include "stdafx.h"
-#include "util.h"
 #include "service.h"
+#include "util.h"
 
 bool __stopRunning;
 
