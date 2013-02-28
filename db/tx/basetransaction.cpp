@@ -254,7 +254,7 @@ BSONObj* BaseTransaction::findFirst(char* db, char* ns, const char* select, cons
 	BSONObj* result = NULL;
 	if (fullList != NULL) {
 		for (BSONArrayObj::iterator it = fullList->begin(); it != fullList->end(); it++) {
-			result = *it;
+			result = new BSONObj(**it);
 			break;
 		}
 		delete fullList;
