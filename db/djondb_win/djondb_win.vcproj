@@ -216,11 +216,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="util.lib pthreadVC2.lib Rpcrt4.lib Ws2_32.lib antlr3c.lib"
 				LinkIncremental="1"
-<<<<<<< HEAD
-				AdditionalLibraryDirectories="../windows/lib;../windows/libs;../windows/libs/x86;../third_party/libs"
-=======
 				AdditionalLibraryDirectories="../windows/libs;../windows/libs/x86;../third_party/libs/$(PlatformName)"
->>>>>>> a50efd3529ab5a9e331b3f4b4723487ce73ba405
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
