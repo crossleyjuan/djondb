@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="djondb_service"
 	ProjectGUID="{8E7CF516-49F1-449D-9838-AE8688823570}"
 	RootNamespace="djondb_service"
@@ -63,6 +63,7 @@
 				AdditionalDependencies="service.lib network.lib command.lib db.lib filesystem.lib bson.lib cache.lib util.lib pthreadVC2.lib Rpcrt4.lib Ws2_32.lib antlr3c.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(SolutionDir)libs;$(SolutionDir)lib;$(SolutionDir)libs/$(PlatformName);$(SolutionDir)..\third_party\libs"
+				IgnoreDefaultLibraryNames="/nodefaultlib:&quot;msvcprt.lib&quot;"
 				GenerateDebugInformation="true"
 				AssemblyDebug="1"
 				TargetMachine="1"
@@ -94,8 +95,9 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
+			UseOfMFC="0"
 			CharacterSet="1"
-			ManagedExtensions="2"
+			ManagedExtensions="1"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -133,9 +135,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="service.lib network.lib command.lib db.lib filesystem.lib bson.lib cache.lib util.lib pthreadVC2.lib Rpcrt4.lib Ws2_32.lib antlr3c.lib"
+				AdditionalDependencies="util.lib pthreadVC2.lib Rpcrt4.lib Ws2_32.lib antlr3c.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(SolutionDir)libs;$(SolutionDir)lib;$(SolutionDir)libs/$(PlatformName);$(SolutionDir)..\third_party\libs"
+				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>

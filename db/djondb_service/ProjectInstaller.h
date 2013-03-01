@@ -57,6 +57,7 @@ namespace djondb_service {
 			// 
 			// serviceProcessInstaller1
 			// 
+			this->serviceProcessInstaller1->Account = System::ServiceProcess::ServiceAccount::LocalSystem;
 			this->serviceProcessInstaller1->Password = nullptr;
 			this->serviceProcessInstaller1->Username = nullptr;
 			// 
