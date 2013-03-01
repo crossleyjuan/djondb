@@ -29,6 +29,7 @@ class Cache
 		  size_type size() const;
 
         V& operator[](const K& key);
+        V& get(const K& key);
 
     protected:
     private:
@@ -98,6 +99,14 @@ void Cache<K, V>::add(const K& key, const V& val) {
 
 template <class K, class V>
 V& Cache<K, V>::operator [](const K& key) {
+    typename map<K,V>::iterator i = _elements.find(key);
+    if (i != _elements.end()) {
+        return i->second;
+    }
+}
+
+template <class K, class V>
+V& Cache<K, V>::get(const K& key) {
     typename map<K,V>::iterator i = _elements.find(key);
     if (i != _elements.end()) {
         return i->second;

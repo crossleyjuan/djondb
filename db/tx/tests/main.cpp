@@ -25,11 +25,15 @@
 #include "util.h"
 #include "command.h"
 #include "insertcommand.h"
+#include "transactionmanager.h"
 #include <stdlib.h>
+#include <memory>
 #include <string.h>
 #include <cpptest.h>
 
 using namespace std;
+
+DBController* _controller;
 
 class TestTXSuite: public Test::Suite
 {
@@ -38,6 +42,7 @@ class TestTXSuite: public Test::Suite
 		{
 			TEST_ADD(TestTXSuite::testTransaction);
 			TEST_ADD(TestTXSuite::testTransactionCommit);
+			TEST_ADD(TestTXSuite::testTransactionManager);
 		}
 
 	private:
@@ -46,9 +51,9 @@ class TestTXSuite: public Test::Suite
 		{
 			Logger* log = getLogger(NULL);
 			log->info("testTransaction");
-			DummyController* _controller = new DummyController();
+			DummyController* controller = new DummyController();
 
-			BaseTransaction* tx = new BaseTransaction(_controller);
+			BaseTransaction* tx = new BaseTransaction(controller);
 
 			tx->dropNamespace("db", "txns");
 
@@ -63,8 +68,7 @@ class TestTXSuite: public Test::Suite
 			TEST_ASSERT(res->length() == 1);
 			BSONObj* test1 = *res->begin();
 			TEST_ASSERT(test1->getString("name").compare("John") == 0);
-
-			test1->add("name", "Peter");
+test1->add("name", "Peter");
 			tx->update("db", "txns", test1);
 
 			delete res;
@@ -77,7 +81,7 @@ class TestTXSuite: public Test::Suite
 
 			delete res;
 			delete tx;
-			delete _controller;
+			delete controller;
 			delete id;
 		}
 
@@ -85,8 +89,6 @@ class TestTXSuite: public Test::Suite
 		{
 			Logger* log = getLogger(NULL);
 			log->info("testTransactionCommit");
-			DBController* _controller = new DBController();
-			_controller->initialize();
 
 			BaseTransaction* tx = new BaseTransaction(_controller);
 			std::string* tuid = uuid();
@@ -116,11 +118,51 @@ class TestTXSuite: public Test::Suite
 			stx->commit();
 			delete stx;
 
-
 			delete tx;
-			_controller->shutdown();
 			delete tuid;
-			delete _controller;
+		}
+
+
+		void testTransactionManager() {
+			Logger* log = getLogger(NULL);
+			log->info("testTransactionManager");
+
+			// Insert a document in wal
+			BaseTransaction* wal = new BaseTransaction(_controller);
+			wal->dropNamespace("db", "mtx");
+
+			TransactionManager* manager = new TransactionManager(wal);
+
+			BSONObj testA;
+			testA.add("cod", 1);
+			testA.add("name", "William");
+			wal->insert("db", "mtx", &testA);
+
+			std::string* t1 = uuid();
+
+			StdTransaction* transaction = manager->getTransaction(*t1);
+			std::auto_ptr<BSONArrayObj> array(transaction->find("db", "mtx", "", "$'cod' == 1"));
+			BSONObj* obj1up = array->get(0);
+			obj1up->add("lastName", "Shakespeare");
+			transaction->update("db", "mtx", obj1up);
+
+			std::auto_ptr<BSONArrayObj> array0(wal->find("db", "mtx", "", "$'cod' == 1"));
+			BSONObj* origin1 = array0->get(0); 
+			TEST_ASSERT(!origin1->has("lastName"));
+
+			std::auto_ptr<BSONArrayObj> array1(transaction->find("db", "mtx", "", "$'cod' == 1"));
+			BSONObj* objtx1 = array1->get(0);
+			TEST_ASSERT(objtx1->has("lastName"));
+
+			transaction->commit();
+			manager->dropTransaction(*t1);
+
+			std::auto_ptr<BSONArrayObj> array2(wal->find("db", "mtx", "", "$'cod' == 1"));
+			BSONObj* origin2 = array2->get(0);
+			TEST_ASSERT(origin2->has("lastName"));
+
+			delete t1;
+			delete manager;
 		}
 
 };
@@ -191,12 +233,17 @@ int main(int argc, char* argv[])
 
 		// Run the tests
 		//
+		_controller = new DBController();
+		_controller->initialize();
 		auto_ptr<Test::Output> output(cmdline(argc, argv));
 		ts.run(*output, true);
 
 		Test::HtmlOutput* const html = dynamic_cast<Test::HtmlOutput*>(output.get());
 		if (html)
 			html->generate(cout, true, "MyTest");
+
+		_controller->shutdown();
+		delete _controller;
 	}
 	catch (...)
 	{

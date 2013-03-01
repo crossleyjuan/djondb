@@ -242,7 +242,7 @@ class TestDBSuite: public Test::Suite
 			BSONObj* res1 = controller->findFirst("dbdelete", "ns", "*", filter.c_str());
 			TEST_ASSERT(res1->getInt("age") == 18);
 
-			controller->remove("dbdelete", "ns", *id, *revision);
+			controller->remove("dbdelete", "ns", const_cast<char*>(id->c_str()), const_cast<char*>(revision->c_str()));
 
 			BSONObj* res2 = controller->findFirst("dbdelete", "ns", "*", filter.c_str());
 

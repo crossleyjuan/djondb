@@ -108,7 +108,9 @@ void TxBufferManager::loadBuffers() {
 }
 
 TxBufferManager::~TxBufferManager() {
-	stopMonitor();
+	if (runningMonitor()) {
+		stopMonitor();
+	}
 
 	// Wait until flushBuffers finished its work
 	while (_flushingBuffers) {

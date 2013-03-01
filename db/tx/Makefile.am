@@ -14,6 +14,7 @@ libdjon_tx_la_LDFLAGS = -static# -fPIC
 libdjon_tx_la_SOURCES = basetransaction.cpp \
 								stdtransaction.cpp \
 								nodenotifier.cpp \
+								transactionmanager.cpp \
 								txbuffermanager.cpp \
 								txbuffer.cpp
 
