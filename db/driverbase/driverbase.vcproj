@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="driverbase"
 	ProjectGUID="{8D4F581B-05E3-41D3-8EF3-DF77FE97E40B}"
 	Keyword="Win32Proj"

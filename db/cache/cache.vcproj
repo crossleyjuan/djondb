@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="cache"
 	ProjectGUID="{62FF06CD-7090-4A69-9CAE-21470F09B447}"
 	RootNamespace="cache"
