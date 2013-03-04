@@ -163,6 +163,7 @@ test1->add("name", "Peter");
 
 			delete t1;
 			delete manager;
+			delete transaction;
 		}
 
 };

@@ -76,7 +76,7 @@ BaseTransaction::~BaseTransaction() {
 		Thread::sleep(30);
 	}
 	delete _bufferManager;
-	if (_transactionId) delete _transactionId;
+	if (_transactionId != NULL) delete _transactionId;
 }
 
 std::list<TransactionOperation*>* BaseTransaction::findOperations(char* db, char* ns) {
@@ -129,6 +129,8 @@ void BaseTransaction::update(char* db, char* ns, BSONObj* bson) {
 	oper.operation = bsonOper;
 
 	_bufferManager->writeOperationToRegister(db, ns, oper);
+
+	delete bsonOper;
 }
 
 void BaseTransaction::remove(char* db, char* ns, char* documentId, char* revision) {
