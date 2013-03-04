@@ -4,7 +4,7 @@
   "description": "djondb driver for nodejs",
   "main": "./build/Release/djondb",
   "scripts": {
-    "install": "sh install.sh"
+    "install": "node build.js"
   },
   "repository": "",
   "keywords": [
