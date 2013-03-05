@@ -58,13 +58,14 @@ char* readFile(char* fileName) {
 
     delete(buffer);
 
+	char* result;
 	if (str.length() > 0) {
-		char* result = strcpy(str);
-
-		return result;
+		result = strcpy(str);
 	} else {
-		return NULL;
+		result = NULL;
 	}
+
+	return result;
 }
 
 int writeFile(const std::string& fileName, const std::string& text, bool append) {

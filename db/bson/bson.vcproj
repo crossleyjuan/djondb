@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="bson"
 	ProjectGUID="{669CDCF4-AAAA-4DA1-9A43-E4DA0C3D08D7}"
 	RootNamespace="bson"

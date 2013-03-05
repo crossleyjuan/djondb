@@ -60,7 +60,7 @@ void readSettings() {
 	free(ccont);
 }
 
-std::string getSetting(std::string key) {
+const std::string getSetting(std::string key) {
 	if (__settingsLoaded == false) {
 		readSettings();
 	}
@@ -68,7 +68,8 @@ std::string getSetting(std::string key) {
 	std::map<std::string, std::string>::iterator it = __settingsValues.find(key);
 
 	if (it != __settingsValues.end()) {
-		return it->second;
+		std::string result = it->second;
+		return result;
 	} else {
 		return std::string();
 	}
