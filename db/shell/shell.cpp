@@ -100,6 +100,8 @@ v8::Handle<v8::Value> fuuid(const v8::Arguments& args);
 v8::Handle<v8::Value> connect(const v8::Arguments& args);
 v8::Handle<v8::Value> help(const v8::Arguments& args);
 v8::Handle<v8::String> ReadFile(const char* name);
+v8::Handle<v8::Value> beginTransaction(const v8::Arguments& args);
+v8::Handle<v8::Value> commitTransaction(const v8::Arguments& args);
 void ReportException(v8::TryCatch* handler);
 
 static bool run_shell;
@@ -121,6 +123,8 @@ char* commands[] = {
 	"fuuid",
 	"connect",
 	"help",
+	"beginTransaction",
+	"commitTransaction",
 	"readfile"
 };
 
@@ -198,6 +202,10 @@ v8::Persistent<v8::Context> CreateShellContext() {
 	global->Set(v8::String::New("remove"), v8::FunctionTemplate::New(remove));
 	// Bind the 'db.uuid' function
 	global->Set(v8::String::New("uuid"), v8::FunctionTemplate::New(fuuid));
+	// Bind the 'beginTransaction' function
+	global->Set(v8::String::New("beginTransaction"), v8::FunctionTemplate::New(beginTransaction));
+	// Bind the 'commitTransaction' function
+	global->Set(v8::String::New("commitTransaction"), v8::FunctionTemplate::New(commitTransaction));
 	// Bind the 'connect' function
 	global->Set(v8::String::New("connect"), v8::FunctionTemplate::New(connect));
 	// Bind the 'db.help' function
@@ -386,6 +394,42 @@ v8::Handle<v8::Value> dropNamespace(const v8::Arguments& args) {
 	return v8::String::New("");
 }
 
+v8::Handle<v8::Value> beginTransaction(const v8::Arguments& args) {
+	if (args.Length() > 0) {
+		return v8::ThrowException(v8::String::New("usage: beginTransaction()"));
+	}
+
+	v8::HandleScope handle_scope;
+
+	if (__djonConnection == NULL) {
+		return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
+	}
+	bool result = __djonConnection->beginTransaction();
+
+	if (result) {
+		printf("Transaction started");
+	} else {
+		printf("Error: Transaction not started");
+	}
+	return v8::String::New("");
+}
+
+v8::Handle<v8::Value> commitTransaction(const v8::Arguments& args) {
+	if (args.Length() > 0) {
+		return v8::ThrowException(v8::String::New("usage: commitTransaction()"));
+	}
+
+	v8::HandleScope handle_scope;
+
+	if (__djonConnection == NULL) {
+		return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
+	}
+	__djonConnection->commitTransaction();
+
+	printf("Transaction committed");
+	return v8::String::New("");
+}
+
 v8::Handle<v8::Value> showDbs(const v8::Arguments& args) {
 	if (args.Length() != 0) {
 		return v8::ThrowException(v8::String::New("usage: showDbs"));
@@ -439,7 +483,9 @@ v8::Handle<v8::Value> help(const v8::Arguments& args) {
 		v8::String::Utf8Value str(args[0]);
 		std::string cmd = ToCString(str);
 	} else {
-		printf("connect('hostname', [port])\n\tEstablish a connection with a server.\n");
+			printf("beginTransaction();\n\tStarts a new transaction\n");
+			printf("commit()\n\tCommits the current transaction.\n");
+			printf("connect('hostname', [port])\n\tEstablish a connection with a server.\n");
 			printf("dropNamespace('db', 'namespace');\n\tDrops a namespace from the db.\n");
 			printf("find('db', 'namespace'[, 'select'][, 'filter']);\n\tExecutes a find using the provided filter.\n");
 			printf("help();\n\tThis help\n");
@@ -453,7 +499,7 @@ v8::Handle<v8::Value> help(const v8::Arguments& args) {
 			printf("showDbs();\n\tReturns a list of the available databases.\n");
 			printf("showNamespaces('db');\n\tReturns the namespaces in that database.\n");
 			printf("shutdown();\n\tRemotely shutdowns the server (Are you sure?).\n");
-		printf("uuid();\n\tGenerates a new UUID (Universal Unique Identifier).\n");
+			printf("uuid();\n\tGenerates a new UUID (Universal Unique Identifier).\n");
 			printf("version();\n\tReturns the current shell version.\n");
 	}
 	return v8::Undefined();

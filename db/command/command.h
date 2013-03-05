@@ -19,7 +19,9 @@ enum COMMANDTYPE {
     SHUTDOWN,
 	 SHOWDBS,
 	 SHOWNAMESPACES,
-	 REMOVE
+	 REMOVE,
+	 COMMIT,
+	 ROLLBACK
 };
 
 class Command {
@@ -53,6 +55,12 @@ class Command {
 			  return _resultMessage;
 		  }
 
+		  void setOptions(const BSONObj* options);
+
+		  const BSONObj* options() const {
+			  return _options;
+		  }
+
 	 protected:
 		  void setResultCode(int rc) {
 			  _resultCode = rc;
@@ -65,27 +73,28 @@ class Command {
 		  int _resultCode;
 		  std::string _resultMessage;
 
-    private:
-        COMMANDTYPE _commandType;
-        Controller* _dbController;
+	 private:
+		  COMMANDTYPE _commandType;
+		  Controller* _dbController;
+		  BSONObj* _options;
 };
 
 class CloseCommand: public Command {
-    public:
-        CloseCommand();
+	public:
+		CloseCommand();
 
-        CloseCommand(const CloseCommand& orig);
-        virtual ~CloseCommand();
+		CloseCommand(const CloseCommand& orig);
+		virtual ~CloseCommand();
 
-        virtual void execute();
+		virtual void execute();
 
-        virtual void* result() {
-            return NULL;
-        }
+		virtual void* result() {
+			return NULL;
+		}
 
-        virtual void writeCommand(OutputStream* out) const;
-        virtual void writeResult(OutputStream* out) const;
-        virtual void readResult(InputStream* is);
+		virtual void writeCommand(OutputStream* out) const;
+		virtual void writeResult(OutputStream* out) const;
+		virtual void readResult(InputStream* is);
 };
 
 

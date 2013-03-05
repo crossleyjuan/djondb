@@ -1,7 +1,7 @@
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
 
-all_includes = -I$(srcdir)/../util -I$(srcdir)/../bson -I$(srcdir)/../filesystem -I$(srcdir)/../db  
+all_includes = -I$(srcdir)/../util -I$(srcdir)/../bson -I$(srcdir)/../filesystem -I$(srcdir)/../db -I$(srcdir)/../tx 
 
 include $(top_srcdir)/common.mk
 
@@ -19,6 +19,7 @@ libdjon_command_la_SOURCES = command.cpp \
 									  insertcommand.cpp \
 									  updatecommand.cpp \
 									  removecommand.cpp \
+									  commitcommand.cpp \
 									  dropnamespacecommand.cpp \
 									  shutdowncommand.cpp \
 									  showdbscommand.cpp \
@@ -27,7 +28,7 @@ libdjon_command_la_SOURCES = command.cpp \
 TESTS = test-command
 check_PROGRAMS = test-command
 #test_command_LDFLAGS = $(all_includes)
-test_command_LDADD = libdjon-command.la -ldjon-db -ldjon-filesystem -ldjon-cache -ldjon-bson -ldjon-util -lrt -luuid  -lcpptest -lantlr3c
+test_command_LDADD = libdjon-command.la -ldjon-tx -ldjon-db -ldjon-filesystem -ldjon-cache -ldjon-bson -ldjon-util -lrt -luuid  -lcpptest -lantlr3c
 test_command_SOURCES = tests/main.cpp
 
 library_includedir=$(includedir)/djon-command-1.0/djon-command

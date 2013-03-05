@@ -45,9 +45,11 @@ class TestCommandSuite: public Test::Suite {
 			TEST_ADD(TestCommandSuite::testFindCommand);	
 			TEST_ADD(TestCommandSuite::testDropnamespaceCommand);	
 			TEST_ADD(TestCommandSuite::testShownamespacesCommand);	
+			TEST_ADD(TestCommandSuite::testOptionsCommand);	
 		}
 
 		void testInsertCommand() {
+			cout << "testInsertCommand" << endl;
 			FileOutputStream* fos = new FileOutputStream("test.dat", "wb");
 
 			CommandWriter* commandWriter = new CommandWriter(fos);
@@ -74,10 +76,56 @@ class TestCommandSuite: public Test::Suite {
 			BSONObj* objResult = rdCmd->bson();
 			TEST_ASSERT(objResult != NULL);
 			TEST_ASSERT(objResult->has("name"));	
-			TEST_ASSERT(strcmp(objResult->getString("name"), "Cross") == 0);
+			TEST_ASSERT(objResult->getString("name").compare("Cross") == 0);
+		}
+
+		void testOptionsCommand() {
+			cout << "testOptionsCommand" << endl;
+			FileOutputStream* fos = new FileOutputStream("test.dat", "wb");
+
+			CommandWriter* commandWriter = new CommandWriter(fos);
+
+			BSONObj* options = new BSONObj();
+			std::string* txId = uuid();
+			options->add("_transactionId", const_cast<char*>(txId->c_str())); 
+			delete txId;
+
+			InsertCommand cmd;
+			cmd.setDB("testdb");
+			cmd.setNameSpace("test.namespace.db");
+			cmd.setOptions(options);
+
+			BSONObj obj;
+			obj.add("name", "Cross");
+			obj.add("age", 18);
+			cmd.setBSON(obj);
+
+			commandWriter->writeCommand(&cmd);
+
+			fos->close();
+			delete fos;
+			delete commandWriter;
+
+			FileInputStream* fis = new FileInputStream("test.dat", "rb");
+			CommandReader* reader = new CommandReader(fis);
+			InsertCommand* rdCmd = (InsertCommand*) reader->readCommand();
+			TEST_ASSERT(rdCmd != NULL);
+			TEST_ASSERT(rdCmd->nameSpace()->compare("test.namespace.db") == 0);
+			TEST_ASSERT(rdCmd->DB()->compare("testdb") == 0);
+			BSONObj* objResult = rdCmd->bson();
+			TEST_ASSERT(objResult != NULL);
+			TEST_ASSERT(objResult->has("name"));	
+			TEST_ASSERT(objResult->getString("name").compare("Cross") == 0);
+
+			TEST_ASSERT(rdCmd->options() != NULL);
+			if (rdCmd->options() != NULL) {
+				const BSONObj* options = rdCmd->options();
+				TEST_ASSERT(options->has("_transactionId"));
+			}
 		}
 
 		void testShowdbs() {
+			cout << "testShowdbs" << endl;
 			FileOutputStream* fos = new FileOutputStream("test.dat", "wb");
 
 			CommandWriter* writer = new CommandWriter(fos);
@@ -102,6 +150,7 @@ class TestCommandSuite: public Test::Suite {
 		}
 
 		void testShownamespacesCommand() {
+			cout << "testShownamespacesCommand" << endl;
 			FileOutputStream* fos = new FileOutputStream("test.dat", "wb");
 
 			CommandWriter* writer = new CommandWriter(fos);
@@ -129,6 +178,7 @@ class TestCommandSuite: public Test::Suite {
 		}
 
 		void testUpdateCommand() {
+			cout << "testUpdateCommand" << endl;
 			FileOutputStream* fos = new FileOutputStream("test.dat", "wb");
 
 			CommandWriter* commandWriter = new CommandWriter(fos);
@@ -158,10 +208,11 @@ class TestCommandSuite: public Test::Suite {
 			BSONObj* objResult = rdCmd->bson();
 			TEST_ASSERT(objResult  != NULL);
 			TEST_ASSERT(objResult->has("name"));	
-			TEST_ASSERT(strcmp(objResult->getString("name"), "Cross") == 0);
+			TEST_ASSERT(objResult->getString("name").compare("Cross") == 0);
 		}
 
 		void testRemoveCommand() {
+			cout << "testRemoveCommand" << endl;
 			FileOutputStream* fos = new FileOutputStream("test.dat", "wb");
 
 			CommandWriter* commandWriter = new CommandWriter(fos);
@@ -194,6 +245,7 @@ class TestCommandSuite: public Test::Suite {
 		}
 
 		void testFindCommand() {
+			cout << "testFindCommand" << endl;
 			FileOutputStream* fos = new FileOutputStream("test.dat", "wb");
 
 			CommandWriter* commandWriter = new CommandWriter(fos);
@@ -220,6 +272,7 @@ class TestCommandSuite: public Test::Suite {
 		}
 		
 		void testDropnamespaceCommand() {
+			cout << "testDropnamespaceCommand" << endl;
 			FileOutputStream* fos = new FileOutputStream("test.dat", "wb");
 
 			CommandWriter* commandWriter = new CommandWriter(fos);

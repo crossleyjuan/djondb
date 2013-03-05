@@ -31,6 +31,7 @@
 #include "showdbscommand.h"
 #include "bsoninputstream.h"
 #include "djondbconnectionmanager.h"
+#include "commitcommand.h"
 #include "util.h"
 #include "bson.h"
 
@@ -45,6 +46,7 @@ DjondbConnection::DjondbConnection(std::string host)
 	_commandWriter = NULL;
 	_open = false;
 	_logger = getLogger(NULL);
+	_activeTransactionId = NULL;
 }
 
 DjondbConnection::DjondbConnection(std::string host, int port)
@@ -56,6 +58,7 @@ DjondbConnection::DjondbConnection(std::string host, int port)
 	_commandWriter = NULL;
 	_open = false;
 	_logger = getLogger(NULL);
+	_activeTransactionId = NULL;
 }
 
 DjondbConnection::DjondbConnection(const DjondbConnection& orig) {
@@ -66,12 +69,14 @@ DjondbConnection::DjondbConnection(const DjondbConnection& orig) {
 	this->_outputStream = orig._outputStream;
 	this->_commandWriter = orig._commandWriter;
 	_logger = getLogger(NULL);
+	this->_activeTransactionId = orig._activeTransactionId;
 }
 
 DjondbConnection::~DjondbConnection()
 {
 	internalClose();
 	delete _logger;
+	if (_activeTransactionId != NULL) free(_activeTransactionId);
 }
 
 bool DjondbConnection::open() {
@@ -94,6 +99,20 @@ void DjondbConnection::close() {
 	if (_logger->isDebug()) _logger->debug("Closing connection");
 	DjondbConnectionManager::releaseConnection(this);
 	_open = false;
+}
+
+const char* DjondbConnection::beginTransaction() {
+	_logger->error("throw error, pilas!");
+	_activeTransactionId = uuid();
+}
+
+void DjondbConnection::commitTransaction() {
+	if (_logger->isDebug()) _logger->debug(2, "Commit command. transactionId: %s", _activeTransactionId->c_str());
+	CommitCommand cmd;
+	cmd.setTransactionId(*_activeTransactionId);
+	_commandWriter->writeCommand(&cmd);
+
+	cmd.readResult(_inputStream);
 }
 
 void DjondbConnection::internalClose() {

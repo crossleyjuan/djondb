@@ -16,49 +16,52 @@
 // this program will be open sourced and all its derivated work will be too.
 // *********************************************************************************************************************
 
-#include "commandwriter.h"
-#include "insertcommand.h"
-#include "dropnamespacecommand.h"
-#include "updatecommand.h"
-#include "findcommand.h"
-#include "shutdowncommand.h"
-#include "bsonoutputstream.h"
-#include "shownamespacescommand.h"
-#include <memory>
-#include <iostream>
+#include "commitcommand.h"
 
-using namespace std;
+#include "inputstream.h"
+#include "outputstream.h"
+#include "dbcontroller.h"
+#include "transactionmanager.h"
+#include "stdtransaction.h"
 
-CommandWriter::CommandWriter(OutputStream* out)
+CommitCommand::CommitCommand()
+    : Command(COMMIT)
 {
-	_stream = out;
 }
 
-CommandWriter::~CommandWriter()
-{
-	//dtor
+CommitCommand::CommitCommand(const CommitCommand& orig)
+: Command(COMMIT) {
 }
 
-
-CommandWriter::CommandWriter(const CommandWriter& orig) {
-	this->_stream = orig._stream;
+CommitCommand::~CommitCommand() {
+    delete(_transactionId);
 }
 
-int CommandWriter::writeCommand(Command* cmd) {
-	std::string version = "0.3.0";
-	_stream->writeString(version);
-	int type = cmd->commandType();
-	_stream->writeInt(type);
+void CommitCommand::execute() {
+	TransactionManager* manager = TransactionManager::getTransactionManager();
+	StdTransaction* tx = manager->getTransaction(*_transactionId);
+	_result = tx->commit();
+}
 
-	BSONOutputStream out(_stream);
-	if (cmd->options() != NULL) {
-		out.writeBSON(*cmd->options());
-	} else {
-		BSONObj options;
-		out.writeBSON(options);
-	}
-	cmd->writeCommand(_stream);
+void* CommitCommand::result() {
+    return &_result;
+}
 
-	return 0;
+void CommitCommand::writeCommand(OutputStream* out) const {
+	out->writeString(*_transactionId);
+}
+
+void CommitCommand::readResult(InputStream* is) {
+}
+
+void CommitCommand::writeResult(OutputStream* out) const {
+}
+
+void CommitCommand::setTransactionId(const std::string& txId) {
+	_transactionId = new std::string(txId);
+}
+
+const std::string* CommitCommand::transactionId() const {
+	return _transactionId;
 }
 

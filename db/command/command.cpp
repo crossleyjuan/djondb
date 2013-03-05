@@ -23,28 +23,43 @@
 Command::Command(COMMANDTYPE commandType)
 {
     _commandType = commandType;
+	 _options = NULL;
 }
 
 Command::Command(const Command& orig) {
     this->_commandType = orig._commandType;
+	 if (orig._options != NULL) {
+		 this->_options = new BSONObj(*orig._options);
+	 } else {
+		 this->_options = NULL;
+	 }
 }
 
 Command::~Command() {
+	if (_options) delete _options;
 }
 
 COMMANDTYPE Command::commandType() const
 {
-    return _commandType;
+	return _commandType;
 }
 
-CloseCommand::CloseCommand()
+void Command::setOptions(const BSONObj* obj) {
+	if (obj != NULL) {
+		_options = new BSONObj(*obj);
+	} else {
+		_options = NULL;
+	}
+}
+
+	CloseCommand::CloseCommand()
 : Command(CLOSECONNECTION)
 {
 }
 
 CloseCommand::CloseCommand(const CloseCommand& orig)
-: Command(CLOSECONNECTION) {
-}
+	: Command(CLOSECONNECTION) {
+	}
 
 CloseCommand::~CloseCommand() {
 }
@@ -63,3 +78,4 @@ void CloseCommand::writeResult(OutputStream* out) const {
 void CloseCommand::readResult(InputStream* is) {
 
 }
+

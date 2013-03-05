@@ -44,9 +44,14 @@ class TransactionManager {
 		StdTransaction* getTransaction(std::string id);
 		void dropTransaction(const std::string& id);
 
+		static TransactionManager* getTransactionManager();
+		static void initializeTransactionManager(BaseTransaction* wal);
+
 	private:
 		Cache<std::string, StdTransaction*>* _cacheTransactions;
 		BaseTransaction* _wal;
+
+		static TransactionManager* _instance;
 };
 
 #endif /* TRANSACTIONMANAGER_INCLUDED_H */

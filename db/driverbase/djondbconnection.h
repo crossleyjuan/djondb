@@ -16,7 +16,7 @@
 class NetworkOutputStream;
 class NetworkInputStream;
 class CommandWriter;
-class Transaction;
+class TransactionManager;
 
 #define SERVER_PORT 1243
 
@@ -32,6 +32,9 @@ namespace djondb {
 
             /** Default destructor */
             virtual ~DjondbConnection();
+
+				const char* beginTransaction();
+				void commitTransaction();
 
             bool open();
             void close();
@@ -62,6 +65,7 @@ namespace djondb {
 				NetworkOutputStream*  _outputStream;
 				NetworkInputStream*   _inputStream;
 				CommandWriter*        _commandWriter;
+				std::string*          _activeTransactionId;
 
 				std::string _host;
 				int _port;

@@ -155,9 +155,6 @@ void BSONBufferedObj::initialize() {
 
 	//pCurrentElement += sizeof(__int64);
 	_bufferBSONLen += sizeof(__int64);
-	if (_elements == 0) {
-		log->error("%", "Error reading the BSON element, the stream returned 0 elements");
-	}
 
 	_keys = (char**)malloc(sizeof(char*) * _elements);
 	_keySize = (__int32**)malloc(sizeof(__int32*) * _elements);

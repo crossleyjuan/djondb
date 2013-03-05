@@ -69,7 +69,7 @@ class TestDriverBaseSuite: public Test::Suite {
 			TEST_ADD(TestDriverBaseSuite::testDbsNamespaces);
 
 			TEST_ADD(TestDriverBaseSuite::testDropNamespace);
-			//TEST_ADD(TestDriverBaseSuite::testTransactions);
+			TEST_ADD(TestDriverBaseSuite::testTransactions);
 		}
 
 		void testDbsNamespaces() {
@@ -454,6 +454,40 @@ class TestDriverBaseSuite: public Test::Suite {
 
 			delete id;
 			delete revision;
+		}
+
+
+		void testTransactions() {
+			cout << "\ntestTransactions()\n" << endl;
+
+			DjondbConnection* connection = DjondbConnectionManager::getConnection("localhost");
+
+			if (connection->open()) {
+				const char* trans = connection->beginTransaction();
+
+				BSONObj o;
+				std::auto_ptr<std::string> id(uuid());
+				o.add("_id", const_cast<char*>(id->c_str()));
+				o.add("name", "John");
+				o.add("lastName", "Crossley");
+
+				connection->insert("testdb", "tx", o);
+
+				BSONObj* res = connection->findByKey("testdb", "tx", id->c_str());
+
+				TEST_ASSERT(res != NULL);
+				TEST_ASSERT(res->has("name"));
+				if (res->has("name")) TEST_ASSERT(res->getString("name").compare("John") == 0);
+
+				connection->commitTransaction();
+
+				BSONObj* res2 = connection->findByKey("testdb", "tx", id->c_str());
+
+				TEST_ASSERT(res2 != NULL);
+				TEST_ASSERT(res2->has("name"));
+				if (res2->has("name")) TEST_ASSERT(res2->getString("name").compare("John") == 0);
+
+			}
 		}
 
 };

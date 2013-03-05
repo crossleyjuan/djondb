@@ -32,6 +32,8 @@
 #include "cache.h"
 #include <map>
 
+TransactionManager* TransactionManager::_instance;
+
 TransactionManager::TransactionManager(BaseTransaction* wal) {
 	_wal = wal;
 	_cacheTransactions = new Cache<std::string, StdTransaction*>();
@@ -62,4 +64,12 @@ void TransactionManager::dropTransaction(const std::string& id) {
 		_cacheTransactions->remove(id);
 		delete trans;
 	}
+}
+		
+void TransactionManager::initializeTransactionManager(BaseTransaction* wal) {
+	_instance = new TransactionManager(wal);
+}
+
+TransactionManager* TransactionManager::getTransactionManager() {
+	return _instance;
 }
