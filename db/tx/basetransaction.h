@@ -65,6 +65,7 @@ class BaseTransaction: public Controller
 		virtual std::vector<std::string>* namespaces(const char* db) const;
 
 		Controller* controller() const;
+		void addBuffers(std::vector<TxBuffer*> buffers);
 
 	protected:
 		BaseTransaction(Controller* controller, std::string transactionId);

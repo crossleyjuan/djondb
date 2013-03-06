@@ -1,7 +1,6 @@
 // *********************************************************************************************************************
 // file:
-// author: Juan Pablo Crossley (crossleyjuan@gmail.com)
-// created:
+// author: Juan Pablo Crossley (crossleyjuan@gmail.com) // created:
 // updated:
 // license:
 // 
@@ -60,6 +59,7 @@ class TestDriverBaseSuite: public Test::Suite {
 		TestDriverBaseSuite() {
 			_host = "localhost";
 			_port = 1243;
+			/*
 			TEST_ADD(TestDriverBaseSuite::testFinds);
 			TEST_ADD(TestDriverBaseSuite::testInsert);
 			TEST_ADD(TestDriverBaseSuite::testInsertComplex);
@@ -69,6 +69,7 @@ class TestDriverBaseSuite: public Test::Suite {
 			TEST_ADD(TestDriverBaseSuite::testDbsNamespaces);
 
 			TEST_ADD(TestDriverBaseSuite::testDropNamespace);
+			*/
 			TEST_ADD(TestDriverBaseSuite::testTransactions);
 		}
 
@@ -463,6 +464,17 @@ class TestDriverBaseSuite: public Test::Suite {
 			DjondbConnection* connection = DjondbConnectionManager::getConnection("localhost");
 
 			if (connection->open()) {
+				// Out of the transaction
+				//
+				connection->dropNamespace("testdb", "tx");
+				BSONObj ontx;
+				std::auto_ptr<std::string> idx(uuid());
+				ontx.add("_id", const_cast<char*>(idx->c_str()));
+				ontx.add("name", "TestOutTx");
+				connection->insert("testdb", "tx", ontx);
+
+
+				// Now the transaction is started
 				const char* trans = connection->beginTransaction();
 
 				BSONObj o;
@@ -478,6 +490,10 @@ class TestDriverBaseSuite: public Test::Suite {
 				TEST_ASSERT(res != NULL);
 				TEST_ASSERT(res->has("name"));
 				if (res->has("name")) TEST_ASSERT(res->getString("name").compare("John") == 0);
+
+				// Test records out of the transaction
+				BSONArrayObj* array1 = connection->find("testdb", "tx", "*", "");
+				TEST_ASSERT(array1->length() == 2);
 
 				connection->commitTransaction();
 

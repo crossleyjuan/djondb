@@ -109,6 +109,7 @@ const char* DjondbConnection::beginTransaction() {
 void DjondbConnection::commitTransaction() {
 	if (_logger->isDebug()) _logger->debug(2, "Commit command. transactionId: %s", _activeTransactionId->c_str());
 	CommitCommand cmd;
+	prepareOptions((Command*)&cmd);
 	cmd.setTransactionId(*_activeTransactionId);
 	_commandWriter->writeCommand(&cmd);
 
@@ -133,6 +134,20 @@ void DjondbConnection::internalClose() {
 		}
 		_open = false;
 	}
+}
+
+void DjondbConnection::prepareOptions(Command* cmd) {
+	BSONObj* options;
+	if (cmd->options() != NULL) {
+		options = new BSONObj(*cmd->options());
+	} else {
+		options = new BSONObj();
+	}
+	if (_activeTransactionId != NULL) {
+		options->add("_transactionId", const_cast<char*>(_activeTransactionId->c_str()));
+	}
+
+	cmd->setOptions(options);
 }
 
 bool DjondbConnection::insert(const std::string& db, const std::string& ns, const std::string& json) {
@@ -168,6 +183,7 @@ bool DjondbConnection::insert(const std::string& db, const std::string& ns, cons
 	}
 	cmd.setBSON(obj);
 	cmd.setNameSpace(ns);
+	prepareOptions((Command*)&cmd);
 	_commandWriter->writeCommand(&cmd);
 
 	cmd.readResult(_inputStream);
@@ -197,6 +213,7 @@ bool DjondbConnection::remove(const std::string& db, const std::string& ns, cons
 	cmd.setId(id);
 	cmd.setRevision(revision);
 
+	prepareOptions((Command*)&cmd);
 	_commandWriter->writeCommand(&cmd);
 	cmd.readResult(_inputStream);
 
@@ -210,6 +227,7 @@ bool DjondbConnection::update(const std::string& db, const std::string& ns, cons
 	cmd.setDB(db);
 	cmd.setNameSpace(ns);
 
+	prepareOptions((Command*)&cmd);
 	_commandWriter->writeCommand(&cmd);
 	cmd.readResult(_inputStream);
 
@@ -296,6 +314,7 @@ BSONArrayObj* DjondbConnection::find(const std::string& db, const std::string& n
 	cmd.setSelect(select);
 	cmd.setDB(db);
 	cmd.setNameSpace(ns);
+	prepareOptions((Command*)&cmd);
 	_commandWriter->writeCommand(&cmd);
 	
 	cmd.readResult(_inputStream);
@@ -319,6 +338,7 @@ bool DjondbConnection::dropNamespace(const std::string& db, const std::string& n
 	cmd.setDB(db);
 	cmd.setNameSpace(ns);
 
+	prepareOptions((Command*)&cmd);
 	_commandWriter->writeCommand(&cmd);
 	cmd.readResult(_inputStream);
 

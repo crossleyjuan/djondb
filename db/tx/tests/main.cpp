@@ -43,6 +43,7 @@ class TestTXSuite: public Test::Suite
 			TEST_ADD(TestTXSuite::testTransaction);
 			TEST_ADD(TestTXSuite::testTransactionCommit);
 			TEST_ADD(TestTXSuite::testTransactionManager);
+			TEST_ADD(TestTXSuite::testTransactionMergedData);
 		}
 
 	private:
@@ -112,13 +113,55 @@ test1->add("name", "Peter");
 			for (std::vector<std::string>::iterator i = idsCheck.begin(); i != idsCheck.end(); i++) {
 				std::string id = *i;
 				std::string filter = format("$'_id' == '%s'", id.c_str());
-				BSONObj* res = stx->findFirst("db", "testcommit", "", filter.c_str());
+				BSONObj* res = stx->findFirst("db", "testcommit", "*", filter.c_str());
 				delete res;
 			}
 			stx->commit();
 			delete stx;
 
 			delete tx;
+			delete tuid;
+		}
+
+		void testTransactionMergedData()
+		{
+			cout << "\ntestTransactionMergedData()\n" << endl;
+
+			BaseTransaction* tx = new BaseTransaction(_controller);
+			tx->dropNamespace("db", "testcommit");
+			
+			BSONObj ooutTX;
+			std::string* idOut = uuid();
+			ooutTX.add("_id", const_cast<char*>(idOut->c_str()));
+			ooutTX.add("name", "JohnOut");
+			tx->insert("db", "testcommit", &ooutTX);
+
+			// Insert out of the transaction
+			std::string* tuid = uuid();
+			StdTransaction* stx = new StdTransaction(tx, *tuid);
+
+			BSONObj o;
+			std::string* id = uuid();
+			o.add("_id", const_cast<char*>(id->c_str()));
+			o.add("name", "John");
+			stx->insert("db", "testcommit", &o);
+
+			BSONArrayObj* res = stx->find("db", "testcommit", "*", "");
+			TEST_ASSERT(res->length() == 2);
+
+			BSONArrayObj* resOut = tx->find("db", "testcommit", "*", "");
+			TEST_ASSERT(resOut->length() == 1);
+
+			stx->commit();
+			delete stx;
+
+			BSONArrayObj* resOut2 = tx->find("db", "testcommit", "*", "");
+			TEST_ASSERT(resOut2->length() == 2);
+
+			delete tx;
+			delete res;
+			delete resOut;
+			delete resOut2;
 			delete tuid;
 		}
 
@@ -141,29 +184,28 @@ test1->add("name", "Peter");
 			std::string* t1 = uuid();
 
 			StdTransaction* transaction = manager->getTransaction(*t1);
-			std::auto_ptr<BSONArrayObj> array(transaction->find("db", "mtx", "", "$'cod' == 1"));
+			std::auto_ptr<BSONArrayObj> array(transaction->find("db", "mtx", "*", "$'cod' == 1"));
 			BSONObj* obj1up = array->get(0);
 			obj1up->add("lastName", "Shakespeare");
 			transaction->update("db", "mtx", obj1up);
 
-			std::auto_ptr<BSONArrayObj> array0(wal->find("db", "mtx", "", "$'cod' == 1"));
+			std::auto_ptr<BSONArrayObj> array0(wal->find("db", "mtx", "*", "$'cod' == 1"));
 			BSONObj* origin1 = array0->get(0); 
 			TEST_ASSERT(!origin1->has("lastName"));
 
-			std::auto_ptr<BSONArrayObj> array1(transaction->find("db", "mtx", "", "$'cod' == 1"));
+			std::auto_ptr<BSONArrayObj> array1(transaction->find("db", "mtx", "*", "$'cod' == 1"));
 			BSONObj* objtx1 = array1->get(0);
 			TEST_ASSERT(objtx1->has("lastName"));
 
 			transaction->commit();
 			manager->dropTransaction(*t1);
 
-			std::auto_ptr<BSONArrayObj> array2(wal->find("db", "mtx", "", "$'cod' == 1"));
+			std::auto_ptr<BSONArrayObj> array2(wal->find("db", "mtx", "*", "$'cod' == 1"));
 			BSONObj* origin2 = array2->get(0);
 			TEST_ASSERT(origin2->has("lastName"));
 
 			delete t1;
 			delete manager;
-			delete transaction;
 		}
 
 };

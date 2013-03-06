@@ -180,33 +180,30 @@ BSONObj* DBController::readBSON(StreamType* stream) {
 	return res;
 }
 
+void DBController::fillRequiredFields(BSONObj* obj) {
+	if (!obj->has("_id")) {
+		string* tid = uuid();
+		std::string key("_id");
+		obj->add(key, const_cast<char*>(tid->c_str()));
+		delete tid;
+	}
+	if (!obj->has("_revision")) {
+		string* trev = uuid();
+		std::string key("_revision");
+		obj->add(key, const_cast<char*>(trev->c_str()));
+		delete trev;
+	}
+	// _status flag
+	obj->add("_status", 1); // Active
+}
+
 BSONObj* DBController::insert(char* db, char* ns, BSONObj* obj) {
 	if (_logger->isDebug()) _logger->debug(2, "DBController::insert ns: %s, bson: %s", ns, obj->toChar());
 	std::string sdb(db);
 	std::string sns(ns);
 	StreamType* streamData = StreamManager::getStreamManager()->open(sdb, sns, DATA_FTYPE);
 
-	BSONObj* result = NULL;
-	if (!obj->has("_id")) {
-		if (_logger->isDebug()) _logger->debug(2, "BSON does not contain an id, DBController is creating one");
-		string* tid = uuid();
-		std::string key("_id");
-		obj->add(key, const_cast<char*>(tid->c_str()));
-		result = new BSONObj();
-		result->add("_id", const_cast<char*>(tid->c_str()));
-		delete tid;
-	}
-	if (!obj->has("_revision")) {
-		if (_logger->isDebug()) _logger->debug(2, "BSON does not contain revision, DBController is creating one");
-		string* trev = uuid();
-		std::string key("_revision");
-		obj->add(key, const_cast<char*>(trev->c_str()));
-		result = new BSONObj();
-		result->add("_revision", const_cast<char*>(trev->c_str()));
-		delete trev;
-	}
-	// _status flag
-	obj->add("_status", 1); // Active
+	DBController::fillRequiredFields(obj);
 
 	//    long crcStructure = checkStructure(obj);
 
@@ -220,7 +217,7 @@ BSONObj* DBController::insert(char* db, char* ns, BSONObj* obj) {
 
 	//CacheManager::objectCache()->add(id, new BSONObj(*obj));
 
-	return result;
+	return obj;
 }
 
 void DBController::update(char* db, char* ns, BSONObj* obj) {

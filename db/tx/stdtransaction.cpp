@@ -29,8 +29,9 @@
 #include <stdlib.h>
 
 StdTransaction::StdTransaction(BaseTransaction* base, std::string transactionId)
-   : BaseTransaction(base->controller(), transactionId) {
+   : BaseTransaction(base, transactionId) {
 	_transactionId = new std::string(transactionId);
+	_baseTransaction = base;
 }
 
 StdTransaction::StdTransaction(const StdTransaction& orig) 
@@ -51,11 +52,11 @@ bool StdTransaction::dropNamespace(char* db, char* ns) {
 }
 
 void StdTransaction::update(char* db, char* ns, BSONObj* bson) {
-	StdTransaction::update(db, ns, bson);
+	BaseTransaction::update(db, ns, bson);
 }
 
 void StdTransaction::remove(char* db, char* ns, char* documentId, char* revision) {
-	StdTransaction::remove(db, ns, documentId, revision);
+	BaseTransaction::remove(db, ns, documentId, revision);
 }
 
 BSONArrayObj* StdTransaction::find(char* db, char* ns, const char* select, const char* filter) throw (ParseException) {
@@ -76,7 +77,7 @@ std::vector<std::string>* StdTransaction::namespaces(const char* db) const {
 
 bool StdTransaction::commit() {
 	std::vector<TxBuffer*> buffers = _bufferManager->popAll();
-	_bufferManager->addBuffers(buffers);
+	_baseTransaction->addBuffers(buffers);
 }
 
 bool StdTransaction::rollback() {

@@ -128,6 +128,8 @@ char* commands[] = {
 	"readfile"
 };
 
+int COMMANDS_LENGTH = 19;
+
 char* getHistoryFilename() {
 	std::string* homeDir = getHomeDir();
 	char* file = (char*)malloc(2048);
@@ -157,7 +159,7 @@ int main(int argc, char* argv[]) {
 
 #ifndef WINDOWS
 void completion(const char *buf, linenoiseCompletions *lc) {
-	for (int x = 0; x < 13; x++) {
+	for (int x = 0; x < COMMANDS_LENGTH; x++) {
 		if (startsWith(commands[x], buf)) {
 			linenoiseAddCompletion(lc, commands[x]);
 		}

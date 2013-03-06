@@ -53,7 +53,7 @@ class StdTransaction: public BaseTransaction
 	public:
 		StdTransaction(BaseTransaction* base, std::string transactionId);
 		StdTransaction(const StdTransaction& orig);
-		~StdTransaction();
+		virtual ~StdTransaction();
 
 		virtual BSONObj* insert(char* db, char* ns, BSONObj* bson);
 		virtual bool dropNamespace(char* db, char* ns);

@@ -37,6 +37,7 @@
 #include "expressionresult.h"
 #include "txbuffermanager.h"
 #include "txbuffer.h"
+#include "dbcontroller.h"
 #include <stdlib.h>
 
 BaseTransaction::BaseTransaction(Controller* controller) {
@@ -103,6 +104,7 @@ BSONObj* BaseTransaction::insert(char* db, char* ns, BSONObj* bson) {
 	BsonOper* insertOper = new BsonOper();
 	insertOper->bson = bson; 
 	oper.operation = insertOper;
+	DBController::fillRequiredFields(bson);
 
 	_bufferManager->writeOperationToRegister(db, ns, oper);
 
@@ -240,7 +242,6 @@ BSONArrayObj* BaseTransaction::find(char* db, char* ns, const char* select, cons
 	for (LinkedMap<std::string, BSONObj*>::iterator it = map.begin(); it != map.end(); it++) {
 		BSONObj* r = it->second;
 		result->add(*r);
-		delete r;
 	}
 	map.clear();
 	delete parser;
@@ -275,4 +276,8 @@ std::vector<std::string>* BaseTransaction::namespaces(const char* db) const {
 
 Controller* BaseTransaction::controller() const {
 	return _controller;
+}
+
+void BaseTransaction::addBuffers(std::vector<TxBuffer*> buffers) {
+	_bufferManager->addBuffers(buffers);
 }

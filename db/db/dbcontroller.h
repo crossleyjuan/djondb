@@ -27,7 +27,6 @@ class DBController: public Controller
         void initialize(std::string dataDir);
         void shutdown();
 
-
         BSONObj* insert(char* db, char* ns, BSONObj* bson);
 		  bool dropNamespace(char* db, char* ns);
         void update(char* db, char* ns, BSONObj* bson);
@@ -37,6 +36,9 @@ class DBController: public Controller
         BSONObj* readBSON(StreamType* stream);
 		  std::vector<std::string>* dbs() const;
 		  std::vector<std::string>* namespaces(const char* db) const;
+
+		  static void fillRequiredFields(BSONObj* bson);
+	 protected:
 
     private:
 		  Logger* _logger;

@@ -17,6 +17,7 @@ class NetworkOutputStream;
 class NetworkInputStream;
 class CommandWriter;
 class TransactionManager;
+class Command;
 
 #define SERVER_PORT 1243
 
@@ -61,6 +62,9 @@ namespace djondb {
 				std::string host() const;
 
 		  protected:
+		  private:
+				void prepareOptions(Command* cmd);
+
 		  private:
 				NetworkOutputStream*  _outputStream;
 				NetworkInputStream*   _inputStream;
