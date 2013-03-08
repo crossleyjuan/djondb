@@ -51,6 +51,23 @@
 
 bool _daemon;
 
+DjondbException::DjondbException(int code, const char* error) {
+	_errorCode = code;
+	_errorMessage = error;
+}
+
+DjondbException::DjondbException(const DjondbException& orig) {
+	this->_errorCode = orig._errorCode;
+	this->_errorMessage = orig._errorMessage;
+}
+
+const char* DjondbException::what() const throw() {
+	return _errorMessage;
+}
+
+int DjondbException::errorCode() const {
+	return _errorCode;
+}
 void logInfo(char* text) {
     cout << text << endl;
 }
