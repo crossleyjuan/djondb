@@ -226,9 +226,9 @@ class TestFileSystemSuite: public Test::Suite
 			TEST_ASSERT(obj->has("int"));
 			TEST_ASSERT(obj->getInt("int") == INT_MAX);
 
-			TEST_ASSERT(strcmp(obj->getString("string"), "test") == 0);
+			TEST_ASSERT(obj->getString("string").compare("test") == 0);
 
-			TEST_ASSERT(strcmp(obj->getString("char*"), "char*") == 0);
+			TEST_ASSERT(obj->getString("char*").compare("char*") == 0);
 
 			TEST_ASSERT(obj->has("long"));
 			TEST_ASSERT(obj->getLong("long") == 100000000L);
@@ -243,7 +243,7 @@ class TestFileSystemSuite: public Test::Suite
 			TEST_ASSERT(innerR != NULL);
 
 			TEST_ASSERT(innerR->has("name"));
-			TEST_ASSERT(strcmp(innerR->getString("name"), "John") == 0);
+			TEST_ASSERT(innerR->getString("name").compare("John") == 0);
 
 			TEST_ASSERT(innerR->has("int"));
 			TEST_ASSERT(innerR->getInt("int") == 1);
@@ -325,14 +325,14 @@ class TestFileSystemSuite: public Test::Suite
 			BSONObj* obj = bsonIn->readBSON();
 			TEST_ASSERT(obj->has("age"));
 			TEST_ASSERT(obj->getInt("age") == 1);
-			TEST_ASSERT(strcmp(obj->getString("name"), "John") == 0);
+			TEST_ASSERT(obj->getString("name").compare("John") == 0);
 
 			TEST_ASSERT(obj->has("salary"));
 			TEST_ASSERT(obj->getDouble("salary") == 3500.25);
 
 			TEST_ASSERT(obj->has("rel1"));
 			TEST_ASSERT(obj->getBSONArray("rel1")->length() == 4);
-			TEST_ASSERT(strcmp(obj->getBSONArray("rel1")->get(0)->getString("innertext"), "inner text") == 0);
+			TEST_ASSERT(obj->getBSONArray("rel1")->get(0)->getString("innertext").compare("inner text") == 0);
 
 			delete obj;
 
@@ -376,9 +376,9 @@ class TestFileSystemSuite: public Test::Suite
 			TEST_ASSERT(obj->has("int"));
 			TEST_ASSERT(obj->getInt("int") == 1);
 
-			TEST_ASSERT(strcmp(obj->getString("string"), "test") == 0);
+			TEST_ASSERT(obj->getString("string").compare( "test") == 0);
 
-			TEST_ASSERT(strcmp(obj->getString("char*"), "char*") == 0);
+			TEST_ASSERT(obj->getString("char*").compare( "char*") == 0);
 
 			TEST_ASSERT(obj->has("long"));
 			TEST_ASSERT(obj->getLong("long") == 1L);
@@ -392,9 +392,9 @@ class TestFileSystemSuite: public Test::Suite
 			TEST_ASSERT(innerTest->has("int"));
 			TEST_ASSERT(innerTest->getInt("int") == 1);
 
-			TEST_ASSERT(strcmp(innerTest->getString("string"), "test") == 0);
+			TEST_ASSERT(innerTest->getString("string").compare( "test") == 0);
 
-			TEST_ASSERT(strcmp(innerTest->getString("char*"), "char*") == 0);
+			TEST_ASSERT(innerTest->getString("char*").compare( "char*") == 0);
 
 			TEST_ASSERT(innerTest->has("long"));
 			TEST_ASSERT(innerTest->getLong("long") == 1L);
@@ -441,9 +441,9 @@ class TestFileSystemSuite: public Test::Suite
 				TEST_ASSERT(obj->has("int"));
 				TEST_ASSERT(obj->getInt("int") == 1);
 
-				TEST_ASSERT(strcmp(obj->getString("string"), "test") == 0);
+				TEST_ASSERT(obj->getString("string").compare( "test") == 0);
 
-				TEST_ASSERT(strcmp(obj->getString("char*"), "char*") == 0);
+				TEST_ASSERT(obj->getString("char*").compare( "char*") == 0);
 
 				TEST_ASSERT(obj->has("long"));
 				TEST_ASSERT(obj->getLong("long") == 1L);
@@ -512,9 +512,14 @@ class TestFileSystemSuite: public Test::Suite
 
 			TEST_ASSERT(buffered.getInt("int") == 10);
 			TEST_ASSERT(buffered.getLong("long") == (__int64)1000000);
-			TEST_ASSERT(strcmp(buffered.getString("char"), "Test Char") == 0);
+			TEST_ASSERT(buffered.getString("char").compare("Test Char") == 0);
 			TEST_ASSERT(buffered.getDouble("double") == (double)2.14159);
-
+			BSONContent* innerResult = buffered.getXpath("inner.int");
+			TEST_ASSERT(innerResult != NULL);
+			if (innerResult != NULL) {
+				__int32 inneri = *innerResult;
+				TEST_ASSERT(inneri == 1);
+			}
 			BSONObj* or2 = buffered.select("$'int', $'long'");
 			TEST_ASSERT(or2->getInt("int") == 10);
 			TEST_ASSERT(or2->getLong("long") == (__int64)1000000);

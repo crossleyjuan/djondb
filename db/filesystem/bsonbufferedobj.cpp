@@ -448,7 +448,7 @@ BSONContent* BSONBufferedObj::getXpath(const std::string& xpath) const {
 	std::string cpyXpath = xpath;
 	__int32 posDot = cpyXpath.find('.');
 	std::string path;
-	if (posDot == string::npos) {
+	if (posDot != string::npos) {
 		path = cpyXpath.substr(0, posDot);
 		cpyXpath = cpyXpath.substr(posDot + 1);
 	} else {
