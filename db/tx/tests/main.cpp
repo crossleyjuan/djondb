@@ -69,7 +69,7 @@ class TestTXSuite: public Test::Suite
 			TEST_ASSERT(res->length() == 1);
 			BSONObj* test1 = *res->begin();
 			TEST_ASSERT(test1->getString("name").compare("John") == 0);
-test1->add("name", "Peter");
+			test1->add("name", "Peter");
 			tx->update("db", "txns", test1);
 
 			delete res;
@@ -129,7 +129,7 @@ test1->add("name", "Peter");
 
 			BaseTransaction* tx = new BaseTransaction(_controller);
 			tx->dropNamespace("db", "testcommit");
-			
+
 			BSONObj ooutTX;
 			std::string* idOut = uuid();
 			ooutTX.add("_id", const_cast<char*>(idOut->c_str()));

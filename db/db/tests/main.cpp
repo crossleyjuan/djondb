@@ -740,10 +740,10 @@ cout << "testing array" << endl;
 			// Insert some data
 			//
 			controller->dropNamespace("dbtest", "find.filter2");
-			controller->insert("dbtest", "find.filter2", BSONParser::parse("{name: 'Juan', lastName:'Crossley', age: 38}"));
-			controller->insert("dbtest", "find.filter2", BSONParser::parse("{name: 'Pepe', lastName:'Crossley', age: 15}"));
-			controller->insert("dbtest", "find.filter2", BSONParser::parse("{name: 'Juan', lastName:'Smith', age: 45}"));
-			controller->insert("dbtest", "find.filter2", BSONParser::parse("{name: 'Juan', lastName:'Clark', age: 38}"));
+			controller->insert("dbtest", "find.filter2", BSONParser::parse("{name: 'Juan', lastName:'Crossley', age: 38, inner: { x: 1}}"));
+			controller->insert("dbtest", "find.filter2", BSONParser::parse("{name: 'Pepe', lastName:'Crossley', age: 15, inner: { x: 1}}"));
+			controller->insert("dbtest", "find.filter2", BSONParser::parse("{name: 'Juan', lastName:'Smith', age: 45, inner: { x: 2}}"));
+			controller->insert("dbtest", "find.filter2", BSONParser::parse("{name: 'Juan', lastName:'Clark', age: 38, inner: { x: 3}}"));
 
 			std::string filter = "$'age' == 45";
 			BSONArrayObj* found = controller->find("dbtest", "find.filter2","*", filter.c_str());
@@ -764,6 +764,10 @@ cout << "testing array" << endl;
 			TEST_ASSERT(name.compare("Crossley", 8) == 0);
 			name = found->get(1)->getDJString("lastName");
 			TEST_ASSERT(name.compare("Clark", 5) == 0);
+			delete found;
+
+			found = controller->find("dbtest", "find.filter2", "*", "$'inner.x' == 1");
+			TEST_ASSERT(found->length() == 2); 
 			delete found;
 		}
 

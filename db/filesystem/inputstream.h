@@ -3,6 +3,7 @@
 
 #include "util.h"
 #include "filesystemdefs.h"
+#include "lock.h"
 #include <istream>
 #include <iostream>
 #include <stdio.h>
@@ -40,6 +41,14 @@ public:
 
 	 virtual std::string* readString() = 0;
 
+	 void acquireLock() {
+		 _lockStream.lock();
+	 }
+
+	 void releaseLock() {
+		 _lockStream.unlock();
+	 }
+
 	 template <typename T>
 		 T readData() {
 			 T result = 0;
@@ -58,6 +67,8 @@ public:
 			 //printf("result after add: %x\n", result);
 			 return result;
 		 }
+private:
+	 Lock _lockStream;
 };
 
 #endif // INPUTSTREAM_H

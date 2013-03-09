@@ -73,7 +73,10 @@ NetworkOutputStream::NetworkOutputStream(const NetworkOutputStream& origin) {
 /* Write 1 byte in the output */
 void NetworkOutputStream::writeChar (unsigned char v)
 {
-	send(_socket, (const char*)&v, 1, __sendFlags_networkoutput);
+	if (send(_socket, (const char*)&v, 1, __sendFlags_networkoutput) < 0) {
+		throw DjondbException(errno, strerror(errno));
+	}
+
 	//    write(_socket, &v, 1);
 }
 
@@ -102,14 +105,18 @@ void NetworkOutputStream::writeLong (__int64 v)
 /* Write a 4 byte float in the output */
 void NetworkOutputStream::writeFloatIEEE (float v)
 {
-	send(_socket, (const char*)&v, sizeof(v), __sendFlags_networkoutput);
+	if (send(_socket, (const char*)&v, sizeof(v), __sendFlags_networkoutput) < 0) {
+		throw DjondbException(errno, strerror(errno));
+	}
 	//    write(_socket, &v, sizeof(v));
 }
 
 /* Write a 8 byte double in the output */
 void NetworkOutputStream::writeDoubleIEEE (double v)
 {
-	send(_socket, (const char*)&v, sizeof(v), __sendFlags_networkoutput);
+	if (send(_socket, (const char*)&v, sizeof(v), __sendFlags_networkoutput) < 0) {
+		throw DjondbException(errno, strerror(errno));
+	}
 	//    write(_socket, &v, sizeof(v));
 
 }
@@ -136,7 +143,11 @@ void NetworkOutputStream::writeChars(const char *text, __int32 len) {
 			int sent = 0;
 			int retries = 0;
 			while (sent < size) {
-				sent += send(_socket, &buffer[sent], size - sent, __sendFlags_networkoutput);
+				int lastSent;
+				if ((lastSent = send(_socket, &buffer[sent], size - sent, __sendFlags_networkoutput)) < 0) {
+					throw DjondbException(errno, strerror(errno));
+				};
+				sent += lastSent;
 				retries++;
 				if (sent < 0) {
 					_logger->error("NetworkOutputStream error sending stream. Error: %d, Description: %s", errno, strerror(errno));

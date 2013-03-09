@@ -299,12 +299,16 @@ v8::Handle<v8::Value> insert(const v8::Arguments& args) {
 		json = ToCString(sjson);
 	}
 
-	if (__djonConnection == NULL) {
-		return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
-	}
-	__djonConnection->insert(db, ns, json);
+	try {
+		if (__djonConnection == NULL) {
+			return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
+		}
+		__djonConnection->insert(db, ns, json);
 
-	return v8::String::New("");
+		return v8::String::New("");
+	} catch (DjondbException e) {
+		return v8::ThrowException(v8::String::New(e.what()));
+	}
 }
 
 v8::Handle<v8::Value> update(const v8::Arguments& args) {
@@ -326,12 +330,16 @@ v8::Handle<v8::Value> update(const v8::Arguments& args) {
 		json = ToCString(sjson);
 	}
 
-	if (__djonConnection == NULL) {
-		return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
-	}
-	__djonConnection->update(db, ns, json);
+	try {
+		if (__djonConnection == NULL) {
+			return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
+		}
+		__djonConnection->update(db, ns, json);
 
-	return v8::String::New("");
+		return v8::String::New("");
+	} catch (DjondbException e) {
+		return v8::ThrowException(v8::String::New(e.what()));
+	}
 }
 
 v8::Handle<v8::Value> remove(const v8::Arguments& args) {
@@ -349,12 +357,16 @@ v8::Handle<v8::Value> remove(const v8::Arguments& args) {
 	v8::String::Utf8Value str4(args[3]);
 	std::string revision = ToCString(str4);
 
-	if (__djonConnection == NULL) {
-		return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
-	}
-	__djonConnection->remove(db, ns, id, revision);
+	try {
+		if (__djonConnection == NULL) {
+			return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
+		}
+		__djonConnection->remove(db, ns, id, revision);
 
-	return v8::String::New("");
+		return v8::String::New("");
+	} catch (DjondbException e) {
+		return v8::ThrowException(v8::String::New(e.what()));
+	}
 }
 
 v8::Handle<v8::Value> shutdown(const v8::Arguments& args) {
@@ -364,12 +376,16 @@ v8::Handle<v8::Value> shutdown(const v8::Arguments& args) {
 
 	v8::HandleScope handle_scope;
 
-	if (__djonConnection == NULL) {
-		return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
-	}
-	__djonConnection->shutdown();
+	try {
+		if (__djonConnection == NULL) {
+			return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
+		}
+		__djonConnection->shutdown();
 
-	return v8::String::New("");
+		return v8::String::New("");
+	} catch (DjondbException e) {
+		return v8::ThrowException(v8::String::New(e.what()));
+	}
 }
 
 v8::Handle<v8::Value> dropNamespace(const v8::Arguments& args) {
@@ -383,17 +399,21 @@ v8::Handle<v8::Value> dropNamespace(const v8::Arguments& args) {
 	v8::String::Utf8Value str(args[1]);
 	std::string ns = ToCString(str);
 
-	if (__djonConnection == NULL) {
-		return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
-	}
-	bool result = __djonConnection->dropNamespace(db, ns);
+	try {
+		if (__djonConnection == NULL) {
+			return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
+		}
+		bool result = __djonConnection->dropNamespace(db, ns);
 
-	if (result) {
-		printf("ns dropped: %s", ns.c_str());
-	} else {
-		printf("ns cannot be dropped: %s", ns.c_str());
+		if (result) {
+			printf("ns dropped: %s", ns.c_str());
+		} else {
+			printf("ns cannot be dropped: %s", ns.c_str());
+		}
+		return v8::String::New("");
+	} catch (DjondbException e) {
+		return v8::ThrowException(v8::String::New(e.what()));
 	}
-	return v8::String::New("");
 }
 
 v8::Handle<v8::Value> beginTransaction(const v8::Arguments& args) {
@@ -439,20 +459,24 @@ v8::Handle<v8::Value> showDbs(const v8::Arguments& args) {
 
 	v8::HandleScope handle_scope;
 
-	if (__djonConnection == NULL) {
-		return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
-	}
-	std::vector<std::string>* dbs = __djonConnection->dbs();
+	try {
+		if (__djonConnection == NULL) {
+			return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
+		}
+		std::vector<std::string>* dbs = __djonConnection->dbs();
 
-	v8::Handle<v8::Array> result = v8::Array::New();
-	int index = 0;
-	for (std::vector<std::string>::iterator i = dbs->begin(); i != dbs->end(); i++) {
-		std::string n = *i;
-		result->Set(v8::Number::New(index), v8::String::New(n.c_str()));
-		index++;
+		v8::Handle<v8::Array> result = v8::Array::New();
+		int index = 0;
+		for (std::vector<std::string>::iterator i = dbs->begin(); i != dbs->end(); i++) {
+			std::string n = *i;
+			result->Set(v8::Number::New(index), v8::String::New(n.c_str()));
+			index++;
+		}
+		delete dbs;
+		return result;
+	} catch (DjondbException e) {
+		return v8::ThrowException(v8::String::New(e.what()));
 	}
-	delete dbs;
-	return result;
 }
 
 v8::Handle<v8::Value> showNamespaces(const v8::Arguments& args) {
@@ -464,20 +488,24 @@ v8::Handle<v8::Value> showNamespaces(const v8::Arguments& args) {
 	v8::String::Utf8Value strDB(args[0]);
 	std::string db = ToCString(strDB);
 
-	if (__djonConnection == NULL) {
-		return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
-	}
-	std::vector<std::string>* ns = __djonConnection->namespaces(db);
+	try {
+		if (__djonConnection == NULL) {
+			return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
+		}
+		std::vector<std::string>* ns = __djonConnection->namespaces(db);
 
-	v8::Handle<v8::Array> result = v8::Array::New();
-	int index = 0;
-	for (std::vector<std::string>::iterator i = ns->begin(); i != ns->end(); i++) {
-		std::string n = *i;
-		result->Set(v8::Number::New(index), v8::String::New(n.c_str()));
-		index++;
+		v8::Handle<v8::Array> result = v8::Array::New();
+		int index = 0;
+		for (std::vector<std::string>::iterator i = ns->begin(); i != ns->end(); i++) {
+			std::string n = *i;
+			result->Set(v8::Number::New(index), v8::String::New(n.c_str()));
+			index++;
+		}
+		delete ns;
+		return result;
+	} catch (DjondbException e) {
+		return v8::ThrowException(v8::String::New(e.what()));
 	}
-	delete ns;
-	return result;
 }
 
 v8::Handle<v8::Value> help(const v8::Arguments& args) {
@@ -550,8 +578,8 @@ v8::Handle<v8::Value> find(const v8::Arguments& args) {
 		free(str);
 		delete result;
 		return jsonValue;
-	} catch (ParseException e) {
-		return v8::ThrowException(v8::String::New("the filter expression contains an error\n"));
+	} catch (DjondbException e) {
+		return v8::ThrowException(v8::String::New(e.what()));
 	}
 	/* 
 		v8::Handle<v8::Context> context = v8::Context::GetCurrent();
@@ -588,22 +616,26 @@ v8::Handle<v8::Value> connect(const v8::Arguments& args) {
 	v8::HandleScope handle_scope;
 	v8::String::Utf8Value str(args[0]);
 	std::string server = ToCString(str);
-	if (__djonConnection != NULL) {
-		__djonConnection->close();
+	try {
+		if (__djonConnection != NULL) {
+			__djonConnection->close();
+		}
+		int port = SERVER_PORT;
+		if (args.Length() == 2) {
+			port = args[1]->Int32Value();	
+		}
+		__djonConnection = DjondbConnectionManager::getConnection(server, port);
+		if (__djonConnection->open()) {
+			printf("Connected to %s\n", server.c_str());
+		} else {
+			printf("Could not connect to: %s\n", server.c_str());
+			__djonConnection->close();
+			__djonConnection = NULL;
+		}
+		return v8::String::New("");
+	} catch (DjondbException e) {
+		return v8::ThrowException(v8::String::New(e.what()));
 	}
-	int port = SERVER_PORT;
-	if (args.Length() == 2) {
-		port = args[1]->Int32Value();	
-	}
-	__djonConnection = DjondbConnectionManager::getConnection(server, port);
-	if (__djonConnection->open()) {
-		printf("Connected to %s\n", server.c_str());
-	} else {
-		printf("Could not connect to: %s\n", server.c_str());
-		__djonConnection->close();
-		__djonConnection = NULL;
-	}
-	return v8::String::New("");
 }
 
 // The callback that is invoked by v8 whenever the JavaScript 'print'

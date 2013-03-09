@@ -240,6 +240,32 @@ class TestUtilSuite : public Test::Suite
 			TEST_ASSERT(checkFileCreation(home));
 			// test directory fail
 			TEST_ASSERT(!checkFileCreation("/"));
+
+
+			cout << "\ntesting combine paths" << endl;
+
+#ifndef WINDOWS
+			const char* path1 = "/home/test";
+			const char* path2 = "myfolder/myfile.txt";
+			char* result = combinePath(path1, path2);
+			TEST_ASSERT(strcmp(result, "/home/test/myfolder/myfile.txt") == 0);
+			free(result);
+			
+			const char* path3 = "/home/test/";
+			const char* path4 = "myfolder/myfile.txt";
+			char* result2 = combinePath(path3, path4);
+			TEST_ASSERT(strcmp(result2, "/home/test/myfolder/myfile.txt") == 0);
+#else
+			char* path1 = "c:\\test";
+			char* path2 = "myfolder\\myfile.txt";
+			char* result = combinePath(path1, path2);
+			TEST_ASSERT(strcmp(result, "c:\\test\\myfolder\\myfile.txt") == 0);
+			
+			char* path3 = "c:\\test\\";
+			char* path4 = "myfolder\\myfile.txt";
+			char* result2 = combinePath(path3, path4);
+			TEST_ASSERT(strcmp(result2, "c:\\test\\myfolder\\myfile.txt") == 0);
+#endif
 		}
 
 		void testFunction(const char* x) {

@@ -577,8 +577,12 @@ class TestFileSystemSuite: public Test::Suite
 			TEST_ASSERT(buffered->getLong("long") == (__int64)1000000);
 			TEST_ASSERT(buffered->getString("char").compare("Test Char") == 0);
 			TEST_ASSERT(buffered->getDouble("double") == (double)2.14159);
-
+			BSONContent* innerResult = buffered.getXpath("inner.int");
 			BSONObj* or2 = buffered->select("$'int', $'long'");
+			if (innerResult != NULL) {
+				__int32 inneri = *innerResult;
+				TEST_ASSERT(inneri == 1);
+			}
 			TEST_ASSERT(or2->getInt("int") == 10);
 			TEST_ASSERT(or2->getLong("long") == (__int64)1000000);
 

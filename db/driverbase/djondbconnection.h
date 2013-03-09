@@ -23,59 +23,60 @@ class Command;
 
 namespace djondb {
 
-    class LibraryExport DjondbConnection
-    {
-        public:
-            /** Default constructor */
-            DjondbConnection(std::string host);
-            DjondbConnection(std::string host, int port);
-            DjondbConnection(const DjondbConnection& orig);
 
-            /** Default destructor */
-            virtual ~DjondbConnection();
+	class LibraryExport DjondbConnection
+	{
+		public:
+			/** Default constructor */
+			DjondbConnection(std::string host);
+			DjondbConnection(std::string host, int port);
+			DjondbConnection(const DjondbConnection& orig);
+
+			/** Default destructor */
+			virtual ~DjondbConnection();
 
 				const char* beginTransaction();
 				void commitTransaction();
 
-            bool open();
-            void close();
-            void internalClose();
-            bool isOpen() const;
+			bool open();
+			void close();
+			void internalClose();
+			bool isOpen() const;
 
-				bool shutdown() const;
+			bool shutdown() const;
 
-				bool insert(const std::string& db, const std::string& ns, const std::string& json);
-            bool insert(const std::string& db, const std::string& ns, const BSONObj& obj);
-            BSONObj* findByKey(const std::string& db, const std::string& ns, const std::string& select, const std::string& id);
-            BSONObj* findByKey(const std::string& db, const std::string& ns, const std::string& id);
-				BSONArrayObj* find(const std::string& db, const std::string& ns) throw(ParseException);
-				BSONArrayObj* find(const std::string& db, const std::string& ns, const std::string& filter) throw(ParseException);
-				BSONArrayObj* find(const std::string& db, const std::string& ns, const std::string& select, const std::string& filter) throw(ParseException);
-            bool update(const std::string& db, const std::string& ns, const std::string& json);
-            bool update(const std::string& db, const std::string& ns, const BSONObj& bson);
-            bool remove(const std::string& db, const std::string& ns, const std::string& id, const std::string& revision);
+			bool insert(const std::string& db, const std::string& ns, const std::string& json);
+			bool insert(const std::string& db, const std::string& ns, const BSONObj& obj);
+			BSONObj* findByKey(const std::string& db, const std::string& ns, const std::string& select, const std::string& id);
+			BSONObj* findByKey(const std::string& db, const std::string& ns, const std::string& id);
+			BSONArrayObj* find(const std::string& db, const std::string& ns);
+			BSONArrayObj* find(const std::string& db, const std::string& ns, const std::string& filter);
+			BSONArrayObj* find(const std::string& db, const std::string& ns, const std::string& select, const std::string& filter);
+			bool update(const std::string& db, const std::string& ns, const std::string& json);
+			bool update(const std::string& db, const std::string& ns, const BSONObj& bson);
+			bool remove(const std::string& db, const std::string& ns, const std::string& id, const std::string& revision);
 
-				bool dropNamespace(const std::string& db, const std::string& ns);
-				std::vector<std::string>* dbs() const;
-				std::vector<std::string>* namespaces(const std::string& db) const;
+			bool dropNamespace(const std::string& db, const std::string& ns);
+			std::vector<std::string>* dbs() const;
+			std::vector<std::string>* namespaces(const std::string& db) const;
 
-				std::string host() const;
+			std::string host() const;
 
-		  protected:
-		  private:
+		protected:
+		private:
 				void prepareOptions(Command* cmd);
 
 		  private:
-				NetworkOutputStream*  _outputStream;
-				NetworkInputStream*   _inputStream;
-				CommandWriter*        _commandWriter;
+			NetworkOutputStream*  _outputStream;
+			NetworkInputStream*   _inputStream;
+			CommandWriter*        _commandWriter;
 				std::string*          _activeTransactionId;
 
-				std::string _host;
-				int _port;
-				bool _open;
-				Logger* _logger;
-	 };
+			std::string _host;
+			int _port;
+			bool _open;
+			Logger* _logger;
+	};
 
 }
 

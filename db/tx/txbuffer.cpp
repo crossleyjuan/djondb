@@ -31,13 +31,18 @@
 #include "lock.h"
 
 TxBuffer::TxBuffer(const TxBufferManager* manager, const char* file, __int64 offset, __int64 bufferLen, __int64 maxLen) {
-	_stream = new MMapInputOutputStream(file, offset, maxLen);
+	char* path = getSetting("DATA_DIR");
+	char* fileName = combinePath(path, file);
+	_stream = new MMapInputOutputStream(fileName, offset, maxLen);
 	_startOffset = 0;
 	_bufferLength = bufferLen;
 	_maxLength = maxLen;
 	_currentPos = 0;
 	_stream->seek(0);
 	_lock = new Lock();
+	_fileName = strcpy(file);
+	free(fileName);
+	free(path);
 };
 
 TxBuffer::TxBuffer(const TxBuffer& other) {
@@ -54,6 +59,7 @@ TxBuffer::~TxBuffer() {
 	_stream->close();
 	delete _stream;
 	delete _lock;
+	free(_fileName);
 };
 
 void TxBuffer::reset() {
@@ -247,4 +253,8 @@ void TxBuffer::acquireLock() {
 
 void TxBuffer::releaseLock() {
 	_lock->unlock();
+}
+
+const char* TxBuffer::fileName() const {
+	return _fileName;
 }

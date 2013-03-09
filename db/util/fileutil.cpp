@@ -245,3 +245,23 @@ long pageSize() {
 	long res = sysconf(_SC_PAGE_SIZE);
 	return res;
 }
+
+char* combinePath(const char* path, const char* path2) {
+	char* result = NULL;
+	if (path != NULL) {
+		if (path2 != NULL) {
+			if (!endsWith(path, FILESEPARATOR)) {
+				result = strcpy(format("%s%s%s", path, FILESEPARATOR, path2).c_str());
+			} else {
+				result = strcpy(format("%s%s", path, path2).c_str());
+			}
+		} else {
+			result = strcpy(path);
+		}
+	} else {
+		if (path2 != NULL) {
+			result = strcpy(path2);
+		}
+	}
+	return result;
+}

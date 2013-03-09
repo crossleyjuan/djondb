@@ -95,7 +95,6 @@ class TxBuffer: public InputOutputStream {
 
 		  void acquireLock();
 		  void releaseLock();
-
 	 private:
 		  InputOutputStream* _stream;
 		  __int64 _startOffset;
@@ -104,6 +103,7 @@ class TxBuffer: public InputOutputStream {
 		  __int64 _currentPos;
 		  __int32 _controlPosition;
 		  TxBufferManager* _manager;
+		  char* _fileName;
 		  Lock* _lock;
 };
 

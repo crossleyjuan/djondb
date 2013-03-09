@@ -69,8 +69,37 @@ class TestDriverBaseSuite: public Test::Suite {
 			TEST_ADD(TestDriverBaseSuite::testDbsNamespaces);
 
 			TEST_ADD(TestDriverBaseSuite::testDropNamespace);
-			*/
+			//TEST_ADD(TestDriverBaseSuite::testTransactions);
 			TEST_ADD(TestDriverBaseSuite::testTransactions);
+
+			// Leave this test at the end, because it will shutdow the server
+			TEST_ADD(TestDriverBaseSuite::testConnection);
+		}
+
+
+		void testConnection() {
+			cout << "\ntestConnection\n" << endl;
+
+			DjondbConnection* conn = DjondbConnectionManager::getConnection("localhost");
+
+			try {
+				conn->insert("db1", "ns1", "{ name: 'Test'  }");
+				TEST_FAIL("If the client is not connected then an exception should be thrown");
+			} catch (DjondbException) {
+				// Expected behavior
+			}
+
+			// test connection and then shutdown the server
+			if (conn->open()) {
+				conn->shutdown();
+				try {
+					conn->insert("db1", "ns1", "{ name: 'Test'  }");
+				} catch (DjondbException) {
+					// Expected behavior
+				}
+			} else {
+				TEST_FAIL("Cannot establish a connection with the server");
+			}
 		}
 
 		void testDbsNamespaces() {
@@ -81,11 +110,11 @@ class TestDriverBaseSuite: public Test::Suite {
 				exit(0);
 			}
 
-		   std::string bson = "{ name: 'Test'}";
+			std::string bson = "{ name: 'Test'}";
 			conn->insert("db1", "ns1", bson);
 			conn->insert("db2", "ns1", bson);
 			conn->insert("db3", "ns1", bson);
-			
+
 			std::vector<std::string>* dbs = conn->dbs();
 
 			TEST_ASSERT(dbs->size() >= 3);
@@ -428,7 +457,7 @@ class TestDriverBaseSuite: public Test::Suite {
 
 		void testRemove() {
 			cout << "\ntestRemove\n" << endl;
-			
+
 			DjondbConnection* conn = DjondbConnectionManager::getConnection("localhost");
 
 			if (!conn->open()) {
