@@ -259,11 +259,16 @@ v8::Handle<v8::Value> WrapConnection::findByKey(const v8::Arguments& args) {
 
 	BSONObj* result = obj->_con->findByKey(db, ns, filter);
 
-	char* sresult = result->toChar();
+	char* sresult; 
+	if (result != NULL) {
+		sresult = result->toChar();
 
-	delete result;
+		delete result;
+		return scope.Close(parseJSON(v8::String::New(sresult)));
+	} else {
+		return v8::Undefined();
+	}
 
-	return scope.Close(parseJSON(v8::String::New(sresult)));
 }
 
 v8::Handle<v8::Value> WrapConnection::update(const v8::Arguments& args) {
