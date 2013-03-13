@@ -33,6 +33,7 @@
 #include <sys/ioctl.h>
 #include <netdb.h>
 #include <netinet/tcp.h>
+  #include <unistd.h>
 #endif
 
 #ifdef LINUX 
