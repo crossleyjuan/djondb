@@ -64,6 +64,7 @@ class TestDriverBaseSuite: public Test::Suite {
 			TEST_ADD(TestDriverBaseSuite::testInsert);
 			TEST_ADD(TestDriverBaseSuite::testInsertComplex);
 			TEST_ADD(TestDriverBaseSuite::testUpdate);
+			TEST_ADD(TestDriverBaseSuite::testUpdateValidations);
 			TEST_ADD(TestDriverBaseSuite::testRemove);
 			TEST_ADD(TestDriverBaseSuite::testFindByFilter);
 			TEST_ADD(TestDriverBaseSuite::testDbsNamespaces);
@@ -444,6 +445,7 @@ class TestDriverBaseSuite: public Test::Suite {
 			if (secs > 0) {
 				cout << "\nThroughput: " << (count / secs) << " ops." << endl;
 			}
+
 			cout << "\n------------------------------------------------------------" << endl;
 			cout << "\nReady to close the connection" << endl;
 			//getchar();
@@ -453,6 +455,26 @@ class TestDriverBaseSuite: public Test::Suite {
 			//    conn->close();
 			//
 			//    delete conn;
+		}
+
+		void testUpdateValidations() {
+			cout << "\ntestUpdateValidations\n" << endl;
+
+			DjondbConnection* conn = DjondbConnectionManager::getConnection("localhost");
+
+			if (!conn->open()) {
+				cout << "\nCannot connect to localhost" << endl;
+				exit(0);
+			}
+
+			try {
+				BSONObj obj;
+				obj.add("test", "test");
+				conn->update("mydb", "updatens", obj);
+				TEST_FAIL("The update should validate that an _id and _revision are required fields");
+			} catch (DjondbException e) {
+				//Expected behavior
+			}
 		}
 
 		void testRemove() {
