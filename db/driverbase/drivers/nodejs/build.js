@@ -60,12 +60,12 @@ function checkDependencies() {
 	var exist = checkExists(path.join(libPath, djonLibrary));
 	if (!exist) {
 		console.error("djondb client library not found, please install the development package or server and try again");
-		process.exit();
+		process.exit(1);
 	}
 
 	if (!checkExists(path.join(includePath, "node/node.h"))) {
 		console.error("node development files not found, please install nodejs-dev package and try again.");
-		process.exit();
+		process.exit(1);
 	}
 }
 
