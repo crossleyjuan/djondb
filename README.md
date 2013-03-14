@@ -3,6 +3,21 @@ djondb
 
 Welcome to djondb, this is a quick readme with very simple compilation instructions. 
 
+Required Packages
+=================
+
+djondb uses some external libraries that need to be installed prior compilation, these are:
+
+* libv8-dev: Google's V8 javascript engine
+* libantlr3c-dev: Antlr
+* libxss-dev
+* libX11-dev
+* libuuid1
+
+In ubuntu that could be easily installed using apt-get as follows:
+
+    sudo apt-get install libv8-dev libantlr3c-dev libxss-dev libx11-dev libuuid1
+    
 Compilation
 ===========
 
