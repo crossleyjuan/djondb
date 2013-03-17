@@ -235,6 +235,10 @@ bool DjondbConnection::update(const std::string& db, const std::string& ns, cons
 	if (!isOpen()) {
 		throw DjondbException(D_ERROR_CONNECTION, "Not connected to any server");
 	}
+
+	if (!obj.has("_id") || !obj.has("_revision")) {
+		throw DjondbException(D_ERROR_INVALID_STATEMENT, "The update command requires a document with _id and _revision.");
+	}
 	UpdateCommand cmd;
 	cmd.setBSON(obj);
 	cmd.setDB(db);

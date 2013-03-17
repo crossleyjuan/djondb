@@ -32,5 +32,6 @@ const int D_ERROR_TOO_MANY_RESULTS = 100;
 
 // 600 is reserved for user errors
 const int D_ERROR_CONNECTION = 600;
+const int D_ERROR_INVALID_STATEMENT = 601;
 
 #endif /* DJON_ERROR_CODES_INCLUDED_H */
