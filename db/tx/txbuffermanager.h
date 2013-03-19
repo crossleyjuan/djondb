@@ -31,6 +31,7 @@
 
 #include "txbuffer.h"
 #include <queue>
+#include <map>
 
 class InputOuputStream;
 class TransactionOperation;
@@ -40,12 +41,13 @@ class Thread;
 class TxBufferManager
 {
 	public:
-		TxBufferManager(Controller* controller, const char* fileName);
+		TxBufferManager(Controller* controller, const char* fileName, bool mainLog);
 		// This prevents copying the buffer manager
 		TxBufferManager(const TxBufferManager& orig);
 		~TxBufferManager();
 
 		TxBuffer* getBuffer(__int32 minimumSize);
+		TxBuffer* getBuffer(__int32 minimumSize, bool force);
 		std::vector<TxBuffer*> getActiveBuffers() const;
 		__int32 buffersCount() const;
 
@@ -57,6 +59,8 @@ class TxBufferManager
 		void stopMonitor();
 		bool runningMonitor() const;
 		std::vector<TxBuffer*> popAll();
+		// Joins the current thread to avoid unwanted abortion
+		void join();
 
 	private:
 		void initialize(const char* file);
@@ -68,6 +72,11 @@ class TxBufferManager
 		virtual void flushBuffer();
 		TxBuffer* createNewBuffer();
 		TxBuffer* pop();
+		void dropBuffer(TxBuffer* buffer);
+
+		bool mainLog() const {
+			return _mainLog;
+		};
 
 	private:
 		std::queue<TxBuffer*>  _activeBuffers;
@@ -76,6 +85,7 @@ class TxBufferManager
 		Lock* _lockActiveBuffers;
 		Thread* _monitorThread;
 		bool _runningMonitor;
+		std::map<std::string, int> _buffersByLog;
 
 		char* _logFileName;
 		InputOutputStream* _controlFile;
@@ -86,6 +96,7 @@ class TxBufferManager
 		__int64 _buffersSize;
 		__int32 _buffersCount;
 		bool _flushingBuffers;
+		bool _mainLog;
 };
 
 #endif // TXBUFFERMANAGER_INCLUDED_H

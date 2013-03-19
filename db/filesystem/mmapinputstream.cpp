@@ -143,6 +143,7 @@ MMapInputStream::MMapInputStream(const char* fileName, __int32 offset)
 }
 
 MMapInputStream::~MMapInputStream() {
+	close();
 }
 
 unsigned char MMapInputStream::readChar() {

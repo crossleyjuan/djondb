@@ -39,7 +39,7 @@
 
 __int64 TX_DEFAULT_BUFFER_SIZE = pageSize() * 20;
 
-TxBufferManager::TxBufferManager(Controller* controller, const char* file) {
+TxBufferManager::TxBufferManager(Controller* controller, const char* file, bool mainLog) {
 	_buffersSize = TX_DEFAULT_BUFFER_SIZE;
 	_buffersCount = 0;
 	_dataDir = getSetting("DATA_DIR");
@@ -48,15 +48,16 @@ TxBufferManager::TxBufferManager(Controller* controller, const char* file) {
 	_flushingBuffers = false;
 	_runningMonitor = false;
 	_monitorThread = NULL;
+	_mainLog = mainLog;
 
 	initialize(file);
 }
 
 void TxBufferManager::initialize(const char* file) {
 	std::string controlFileName = std::string(file) + ".trc";
-	std::string fullcontrolFileName = combinePath(_dataDir, controlFileName.c_str());
+	std::string fullcontrolFileName = combinePath(_dataDir.c_str(), controlFileName.c_str());
 	std::string fileName = std::string(file) + ".log";
-	std::string fullLogFileName = combinePath(_dataDir, fileName.c_str());
+	std::string fullLogFileName = combinePath(_dataDir.c_str(), fileName.c_str());
 	_logFileName = strcpy(const_cast<char*>(fileName.c_str()), fileName.length());
 
 	bool existControl = existFile(fullcontrolFileName.c_str());
@@ -70,7 +71,7 @@ void TxBufferManager::initialize(const char* file) {
 	_controlFile = (InputOutputStream*)new FileInputOutputStream(fullcontrolFileName, flags); 
 	_controlFile->seek(0);
 
-	bool existLogFile = existFile(fullLogFileName);
+	bool existLogFile = existFile(fullLogFileName.c_str());
 	if (existLogFile) {
 		flags = "rb+";
 	} else {
@@ -100,7 +101,8 @@ void TxBufferManager::loadBuffers() {
 		__int64 startOffset = _controlFile->readLong();
 		__int64 bufferLen = _controlFile->readLong();
 		char* logFileName = _controlFile->readChars();
-		TxBuffer* buffer = new TxBuffer(this, logFileName, startOffset, bufferLen, _buffersSize / pageSize());
+		bool mainLog = (bool)_controlFile->readInt();
+		TxBuffer* buffer = new TxBuffer(this, logFileName, startOffset, bufferLen, _buffersSize / pageSize(), mainLog);
 
 		if (flag & 0x01) {
 			addBuffer(buffer);
@@ -139,11 +141,11 @@ TxBufferManager::~TxBufferManager() {
 }
 
 TxBuffer* TxBufferManager::createNewBuffer() {
-	TxBuffer* result = new TxBuffer(this, _logFileName, _buffersCount * _buffersSize, (__int64)0, _buffersSize / pageSize());
+	TxBuffer* result = new TxBuffer(this, _logFileName, _buffersCount * _buffersSize, (__int64)0, _buffersSize / pageSize(), _mainLog);
 	return result;
 }
 
-void registerBufferControlFile(InputOutputStream* controlFile, TxBuffer* buffer, bool newBuffer, int flag, int buffersCount) {
+void registerBufferControlFile(InputOutputStream* controlFile, std::map<std::string, int> buffersByLog, TxBuffer* buffer, bool newBuffer, int flag, int buffersCount) {
 	controlFile->acquireLock();
 	controlFile->seek(sizeof(__int64)); 
 	controlFile->writeInt(buffersCount);
@@ -159,12 +161,24 @@ void registerBufferControlFile(InputOutputStream* controlFile, TxBuffer* buffer,
 	controlFile->writeChar((char)0x01);
 	controlFile->writeLong(buffer->startOffset());
 	controlFile->writeLong(0);
-	const char* fileName = buffer->fileName();
-	controlFile->writeChars(fileName, strlen(fileName));
+	const std::string fileName = buffer->fileName();
+	std::map<std::string, int>::iterator itBuffersByLog = buffersByLog.find(fileName);
+	if (itBuffersByLog == buffersByLog.end()) {
+		buffersByLog.insert(pair<std::string, int>(fileName, 1));
+	} else {
+		int* count = &itBuffersByLog->second;
+		*count = *count + 1;
+	}
+	controlFile->writeChars(fileName.c_str(), fileName.length());
+	controlFile->writeInt((int)buffer->mainLog());
 	controlFile->releaseLock();
 }
 
 TxBuffer* TxBufferManager::getBuffer(__int32 minimumSize) {
+	return getBuffer(minimumSize, false);
+}
+
+TxBuffer* TxBufferManager::getBuffer(__int32 minimumSize, bool force) {
 	TxBuffer* result = NULL;
 	if (!_activeBuffers.empty()) {
 		result = _activeBuffers.back();
@@ -172,7 +186,7 @@ TxBuffer* TxBufferManager::getBuffer(__int32 minimumSize) {
 		// we should ensure its in the right place before returning the buffer
 		result->seek(result->currentPos());
 	}
-	if ((result == NULL) 
+	if ((force) || (result == NULL) 
 			|| ((_buffersSize - result->currentPos()) < minimumSize)) {
 
 		bool newBuffer;
@@ -189,7 +203,7 @@ TxBuffer* TxBufferManager::getBuffer(__int32 minimumSize) {
 		result->seek(0);
 
 		_buffersCount++;
-		registerBufferControlFile(_controlFile, result, newBuffer, flag, _buffersCount);
+		registerBufferControlFile(_controlFile, _buffersByLog, result, newBuffer, flag, _buffersCount);
 	}
 	return result;
 }
@@ -217,12 +231,14 @@ void TxBufferManager::addBuffers(std::vector<TxBuffer*> buffers) {
 	_lockActiveBuffers->lock();
 	for (std::vector<TxBuffer*>::iterator it = buffers.begin(); it != buffers.end(); it++) {
 		TxBuffer* buffer = *it;
+		registerBufferControlFile(_controlFile, _buffersByLog, buffer, true, 0x01, _buffersCount);
 		_activeBuffers.push(buffer);
 		_vactiveBuffers.push_back(buffer);
+		_buffersCount++;
 	}
 	_lockActiveBuffers->unlock();
-	// Notify that a new buffers are available
-	_lockActiveBuffers->notify();
+	// this will force a new buffer to be put
+	getBuffer(0, true);
 }
 
 void TxBufferManager::addReusable(TxBuffer* buffer) {
@@ -247,7 +263,7 @@ TxBuffer* TxBufferManager::pop() {
 
 	__int64 controlPos = buffer->controlPosition();
 	_controlFile->seek(controlPos);
-	_controlFile->writeChar((char)0x02); // reusable
+	_controlFile->writeChar((char)0x01); // reusable
 	_buffersCount--;
 
 	return buffer;
@@ -274,11 +290,13 @@ void TxBufferManager::stopMonitor() {
 }
 
 void* TxBufferManager::monitorBuffers(void* arg) {
+	Logger* log = getLogger(NULL);
 	TxBufferManager* manager = (TxBufferManager*)arg;
 	while (manager->runningMonitor()) {
 		// Waiting for notifications on new buffers
 		manager->flushBuffer();
 	}
+	if (log->isDebug()) log->debug(2, "TxBufferManager::~monitorBuffers");
 }
 
 void TxBufferManager::flushBuffer() {
@@ -332,9 +350,26 @@ void TxBufferManager::flushBuffer() {
 			}
 			delete operation;
 		}
-		addReusable(buffer);
+		if (buffer->mainLog()) {
+			addReusable(buffer);
+		} else {
+			dropBuffer(buffer);
+		}
 	}
 	_flushingBuffers = false;
+}
+
+void TxBufferManager::dropBuffer(TxBuffer* buffer) {
+	if (!buffer->mainLog()) {
+		std::map<std::string, int>::iterator it = _buffersByLog.find(buffer->fileName());
+		int* count = &it->second;
+		*count--;
+		if (*count == 0) {
+			std::string file = buffer->fileName();
+			removeFile(file.c_str());
+		}
+	}
+	delete buffer;
 }
 
 void TxBufferManager::writeOperationToRegister(char* db, char* ns, const TransactionOperation& operation) {
@@ -464,4 +499,10 @@ jumpoperation:
 	delete stream;
 	free(fullBuffer);
 	return result;
+}
+
+void TxBufferManager::join() {
+	if (_monitorThread != NULL) {
+		this->_monitorThread->join();
+	}
 }

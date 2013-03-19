@@ -30,19 +30,19 @@
 #include "mmapinputoutputstream.h"
 #include "lock.h"
 
-TxBuffer::TxBuffer(const TxBufferManager* manager, const char* file, __int64 offset, __int64 bufferLen, __int64 maxLen) {
-	char* path = getSetting("DATA_DIR");
-	char* fileName = combinePath(path, file);
+TxBuffer::TxBuffer(const TxBufferManager* manager, const char* file, __int64 offset, __int64 bufferLen, __int64 maxLen, bool mainLog) {
+	std::string path = getSetting("DATA_DIR");
+	char* fileName = combinePath(path.c_str(), file);
 	_stream = new MMapInputOutputStream(fileName, offset, maxLen);
 	_startOffset = 0;
 	_bufferLength = bufferLen;
 	_maxLength = maxLen;
+	_mainLog = mainLog;
 	_currentPos = 0;
 	_stream->seek(0);
 	_lock = new Lock();
-	_fileName = strcpy(file);
+	_fileName = std::string(file);
 	free(fileName);
-	free(path);
 };
 
 TxBuffer::TxBuffer(const TxBuffer& other) {
@@ -59,7 +59,6 @@ TxBuffer::~TxBuffer() {
 	_stream->close();
 	delete _stream;
 	delete _lock;
-	free(_fileName);
 };
 
 void TxBuffer::reset() {
@@ -210,7 +209,7 @@ __int64 TxBuffer::currentPos() const {
 };
 
 const std::string TxBuffer::fileName() const {
-	return _stream->fileName();
+	return _fileName;
 };
 
 bool TxBuffer::eof() {
@@ -255,6 +254,3 @@ void TxBuffer::releaseLock() {
 	_lock->unlock();
 }
 
-const char* TxBuffer::fileName() const {
-	return _fileName;
-}

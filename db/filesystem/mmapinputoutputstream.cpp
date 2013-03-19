@@ -47,111 +47,121 @@ MMapInputOutputStream::MMapInputOutputStream(const char* fileName, __int32 offse
 	 _initaddr = NULL;
 	 _addr = NULL;
 #ifndef WINDOWS
-	_pFile = ::open(fileName, O_RDWR | O_CREAT, "wb+");
-	if (_pFile > -1) {
-		_len = fileSize(fileName);
-		long psize = pageSize();
-		__int64 maxLen = (pages * psize) + offset;
-		if (_len < maxLen) {
-			_len = maxLen;
-		}
-		lseek(_pFile, _len, SEEK_SET);
-		write(_pFile, "", 1);
-		lseek(_pFile, 0, SEEK_SET);
+	 if (existFile(fileName)) {
+		 _pFile = ::open(fileName, O_RDWR);
+	 } else {
+		 _pFile = ::open(fileName, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+	 }
+	 if (_pFile > -1) {
+		 _len = fileSize(fileName);
+		 long psize = pageSize();
+		 __int64 maxLen = (pages * psize) + offset;
+		 if (_len < maxLen) {
+			 _len = maxLen;
+		 }
+		 lseek(_pFile, _len, SEEK_SET);
+		 write(_pFile, "", 1);
+		 lseek(_pFile, 0, SEEK_SET);
 
-		bool shared = false;
-		bool advise = true;
+		 bool shared = true;
+		 bool advise = true;
 #ifdef LINUX
-		_addr = reinterpret_cast<char *>(mmap(NULL, _len, PROT_READ | PROT_WRITE, MAP_FILE | (shared?MAP_SHARED:MAP_PRIVATE) | MAP_POPULATE , _pFile, offset));
+		 _addr = reinterpret_cast<char *>(mmap(NULL, _len, PROT_READ | PROT_WRITE, MAP_FILE | (shared?MAP_SHARED:MAP_PRIVATE) | MAP_POPULATE , _pFile, offset));
 #else
-		_addr = reinterpret_cast<char *>(mmap(NULL, _len, PROT_READ | PROT_WRITE, MAP_FILE | (shared?MAP_SHARED:MAP_PRIVATE), _pFile, offset));
+		 _addr = reinterpret_cast<char *>(mmap(NULL, _len, PROT_READ | PROT_WRITE, MAP_FILE | (shared?MAP_SHARED:MAP_PRIVATE), _pFile, offset));
 #endif
-		_initaddr = _addr;    
-		if (_addr == MAP_FAILED) {
-			log->error("Error mapping the file: %s. errno: %d", fileName, errno);
-			exit(1);
-		}
-		if(advise)
-			if(madvise(_addr,_len,MADV_SEQUENTIAL|MADV_WILLNEED)!=0)  {
-				log->error("Error mapping the file: %s, couldn't set hints, errno: %d", fileName, errno, errno);
-				exit(1);
-			}
-		::close(_pFile);
-	}
+		 _initaddr = _addr;    
+		 if (_addr == MAP_FAILED) {
+			 log->error("Error mapping the file: %s. errno: %d", fileName, errno);
+			 exit(1);
+		 }
+		 if(advise)
+			 if(madvise(_addr,_len,MADV_SEQUENTIAL|MADV_WILLNEED)!=0)  {
+				 log->error("Error mapping the file: %s, couldn't set hints, errno: %d", fileName, errno, errno);
+				 exit(1);
+			 }
+		 ::close(_pFile);
+		 _pFile = 0;
+	 } else {
+		 char* error = strerror(errno);
+		 log->error("An error ocurred opening the file: %s, error: %s", error);
+		 exit(1);
+	 }
 #else
-	// Create the test file. Open it "Create Always" to overwrite any
-	// existing file. The data is re-created below
-	_pFile = CreateFile(fileName,
-			GENERIC_READ,
-			FILE_SHARE_READ | FILE_SHARE_WRITE,
-			NULL,
-			OPEN_EXISTING,
-			FILE_ATTRIBUTE_NORMAL,
-			NULL);
+	 // Create the test file. Open it "Create Always" to overwrite any
+	 // existing file. The data is re-created below
+	 _pFile = CreateFile(fileName,
+			 GENERIC_READ,
+			 FILE_SHARE_READ | FILE_SHARE_WRITE,
+			 NULL,
+			 OPEN_EXISTING,
+			 FILE_ATTRIBUTE_NORMAL,
+			 NULL);
 
-	if (_pFile == INVALID_HANDLE_VALUE)
-	{
-		DWORD error = GetLastError();
-	}
+	 if (_pFile == INVALID_HANDLE_VALUE)
+	 {
+		 DWORD error = GetLastError();
+	 }
 
-	SYSTEM_INFO SysInfo;  // system information; used to get granularity
-	// Get the system allocation granularity.
-	GetSystemInfo(&SysInfo);
-	DWORD dwSysGran = SysInfo.dwAllocationGranularity;
+	 SYSTEM_INFO SysInfo;  // system information; used to get granularity
+	 // Get the system allocation granularity.
+	 GetSystemInfo(&SysInfo);
+	 DWORD dwSysGran = SysInfo.dwAllocationGranularity;
 
-	// Now calculate a few variables. Calculate the file offsets as
-	// 64-bit values, and then get the low-order 32 bits for the
-	// function calls.
+	 // Now calculate a few variables. Calculate the file offsets as
+	 // 64-bit values, and then get the low-order 32 bits for the
+	 // function calls.
 
-	// To calculate where to start the file mapping, round down the
-	// offset of the data into the file to the nearest multiple of the
-	// system allocation granularity.
-	DWORD dwFileMapStart; // where to start the file map view
-	dwFileMapStart = (0 / dwSysGran) * dwSysGran;
+	 // To calculate where to start the file mapping, round down the
+	 // offset of the data into the file to the nearest multiple of the
+	 // system allocation granularity.
+	 DWORD dwFileMapStart; // where to start the file map view
+	 dwFileMapStart = (0 / dwSysGran) * dwSysGran;
 
-	_len = GetFileSize(_pFile,  NULL);
+	 _len = GetFileSize(_pFile,  NULL);
 
-	// Create a file mapping object for the file
-	// Note that it is a good idea to ensure the file size is not zero
-	HANDLE hMapFile = CreateFileMapping( _pFile,          // current file handle
-			NULL,           // default security
-			PAGE_READONLY, // read/write permission
-			0,              // size of mapping object, high
-			0,  // size of mapping object, low
-			NULL);          // name of mapping object
+	 // Create a file mapping object for the file
+	 // Note that it is a good idea to ensure the file size is not zero
+	 HANDLE hMapFile = CreateFileMapping( _pFile,          // current file handle
+			 NULL,           // default security
+			 PAGE_READONLY, // read/write permission
+			 0,              // size of mapping object, high
+			 0,  // size of mapping object, low
+			 NULL);          // name of mapping object
 
-	if (hMapFile == NULL)
-	{
-		log->error("Error mapping the file: %s. errno: %d", fileName, GetLastError());
-		exit(1);
-	}
+	 if (hMapFile == NULL)
+	 {
+		 log->error("Error mapping the file: %s. errno: %d", fileName, GetLastError());
+		 exit(1);
+	 }
 
-	// Map the view and test the results.
-	LPVOID lpMapAddress = MapViewOfFile(hMapFile,            // handle to
-			// mapping object
-			FILE_MAP_READ, // read/write
-			0,                   // high-order 32
-			// bits of file
-			// offset
-			0,      // low-order 32
-			// bits of file
-			// offset
-			_len);      // number of bytes
-	// to map
-	if (lpMapAddress == NULL)
-	{
-		log->error("Error mapping the file: %s. errno: %d", fileName, GetLastError());
-		exit(1);
-	}
+	 // Map the view and test the results.
+	 LPVOID lpMapAddress = MapViewOfFile(hMapFile,            // handle to
+			 // mapping object
+			 FILE_MAP_READ, // read/write
+			 0,                   // high-order 32
+			 // bits of file
+			 // offset
+			 0,      // low-order 32
+			 // bits of file
+			 // offset
+			 _len);      // number of bytes
+	 // to map
+	 if (lpMapAddress == NULL)
+	 {
+		 log->error("Error mapping the file: %s. errno: %d", fileName, GetLastError());
+		 exit(1);
+	 }
 
-	// Calculate the pointer to the data.
-	_addr = (char*)lpMapAddress;
-	_initaddr = _addr;
+	 // Calculate the pointer to the data.
+	 _addr = (char*)lpMapAddress;
+	 _initaddr = _addr;
 #endif
-	_open = true;
+	 _open = true;
 }
 
 MMapInputOutputStream::~MMapInputOutputStream() {
+	close();
 }
 
 unsigned char MMapInputOutputStream::readChar() {

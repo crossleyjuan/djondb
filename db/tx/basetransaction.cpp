@@ -59,7 +59,7 @@ BaseTransaction::BaseTransaction(Controller* controller, std::string transaction
 void BaseTransaction::loadControlFile() {
 	std::string file = _mainTransactionLog ? "main": *_transactionId;
 
-	_bufferManager = new TxBufferManager(_controller, file.c_str());
+	_bufferManager = new TxBufferManager(_controller, file.c_str(), _mainTransactionLog);
 	if (_mainTransactionLog) {
 		_bufferManager->startMonitor();
 	}
@@ -280,4 +280,8 @@ Controller* BaseTransaction::controller() const {
 
 void BaseTransaction::addBuffers(std::vector<TxBuffer*> buffers) {
 	_bufferManager->addBuffers(buffers);
+}
+
+void BaseTransaction::join() {
+	_bufferManager->join();
 }

@@ -66,6 +66,7 @@ class BaseTransaction: public Controller
 
 		Controller* controller() const;
 		void addBuffers(std::vector<TxBuffer*> buffers);
+		void join();
 
 	protected:
 		BaseTransaction(Controller* controller, std::string transactionId);

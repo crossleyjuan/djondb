@@ -116,16 +116,18 @@ class TestTXSuite: public Test::Suite
 				BSONObj* res = stx->findFirst("db", "testcommit", "*", filter.c_str());
 				delete res;
 			}
+			log->info("Doing commit");
 			stx->commit();
 			delete stx;
 
 			delete tx;
-			delete tuid;
+			log->info("~testTransactionCommit");
 		}
 
 		void testTransactionMergedData()
 		{
-			cout << "\ntestTransactionMergedData()\n" << endl;
+			Logger* log = getLogger(NULL);
+			log->info("testTransactionMergedData");
 
 			BaseTransaction* tx = new BaseTransaction(_controller);
 			tx->dropNamespace("db", "testcommit");
@@ -153,6 +155,7 @@ class TestTXSuite: public Test::Suite
 			TEST_ASSERT(resOut->length() == 1);
 
 			stx->commit();
+			tx->join();
 			delete stx;
 
 			BSONArrayObj* resOut2 = tx->find("db", "testcommit", "*", "");
@@ -204,6 +207,7 @@ class TestTXSuite: public Test::Suite
 			BSONObj* origin2 = array2->get(0);
 			TEST_ASSERT(origin2->has("lastName"));
 
+			wal->join();
 			delete t1;
 			delete manager;
 		}
