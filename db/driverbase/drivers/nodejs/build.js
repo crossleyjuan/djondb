@@ -15,8 +15,7 @@ var arch = process.arch,
 				force = true;
 				return false;
 			} else if (arg.substring(0, 13) === '--target_arch') {
-				arch = arg.substring(14);
-			}
+				arch = arg.substring(14); }
 		return true;
 	});
 
@@ -44,6 +43,15 @@ function checkExists(path) {
 	}
 }
 
+function generateDefs(nodeh) {
+	var fs = require('fs');
+	var text = "#ifndef DJONDB_DEFS_H\n";
+	text += "#define DJONDB_DEFS_H\n";
+	text += "#include <" + nodeh + ">;\n";
+	text += "#endif // DJONDB_DEFS_H\n";
+	fs.writeFileSync("djondefs.h", text);
+}
+
 function checkDependencies() {
 	var libPath;
 	var includePath;
@@ -63,7 +71,11 @@ function checkDependencies() {
 		process.exit(1);
 	}
 
-	if (!checkExists(path.join(includePath, "node/node.h"))) {
+	if (checkExists(path.join(includePath, "node/node.h"))) {
+		generateDefs("node/node.h");
+	} else if (checkExists(path.join(includePath, "nodejs/node.h"))) {
+		generateDefs("nodejs/node.h");
+	} else {
 		console.error("node development files not found, please install nodejs-dev package and try again.");
 		process.exit(1);
 	}

@@ -1,7 +1,7 @@
 #ifndef WRAP_CONNECTIONMANAGER_H
 #define WRAP_CONNECTIONMANAGER_H
 
-#include <node/node.h>
+#include "djondefs.h"
 
 class WrapConnectionManager: public node::ObjectWrap
 {
