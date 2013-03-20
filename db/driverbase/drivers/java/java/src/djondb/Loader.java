@@ -36,7 +36,7 @@ public class Loader {
                 throw new LibraryException(ex);
             } finally {
                 try {
-                    fos.close();
+                    if (fos != null) fos.close();
                 } catch (IOException ex) {
                     Logger.getLogger(Loader.class.getName()).log(Level.SEVERE, null, ex);
                 }
