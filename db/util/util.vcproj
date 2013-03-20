@@ -296,15 +296,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\djon_error_codes.h"
+				>
+			</File>
+			<File
 				RelativePath=".\dtime.h"
 				>
 			</File>
 			<File
 				RelativePath=".\errorhandle.h"
-				>
-			</File>
-			<File
-				RelativePath=".\errors.h"
 				>
 			</File>
 			<File

@@ -64,7 +64,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="util.lib pthreadVC2.lib Rpcrt4.lib Ws2_32.lib antlr3c.lib"
+				AdditionalDependencies="bson.lib util.lib pthreadVC2.lib Rpcrt4.lib Ws2_32.lib antlr3c.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(SolutionDir)\libs\$(PlatformName);$(SolutionDir)\..\third_party\libs\$(PlatformName)"
 				GenerateDebugInformation="true"
@@ -139,7 +139,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="util.lib pthreadVC2.lib Rpcrt4.lib Ws2_32.lib antlr3c.lib"
+				AdditionalDependencies="bson.lib util.lib pthreadVC2.lib Rpcrt4.lib Ws2_32.lib antlr3c.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(SolutionDir)\libs\$(PlatformName);$(SolutionDir)\..\third_party\libs\$(PlatformName)"
 				GenerateDebugInformation="true"
@@ -215,7 +215,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="util.lib pthreadVC2.lib Rpcrt4.lib Ws2_32.lib antlr3c.lib"
+				AdditionalDependencies="bson.lib util.lib pthreadVC2.lib Rpcrt4.lib Ws2_32.lib antlr3c.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(SolutionDir)\libs\$(PlatformName);$(SolutionDir)\..\third_party\libs\$(PlatformName)"
 				GenerateDebugInformation="true"
@@ -293,7 +293,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="util.lib pthreadVC2.lib Rpcrt4.lib Ws2_32.lib antlr3c.lib"
+				AdditionalDependencies="bson.lib util.lib pthreadVC2.lib Rpcrt4.lib Ws2_32.lib antlr3c.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(SolutionDir)\libs\$(PlatformName);$(SolutionDir)\..\third_party\libs\$(PlatformName)"
 				GenerateDebugInformation="true"
