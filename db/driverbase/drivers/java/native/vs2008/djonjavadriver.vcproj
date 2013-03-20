@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="djonjavadriver"
 	ProjectGUID="{3F4E72FD-F616-4BA5-87C7-D44561004F0E}"
 	RootNamespace="djonjavadriver"
@@ -20,7 +20,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(ProjectDir)$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)\libs\$(PlatformName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2"
@@ -43,7 +43,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)/../third_party/boost&quot;;&quot;$(SolutionDir)/../third_party/pthreads&quot;;C:\development\Java\jdk1.7.0_04\include\win32;C:\development\Java\jdk1.7.0_04\include;&quot;$(SolutionDir)/../driverbase/drivers&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)/../third_party/includes&quot;;&quot;$(SolutionDir)/../third_party/includes/Win32&quot;;&quot;$(SolutionDir)/../third_party/boost&quot;;&quot;$(SolutionDir)/../third_party/pthreads&quot;;&quot;$(SolutionDir)/../driverbase/drivers&quot;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -62,7 +62,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies=" Rpcrt4.lib Ws2_32.lib driverbase.lib network.lib command.lib db.lib filesystem.lib cache.lib bson.lib util.lib antlr3c.lib"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)\libs&quot;;&quot;$(SolutionDir)/../third_party/libs/$(PlatformName)&quot;"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)\libs\$(PlatformName)&quot;;&quot;$(SolutionDir)/../third_party/libs/$(PlatformName)&quot;"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
@@ -90,8 +90,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|x64"
-			OutputDirectory="$(ProjectDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)\libs\$(PlatformName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2"
 			>
@@ -114,7 +114,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)/../third_party/boost&quot;;&quot;$(SolutionDir)/../third_party/pthreads&quot;;C:\development\Java\jdk1.7.0_04\include\win32;C:\development\Java\jdk1.7.0_04\include;&quot;$(SolutionDir)/../driverbase/drivers&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)/../third_party/includes&quot;;&quot;$(SolutionDir)/../third_party/includes/Win32&quot;;&quot;$(SolutionDir)/../third_party/boost&quot;;&quot;$(SolutionDir)/../third_party/pthreads&quot;;&quot;$(SolutionDir)/../driverbase/drivers&quot;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -133,7 +133,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies=" Rpcrt4.lib Ws2_32.lib driverbase.lib network.lib command.lib db.lib filesystem.lib cache.lib bson.lib util.lib antlr3c.lib"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)\libs&quot;;&quot;$(SolutionDir)/../third_party/libs/$(PlatformName)&quot;"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)\libs\$(PlatformName)&quot;;&quot;$(SolutionDir)/../third_party/libs/$(PlatformName)&quot;"
 				GenerateDebugInformation="true"
 				TargetMachine="17"
 			/>
@@ -161,7 +161,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(ProjectDir)$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)\libs\$(PlatformName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2"
@@ -186,7 +186,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)/../third_party/boost&quot;;&quot;$(SolutionDir)/../third_party/pthreads&quot;;C:\development\Java\jdk1.7.0_04\include\win32;C:\development\Java\jdk1.7.0_04\include;&quot;$(SolutionDir)/../driverbase/drivers&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)/../third_party/includes&quot;;&quot;$(SolutionDir)/../third_party/includes/Win32&quot;;&quot;$(SolutionDir)/../third_party/boost&quot;;&quot;$(SolutionDir)/../third_party/pthreads&quot;;&quot;$(SolutionDir)/../driverbase/drivers&quot;"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
@@ -205,7 +205,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies=" Rpcrt4.lib Ws2_32.lib driverbase.lib network.lib command.lib db.lib filesystem.lib cache.lib bson.lib util.lib antlr3c.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)\libs&quot;;&quot;$(SolutionDir)/../third_party/libs/$(PlatformName)&quot;"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)\libs\$(PlatformName)&quot;;&quot;$(SolutionDir)/../third_party/libs/$(PlatformName)&quot;"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -235,8 +235,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory="$(ProjectDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)\libs\$(PlatformName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
@@ -261,7 +261,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)/../third_party/boost&quot;;&quot;$(SolutionDir)/../third_party/pthreads&quot;;C:\development\Java\jdk1.7.0_04\include\win32;C:\development\Java\jdk1.7.0_04\include;&quot;$(SolutionDir)/../driverbase/drivers&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)/../third_party/includes&quot;;&quot;$(SolutionDir)/../third_party/includes/Win32&quot;;&quot;$(SolutionDir)/../third_party/boost&quot;;&quot;$(SolutionDir)/../third_party/pthreads&quot;;&quot;$(SolutionDir)/../driverbase/drivers&quot;"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
@@ -279,7 +279,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies=" Rpcrt4.lib Ws2_32.lib driverbase.lib network.lib command.lib db.lib filesystem.lib cache.lib bson.lib util.lib antlr3c.lib"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)\libs&quot;;&quot;$(SolutionDir)/../third_party/libs/$(PlatformName)&quot;"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)\libs\$(PlatformName)&quot;;&quot;$(SolutionDir)/../third_party/libs/$(PlatformName)&quot;"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"

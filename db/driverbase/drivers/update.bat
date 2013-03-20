@@ -35,7 +35,7 @@ copy ..\..\util\defs.h .
 copy ..\..\util\datetime.h .
 copy ..\..\util\dtime.h .
 copy ..\..\util\errorhandle.h .
-copy ..\..\util\errors.h .
+copy ..\..\util\djon_error_codes.h .
 copy ..\..\util\fileutil.h .
 copy ..\..\util\circular_queue.h .
 copy ..\..\obj\config.h .

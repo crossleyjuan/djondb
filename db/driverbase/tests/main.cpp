@@ -64,12 +64,43 @@ class TestDriverBaseSuite: public Test::Suite {
 			TEST_ADD(TestDriverBaseSuite::testInsert);
 			TEST_ADD(TestDriverBaseSuite::testInsertComplex);
 			TEST_ADD(TestDriverBaseSuite::testUpdate);
+			TEST_ADD(TestDriverBaseSuite::testUpdateValidations);
 			TEST_ADD(TestDriverBaseSuite::testRemove);
 			TEST_ADD(TestDriverBaseSuite::testFindByFilter);
 			TEST_ADD(TestDriverBaseSuite::testDbsNamespaces);
 
 			TEST_ADD(TestDriverBaseSuite::testDropNamespace);
 			//TEST_ADD(TestDriverBaseSuite::testTransactions);
+
+
+			// Leave this test at the end, because it will shutdow the server
+			TEST_ADD(TestDriverBaseSuite::testConnection);
+		}
+
+
+		void testConnection() {
+			cout << "\ntestConnection\n" << endl;
+
+			DjondbConnection* conn = DjondbConnectionManager::getConnection("localhost");
+
+			try {
+				conn->insert("db1", "ns1", "{ name: 'Test'  }");
+				TEST_FAIL("If the client is not connected then an exception should be thrown");
+			} catch (DjondbException) {
+				// Expected behavior
+			}
+
+			// test connection and then shutdown the server
+			if (conn->open()) {
+				conn->shutdown();
+				try {
+					conn->insert("db1", "ns1", "{ name: 'Test'  }");
+				} catch (DjondbException) {
+					// Expected behavior
+				}
+			} else {
+				TEST_FAIL("Cannot establish a connection with the server");
+			}
 		}
 
 		void testDbsNamespaces() {
@@ -80,11 +111,11 @@ class TestDriverBaseSuite: public Test::Suite {
 				exit(0);
 			}
 
-		   std::string bson = "{ name: 'Test'}";
+			std::string bson = "{ name: 'Test'}";
 			conn->insert("db1", "ns1", bson);
 			conn->insert("db2", "ns1", bson);
 			conn->insert("db3", "ns1", bson);
-			
+
 			std::vector<std::string>* dbs = conn->dbs();
 
 			TEST_ASSERT(dbs->size() >= 3);
@@ -414,6 +445,7 @@ class TestDriverBaseSuite: public Test::Suite {
 			if (secs > 0) {
 				cout << "\nThroughput: " << (count / secs) << " ops." << endl;
 			}
+
 			cout << "\n------------------------------------------------------------" << endl;
 			cout << "\nReady to close the connection" << endl;
 			//getchar();
@@ -425,9 +457,29 @@ class TestDriverBaseSuite: public Test::Suite {
 			//    delete conn;
 		}
 
+		void testUpdateValidations() {
+			cout << "\ntestUpdateValidations\n" << endl;
+
+			DjondbConnection* conn = DjondbConnectionManager::getConnection("localhost");
+
+			if (!conn->open()) {
+				cout << "\nCannot connect to localhost" << endl;
+				exit(0);
+			}
+
+			try {
+				BSONObj obj;
+				obj.add("test", "test");
+				conn->update("mydb", "updatens", obj);
+				TEST_FAIL("The update should validate that an _id and _revision are required fields");
+			} catch (DjondbException e) {
+				//Expected behavior
+			}
+		}
+
 		void testRemove() {
 			cout << "\ntestRemove\n" << endl;
-			
+
 			DjondbConnection* conn = DjondbConnectionManager::getConnection("localhost");
 
 			if (!conn->open()) {

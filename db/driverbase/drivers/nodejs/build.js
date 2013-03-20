@@ -15,8 +15,7 @@ var arch = process.arch,
 				force = true;
 				return false;
 			} else if (arg.substring(0, 13) === '--target_arch') {
-				arch = arg.substring(14);
-			}
+				arch = arg.substring(14); }
 		return true;
 	});
 
@@ -44,6 +43,15 @@ function checkExists(path) {
 	}
 }
 
+function generateDefs(nodeh) {
+	var fs = require('fs');
+	var text = "#ifndef DJONDB_DEFS_H\n";
+	text += "#define DJONDB_DEFS_H\n";
+	text += "#include <" + nodeh + ">;\n";
+	text += "#endif // DJONDB_DEFS_H\n";
+	fs.writeFileSync("djondefs.h", text);
+}
+
 function checkDependencies() {
 	var libPath;
 	var libLocalPath;
@@ -66,19 +74,22 @@ function checkDependencies() {
 	var exist = checkExists(path.join(libPath, djonLibrary)) || checkExists(path.join(libLocalPath, djonLibrary));
 	if (!exist) {
 		console.error("djondb client library not found, please install the development package or server and try again");
-		process.exit();
+		process.exit(1);
 	}
 
-	exist = checkExists(path.join(includePath, "node/node.h")) || checkExists(path.join(includeLocalPath, "node/node.h"));
-	if (!exist) {
-		console.error("node development files not found, please install nodejs-dev package and try again.");
+	if (checkExists(path.join(includePath, "node/node.h"))) {
+		generateDefs("node/node.h");
+	} else if (checkExists(path.join(includePath, "nodejs/node.h"))) {
+		generateDefs("nodejs/node.h");
+	} else {
 		if (process.platform == "linux") {
 			console.error("This can be installed using: sudo apt-get install nodejs-dev");
-      }
-		if (process.platform == "darwing") {
+      } else if (process.platform == "darwing") {
 			console.error("This can be installed easily with Homebrew executing brew install node");
-      }
-		process.exit();
+      } else {
+			console.error("node development files not found, please install nodejs-dev package and try again.");
+		}
+		process.exit(1);
 	}
 }
 

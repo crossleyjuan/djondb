@@ -21,5 +21,4 @@ public:
     }
 };
 
-
 #endif // NETWORK_H_INCLUDED

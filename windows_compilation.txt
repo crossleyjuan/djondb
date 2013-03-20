@@ -1,1 +1,8 @@
+under cygwin
 third_party/python_26/python build/gyp_v8 -Dcomponent=shared_library
+
+to compile under x64 add:
+-Dtarget_arch=x64
+
+To force vs2008
+ -G msvs_version=2008

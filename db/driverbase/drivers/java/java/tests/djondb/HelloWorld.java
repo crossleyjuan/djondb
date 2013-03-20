@@ -14,7 +14,7 @@ public class HelloWorld {
         try {
             Loader.initialize();
 
-            Connection con = ConnectionManager.getConnection("localhost");
+            DjondbConnection con = DjondbConnectionManager.getConnection("localhost");
 
             if (!con.open()) {
                 System.out.println("Not connected");
@@ -23,13 +23,13 @@ public class HelloWorld {
 
             con.insert("dbjava", "nsjava", "{ 'name': 'John', 'lastName': 'Smith' }");
 
-            BSONObjVectorPtr wrapper = con.find("dbjava", "nsjava", "$'lastName' == 'Smith'");
+            BSONArrayObj wrapper = con.find("dbjava", "nsjava", "$'lastName' == 'Smith'");
 
             BSONObj bson = wrapper.get(0);
 
             System.out.println("Hello: " + bson.getString("name"));
 
-            ConnectionManager.releaseConnection(con);
+            DjondbConnectionManager.releaseConnection(con);
         } catch (LibraryException e) {
             e.printStackTrace();
         }

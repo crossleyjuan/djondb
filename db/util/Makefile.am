@@ -33,7 +33,7 @@ libdjon_util_la_SOURCES = util.cpp \
 			  circular_queue.h 
 
 library_includedir=$(includedir)/djondb
-library_include_HEADERS=util.h datetime.h errorhandle.h dtime.h fileutil.h logger.h version.h stringfunctions.h threads.h settings.h defs.h circular_queue.h errors.h
+library_include_HEADERS=util.h datetime.h errorhandle.h dtime.h fileutil.h logger.h version.h stringfunctions.h threads.h settings.h defs.h circular_queue.h djon_error_codes.h
 
 
 TESTS = test-util
