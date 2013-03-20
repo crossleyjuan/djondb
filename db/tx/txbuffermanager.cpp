@@ -79,7 +79,7 @@ void TxBufferManager::initialize(const char* file) {
 	}
 
 	if (existControl) {
-		_buffersSize = _controlFile->readInt();
+		_buffersSize = _controlFile->readLong();
 		
 		loadBuffers();
 	} else {
@@ -97,12 +97,14 @@ void TxBufferManager::loadBuffers() {
 	__int32 buffers = _controlFile->readInt();
 
 	for (__int32 x = 0; x < buffers; x++) {
+		__int32 controlPosition = _controlFile->currentPos();
 		char flag = _controlFile->readChar();
 		__int64 startOffset = _controlFile->readLong();
 		__int64 bufferLen = _controlFile->readLong();
 		char* logFileName = _controlFile->readChars();
 		bool mainLog = (bool)_controlFile->readInt();
 		TxBuffer* buffer = new TxBuffer(this, logFileName, startOffset, bufferLen, _buffersSize / pageSize(), mainLog);
+		buffer->setControlPosition(controlPosition);
 
 		if (flag & 0x01) {
 			addBuffer(buffer);
@@ -194,10 +196,12 @@ TxBuffer* TxBufferManager::getBuffer(__int32 minimumSize, bool force) {
 		// Active buffer
 		if (_reusableBuffers.empty()) {
 			result = createNewBuffer();
+			newBuffer = true;
 		} else {
 			result = _reusableBuffers.front();
 			_reusableBuffers.pop();
 			result->reset();
+			newBuffer = false;
 		}
 		addBuffer(result);
 		result->seek(0);
