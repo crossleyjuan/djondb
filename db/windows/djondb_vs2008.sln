@@ -519,7 +519,8 @@ Global
 		{2B37641C-4A5C-41F5-A4E1-034BAB23718A}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{2B37641C-4A5C-41F5-A4E1-034BAB23718A}.Release|Win32.ActiveCfg = Release|Win32
 		{2B37641C-4A5C-41F5-A4E1-034BAB23718A}.Release|Win32.Build.0 = Release|Win32
-		{2B37641C-4A5C-41F5-A4E1-034BAB23718A}.Release|x64.ActiveCfg = Release|Win32
+		{2B37641C-4A5C-41F5-A4E1-034BAB23718A}.Release|x64.ActiveCfg = Release|x64
+		{2B37641C-4A5C-41F5-A4E1-034BAB23718A}.Release|x64.Build.0 = Release|x64
 		{2B37641C-4A5C-41F5-A4E1-034BAB23718A}.Release|x86.ActiveCfg = Release|Win32
 		{2B37641C-4A5C-41F5-A4E1-034BAB23718A}.ReleaseDLL|Any CPU.ActiveCfg = Release|Win32
 		{2B37641C-4A5C-41F5-A4E1-034BAB23718A}.ReleaseDLL|Mixed Platforms.ActiveCfg = Release|Win32
@@ -549,7 +550,8 @@ Global
 		{C21587E5-9666-46AB-A1A5-892185062A44}.Release|Mixed Platforms.Build.0 = Release|x86
 		{C21587E5-9666-46AB-A1A5-892185062A44}.Release|Win32.ActiveCfg = Release|x86
 		{C21587E5-9666-46AB-A1A5-892185062A44}.Release|Win32.Build.0 = Release|x86
-		{C21587E5-9666-46AB-A1A5-892185062A44}.Release|x64.ActiveCfg = Release|x86
+		{C21587E5-9666-46AB-A1A5-892185062A44}.Release|x64.ActiveCfg = Release|x64
+		{C21587E5-9666-46AB-A1A5-892185062A44}.Release|x64.Build.0 = Release|x64
 		{C21587E5-9666-46AB-A1A5-892185062A44}.Release|x86.ActiveCfg = Release|x86
 		{C21587E5-9666-46AB-A1A5-892185062A44}.Release|x86.Build.0 = Release|x86
 		{C21587E5-9666-46AB-A1A5-892185062A44}.ReleaseDLL|Any CPU.ActiveCfg = Release|x86
@@ -573,7 +575,8 @@ Global
 		{8E7CF516-49F1-449D-9838-AE8688823570}.Release|Mixed Platforms.ActiveCfg = Release|Win32
 		{8E7CF516-49F1-449D-9838-AE8688823570}.Release|Win32.ActiveCfg = Release|Win32
 		{8E7CF516-49F1-449D-9838-AE8688823570}.Release|Win32.Build.0 = Release|Win32
-		{8E7CF516-49F1-449D-9838-AE8688823570}.Release|x64.ActiveCfg = Release|Win32
+		{8E7CF516-49F1-449D-9838-AE8688823570}.Release|x64.ActiveCfg = Release|x64
+		{8E7CF516-49F1-449D-9838-AE8688823570}.Release|x64.Build.0 = Release|x64
 		{8E7CF516-49F1-449D-9838-AE8688823570}.Release|x86.ActiveCfg = Release|Win32
 		{8E7CF516-49F1-449D-9838-AE8688823570}.ReleaseDLL|Any CPU.ActiveCfg = Release|Win32
 		{8E7CF516-49F1-449D-9838-AE8688823570}.ReleaseDLL|Mixed Platforms.ActiveCfg = Release|Win32

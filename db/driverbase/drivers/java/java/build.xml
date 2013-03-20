@@ -42,7 +42,7 @@
   </target>
 
   <target name="if_windows" depends="checkos,configuration" if="isWindows">
-	  <property name="native_file" value="/vs2008/${configuration}/djonjavadriver.dll" />
+	  <property name="native_file" value="/vs2008/djonjavadriver.dll" />
   </target>
 
   <target name="if_unix" depends="checkos" if="isLinux">
