@@ -320,13 +320,13 @@ class TestDBSuite: public Test::Suite
 				bres = *result;
 				TEST_ASSERT(bres);
 
-				parser = FilterParser::parse("(($'age' == 36 ) and ($'state' == 1 ))");
+				parser = FilterParser::parse("(($'age' == 36 ) AnD ($'state' == 1 ))");
 				result = parser->eval(obj);
 				TEST_ASSERT(result->type() == ExpressionResult::RT_BOOLEAN);
 				bres = *result;
 				TEST_ASSERT(!bres);
 
-				parser = FilterParser::parse("(($'age' == 35 ) and ($'state' == 2 ))");
+				parser = FilterParser::parse("(($'age' == 35 ) AND ($'state' == 2 ))");
 				result = parser->eval(obj);
 				TEST_ASSERT(result->type() == ExpressionResult::RT_BOOLEAN);
 				bres = *result;
@@ -350,7 +350,7 @@ class TestDBSuite: public Test::Suite
 				bres = *result;
 				TEST_ASSERT(bres);
 
-				parser = FilterParser::parse("(('Johnny' == $'name') or ($'age'==35))");
+				parser = FilterParser::parse("(('Johnny' == $'name') OR ($'age'==35))");
 				result = parser->eval(obj);
 				TEST_ASSERT(result->type() == ExpressionResult::RT_BOOLEAN);
 				bres = *result;
