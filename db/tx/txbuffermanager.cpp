@@ -69,6 +69,7 @@ void TxBufferManager::initialize(const char* file) {
 		flags = "wb+";
 	}
 	_controlFile = (InputOutputStream*)new FileInputOutputStream(fullcontrolFileName, flags); 
+	_controlFile->acquireLock();
 	_controlFile->seek(0);
 
 	bool existLogFile = existFile(fullLogFileName.c_str());
@@ -89,6 +90,7 @@ void TxBufferManager::initialize(const char* file) {
 		_controlFile->seek(pos);
 		loadBuffers();
 	}
+	_controlFile->releaseLock();
 }
 
 void TxBufferManager::loadBuffers() {
@@ -149,6 +151,7 @@ TxBuffer* TxBufferManager::createNewBuffer() {
 
 void registerBufferControlFile(InputOutputStream* controlFile, std::map<std::string, int> buffersByLog, TxBuffer* buffer, bool newBuffer, int flag, int buffersCount) {
 	controlFile->acquireLock();
+	// Jumps the buffersSize (first 8 bytes)
 	controlFile->seek(sizeof(__int64)); 
 	controlFile->writeInt(buffersCount);
 	// Active buffer
@@ -235,14 +238,15 @@ void TxBufferManager::addBuffers(std::vector<TxBuffer*> buffers) {
 	_lockActiveBuffers->lock();
 	for (std::vector<TxBuffer*>::iterator it = buffers.begin(); it != buffers.end(); it++) {
 		TxBuffer* buffer = *it;
+		_buffersCount++;
 		registerBufferControlFile(_controlFile, _buffersByLog, buffer, true, 0x01, _buffersCount);
 		_activeBuffers.push(buffer);
 		_vactiveBuffers.push_back(buffer);
-		_buffersCount++;
 	}
 	_lockActiveBuffers->unlock();
 	// this will force a new buffer to be put
 	getBuffer(0, true);
+	flushBuffer();
 }
 
 void TxBufferManager::addReusable(TxBuffer* buffer) {
@@ -266,9 +270,11 @@ TxBuffer* TxBufferManager::pop() {
 	_activeBuffers.pop();
 
 	__int64 controlPos = buffer->controlPosition();
+	_controlFile->acquireLock();
 	_controlFile->seek(controlPos);
 	_controlFile->writeChar((char)0x01); // reusable
 	_buffersCount--;
+	_controlFile->releaseLock();
 
 	return buffer;
 }
@@ -280,7 +286,7 @@ __int32 TxBufferManager::buffersCount() const {
 void TxBufferManager::startMonitor() {
 	_monitorThread = new Thread(&TxBufferManager::monitorBuffers);
 	_runningMonitor = true;
-	_monitorThread->start(this);
+	//_monitorThread->start(this);
 }
 
 bool TxBufferManager::runningMonitor() const {
