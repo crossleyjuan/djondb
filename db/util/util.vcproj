@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="util"
 	ProjectGUID="{C5EB45F0-68D0-426D-A04A-47439917D92F}"
 	RootNamespace="util"
@@ -21,7 +21,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)\libs"
+			OutputDirectory="$(SolutionDir)\libs\$(PlatformName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="0"
@@ -86,7 +86,7 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)\libs\$(PlatformName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="0"
@@ -152,7 +152,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)\libs"
+			OutputDirectory="$(SolutionDir)\libs\$(PlatformName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="4"
 			ManagedExtensions="1"
@@ -213,7 +213,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)\libs\$(PlatformName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
 			ManagedExtensions="1"
@@ -296,15 +296,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\djon_error_codes.h"
+				>
+			</File>
+			<File
 				RelativePath=".\dtime.h"
 				>
 			</File>
 			<File
 				RelativePath=".\errorhandle.h"
-				>
-			</File>
-			<File
-				RelativePath=".\errors.h"
 				>
 			</File>
 			<File

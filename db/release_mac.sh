@@ -10,11 +10,11 @@ cd obj
 ../configure --prefix=/usr
 make
 make DESTDIR=`pwd` install
-
 rm usr/bin/test*
 
-
+cd ..
 sh createMacPackage.sh
+sh createMacDevPackage.sh
 
 # cd ../mac
 # sh macpackage.sh

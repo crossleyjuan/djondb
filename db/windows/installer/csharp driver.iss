@@ -33,9 +33,6 @@ Name: "{app}\"; Permissions: everyone-modify
 [Files]
 Source: "..\Release\csharpdriver.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Release\djonwrapper.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\Release\msvcm90.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\Release\msvcp90.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\Release\msvcr90.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Release\pthreadVC2.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\djondb.conf"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\installer\vcredist_x86_vs2010.exe"; DestDir: {tmp}

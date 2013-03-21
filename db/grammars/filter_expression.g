@@ -182,8 +182,8 @@ operand_expr returns [BaseExpression* val]
 NOT	:	'not';
 
 OPER	:	('==' | '>' | '>=' | '<' | '<=' );
-OR	:	'or';
-AND	:	'and';
+OR	:	('o' | 'O') ('R' | 'r');
+AND	:	('a' | 'A') ('n' | 'N') ('d' | 'D');
 
 NUMBER :	'0'..'9'+;
 
@@ -198,11 +198,7 @@ COMMENT
     |   '/*' ( options {greedy=false;} : . )* '*/' {$channel=HIDDEN;}
     ;
 
-WS  :   ( ' '
-        | '\t'
-        | '\r'
-        | '\n'
-        ) {$channel=HIDDEN;}
+WS  :   ( ' ' | '\t' | '\r' | '\n')+ {$channel=HIDDEN;}
     ;
 
 STRING 		: 	'\"' ( options{ greedy=false; }: (~('\"') | ('\\"')) )* '\"' | '\'' ( options{ greedy=false; }: (~('\'') | ('\\\'')) )* '\'' ;
