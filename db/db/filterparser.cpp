@@ -297,6 +297,7 @@ void FilterParser::setTokens(std::set<std::string> tokens) {
 
 // static
 FilterParser* FilterParser::parse(const std::string& expression) throw(ParseException) {
+	Logger* log = getLogger(NULL);
 	BaseExpression* rootExpression = NULL;
 	std::list<Token*> lTokens;
 	std::set<std::string> xpathTokens;
@@ -311,7 +312,8 @@ FilterParser* FilterParser::parse(const std::string& expression) throw(ParseExce
 		pfilter_expressionParser              parser;
 
 		const char* filter = expression.c_str();
-		input  = antlr3NewAsciiStringInPlaceStream((pANTLR3_UINT8)filter, (ANTLR3_INT8)strlen(filter), (pANTLR3_UINT8)"name");
+		if (log->isDebug()) log->debug("filter expression: %s, len: %d, Size Hint: %d", filter, strlen(filter), ANTLR3_SIZE_HINT);
+		input  = antlr3NewAsciiStringInPlaceStream((pANTLR3_UINT8)filter, strlen(filter), (pANTLR3_UINT8)"name");
 		lex    = filter_expressionLexerNew                (input);
 		tokens = antlr3CommonTokenStreamSourceNew  (ANTLR3_SIZE_HINT, TOKENSOURCE(lex));
 		parser = filter_expressionParserNew               (tokens);

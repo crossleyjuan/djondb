@@ -285,6 +285,7 @@ class TestDBSuite: public Test::Suite
 
 		void testFilterExpressionParser() {
 			cout << "\ntestFilterExpressionParser" << endl;
+			Logger* log = getLogger(NULL);
 			try {
 				BSONObj obj;
 				obj.add("age", 35);
@@ -399,6 +400,14 @@ class TestDBSuite: public Test::Suite
 
 				// Eval an attribute that does not exist
 				parser = FilterParser::parse("($'nn' == \"John\")");
+				result = parser->eval(obj);
+				TEST_ASSERT(result->type() == ExpressionResult::RT_BOOLEAN);
+				bres = *result;
+				TEST_ASSERT(!bres);
+
+				// Eval an attribute that does not exist
+				log->info("Complex filter");
+				parser = FilterParser::parse("($'process' == 'Complains') and ((($'values.complains__idCustomer__identification' == '63154446') or ($'values.complains__idCustomer__identification' == '09821150')))");
 				result = parser->eval(obj);
 				TEST_ASSERT(result->type() == ExpressionResult::RT_BOOLEAN);
 				bres = *result;
