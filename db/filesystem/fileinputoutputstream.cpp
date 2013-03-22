@@ -190,10 +190,18 @@ __int64 FileInputOutputStream::currentPos() const {
 }
 
 void FileInputOutputStream::close() {
+	Logger* log = getLogger(NULL);
     if (_pFile) {
         flush();
 #ifndef A
-        fclose(_pFile);
+        int res = fclose(_pFile);
+		if (res != 0) {
+#ifdef WINDOWS
+			log->error("An error ocurreed closing the file. Error: %d", GetLastError());
+#else
+			log->error("An error ocurreed closing the file. Error: %d", strerror(errno));
+#endif
+		}
         _pFile = 0;
 #else
 		CloseHandle(_pFile);
