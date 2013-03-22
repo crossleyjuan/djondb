@@ -56,6 +56,7 @@ private:
     int _pFile;
 #else
     HANDLE _pFile;
+	HANDLE _hMapFile;
 #endif
 	 char* _initaddr;
 	 char* _addr;

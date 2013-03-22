@@ -1,4 +1,22 @@
 @echo off
+
+if [%1] ==[] goto usage
+
+set x32=false
+if [%1] == [-x32] (
+   set x32=true
+)
+if [%2] == [-x32] (
+   set x32=true
+)
+set x64=false
+if [%1] == [-x64] (
+   set x64=true
+)
+if [%2] == [-x64] (
+   set x64=true
+)
+
 call setenv.bat
 
 cd %PATH_SRC_STARTUP%\driverbase\drivers
@@ -7,16 +25,20 @@ call update.bat
 cd %PATH_SRC_STARTUP%
 
 :Win32
-echo starting win32
-SET PLATFORM=Win32
-SET NEXT_STEP=x64
-GOTO ExecuteJob
+if %x32% == true (
+	echo starting win32
+	SET PLATFORM=Win32
+	SET NEXT_STEP=x64
+	GOTO ExecuteJob
+)
 
 :x64
-echo starting x64
-SET PLATFORM=x64
-SET NEXT_STEP=END
-GOTO ExecuteJob
+if %x64% == true (
+	echo starting x64
+	SET PLATFORM=x64
+	SET NEXT_STEP=END
+	GOTO ExecuteJob
+)
 
 GOTO END
 
@@ -32,6 +54,10 @@ cd %PATH_SRC_STARTUP%
 
 mkdir "%RELEASE_DIR%"
 xcopy /y "%PATH_SRC_STARTUP%\Windows\libs\%PLATFORM%\*.*" "%RELEASE_DIR%\"
+if x32 == true (
+    rem the Csharp driver is been copied on other folder
+    xcopy /y "%PATH_SRC_STARTUP%\Windows\libs\x86\*.*" "%RELEASE_DIR%\"
+)
 xcopy /y "%PATH_SRC_STARTUP%\third_party\libs\%PLATFORM%\pthreadVC2.dll" "%RELEASE_DIR%\"
 
 "%INNO_PATH%\compil32" /cc "%PATH_SRC_STARTUP%\windows\installer\inno script.iss"
@@ -53,6 +79,13 @@ move "%PATH_SRC_STARTUP%\windows\output\setup_djondb.exe" "%PATH_SRC_STARTUP%\wi
 
 GOTO %NEXT_STEP%
 
+:usage
+
+Echo Usage: release-windows [-x32] [-x64]
+goto exit
+
 :END
 
 Echo Done!
+
+:Exit
