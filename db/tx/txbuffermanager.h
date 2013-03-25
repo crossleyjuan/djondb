@@ -61,6 +61,8 @@ class TxBufferManager
 		std::vector<TxBuffer*> popAll();
 		// Joins the current thread to avoid unwanted abortion
 		void join();
+		void dropAllBuffers();
+		void dropControlFile();
 
 	private:
 		void initialize(const char* file);
@@ -73,6 +75,10 @@ class TxBufferManager
 		TxBuffer* createNewBuffer();
 		TxBuffer* pop();
 		void dropBuffer(TxBuffer* buffer);
+
+#ifdef DEBUG
+		void debugFlushBuffers();
+#endif
 
 		bool mainLog() const {
 			return _mainLog;

@@ -53,6 +53,7 @@ class TestFileSystemSuite: public Test::Suite
 			TEST_ADD(TestFileSystemSuite::testBSONSelect);
 			TEST_ADD(TestFileSystemSuite::testBSONBufferedArray);
 			TEST_ADD(TestFileSystemSuite::testBSONBuffered);
+			TEST_ADD(TestFileSystemSuite::testFileSeek);
 		}
 
 	private:
@@ -577,7 +578,7 @@ class TestFileSystemSuite: public Test::Suite
 			TEST_ASSERT(buffered->getLong("long") == (__int64)1000000);
 			TEST_ASSERT(buffered->getString("char").compare("Test Char") == 0);
 			TEST_ASSERT(buffered->getDouble("double") == (double)2.14159);
-			BSONContent* innerResult = buffered.getXpath("inner.int");
+			BSONContent* innerResult = buffered->getXpath("inner.int");
 			BSONObj* or2 = buffered->select("$'int', $'long'");
 			if (innerResult != NULL) {
 				__int32 inneri = *innerResult;
@@ -597,6 +598,34 @@ class TestFileSystemSuite: public Test::Suite
 			delete or2;
 			delete ms;
 			free(c);
+		}
+
+		void testFileSeek() {
+			Logger* log = getLogger(NULL);
+			log->info("testFileSeek");
+
+			if (existFile("testseek.dat")) {
+				removeFile("testseek.dat");
+			}
+
+			FileInputOutputStream* fos = new FileInputOutputStream("testseek.dat", "wb+");
+
+			fos->writeChars("Test", 4);
+
+			__int32 pos = fos->currentPos();
+			fos->seek(0);
+			char* test = fos->readChars();
+			TEST_ASSERT(strcmp(test, "Test") == 0);
+			fos->seek(0, FROMEND_SEEK);
+
+			fos->writeChars("Test2", 5);
+			fos->seek(0);
+			char* test2 = fos->readChars();
+			TEST_ASSERT(strcmp(test2, "Test") == 0);
+			char* test3 = fos->readChars();
+			TEST_ASSERT(strcmp(test3, "Test2") == 0);
+			fos->close();
+
 		}
 };
 

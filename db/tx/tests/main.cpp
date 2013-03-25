@@ -40,13 +40,38 @@ class TestTXSuite: public Test::Suite
 	public:
 		TestTXSuite()
 		{
+			TEST_ADD(TestTXSuite::testTransactionSimplest);
 			TEST_ADD(TestTXSuite::testTransaction);
+			TEST_ADD(TestTXSuite::testTransactionSimpleCommit);
 			TEST_ADD(TestTXSuite::testTransactionCommit);
 			TEST_ADD(TestTXSuite::testTransactionManager);
 			TEST_ADD(TestTXSuite::testTransactionMergedData);
 		}
 
 	private:
+
+		void testTransactionSimplest()
+		{
+			Logger* log = getLogger(NULL);
+			log->info("testTransactionSimplest");
+			DummyController* controller = new DummyController();
+
+			BaseTransaction* tx = new BaseTransaction(controller);
+
+			tx->dropNamespace("db", "txns");
+
+			delete tx;
+			delete controller;
+
+			controller = new DummyController();
+
+			tx = new BaseTransaction(controller);
+
+			tx->dropNamespace("db", "txns");
+
+			delete tx;
+			delete controller;
+		}
 
 		void testTransaction()
 		{
@@ -84,6 +109,27 @@ class TestTXSuite: public Test::Suite
 			delete tx;
 			delete controller;
 			delete id;
+		}
+
+		void testTransactionSimpleCommit()
+		{
+			Logger* log = getLogger(NULL);
+			log->info("testTransactionSimpleCommit");
+
+			BaseTransaction* tx = new BaseTransaction(_controller);
+			std::string* tuid = uuid();
+			StdTransaction* stx = new StdTransaction(tx, *tuid);
+
+			BSONObj* obj = BSONParser::parse("{name: 'test', lastName: 'testln'}");
+			stx->insert("db", "testcommit", obj);
+
+			log->info("Doing commit");
+			stx->commit();
+			delete stx;
+
+			delete tx;
+			delete obj;
+			log->info("~testTransactionSimpleCommit");
 		}
 
 		void testTransactionCommit()

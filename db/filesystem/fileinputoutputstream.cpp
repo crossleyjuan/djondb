@@ -32,7 +32,8 @@ FileInputOutputStream::FileInputOutputStream(const std::string& fileName, const 
 	Logger* log = getLogger(NULL);
 #ifndef A
     _pFile = fopen(fileName.c_str(), flags);
-	 setvbuf (_pFile, NULL , _IOFBF , 1024*4 ); // large buffer
+	 //setvbuf (_pFile, NULL , _IOFBF , 1024*4 ); // large buffer
+	 setvbuf (_pFile, NULL , _IONBF , 1024*4 ); // large buffer
     fseek(_pFile, 0, SEEK_END);
 #else
 	if (existFile(fileName.c_str())) {

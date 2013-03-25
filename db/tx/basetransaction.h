@@ -83,7 +83,8 @@ class BaseTransaction: public Controller
 
 	private:
 		void checkState();
-		std::list<TransactionOperation*>* findOperations(char* db, char* ns);
+		std::list<TransactionOperation*>* findOperations(const char* db) const;
+		std::list<TransactionOperation*>* findOperations(const char* db, const char* ns) const;
 
 };
 

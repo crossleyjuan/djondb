@@ -122,21 +122,21 @@ MMapInputOutputStream::MMapInputOutputStream(const char* fileName, __int32 offse
 
 	 // Create a file mapping object for the file
 	 // Note that it is a good idea to ensure the file size is not zero
-	 HANDLE hMapFile = CreateFileMapping( _pFile,          // current file handle
+	 _hMapFile = CreateFileMapping( _pFile,          // current file handle
 			 NULL,           // default security
 			 PAGE_READONLY, // read/write permission
 			 0,              // size of mapping object, high
 			 0,  // size of mapping object, low
 			 NULL);          // name of mapping object
 
-	 if (hMapFile == NULL)
+	 if (_hMapFile == NULL)
 	 {
 		 log->error("Error mapping the file: %s. errno: %d", fileName, GetLastError());
 		 exit(1);
 	 }
 
 	 // Map the view and test the results.
-	 LPVOID lpMapAddress = MapViewOfFile(hMapFile,            // handle to
+	 LPVOID lpMapAddress = MapViewOfFile(_hMapFile,            // handle to
 			 // mapping object
 			 FILE_MAP_READ, // read/write
 			 0,                   // high-order 32
@@ -291,6 +291,11 @@ void MMapInputOutputStream::close() {
 		munmap(_initaddr, _len);
 		_pFile = 0;
 #else
+		if (!UnmapViewOfFile((LPVOID)_initaddr)) {
+			Logger* log = getLogger(NULL);
+			log->error("An error ocurred unmapping the file: %d", GetLastError());
+		}
+		CloseHandle(_hMapFile);
 		CloseHandle(_pFile);
 #endif
 		_open = false;

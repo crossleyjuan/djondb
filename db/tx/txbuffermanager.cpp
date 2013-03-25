@@ -184,6 +184,7 @@ TxBuffer* TxBufferManager::getBuffer(__int32 minimumSize) {
 }
 
 TxBuffer* TxBufferManager::getBuffer(__int32 minimumSize, bool force) {
+	Logger* log = getLogger(NULL);
 	TxBuffer* result = NULL;
 	if (!_activeBuffers.empty()) {
 		result = _activeBuffers.back();
@@ -209,7 +210,6 @@ TxBuffer* TxBufferManager::getBuffer(__int32 minimumSize, bool force) {
 		addBuffer(result);
 		result->seek(0);
 
-		_buffersCount++;
 		registerBufferControlFile(_controlFile, _buffersByLog, result, newBuffer, flag, _buffersCount);
 	}
 	return result;
@@ -226,18 +226,46 @@ void TxBufferManager::openLogFile() {
 }
 
 void TxBufferManager::addBuffer(TxBuffer* buffer) {
+	Logger* log = getLogger(NULL);
+	if (log->isDebug()) log->debug(2, "TxBufferManager::addBuffer()");
 	_lockActiveBuffers->lock();
 	_activeBuffers.push(buffer);
 	_vactiveBuffers.push_back(buffer);
+	_buffersCount++;
 	_lockActiveBuffers->unlock();
 	// Notify that a new buffer is available
+#ifdef DEBUG
+	debugFlushBuffers();
+#else
 	_lockActiveBuffers->notify();
+#endif
 }
 
+#ifdef DEBUG
+void TxBufferManager::debugFlushBuffers() {
+	Logger* log = getLogger(NULL);
+	if (log->isDebug()) {
+		log->debug(2, "Buffers to be flushed");
+		for (std::vector<TxBuffer*>::iterator i = _vactiveBuffers.begin(); i != _vactiveBuffers.end(); i++) {
+			TxBuffer* buffer = *i;
+			if (log->isDebug()) log->debug(2, "   Buffer fileName: %s, mainLog: %s", buffer->fileName().c_str(), buffer->mainLog() ? "true": "false");
+		}
+	}
+	if (log->isDebug()) log->debug(2, "debugFlushBuffers buffersCount: %d", buffersCount());
+	while (buffersCount() > 1) {
+		flushBuffer();
+	}
+}
+#endif
+
 void TxBufferManager::addBuffers(std::vector<TxBuffer*> buffers) {
+	Logger* log = getLogger(NULL);
+	if (log->isDebug()) log->debug(2, "TxBufferManager::addBuffers()");
+
 	_lockActiveBuffers->lock();
 	for (std::vector<TxBuffer*>::iterator it = buffers.begin(); it != buffers.end(); it++) {
 		TxBuffer* buffer = *it;
+		if (log->isDebug()) log->debug(2, "Adding buffer. fileName: %s, mainLog: %s", buffer->fileName().c_str(), buffer->mainLog() ? "true": "false");
 		_buffersCount++;
 		registerBufferControlFile(_controlFile, _buffersByLog, buffer, true, 0x01, _buffersCount);
 		_activeBuffers.push(buffer);
@@ -246,7 +274,12 @@ void TxBufferManager::addBuffers(std::vector<TxBuffer*> buffers) {
 	_lockActiveBuffers->unlock();
 	// this will force a new buffer to be put
 	getBuffer(0, true);
-	flushBuffer();
+	if (log->isDebug()) log->debug("buffersCount: %d", buffersCount());
+#ifdef DEBUG
+	debugFlushBuffers();
+#else
+	_lockActiveBuffers->notify();
+#endif
 }
 
 void TxBufferManager::addReusable(TxBuffer* buffer) {
@@ -268,6 +301,7 @@ std::vector<TxBuffer*> TxBufferManager::popAll() {
 TxBuffer* TxBufferManager::pop() {
 	TxBuffer* buffer = _activeBuffers.front();
 	_activeBuffers.pop();
+	_vactiveBuffers.erase(_vactiveBuffers.begin());
 
 	__int64 controlPos = buffer->controlPosition();
 	_controlFile->acquireLock();
@@ -286,7 +320,9 @@ __int32 TxBufferManager::buffersCount() const {
 void TxBufferManager::startMonitor() {
 	_monitorThread = new Thread(&TxBufferManager::monitorBuffers);
 	_runningMonitor = true;
-	//_monitorThread->start(this);
+#ifndef DEBUG
+	_monitorThread->start(this);
+#endif
 }
 
 bool TxBufferManager::runningMonitor() const {
@@ -296,7 +332,11 @@ bool TxBufferManager::runningMonitor() const {
 void TxBufferManager::stopMonitor() {
 	_runningMonitor = false;
 	// Sends a notification to release the inner wait
+#ifdef DEBUG
+	debugFlushBuffers();
+#else
 	_lockActiveBuffers->notify();
+#endif
 }
 
 void* TxBufferManager::monitorBuffers(void* arg) {
@@ -312,8 +352,11 @@ void* TxBufferManager::monitorBuffers(void* arg) {
 void TxBufferManager::flushBuffer() {
 	_lockActiveBuffers->wait(3);
 	_flushingBuffers = true;
+	Logger* log = getLogger(NULL);
 	if (buffersCount() > 1) {
 		TxBuffer* buffer = pop();
+
+		if (log->isDebug()) log->debug(2, "Buffer popped up. filename: %s, mainLog: %s", buffer->fileName().c_str(), buffer->mainLog()?"true": "false");
 
 		TransactionOperation* operation = NULL;
 		buffer->seek(0);
@@ -369,14 +412,43 @@ void TxBufferManager::flushBuffer() {
 	_flushingBuffers = false;
 }
 
+void TxBufferManager::dropAllBuffers() {
+	std::vector<TxBuffer*> buffers = popAll();
+	for (std::vector<TxBuffer*>::iterator it = buffers.begin(); it != buffers.end(); it++) {
+		TxBuffer* buffer = *it;
+		dropBuffer(buffer);
+		delete buffer;
+	}
+}
+
+void TxBufferManager::dropControlFile() {
+	Logger* log = getLogger(NULL);
+	std::string fileName = _controlFile->fileName();
+
+	_controlFile->close();
+
+	if (log->isDebug()) log->debug(2, "Removing the control file: %s", fileName.c_str());
+
+	if (!removeFile(fileName.c_str())) {
+		log->error("The file %s could not be dropped", fileName.c_str());
+	}
+}
+
 void TxBufferManager::dropBuffer(TxBuffer* buffer) {
+	Logger* log = getLogger(NULL);
+	if (log->isDebug()) log->debug(2, "dropBuffer(buffer:  fileName %s, mainLog %s)", buffer->fileName().c_str(), buffer->mainLog() ? "true": "false");
+
 	if (!buffer->mainLog()) {
 		std::map<std::string, int>::iterator it = _buffersByLog.find(buffer->fileName());
 		int* count = &it->second;
 		*count--;
 		if (*count == 0) {
 			std::string file = buffer->fileName();
-			removeFile(file.c_str());
+			std::string datadir = getSetting("DATA_DIR");
+			char* fullFilePath = combinePath(datadir.c_str(), file.c_str());
+			if (log->isDebug()) log->debug(2, "removing the log file: %s", fullFilePath);
+			removeFile(fullFilePath);
+			free(fullFilePath);
 		}
 	}
 	delete buffer;
@@ -429,6 +501,13 @@ void TxBufferManager::writeOperationToRegister(char* db, char* ns, const Transac
 	txBuffer->writeChars(chrs, bufferSize);
 
 	txBuffer->flush();
+
+	// Saving the new buffer length
+	__int64 lenPos = txBuffer->controlPosition() + sizeof(char) + sizeof(__int64);
+	_controlFile->acquireLock();
+	_controlFile->seek(lenPos);
+	_controlFile->writeLong(txBuffer->bufferLength());
+	_controlFile->releaseLock();
 	txBuffer->releaseLock();
 
 	free(chrs);
@@ -438,10 +517,18 @@ TransactionOperation* TxBufferManager::readOperationFromRegister(TxBuffer* buffe
 	return readOperationFromRegister(buffer, NULL, NULL);
 }
 
+/*
+ * the will read an operation based on the parameters, 
+ * the buffer indicates where is going to be readed
+ * the parameters db and ns are used to filter which operations should be included in the result
+ * if db is NULL then all the operations are going to be included
+ * if ns is NULL all the operations within the db will be included
+ * */
 TransactionOperation* TxBufferManager::readOperationFromRegister(TxBuffer* buffer, char* db, char* ns) {
 	if (buffer->eof()) {
 		return NULL;
 	}
+	bool check = false;
 	buffer->acquireLock();
 	__int64 size = buffer->readLong();
 
@@ -460,7 +547,16 @@ TransactionOperation* TxBufferManager::readOperationFromRegister(TxBuffer* buffe
 	if (!(status & TXOS_NORMAL)) {
 		goto jumpoperation;
 	};
-	if ((db == NULL) || (ns == NULL) || ((strcmp(rdb, db) == 0) && (strcmp(rns, ns) == 0))) {
+	if (db == NULL) {
+		check = true;
+	} else if (strcmp(rdb, db) == 0) {
+		if (ns == NULL) {
+			check = true;
+		} else if (strcmp(rns, ns) == 0) {
+			check = true;
+		}
+	}
+	if (check) {
 		char* cstream = stream->readChars();
 		MemoryStream ms(cstream, length);
 		ms.seek(0);

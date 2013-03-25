@@ -26,6 +26,7 @@
  */
 #include "stdtransaction.h"
 #include "txbuffermanager.h"
+#include "util.h"
 #include <stdlib.h>
 
 StdTransaction::StdTransaction(BaseTransaction* base, std::string transactionId)
@@ -76,9 +77,16 @@ std::vector<std::string>* StdTransaction::namespaces(const char* db) const {
 }
 
 bool StdTransaction::commit() {
+	Logger* log = getLogger(NULL);
+	if (log->isDebug()) log->debug("StdTransaction::commit()");
+
 	std::vector<TxBuffer*> buffers = _bufferManager->popAll();
 	_baseTransaction->addBuffers(buffers);
+
+	_bufferManager->dropControlFile();
 }
 
 bool StdTransaction::rollback() {
+	_bufferManager->dropAllBuffers();
+	_bufferManager->dropControlFile();
 }

@@ -80,14 +80,30 @@ BaseTransaction::~BaseTransaction() {
 	if (_transactionId != NULL) delete _transactionId;
 }
 
-std::list<TransactionOperation*>* BaseTransaction::findOperations(char* db, char* ns) {
+std::list<TransactionOperation*>* BaseTransaction::findOperations(const char* db) const {
 	std::list<TransactionOperation*>* result = new std::list<TransactionOperation*>();
 	std::vector<TxBuffer*> buffers = _bufferManager->getActiveBuffers();
 	for (std::vector<TxBuffer*>::iterator i = buffers.begin(); i != buffers.end(); i++) {
 		TxBuffer* buffer = *i;
 		buffer->seek(0);
 		while (!buffer->eof()) {
-			TransactionOperation* operation = _bufferManager->readOperationFromRegister(buffer, db, ns);
+			TransactionOperation* operation = _bufferManager->readOperationFromRegister(buffer, const_cast<char*>(db), NULL);
+			if (operation != NULL) {
+				result->push_back(operation);
+			}
+		}
+	}
+	return result;
+}
+
+std::list<TransactionOperation*>* BaseTransaction::findOperations(const char* db, const char* ns) const {
+	std::list<TransactionOperation*>* result = new std::list<TransactionOperation*>();
+	std::vector<TxBuffer*> buffers = _bufferManager->getActiveBuffers();
+	for (std::vector<TxBuffer*>::iterator i = buffers.begin(); i != buffers.end(); i++) {
+		TxBuffer* buffer = *i;
+		buffer->seek(0);
+		while (!buffer->eof()) {
+			TransactionOperation* operation = _bufferManager->readOperationFromRegister(buffer, const_cast<char*>(db), const_cast<char*>(ns));
 			if (operation != NULL) {
 				result->push_back(operation);
 			}
@@ -271,7 +287,50 @@ std::vector<std::string>* BaseTransaction::dbs() const {
 }
 
 std::vector<std::string>* BaseTransaction::namespaces(const char* db) const {
-	return _controller->namespaces(db);
+	std::list<TransactionOperation*>* operations = findOperations(db, NULL);
+
+	std::vector<std::string>* nss = _controller->namespaces(db);
+
+	std::set<std::string> sresult;
+	for (std::vector<std::string>::iterator it = nss->begin(); it != nss->end(); it++) {
+		sresult.insert(*it);
+	}
+
+	for (std::list<TransactionOperation*>::iterator i = operations->begin(); i != operations->end(); i++) {
+		TransactionOperation* operation = *i;
+		std::string operns(operation->ns);
+		switch (operation->code) {
+			case TXO_INSERT: 
+				{
+					std::set<std::string>::iterator it = sresult.find(operns);
+					if (it == sresult.end()) {
+						sresult.insert(operns);
+					}
+				};
+				break;
+			case TXO_DROPNAMESPACE:
+				{
+					std::set<std::string>::iterator it = sresult.find(operns);
+					if (it != sresult.end()) {
+						sresult.erase(it);
+					}
+				};
+				break;
+		}
+		free(operation->db);
+		free(operation->ns);
+		delete operation;
+	}
+
+	delete operations;
+
+	std::vector<std::string>* result = new std::vector<std::string>();
+
+	for (std::set<std::string>::iterator it = sresult.begin(); it != sresult.end(); it++) {
+		result->push_back(*it);
+	}
+
+	return result;
 }
 
 Controller* BaseTransaction::controller() const {
