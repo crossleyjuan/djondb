@@ -52,7 +52,7 @@
 
 #include "djondb_client.h"
 #include <vector>
-#include <sstream>
+#include <sstream> 
 #ifndef WINDOWS
 #include "linenoise.h"
 #endif
@@ -102,6 +102,7 @@ v8::Handle<v8::Value> help(const v8::Arguments& args);
 v8::Handle<v8::String> ReadFile(const char* name);
 v8::Handle<v8::Value> beginTransaction(const v8::Arguments& args);
 v8::Handle<v8::Value> commitTransaction(const v8::Arguments& args);
+v8::Handle<v8::Value> rollbackTransaction(const v8::Arguments& args);
 void ReportException(v8::TryCatch* handler);
 
 static bool run_shell;
@@ -125,6 +126,7 @@ char* commands[] = {
 	"help",
 	"beginTransaction",
 	"commitTransaction",
+	"rollbackTransaction",
 	"readfile"
 };
 
@@ -208,6 +210,8 @@ v8::Persistent<v8::Context> CreateShellContext() {
 	global->Set(v8::String::New("beginTransaction"), v8::FunctionTemplate::New(beginTransaction));
 	// Bind the 'commitTransaction' function
 	global->Set(v8::String::New("commitTransaction"), v8::FunctionTemplate::New(commitTransaction));
+	// Bind the 'rollbackTransaction' function
+	global->Set(v8::String::New("rollbackTransaction"), v8::FunctionTemplate::New(rollbackTransaction));
 	// Bind the 'connect' function
 	global->Set(v8::String::New("connect"), v8::FunctionTemplate::New(connect));
 	// Bind the 'db.help' function
@@ -452,6 +456,22 @@ v8::Handle<v8::Value> commitTransaction(const v8::Arguments& args) {
 	return v8::String::New("");
 }
 
+v8::Handle<v8::Value> rollbackTransaction(const v8::Arguments& args) {
+	if (args.Length() > 0) {
+		return v8::ThrowException(v8::String::New("usage: rollbackTransaction()"));
+	}
+
+	v8::HandleScope handle_scope;
+
+	if (__djonConnection == NULL) {
+		return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
+	}
+	__djonConnection->rollbackTransaction();
+
+	printf("Transaction rollbacked");
+	return v8::String::New("");
+}
+
 v8::Handle<v8::Value> showDbs(const v8::Arguments& args) {
 	if (args.Length() != 0) {
 		return v8::ThrowException(v8::String::New("usage: showDbs"));
@@ -520,15 +540,16 @@ v8::Handle<v8::Value> help(const v8::Arguments& args) {
 			printf("find('db', 'namespace'[, 'select'][, 'filter']);\n\tExecutes a find using the provided filter.\n");
 			printf("help();\n\tThis help\n");
 			printf("insert('db', 'namespace', { json...object});\n\tInserts a new document.\n");
-			printf("update('db', 'namespace', { json...object});\n\tUpdates a document.\n");
-			printf("remove('db', 'namespace', 'id', 'revision');\n\tRemoves a document.\n");
 			printf("load('file');\n\tLoads and executes a script.\n");
 			printf("print(data);\n\tPrint console messages.\n");
 			printf("quit();\n\tBye bye fellow.\n");
+			printf("remove('db', 'namespace', 'id', 'revision');\n\tRemoves a document.\n");
+			printf("rollback()\n\tRollbacks the current transaction.\n");
 			printf("read('file');\n\tReads the contents of a file.\n");
 			printf("showDbs();\n\tReturns a list of the available databases.\n");
 			printf("showNamespaces('db');\n\tReturns the namespaces in that database.\n");
 			printf("shutdown();\n\tRemotely shutdowns the server (Are you sure?).\n");
+			printf("update('db', 'namespace', { json...object});\n\tUpdates a document.\n");
 			printf("uuid();\n\tGenerates a new UUID (Universal Unique Identifier).\n");
 			printf("version();\n\tReturns the current shell version.\n");
 	}

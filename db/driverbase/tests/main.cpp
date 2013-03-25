@@ -59,7 +59,6 @@ class TestDriverBaseSuite: public Test::Suite {
 		TestDriverBaseSuite() {
 			_host = "localhost";
 			_port = 1243;
-			/*
 			TEST_ADD(TestDriverBaseSuite::testFinds);
 			TEST_ADD(TestDriverBaseSuite::testInsert);
 			TEST_ADD(TestDriverBaseSuite::testInsertComplex);
@@ -553,7 +552,27 @@ class TestDriverBaseSuite: public Test::Suite {
 				TEST_ASSERT(res2 != NULL);
 				TEST_ASSERT(res2->has("name"));
 				if (res2->has("name")) TEST_ASSERT(res2->getString("name").compare("John") == 0);
+				delete res2;
 
+				connection->dropNamespace("testdb", "tx");
+				connection->beginTransaction();
+				BSONObj* objRollback = BSONParser::parse("{'_id': '001'}");
+
+				connection->insert("testdb", "tx", *objRollback);
+				
+				res2 = connection->findByKey("testdb", "tx", "001");
+				TEST_ASSERT(res2 != NULL);
+				TEST_ASSERT(res2->getString("id").compare("id") == 0);
+				delete res2;
+
+				connection->rollbackTransaction();
+
+				res2 = connection->findByKey("testdb", "tx", "001");
+				TEST_ASSERT(res2 == NULL);
+				delete res2;
+
+				delete objRollback;
+				delete res2;
 			}
 		}
 

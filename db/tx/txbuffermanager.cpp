@@ -417,7 +417,6 @@ void TxBufferManager::dropAllBuffers() {
 	for (std::vector<TxBuffer*>::iterator it = buffers.begin(); it != buffers.end(); it++) {
 		TxBuffer* buffer = *it;
 		dropBuffer(buffer);
-		delete buffer;
 	}
 }
 

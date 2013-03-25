@@ -44,6 +44,7 @@ class TestTXSuite: public Test::Suite
 			TEST_ADD(TestTXSuite::testTransaction);
 			TEST_ADD(TestTXSuite::testTransactionSimpleCommit);
 			TEST_ADD(TestTXSuite::testTransactionCommit);
+			TEST_ADD(TestTXSuite::testTransactionRollback);
 			TEST_ADD(TestTXSuite::testTransactionManager);
 			TEST_ADD(TestTXSuite::testTransactionMergedData);
 		}
@@ -125,6 +126,28 @@ class TestTXSuite: public Test::Suite
 
 			log->info("Doing commit");
 			stx->commit();
+			delete stx;
+
+			delete tx;
+			delete obj;
+			log->info("~testTransactionSimpleCommit");
+		}
+
+		void testTransactionRollback()
+		{
+			Logger* log = getLogger(NULL);
+			log->info("testTransactionRollback");
+
+			BaseTransaction* tx = new BaseTransaction(_controller);
+			std::string* tuid = uuid();
+			StdTransaction* stx = new StdTransaction(tx, *tuid);
+
+			BSONObj* obj = BSONParser::parse("{'_id': '1'}");
+			stx->insert("db", "testrollback", obj);
+
+			log->info("Doing rollback");
+			stx->rollback();
+			
 			delete stx;
 
 			delete tx;

@@ -27,6 +27,7 @@
 #include "removecommand.h"
 #include "bsoninputstream.h"
 #include "commitcommand.h"
+#include "rollbackcommand.h"
 #include "util.h"
 #include <memory>
 #include <assert.h>
@@ -138,6 +139,15 @@ CommitCommand* parseCommit(InputStream* is)  {
 	return command;
 }
 
+RollbackCommand* parseRollback(InputStream* is)  {
+	RollbackCommand* command = new RollbackCommand();
+	std::string* txId = is->readString();
+	command->setTransactionId(*txId);
+
+	delete txId;
+	return command;
+}
+
 FindCommand* parseFind(InputStream* is)  {
 	FindCommand* command = new FindCommand();
 	std::string* db = is->readString();
@@ -218,6 +228,9 @@ Command* CommandReader::readCommand() {
 			break;
 		case COMMIT: // Commit transaction
 			cmd = parseCommit(_stream);
+			break;
+		case ROLLBACK: // Rollback transaction
+			cmd = parseRollback(_stream);
 			break;
 		default:
 			cout << "unknown command type " << type << endl;

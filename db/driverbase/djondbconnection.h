@@ -35,8 +35,9 @@ namespace djondb {
 			/** Default destructor */
 			virtual ~DjondbConnection();
 
-				const char* beginTransaction();
-				void commitTransaction();
+			const char* beginTransaction();
+			void commitTransaction();
+			void rollbackTransaction();
 
 			bool open();
 			void close();
@@ -64,13 +65,13 @@ namespace djondb {
 
 		protected:
 		private:
-				void prepareOptions(Command* cmd);
+			void prepareOptions(Command* cmd);
 
-		  private:
+		private:
 			NetworkOutputStream*  _outputStream;
 			NetworkInputStream*   _inputStream;
 			CommandWriter*        _commandWriter;
-				std::string*          _activeTransactionId;
+			std::string*          _activeTransactionId;
 
 			std::string _host;
 			int _port;

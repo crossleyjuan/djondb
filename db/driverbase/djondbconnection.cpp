@@ -32,6 +32,7 @@
 #include "bsoninputstream.h"
 #include "djondbconnectionmanager.h"
 #include "commitcommand.h"
+#include "rollbackcommand.h"
 #include "util.h"
 #include "bson.h"
 
@@ -103,18 +104,31 @@ void DjondbConnection::close() {
 }
 
 const char* DjondbConnection::beginTransaction() {
-	_logger->error("throw error, pilas!");
 	_activeTransactionId = uuid();
 }
 
 void DjondbConnection::commitTransaction() {
-	if (_logger->isDebug()) _logger->debug(2, "Commit command. transactionId: %s", _activeTransactionId->c_str());
+	if (_logger->isDebug()) _logger->debug(2, "commitTransaction. transactionId: %s", _activeTransactionId->c_str());
 	CommitCommand cmd;
 	prepareOptions((Command*)&cmd);
 	cmd.setTransactionId(*_activeTransactionId);
 	_commandWriter->writeCommand(&cmd);
 
 	cmd.readResult(_inputStream);
+	delete _activeTransactionId;
+	_activeTransactionId = NULL;
+}
+
+void DjondbConnection::rollbackTransaction() {
+	if (_logger->isDebug()) _logger->debug(2, "rollbackTransaction. transactionId: %s", _activeTransactionId->c_str());
+	RollbackCommand cmd;
+	prepareOptions((Command*)&cmd);
+	cmd.setTransactionId(*_activeTransactionId);
+	_commandWriter->writeCommand(&cmd);
+
+	cmd.readResult(_inputStream);
+	delete _activeTransactionId;
+	_activeTransactionId = NULL;
 }
 
 void DjondbConnection::internalClose() {

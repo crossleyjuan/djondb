@@ -20,6 +20,7 @@ libdjon_command_la_SOURCES = command.cpp \
 									  updatecommand.cpp \
 									  removecommand.cpp \
 									  commitcommand.cpp \
+									  rollbackcommand.cpp \
 									  dropnamespacecommand.cpp \
 									  shutdowncommand.cpp \
 									  showdbscommand.cpp \
