@@ -76,13 +76,13 @@ void BSONObj::add(std::string key, __int64 val) {
 	_elements.insert(pair<std::string, BSONContent* >(key, content));
 }
 
-void BSONObj::add(std::string key, char* val) {
+void BSONObj::add(std::string key, const char* val) {
 	add(key, val, strlen(val));
 }
 
-void BSONObj::add(std::string key, char* val, __int32 length) {
+void BSONObj::add(std::string key, const char* val, __int32 length) {
 	remove(key);
-	BSONContentString* content = new BSONContentString(strcpy(val, length), length); 
+	BSONContentString* content = new BSONContentString(strcpy(const_cast<char*>(val), length), length); 
 	_elements.insert(pair<std::string, BSONContent* >(key, content));
 }
 

@@ -25,11 +25,11 @@ class InsertCommand: public Command {
         void setBSON(const BSONObj bson);
         BSONObj* bson() const;
     private:
-        const std::string* _namespace;
-        const std::string* _db;
+        std::string* _namespace;
+        std::string* _db;
         BSONObj* _bson;
 
-        BSONObj* _bsonResult;
+        const BSONObj* _bsonResult;
 };
 
 #endif // INSERTCOMMAND_H

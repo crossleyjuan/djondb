@@ -25,27 +25,37 @@
  * =====================================================================================
  */
 #include "lock.h"
+#include "logger.h"
 
 Lock::Lock() {
-	pthread_mutex_init(&_mutex, NULL);
+	pthread_mutexattr_t mutexattr;
+	pthread_mutexattr_init(&mutexattr);
+	pthread_mutexattr_settype(&mutexattr, PTHREAD_MUTEX_RECURSIVE);
+
+	pthread_mutex_init(&_mutexLock, &mutexattr);
+	
 	pthread_cond_init(&_cond, NULL);
 }
 
 Lock::~Lock() {
-	pthread_mutex_destroy(&_mutex);
+	pthread_mutex_destroy(&_mutexLock);
 	pthread_cond_destroy(&_cond);
 }
 
 void Lock::lock() {
-	pthread_mutex_lock(&_mutex);
+	Logger* log = getLogger(NULL);
+	if (log->isDebug()) log->debug(3, "Lock::lock() %d", (long)this);
+	pthread_mutex_lock(&_mutexLock);
 }
 
 void Lock::unlock() {
-	pthread_mutex_unlock(&_mutex);
+	Logger* log = getLogger(NULL);
+	if (log->isDebug()) log->debug(3, "Lock::unlock() %d", (long)this);
+	pthread_mutex_unlock(&_mutexLock);
 }
 
 void Lock::wait() {
-	pthread_cond_wait(&_cond, &_mutex);
+	pthread_cond_wait(&_cond, &_mutexLock);
 }
 
 void Lock::wait(__int32 timeout) {
@@ -56,7 +66,7 @@ void Lock::wait(__int32 timeout) {
 	time(&now);
 
 	timeToWait.tv_sec = now+timeout;
-	pthread_cond_timedwait(&_cond, &_mutex, &timeToWait);
+	pthread_cond_timedwait(&_cond, &_mutexLock, &timeToWait);
 }
 
 void Lock::notify() {

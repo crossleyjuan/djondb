@@ -44,7 +44,7 @@ StdTransaction::StdTransaction(const StdTransaction& orig)
 StdTransaction::~StdTransaction() {
 }
 
-BSONObj* StdTransaction::insert(char* db, char* ns, BSONObj* bson) {
+const BSONObj* StdTransaction::insert(char* db, char* ns, BSONObj* bson) {
 	return BaseTransaction::insert(db, ns, bson);
 }
 

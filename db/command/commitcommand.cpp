@@ -41,6 +41,7 @@ void CommitCommand::execute() {
 	TransactionManager* manager = TransactionManager::getTransactionManager();
 	StdTransaction* tx = manager->getTransaction(*_transactionId);
 	_result = tx->commit();
+	manager->dropTransaction(*_transactionId);
 }
 
 void* CommitCommand::result() {

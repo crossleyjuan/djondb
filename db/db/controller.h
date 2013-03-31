@@ -39,12 +39,12 @@ using namespace std;
 class Controller 
 {
 	public:
-		virtual BSONObj* insert(char* db, char* ns, BSONObj* bson) = 0;
-		virtual bool dropNamespace(char* db, char* ns) = 0;
-		virtual void update(char* db, char* ns, BSONObj* bson) = 0;
-		virtual void remove(char* db, char* ns, char* documentId, char* revision) = 0;
-		virtual BSONArrayObj* find(char* db, char* ns, const char* select, const char* filter) throw (ParseException) = 0;
-		virtual BSONObj* findFirst(char* db, char* ns, const char* select, const char* filter) throw (ParseException) = 0;
+		virtual const BSONObj* insert(const char* db, const char* ns, BSONObj* bson) = 0;
+		virtual bool dropNamespace(const char* db, const char* ns) = 0;
+		virtual void update(const char* db, const char* ns, BSONObj* bson) = 0;
+		virtual void remove(const char* db, const char* ns, const char* documentId, const char* revision) = 0;
+		virtual BSONArrayObj* find(const char* db, const char* ns, const char* select, const char* filter) throw (ParseException) = 0;
+		virtual BSONObj* findFirst(const char* db, const char* ns, const char* select, const char* filter) throw (ParseException) = 0;
 		virtual std::vector<std::string>* dbs() const = 0;
 		virtual std::vector<std::string>* namespaces(const char* db) const = 0;
 };

@@ -45,7 +45,7 @@ class Lock {
 		void wait(__int32 timeout);
 		void notify();
 	private:
-		pthread_mutex_t _mutex;
+		pthread_mutex_t _mutexLock;
 		pthread_cond_t  _cond;
 };
 

@@ -30,6 +30,8 @@
 #include <memory>
 #include <string.h>
 #include <cpptest.h>
+#include <errno.h>
+#include <sstream>
 
 using namespace std;
 
@@ -152,7 +154,7 @@ class TestTXSuite: public Test::Suite
 
 			delete tx;
 			delete obj;
-			log->info("~testTransactionSimpleCommit");
+			log->info("~testTransactionRollback");
 		}
 
 		void testTransactionCommit()
@@ -234,6 +236,7 @@ class TestTXSuite: public Test::Suite
 			delete resOut;
 			delete resOut2;
 			delete tuid;
+			log->info("~testTransactionMergedData");
 		}
 
 
@@ -277,6 +280,7 @@ class TestTXSuite: public Test::Suite
 
 			delete t1;
 			delete manager;
+			log->info("~testTransactionManager");
 		}
 
 };
@@ -340,6 +344,16 @@ int main(int argc, char* argv[])
 	{
 		// Demonstrates the ability to use multiple test suites
 		//
+		std::string sdataDir = getSetting("DATA_DIR");
+		char* dataDir = combinePath(sdataDir.c_str(), "*");
+		std::stringstream ss;
+		ss << "exec rm -rf " << dataDir;
+
+		if (system(ss.str().c_str()) < 0) {
+			cout << "the data dir " << dataDir << " could not be removed. error: " << strerror(errno) << endl;
+			exit(1);
+		}
+		free(dataDir);
 		Test::Suite ts;
 		ts.add(auto_ptr<Test::Suite>(new TestTXSuite));
 		//        ts.add(auto_ptr<Test::Suite>(new CompareTestSuite));

@@ -48,10 +48,10 @@ class TxBufferManager
 
 		TxBuffer* getBuffer(__int32 minimumSize);
 		TxBuffer* getBuffer(__int32 minimumSize, bool force);
-		std::vector<TxBuffer*> getActiveBuffers() const;
+		const std::vector<TxBuffer*>* getActiveBuffers() const;
 		__int32 buffersCount() const;
 
-		void writeOperationToRegister(char* db, char* ns, const TransactionOperation& operation);
+		void writeOperationToRegister(const char* db, const char* ns, const TransactionOperation& operation);
 		TransactionOperation* readOperationFromRegister(TxBuffer* buffer);
 		TransactionOperation* readOperationFromRegister(TxBuffer* buffer, char* db, char* ns);
 		void addBuffers(std::vector<TxBuffer*> buffers);
@@ -75,6 +75,7 @@ class TxBufferManager
 		TxBuffer* createNewBuffer();
 		TxBuffer* pop();
 		void dropBuffer(TxBuffer* buffer);
+		void registerBufferControlFile(TxBuffer* buffer, bool newBuffer, int flag);
 
 #ifdef DEBUG
 		void debugFlushBuffers();
@@ -85,13 +86,13 @@ class TxBufferManager
 		};
 
 	private:
-		std::queue<TxBuffer*>  _activeBuffers;
-		std::vector<TxBuffer*> _vactiveBuffers;
-		std::queue<TxBuffer*>  _reusableBuffers;
+		std::queue<TxBuffer*>*  _activeBuffers;
+		std::vector<TxBuffer*>* _vactiveBuffers;
+		std::queue<TxBuffer*>*  _reusableBuffers;
 		Lock* _lockActiveBuffers;
 		Thread* _monitorThread;
 		bool _runningMonitor;
-		std::map<std::string, int> _buffersByLog;
+		std::map<std::string, int*>* _buffersByLog;
 
 		char* _logFileName;
 		InputOutputStream* _controlFile;
@@ -103,6 +104,7 @@ class TxBufferManager
 		__int32 _buffersCount;
 		bool _flushingBuffers;
 		bool _mainLog;
+		Logger* _log;
 };
 
 #endif // TXBUFFERMANAGER_INCLUDED_H

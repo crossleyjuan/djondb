@@ -108,7 +108,7 @@ class TxBuffer: public InputOutputStream {
 		  __int32 _controlPosition;
 		  bool    _mainLog;
 		  TxBufferManager* _manager;
-		  std::string _fileName;
+		  std::string* _fileName;
 		  Lock* _lock;
 };
 

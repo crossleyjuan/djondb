@@ -44,20 +44,18 @@ InsertCommand::~InsertCommand() {
 
 void InsertCommand::execute() {
     const char* ns = _namespace->c_str();
-    _bsonResult = dbController()->insert(const_cast<char*>(_db->c_str()), const_cast<char*>(ns), _bson);
+	 const char* db = _db->c_str();
+    _bsonResult = dbController()->insert(db, ns, _bson);
 }
 
 void* InsertCommand::result() {
-    return _bsonResult;
+    return const_cast<BSONObj*>(_bsonResult);
 }
 
 void InsertCommand::writeCommand(OutputStream* out) const {
 	out->writeString(*_db);
 	out->writeString(*_namespace);
 
-	/*
-	out->writeString(_bson->toChar());
-	*/
 	std::auto_ptr<BSONOutputStream> bsonout(new BSONOutputStream(out));
 	bsonout->writeBSON(*_bson);
 }

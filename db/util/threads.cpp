@@ -39,7 +39,10 @@ Thread::Thread(void *(*run)(void* arg)) {
 
 void Thread::start(void* arg) {
 	_attached = true;
-	int rc = pthread_create(&internal, NULL, runFunction, (void*)arg);
+   pthread_attr_t attr;	
+	pthread_attr_init(&attr);
+	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+	int rc = pthread_create(&internal, &attr, runFunction, (void*)arg);
 	if (rc) {
 		throw "Error creating the thread";
 	}

@@ -20,8 +20,8 @@ class BSONObj
         void add(std::string, __int32);
         void add(std::string, double);
         void add(std::string, __int64);
-        void add(std::string, char*);
-        void add(std::string, char*, __int32);
+        void add(std::string, const char*);
+        void add(std::string, const char*, __int32);
         void add(std::string, const BSONObj&);
         void add(std::string, const BSONArrayObj&);
 

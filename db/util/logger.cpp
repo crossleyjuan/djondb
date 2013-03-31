@@ -252,11 +252,14 @@ Logger::~Logger() {
 }
 
 void Logger::print(std::string type, std::string text) {
+
 #ifndef WINDOWS
 	if (isDaemon()) {
 		syslog(LOG_DEBUG, text.c_str());
 	} else {
-		cout << type << ": " << text << endl;
+		pthread_t thread = pthread_self();
+		printf("%s:%lx: %s\n", type.c_str(), thread, text.c_str());
+		//cout << type << ":" << hex << thread << ":" << text << endl;
 	}
 #else
 #ifdef WINDOWS_SERVICE

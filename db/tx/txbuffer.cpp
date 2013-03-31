@@ -41,7 +41,7 @@ TxBuffer::TxBuffer(const TxBufferManager* manager, const char* file, __int64 off
 	_currentPos = 0;
 	_stream->seek(0);
 	_lock = new Lock();
-	_fileName = std::string(file);
+	_fileName = new std::string(file);
 	free(fileName);
 };
 
@@ -59,6 +59,7 @@ TxBuffer::~TxBuffer() {
 	_stream->close();
 	delete _stream;
 	delete _lock;
+	delete _fileName;
 };
 
 void TxBuffer::reset() {
@@ -209,7 +210,7 @@ __int64 TxBuffer::currentPos() const {
 };
 
 const std::string TxBuffer::fileName() const {
-	return _fileName;
+	return *_fileName;
 };
 
 bool TxBuffer::eof() {

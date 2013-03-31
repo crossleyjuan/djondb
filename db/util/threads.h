@@ -25,6 +25,9 @@ public:
     void *(*runFunction)(void* arg);
 
     Thread(void *(*run)(void* arg));
+	 // this will prevent copy or assignation
+	 Thread(const Thread& orig);
+	 Thread& operator=(const Thread& rhs);
 
     ~Thread();
 

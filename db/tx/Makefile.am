@@ -18,10 +18,13 @@ libdjon_tx_la_SOURCES = basetransaction.cpp \
 								txbuffermanager.cpp \
 								txbuffer.cpp
 
-TESTS = test-tx
-check_PROGRAMS = test-tx
-test_tx_LDADD = libdjon-tx.la -ldjon-command -ldjon-db -ldjon-filesystem -ldjon-cache -ldjon-bson -ldjon-util -lX11 -lXss -lrt -luuid -lcpptest -lantlr3c
+TESTS = test-tx testRollback
+check_PROGRAMS = test-tx testRollback
+test_tx_LDADD = libdjon-tx.la -ldjon-command -ldjon-db -ldjon-filesystem -ldjon-cache -ldjon-bson -ldjon-util -lX11 -lXss -lrt -luuid -lcpptest -lantlr3c -lpthread
 test_tx_SOURCES = tests/main.cpp tests/controllertest.cpp
+
+testRollback_LDADD = libdjon-tx.la -ldjon-command -ldjon-db -ldjon-filesystem -ldjon-cache -ldjon-bson -ldjon-util -lX11 -lXss -lrt -luuid -lcpptest -lantlr3c -lboost_system -lboost_filesystem -lpthread
+testRollback_SOURCES = tests/testRollback.cpp tests/controllertest.cpp
 
 djon_tx_libincludedir = $(libdir)/djon-tx-1.0/include
 

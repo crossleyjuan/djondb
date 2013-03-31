@@ -55,7 +55,7 @@ class StdTransaction: public BaseTransaction
 		StdTransaction(const StdTransaction& orig);
 		virtual ~StdTransaction();
 
-		virtual BSONObj* insert(char* db, char* ns, BSONObj* bson);
+		virtual const BSONObj* insert(char* db, char* ns, BSONObj* bson);
 		virtual bool dropNamespace(char* db, char* ns);
 		virtual void update(char* db, char* ns, BSONObj* bson);
 		virtual void remove(char* db, char* ns, char* documentId, char* revision);

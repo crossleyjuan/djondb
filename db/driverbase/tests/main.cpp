@@ -73,7 +73,7 @@ class TestDriverBaseSuite: public Test::Suite {
 			TEST_ADD(TestDriverBaseSuite::testTransactions);
 
 			// Leave this test at the end, because it will shutdow the server
-			TEST_ADD(TestDriverBaseSuite::testConnection);
+			//TEST_ADD(TestDriverBaseSuite::testConnection);
 		}
 
 

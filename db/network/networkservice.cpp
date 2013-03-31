@@ -123,8 +123,9 @@ void NetworkService::stop() { //throw (NetworkException*) {
 			break;
 		}
 	}
-	__dbController->shutdown();
 	delete _transactionManager;
+	delete _baseTransaction;
+	__dbController->shutdown();
 	setRunning(false);
 #ifndef WINDOWS
 	int res = close(sock);
@@ -358,7 +359,7 @@ int processRequest(NetworkService* service, void *arg) {
 	//    while (nis->waitAvailable(5) > 0) {
 	//        log->debug("New command available");
 	// Reads command
-	std::auto_ptr<Command> cmd(reader->readCommand());
+	Command* cmd = reader->readCommand();
 	commands++;
 	BaseTransaction* transaction = _baseTransaction;
 	if (cmd->options() != NULL) {
@@ -399,6 +400,8 @@ int processRequest(NetworkService* service, void *arg) {
 	//    }
 
 	if (log->isDebug()) log->debug("%d Executed.", commands);
+
+	delete cmd;
 
 	return 0;
 }

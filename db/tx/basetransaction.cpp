@@ -69,21 +69,19 @@ BaseTransaction::BaseTransaction(const BaseTransaction& orig) {
 	this->_controller = orig._controller;
 	this->_transactionId = orig._transactionId;
 	this->_bufferManager = orig._bufferManager;
+	getLogger(NULL)->info("BaseTransaction been copied");
 }
 
 BaseTransaction::~BaseTransaction() {
 	_bufferManager->stopMonitor();
-	while (_bufferManager->runningMonitor()) {
-		Thread::sleep(30);
-	}
 	delete _bufferManager;
 	if (_transactionId != NULL) delete _transactionId;
 }
 
 std::list<TransactionOperation*>* BaseTransaction::findOperations(const char* db) const {
 	std::list<TransactionOperation*>* result = new std::list<TransactionOperation*>();
-	std::vector<TxBuffer*> buffers = _bufferManager->getActiveBuffers();
-	for (std::vector<TxBuffer*>::iterator i = buffers.begin(); i != buffers.end(); i++) {
+	const std::vector<TxBuffer*>* buffers = _bufferManager->getActiveBuffers();
+	for (std::vector<TxBuffer*>::const_iterator i = buffers->begin(); i != buffers->end(); i++) {
 		TxBuffer* buffer = *i;
 		buffer->seek(0);
 		while (!buffer->eof()) {
@@ -98,8 +96,8 @@ std::list<TransactionOperation*>* BaseTransaction::findOperations(const char* db
 
 std::list<TransactionOperation*>* BaseTransaction::findOperations(const char* db, const char* ns) const {
 	std::list<TransactionOperation*>* result = new std::list<TransactionOperation*>();
-	std::vector<TxBuffer*> buffers = _bufferManager->getActiveBuffers();
-	for (std::vector<TxBuffer*>::iterator i = buffers.begin(); i != buffers.end(); i++) {
+	const std::vector<TxBuffer*>* buffers = _bufferManager->getActiveBuffers();
+	for (std::vector<TxBuffer*>::const_iterator i = buffers->begin(); i != buffers->end(); i++) {
 		TxBuffer* buffer = *i;
 		buffer->seek(0);
 		while (!buffer->eof()) {
@@ -112,11 +110,11 @@ std::list<TransactionOperation*>* BaseTransaction::findOperations(const char* db
 	return result;
 }
 
-BSONObj* BaseTransaction::insert(char* db, char* ns, BSONObj* bson) {
+const BSONObj* BaseTransaction::insert(const char* db, const char* ns, BSONObj* bson) {
 	TransactionOperation oper;
 	oper.code = TXO_INSERT;
-	oper.db = db;
-	oper.ns = ns;
+	oper.db = strcpy(db);
+	oper.ns = strcpy(ns);
 	BsonOper* insertOper = new BsonOper();
 	insertOper->bson = bson; 
 	oper.operation = insertOper;
@@ -124,10 +122,13 @@ BSONObj* BaseTransaction::insert(char* db, char* ns, BSONObj* bson) {
 
 	_bufferManager->writeOperationToRegister(db, ns, oper);
 
+	free(oper.db);
+	free(oper.ns);
 	delete insertOper;
+	return bson;
 }
 
-bool BaseTransaction::dropNamespace(char* db, char* ns) {
+bool BaseTransaction::dropNamespace(const char* db, const char* ns) {
 	TransactionOperation oper;
 	oper.code = TXO_DROPNAMESPACE;
 	oper.operation = NULL;
@@ -137,32 +138,38 @@ bool BaseTransaction::dropNamespace(char* db, char* ns) {
 	_bufferManager->writeOperationToRegister(db, ns, oper);
 }
 
-void BaseTransaction::update(char* db, char* ns, BSONObj* bson) {
+void BaseTransaction::update(const char* db, const char* ns, BSONObj* bson) {
 	TransactionOperation oper;
 	oper.code = TXO_UPDATE;
-	oper.db = db;
-	oper.ns = ns;
+	oper.db = strcpy(db);
+	oper.ns = strcpy(ns);
 	BsonOper* bsonOper = new BsonOper();
 	bsonOper->bson = bson; 
 	oper.operation = bsonOper;
 
 	_bufferManager->writeOperationToRegister(db, ns, oper);
 
+	free(oper.db);
+	free(oper.ns);
 	delete bsonOper;
 }
 
-void BaseTransaction::remove(char* db, char* ns, char* documentId, char* revision) {
+void BaseTransaction::remove(const char* db, const char* ns, const char* documentId, const char* revision) {
 	TransactionOperation oper;
 	oper.code = TXO_REMOVE;
-	oper.db = db;
-	oper.ns = ns;
+	oper.db = strcpy(db);
+	oper.ns = strcpy(ns);
 	RemoveOper* removeOper = new RemoveOper();
-	removeOper->key = documentId;
-	removeOper->revision = revision;
+	removeOper->key = strcpy(documentId);
+	removeOper->revision = strcpy(revision);
 	oper.operation = removeOper;
 
 	_bufferManager->writeOperationToRegister(db, ns, oper);
 
+	free(oper.db);
+	free(oper.ns);
+	free(removeOper->key);
+	free(removeOper->revision);
 	delete removeOper;
 }
 
@@ -170,7 +177,7 @@ bool compareStrings(std::string s1, std::string s2) {
 	return s1.compare(s2) == 0;
 }
 
-BSONArrayObj* BaseTransaction::find(char* db, char* ns, const char* select, const char* filter) throw (ParseException) {
+BSONArrayObj* BaseTransaction::find(const char* db, const char* ns, const char* select, const char* filter) throw (ParseException) {
 	std::list<TransactionOperation*>* operations = findOperations(db, ns);
 	LinkedMap<std::string, BSONObj*> map(compareStrings);
 
@@ -267,7 +274,7 @@ BSONArrayObj* BaseTransaction::find(char* db, char* ns, const char* select, cons
 	return result;
 }
 
-BSONObj* BaseTransaction::findFirst(char* db, char* ns, const char* select, const char* filter) throw (ParseException) {
+BSONObj* BaseTransaction::findFirst(const char* db, const char* ns, const char* select, const char* filter) throw (ParseException) {
 	BSONArrayObj* fullList = find(db, ns, select, filter);
 
 	BSONObj* result = NULL;

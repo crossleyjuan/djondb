@@ -27,25 +27,25 @@
 #include "controllertest.h"
 #include "bson.h"
 
-BSONObj* DummyController::insert(char* db, char* ns, BSONObj* bson)  {
+BSONObj* DummyController::insert(const char* db, const char* ns, BSONObj* bson)  {
 	return bson;
 }
 
-bool DummyController::dropNamespace(char* db, char* ns)  {
+bool DummyController::dropNamespace(const char* db, const char* ns)  {
 	return true;
 }
 
-void DummyController::update(char* db, char* ns, BSONObj* bson)  {
+void DummyController::update(const char* db, const char* ns, BSONObj* bson)  {
 }
 
-void DummyController::remove(char* db, char* ns, char* documentId, char* revision)  {
+void DummyController::remove(const char* db, const char* ns, char* documentId, char* revision)  {
 }
 
-BSONArrayObj* DummyController::find(char* db, char* ns, const char* select, const char* filter) throw (ParseException)  {
+BSONArrayObj* DummyController::find(const char* db, const char* ns, const char* select, const char* filter) throw (ParseException)  {
 	return new BSONArrayObj();
 }
 
-BSONObj* DummyController::findFirst(char* db, char* ns, const char* select, const char* filter) throw (ParseException)  {
+BSONObj* DummyController::findFirst(const char* db, const char* ns, const char* select, const char* filter) throw (ParseException)  {
 	return NULL;
 }
 

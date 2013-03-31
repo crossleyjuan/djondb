@@ -125,13 +125,12 @@ class TestDBSuite: public Test::Suite
 		}
 	private:
 
-		std::vector<std::string*> __ids;
+		std::vector<std::string> __ids;
 
 	private:
 		void testInsert(BSONObj* o)
 		{
-			BSONObj* res = controller->insert("dbtest", "sp1.customer", o);
-			delete res;
+			controller->insert("dbtest", "sp1.customer", o);
 		}
 
 		void testExpressions() {
@@ -450,14 +449,10 @@ class TestDBSuite: public Test::Suite
 			cout << "\ntestInsertWithStringId" << endl;
 			BSONObj obj;
 			std::string* id = uuid();
-			obj.add("_id", const_cast<char*>(id->c_str()));
-			obj.add("name", "cross");
+			obj.add("_id", id->c_str());
+			obj.add("name", (const char*)"cross");
 			delete id;
-			BSONObj* res = controller->insert("dbtest", "sp1.customer", &obj);
-			if (res != NULL)
-			{
-				delete res;
-			}
+			controller->insert("dbtest", "sp1.customer", &obj);
 		}
 
 		void testInsertWithCharId()
@@ -465,14 +460,10 @@ class TestDBSuite: public Test::Suite
 			cout << "\ntestInsertWithCharId" << endl;
 			BSONObj obj;
 			std::string* id = uuid();
-			obj.add("_id", const_cast<char*>(id->c_str()));
-			obj.add("name", "cross");
+			obj.add("_id", id->c_str());
+			obj.add("name", (const char*)"cross");
 			delete id;
-			BSONObj* res = controller->insert("dbtest", "sp1.customer", &obj);
-			if (res != NULL)
-			{
-				delete res;
-			}
+			controller->insert("dbtest", "sp1.customer", &obj);
 		}
 
 		void testInsertComplexBSON() {
@@ -558,6 +549,8 @@ cout << "testing array" << endl;
 			for (int x = 0; x < inserts; x++)
 			{
 				BSONObj* obj = new BSONObj();
+				std::string* id = uuid();
+				obj->add("_id", const_cast<char*>(id->c_str()));
 				obj->add("name", "John");
 				char temp[700];
 				memset(temp, 0, 699);
@@ -569,14 +562,15 @@ cout << "testing array" << endl;
 				int test = rand() % 10;
 				if (test > 0)
 				{
-					__ids.push_back(new std::string(obj->getString("_id")));
-					fos.writeString(obj->getString("_id").c_str());
+					__ids.push_back(*id);
+					fos.writeString(id->c_str());
 				}
 				if ((x % 1000000) == 0)
 				{
 					cout<< "inserts " << x << endl;
 				}
 				delete obj;
+				delete id;
 			}
 			fos.close();
 
@@ -626,11 +620,11 @@ cout << "testing array" << endl;
 
 			log->startTimeRecord();
 
-			for (std::vector<string*>::iterator i = __ids.begin(); i != __ids.end(); i++)
+			for (std::vector<string>::iterator i = __ids.begin(); i != __ids.end(); i++)
 			{
-				string* id = *i;
+				string id = *i;
 
-				std::string filter = format("$\"_id\" == \"%s\"", id->c_str());
+				std::string filter = format("$\"_id\" == \"%s\"", id.c_str());
 
 				BSONObj* res = controller->findFirst("dbtest", "sp1.customer", "*", filter.c_str());
 				TEST_ASSERT(res != NULL);
@@ -639,7 +633,7 @@ cout << "testing array" << endl;
 					return;
 				}
 				djondb::string id2 = res->getDJString("_id");
-				if (id2.compare(id->c_str(), id->length()) != 0)
+				if (id2.compare(id.c_str(), id.length()) != 0)
 				{
 					TEST_FAIL("id not found");
 					return;
@@ -1149,7 +1143,7 @@ cout << "testing array" << endl;
 			BSONObj obj;
 			obj.add("name", "Test");
 
-			BSONObj* res = controller->insert("dbtest", "ns.drop", &obj);
+			controller->insert("dbtest", "ns.drop", &obj);
 
 			bool result = controller->dropNamespace("dbtest", "ns.drop");
 			TEST_ASSERT(result);
@@ -1159,7 +1153,6 @@ cout << "testing array" << endl;
 			TEST_ASSERT(finds->length() == 0);
 
 			delete finds;
-			delete res;
 		}
 
 		void testErrorHandling() {
