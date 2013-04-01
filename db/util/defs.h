@@ -13,8 +13,8 @@
 #ifndef WINDOWS
 #include "config.h"
 #else
-#define VERSION "0.25"
-#define PACKAGE_VERSION "0.2"
+#define VERSION "0.3"
+#define PACKAGE_VERSION "0.3"
 #endif
 
 #if (defined __MACH__ || __APPLE__ || TARGET_OS_MAC)

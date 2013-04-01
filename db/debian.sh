@@ -1,9 +1,10 @@
 #!/bin/sh
 
-while getopts j:d:u o
+while getopts s:j:d:u o
    do case "$o" in
 		d)  DIR="$OPTARG";;
-		\?)  echo "Usage: $0 -d dist_dir" && exit 1;;
+	   s)  SUFFIX="$OPTARG";;
+		\?)  echo "Usage: $0 -d dist_dir -s suffix" && exit 1;;
 	esac
 done
 
@@ -27,7 +28,7 @@ strip --strip-unneeded debian/usr/lib/*.so*
 fakeroot dpkg-deb --build debian djondb.deb
 lintian djondb.deb
 
-debfile="djondb_`uname`_`uname -i`.deb"
+debfile="djondb_`uname`_`uname -i`${SUFFIX}.deb"
 mv djondb.deb $debfile
 
 if [ ! -z "${DIR}" ]; 

@@ -3,7 +3,7 @@
 sh update.sh
 sh update-nodejs.sh
 
-while getopts j:d:u o
+while getopts s:j:d:u o
    do case "$o" in
 		j)  JAVA="$OPTARG";;
 		d)  DIR="$OPTARG";;

@@ -538,8 +538,10 @@ class TestDriverBaseSuite: public Test::Suite {
 				BSONObj* res = connection->findByKey("testdb", "tx", id->c_str());
 
 				TEST_ASSERT(res != NULL);
-				TEST_ASSERT(res->has("name"));
-				if (res->has("name")) TEST_ASSERT(res->getString("name").compare("John") == 0);
+				if (res != NULL) {
+					TEST_ASSERT(res->has("name"));
+					if (res->has("name")) TEST_ASSERT(res->getString("name").compare("John") == 0);
+				}
 
 				// Test records out of the transaction
 				BSONArrayObj* array1 = connection->find("testdb", "tx", "*", "");
@@ -550,29 +552,31 @@ class TestDriverBaseSuite: public Test::Suite {
 				BSONObj* res2 = connection->findByKey("testdb", "tx", id->c_str());
 
 				TEST_ASSERT(res2 != NULL);
-				TEST_ASSERT(res2->has("name"));
-				if (res2->has("name")) TEST_ASSERT(res2->getString("name").compare("John") == 0);
-				delete res2;
+				if (res2 != NULL) {
+					TEST_ASSERT(res2->has("name"));
+					if (res2->has("name")) TEST_ASSERT(res2->getString("name").compare("John") == 0);
+					delete res2;
+				}
 
 				connection->dropNamespace("testdb", "tx");
 				connection->beginTransaction();
 				BSONObj* objRollback = BSONParser::parse("{'_id': '001'}");
 
 				connection->insert("testdb", "tx", *objRollback);
-				
+
 				res2 = connection->findByKey("testdb", "tx", "001");
 				TEST_ASSERT(res2 != NULL);
-				TEST_ASSERT(res2->getString("id").compare("id") == 0);
-				delete res2;
+				if (res2 != NULL) {
+					TEST_ASSERT(res2->getString("id").compare("id") == 0);
+					delete res2;
+				}
 
 				connection->rollbackTransaction();
 
 				res2 = connection->findByKey("testdb", "tx", "001");
 				TEST_ASSERT(res2 == NULL);
-				delete res2;
 
 				delete objRollback;
-				delete res2;
 			}
 		}
 

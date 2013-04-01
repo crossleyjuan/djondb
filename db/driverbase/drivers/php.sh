@@ -1,10 +1,11 @@
 #!/bin/sh
 
-while getopts j:d:u o
+while getopts s:j:d:u o
    do case "$o" in
 		d)  DIR="$OPTARG";;
 	   u)  UPLOAD="true";;
-		\?)  echo "Usage: $0 -d dist_dir" && exit 1;;
+	   s)  SUFFIX="$OPTARG";;
+		\?)  echo "Usage: $0 -d dist_dir [-s suffix]" && exit 1;;
 	esac
 done
 
@@ -31,7 +32,7 @@ phpize
 make
 
 
-zipfile="djondb_phpext_`uname`_`uname -m`.zip"
+zipfile="djondb_phpext_`uname`_`uname -m`${SUFFIX}.zip"
 
 zip $zipfile test.php modules/djonwrapper.so djonwrapper.php
 
