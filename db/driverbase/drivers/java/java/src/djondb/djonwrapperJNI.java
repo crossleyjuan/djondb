@@ -85,6 +85,9 @@ public class djonwrapperJNI {
   public final static native long new_DjondbConnection__SWIG_1(String jarg1, int jarg2);
   public final static native long new_DjondbConnection__SWIG_2(long jarg1, DjondbConnection jarg1_);
   public final static native void delete_DjondbConnection(long jarg1);
+  public final static native String DjondbConnection_beginTransaction(long jarg1, DjondbConnection jarg1_);
+  public final static native void DjondbConnection_commitTransaction(long jarg1, DjondbConnection jarg1_);
+  public final static native void DjondbConnection_rollbackTransaction(long jarg1, DjondbConnection jarg1_);
   public final static native boolean DjondbConnection_open(long jarg1, DjondbConnection jarg1_);
   public final static native void DjondbConnection_close(long jarg1, DjondbConnection jarg1_);
   public final static native void DjondbConnection_internalClose(long jarg1, DjondbConnection jarg1_);

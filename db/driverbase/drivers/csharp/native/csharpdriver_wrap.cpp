@@ -2277,6 +2277,34 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_DjondbConnection(void * jarg1) {
 }
 
 
+SWIGEXPORT char * SWIGSTDCALL CSharp_DjondbConnection_beginTransaction(void * jarg1) {
+  char * jresult ;
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
+  char *result = 0 ;
+  
+  arg1 = (djondb::DjondbConnection *)jarg1; 
+  result = (char *)(arg1)->beginTransaction();
+  jresult = SWIG_csharp_string_callback((const char *)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_DjondbConnection_commitTransaction(void * jarg1) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
+  
+  arg1 = (djondb::DjondbConnection *)jarg1; 
+  (arg1)->commitTransaction();
+}
+
+
+SWIGEXPORT void SWIGSTDCALL CSharp_DjondbConnection_rollbackTransaction(void * jarg1) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
+  
+  arg1 = (djondb::DjondbConnection *)jarg1; 
+  (arg1)->rollbackTransaction();
+}
+
+
 SWIGEXPORT unsigned int SWIGSTDCALL CSharp_DjondbConnection_open(void * jarg1) {
   unsigned int jresult ;
   djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
@@ -2487,15 +2515,7 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_DjondbConnection_find__SWIG_0(void * jarg1,
   }
   std::string arg3_str(jarg3);
   arg3 = &arg3_str; 
-  try {
-    result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3);
-  }
-  catch(ParseException &_e) {
-    (void)_e;
-    SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, "C++ ParseException exception thrown");
-    return 0; 
-  }
-  
+  result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3);
   jresult = (void *)result; 
   return jresult;
 }
@@ -2528,15 +2548,7 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_DjondbConnection_find__SWIG_1(void * jarg1,
   }
   std::string arg4_str(jarg4);
   arg4 = &arg4_str; 
-  try {
-    result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4);
-  }
-  catch(ParseException &_e) {
-    (void)_e;
-    SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, "C++ ParseException exception thrown");
-    return 0; 
-  }
-  
+  result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4);
   jresult = (void *)result; 
   return jresult;
 }
@@ -2576,15 +2588,7 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_DjondbConnection_find__SWIG_2(void * jarg1,
   }
   std::string arg5_str(jarg5);
   arg5 = &arg5_str; 
-  try {
-    result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4,(std::string const &)*arg5);
-  }
-  catch(ParseException &_e) {
-    (void)_e;
-    SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, "C++ ParseException exception thrown");
-    return 0; 
-  }
-  
+  result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4,(std::string const &)*arg5);
   jresult = (void *)result; 
   return jresult;
 }

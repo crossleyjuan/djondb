@@ -38,7 +38,7 @@ cp defs.h php/includes/
 cp datetime.h php/includes/
 cp dtime.h php/includes/
 cp errorhandle.h php/includes/
-cp errors.h php/includes/
+cp djon_error_codes.h php/includes/
 cp fileutil.h php/includes/
 cp circular_queue.h php/includes/
 cp config.h php/includes/

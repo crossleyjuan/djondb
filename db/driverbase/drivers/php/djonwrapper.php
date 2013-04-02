@@ -466,7 +466,7 @@ class BSONParser {
 	}
 }
 
-class ParseException extends Exception {
+class ParseException {
 	public $_cPtr=null;
 	protected $_pData=array();
 
@@ -533,6 +533,18 @@ class DjondbConnection {
 		case 1: $this->_cPtr=new_DjondbConnection($host_or_orig); break;
 		default: $this->_cPtr=new_DjondbConnection($host_or_orig,$port);
 		}
+	}
+
+	function beginTransaction() {
+		return DjondbConnection_beginTransaction($this->_cPtr);
+	}
+
+	function commitTransaction() {
+		DjondbConnection_commitTransaction($this->_cPtr);
+	}
+
+	function rollbackTransaction() {
+		DjondbConnection_rollbackTransaction($this->_cPtr);
 	}
 
 	function open() {

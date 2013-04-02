@@ -507,6 +507,15 @@ class djonwrapperPINVOKE {
   [DllImport("djonwrapper", EntryPoint="CSharp_delete_DjondbConnection")]
   public static extern void delete_DjondbConnection(HandleRef jarg1);
 
+  [DllImport("djonwrapper", EntryPoint="CSharp_DjondbConnection_beginTransaction")]
+  public static extern string DjondbConnection_beginTransaction(HandleRef jarg1);
+
+  [DllImport("djonwrapper", EntryPoint="CSharp_DjondbConnection_commitTransaction")]
+  public static extern void DjondbConnection_commitTransaction(HandleRef jarg1);
+
+  [DllImport("djonwrapper", EntryPoint="CSharp_DjondbConnection_rollbackTransaction")]
+  public static extern void DjondbConnection_rollbackTransaction(HandleRef jarg1);
+
   [DllImport("djonwrapper", EntryPoint="CSharp_DjondbConnection_open")]
   public static extern bool DjondbConnection_open(HandleRef jarg1);
 

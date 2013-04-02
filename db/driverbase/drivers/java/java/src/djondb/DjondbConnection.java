@@ -47,6 +47,18 @@ public class DjondbConnection {
     this(djonwrapperJNI.new_DjondbConnection__SWIG_2(DjondbConnection.getCPtr(orig), orig), true);
   }
 
+  public String beginTransaction() {
+    return djonwrapperJNI.DjondbConnection_beginTransaction(swigCPtr, this);
+  }
+
+  public void commitTransaction() {
+    djonwrapperJNI.DjondbConnection_commitTransaction(swigCPtr, this);
+  }
+
+  public void rollbackTransaction() {
+    djonwrapperJNI.DjondbConnection_rollbackTransaction(swigCPtr, this);
+  }
+
   public boolean open() {
     return djonwrapperJNI.DjondbConnection_open(swigCPtr, this);
   }

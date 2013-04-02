@@ -18,15 +18,26 @@
 #include "threads.h"
 #include "settings.h"
 #include "circular_queue.h"
-#include "errors.h"
+#include "djon_error_codes.h"
 
 #include <string>
 #include <vector>
 #include <map>
 
+class DjondbException: public std::exception {
+	public:
+		DjondbException(int code, const char* error);
+		DjondbException(const DjondbException& orig);
+		virtual const char* what() const throw();
+		int errorCode() const;
+
+	private:
+		int _errorCode;
+		const char* _errorMessage;
+};
 /*****************************************************************
   Type Definitions and macros
-*/
+  */
 
 bool isDaemon();
 void setDaemon(bool daemon);
@@ -45,8 +56,8 @@ Version getCurrentVersion();
 Version getVersion(const char* version);
 
 /***********************************************************************
-* Memory functions
-***********************************************************************/
+ * Memory functions
+ ***********************************************************************/
 void* mmalloc(size_t size);
 
 /***********************************************************************/

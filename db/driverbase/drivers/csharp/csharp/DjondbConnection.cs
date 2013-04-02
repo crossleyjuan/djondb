@@ -53,6 +53,19 @@ public class DjondbConnection : IDisposable {
     if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
   }
 
+  public string beginTransaction() {
+    string ret = djonwrapperPINVOKE.DjondbConnection_beginTransaction(swigCPtr);
+    return ret;
+  }
+
+  public void commitTransaction() {
+    djonwrapperPINVOKE.DjondbConnection_commitTransaction(swigCPtr);
+  }
+
+  public void rollbackTransaction() {
+    djonwrapperPINVOKE.DjondbConnection_rollbackTransaction(swigCPtr);
+  }
+
   public bool open() {
     bool ret = djonwrapperPINVOKE.DjondbConnection_open(swigCPtr);
     return ret;

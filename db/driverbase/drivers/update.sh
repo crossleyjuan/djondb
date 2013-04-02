@@ -35,7 +35,7 @@ cp ../../includes/defs.h .
 cp ../../includes/datetime.h .
 cp ../../includes/dtime.h .
 cp ../../includes/errorhandle.h .
-cp ../../includes/errors.h .
+cp ../../includes/djon_error_codes.h .
 cp ../../includes/fileutil.h .
 cp ../../includes/circular_queue.h .
 cp ../../includes/config.h .

@@ -1719,6 +1719,43 @@ SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_delete_1DjondbConnection(JNIE
 }
 
 
+SWIGEXPORT jstring JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1beginTransaction(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(djondb::DjondbConnection **)&jarg1; 
+  result = (char *)(arg1)->beginTransaction();
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1commitTransaction(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(djondb::DjondbConnection **)&jarg1; 
+  (arg1)->commitTransaction();
+}
+
+
+SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1rollbackTransaction(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(djondb::DjondbConnection **)&jarg1; 
+  (arg1)->rollbackTransaction();
+}
+
+
 SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1open(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jboolean jresult = 0 ;
   djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
@@ -2002,15 +2039,7 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1find_1_1SW
   std::string arg3_str(arg3_pstr);
   arg3 = &arg3_str;
   jenv->ReleaseStringUTFChars(jarg3, arg3_pstr); 
-  try {
-    result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3);
-  }
-  catch(ParseException &_e) {
-    (void)_e;
-    SWIG_JavaThrowException(jenv, SWIG_JavaRuntimeException, "C++ ParseException exception thrown");
-    return 0; 
-  }
-  
+  result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3);
   *(BSONArrayObj **)&jresult = result; 
   return jresult;
 }
@@ -2055,15 +2084,7 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1find_1_1SW
   std::string arg4_str(arg4_pstr);
   arg4 = &arg4_str;
   jenv->ReleaseStringUTFChars(jarg4, arg4_pstr); 
-  try {
-    result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4);
-  }
-  catch(ParseException &_e) {
-    (void)_e;
-    SWIG_JavaThrowException(jenv, SWIG_JavaRuntimeException, "C++ ParseException exception thrown");
-    return 0; 
-  }
-  
+  result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4);
   *(BSONArrayObj **)&jresult = result; 
   return jresult;
 }
@@ -2118,15 +2139,7 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1find_1_1SW
   std::string arg5_str(arg5_pstr);
   arg5 = &arg5_str;
   jenv->ReleaseStringUTFChars(jarg5, arg5_pstr); 
-  try {
-    result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4,(std::string const &)*arg5);
-  }
-  catch(ParseException &_e) {
-    (void)_e;
-    SWIG_JavaThrowException(jenv, SWIG_JavaRuntimeException, "C++ ParseException exception thrown");
-    return 0; 
-  }
-  
+  result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4,(std::string const &)*arg5);
   *(BSONArrayObj **)&jresult = result; 
   return jresult;
 }

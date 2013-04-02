@@ -37,7 +37,7 @@ cp defs.h nodejs/includes/
 cp datetime.h nodejs/includes/
 cp dtime.h nodejs/includes/
 cp errorhandle.h nodejs/includes/
-cp errors.h nodejs/includes/
+cp djon_error_codes.h nodejs/includes/
 cp fileutil.h nodejs/includes/
 cp circular_queue.h nodejs/includes/
 cp config.h nodejs/includes/

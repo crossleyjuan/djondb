@@ -16,6 +16,9 @@
  * =====================================================================================
  */
 
+#ifndef STREAMMANAGER_INCLUDE_H
+#define STREAMMANAGER_INCLUDE_H
+
 #include "dbfilestream.h"
 #include "util.h"
 #include <map>
@@ -41,18 +44,18 @@ class StreamManager {
 		virtual ~StreamManager();
 
 		static StreamManager* getStreamManager();
-		StreamType* open(std::string db, std::string ns, FILE_TYPE type);
+		StreamType* open(const char* db, const char* ns, FILE_TYPE type);
 		  std::vector<std::string>* dbs() const;
 		  std::vector<std::string>* namespaces(const char* db) const;
 		void saveDatabases();
 		void closeDatabases();
-		bool dropNamespace(char* db, char* ns);
+		bool dropNamespace(const char* db, const char* ns);
 		void setDataDir(const std::string& dataDir);
 
 		void setInitializing(bool initializing);
 
 	private:
-		bool close(char* db, char* ns);
+		bool close(const char* db, const char* ns);
 		StreamType* checkVersion(StreamType* stream);
 
 	private:
@@ -66,3 +69,4 @@ class StreamManager {
 		bool _initializing;
 };
 
+#endif // STREAMMANAGER_INCLUDE_H

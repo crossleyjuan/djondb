@@ -41,6 +41,7 @@ sh debian_dev.sh $@
 
 cd driverbase/drivers
 
+./update.sh
 ./php.sh $@
 ./java.sh $@
 ./csharp.sh $@

@@ -4111,6 +4111,82 @@ fail:
 }
 
 
+ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_beginTransaction) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
+  zval **args[1];
+  char *result = 0 ;
+  
+  SWIG_ResetError();
+  if(ZEND_NUM_ARGS() != 1 || zend_get_parameters_array_ex(1, args) != SUCCESS) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_djondb__DjondbConnection, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of DjondbConnection_beginTransaction. Expected SWIGTYPE_p_djondb__DjondbConnection");
+    }
+  }
+  if(!arg1) SWIG_PHP_Error(E_ERROR, "this pointer is NULL");
+  result = (char *)(arg1)->beginTransaction();
+  {
+    if(!result) {
+      ZVAL_NULL(return_value);
+    } else {
+      ZVAL_STRING(return_value, (char *)result, 1);
+    }
+  }
+  return;
+fail:
+  SWIG_FAIL();
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_commitTransaction) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
+  zval **args[1];
+  
+  SWIG_ResetError();
+  if(ZEND_NUM_ARGS() != 1 || zend_get_parameters_array_ex(1, args) != SUCCESS) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_djondb__DjondbConnection, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of DjondbConnection_commitTransaction. Expected SWIGTYPE_p_djondb__DjondbConnection");
+    }
+  }
+  if(!arg1) SWIG_PHP_Error(E_ERROR, "this pointer is NULL");
+  (arg1)->commitTransaction();
+  
+  return;
+fail:
+  SWIG_FAIL();
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_rollbackTransaction) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
+  zval **args[1];
+  
+  SWIG_ResetError();
+  if(ZEND_NUM_ARGS() != 1 || zend_get_parameters_array_ex(1, args) != SUCCESS) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_djondb__DjondbConnection, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of DjondbConnection_rollbackTransaction. Expected SWIGTYPE_p_djondb__DjondbConnection");
+    }
+  }
+  if(!arg1) SWIG_PHP_Error(E_ERROR, "this pointer is NULL");
+  (arg1)->rollbackTransaction();
+  
+  return;
+fail:
+  SWIG_FAIL();
+}
+
+
 ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_open) {
   djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   zval **args[1];
@@ -4591,16 +4667,7 @@ ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_find__SWIG_0) {
   temp3.assign(Z_STRVAL_PP(args[2]), Z_STRLEN_PP(args[2]));
   arg3 = &temp3;
   
-  try {
-    result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3);
-  }
-  catch(ParseException &_e) {
-    (void)_e;
-    zend_throw_exception(NULL, const_cast<char*>("C++ ParseException exception thrown"), 0 TSRMLS_CC);
-    return;
-    
-  }
-  
+  result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3);
   
   SWIG_SetPointerZval(return_value, (void *)result, SWIGTYPE_p_BSONArrayObj, 0);
   
@@ -4649,16 +4716,7 @@ ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_find__SWIG_1) {
   temp4.assign(Z_STRVAL_PP(args[3]), Z_STRLEN_PP(args[3]));
   arg4 = &temp4;
   
-  try {
-    result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4);
-  }
-  catch(ParseException &_e) {
-    (void)_e;
-    zend_throw_exception(NULL, const_cast<char*>("C++ ParseException exception thrown"), 0 TSRMLS_CC);
-    return;
-    
-  }
-  
+  result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4);
   
   SWIG_SetPointerZval(return_value, (void *)result, SWIGTYPE_p_BSONArrayObj, 0);
   
@@ -4715,16 +4773,7 @@ ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_find__SWIG_2) {
   temp5.assign(Z_STRVAL_PP(args[4]), Z_STRLEN_PP(args[4]));
   arg5 = &temp5;
   
-  try {
-    result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4,(std::string const &)*arg5);
-  }
-  catch(ParseException &_e) {
-    (void)_e;
-    zend_throw_exception(NULL, const_cast<char*>("C++ ParseException exception thrown"), 0 TSRMLS_CC);
-    return;
-    
-  }
-  
+  result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4,(std::string const &)*arg5);
   
   SWIG_SetPointerZval(return_value, (void *)result, SWIGTYPE_p_BSONArrayObj, 0);
   
@@ -5646,6 +5695,9 @@ static zend_function_entry djonwrapper_functions[] = {
  SWIG_ZEND_NAMED_FE(bson_splitselect,_wrap_bson_splitSelect,NULL)
  SWIG_ZEND_NAMED_FE(bson_subselect,_wrap_bson_subselect,NULL)
  SWIG_ZEND_NAMED_FE(new_djondbconnection,_wrap_new_DjondbConnection,NULL)
+ SWIG_ZEND_NAMED_FE(djondbconnection_begintransaction,_wrap_DjondbConnection_beginTransaction,NULL)
+ SWIG_ZEND_NAMED_FE(djondbconnection_committransaction,_wrap_DjondbConnection_commitTransaction,NULL)
+ SWIG_ZEND_NAMED_FE(djondbconnection_rollbacktransaction,_wrap_DjondbConnection_rollbackTransaction,NULL)
  SWIG_ZEND_NAMED_FE(djondbconnection_open,_wrap_DjondbConnection_open,NULL)
  SWIG_ZEND_NAMED_FE(djondbconnection_close,_wrap_DjondbConnection_close,NULL)
  SWIG_ZEND_NAMED_FE(djondbconnection_internalclose,_wrap_DjondbConnection_internalClose,NULL)

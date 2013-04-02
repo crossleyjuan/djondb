@@ -22,7 +22,7 @@ sh update.sh
 swig -outdir java/java/src/djondb -o java/native/javadriver_wrap.cpp -c++ -java -package djondb driver.i
 
 cd java
-./release.sh
+./release.sh $@
 
 if [ ! -z "${DIR}" ]; 
 then
