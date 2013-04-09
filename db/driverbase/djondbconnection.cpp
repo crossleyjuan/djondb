@@ -217,7 +217,7 @@ bool DjondbConnection::insert(const std::string& db, const std::string& ns, cons
 }
 
 bool DjondbConnection::update(const std::string& db, const std::string& ns, const std::string& json) {
-	if (_logger->isDebug()) _logger->debug(2, "Update command. db: %s, ns: %s", db.c_str(), ns.c_str());
+	if (_logger->isDebug()) _logger->debug(2, "Update command. db: %s, ns: %s, json: %s", db.c_str(), ns.c_str(), json.c_str());
 	BSONObj* obj = BSONParser::parse(json);
 	bool result = update(db, ns, *obj);
 	delete obj;
@@ -244,7 +244,7 @@ bool DjondbConnection::remove(const std::string& db, const std::string& ns, cons
 }
 
 bool DjondbConnection::update(const std::string& db, const std::string& ns, const BSONObj& obj) {
-	if (_logger->isDebug()) _logger->debug(2, "Update command. db: %s, ns: %s", db.c_str(), ns.c_str());
+	if (_logger->isDebug()) _logger->debug(2, "Update command. db: %s, ns: %s, bson: %s", db.c_str(), ns.c_str(), BSONObj(obj).toChar());
 
 	if (!isOpen()) {
 		throw DjondbException(D_ERROR_CONNECTION, "Not connected to any server");
@@ -332,14 +332,26 @@ BSONObj* DjondbConnection::findByKey(const std::string& db, const std::string& n
 }
 
 BSONArrayObj* DjondbConnection::find(const std::string& db, const std::string& ns) {
-	return find(db, ns, "*", "");
+	return find(db, ns, "*", "", BSONObj());
+}
+
+BSONArrayObj* DjondbConnection::find(const std::string& db, const std::string& ns, const BSONObj& options) {
+	return find(db, ns, "*", "", options);
 }
 
 BSONArrayObj* DjondbConnection::find(const std::string& db, const std::string& ns, const std::string& filter) {
-	return find(db, ns, "*", filter);
+	return find(db, ns, "*", filter, BSONObj());
+}
+
+BSONArrayObj* DjondbConnection::find(const std::string& db, const std::string& ns, const std::string& filter, const BSONObj& options) {
+	return find(db, ns, "*", filter, options);
 }
 
 BSONArrayObj* DjondbConnection::find(const std::string& db, const std::string& ns, const std::string& select, const std::string& filter) {
+	return find(db, ns, select, filter, BSONObj());
+}
+
+BSONArrayObj* DjondbConnection::find(const std::string& db, const std::string& ns, const std::string& select, const std::string& filter, const BSONObj& options) {
 	if (_logger->isDebug()) _logger->debug("executing find db: %s, ns: %s, select: %s, filter: %s", db.c_str(), ns.c_str(), select.c_str(), filter.c_str());
 
 	if (!isOpen()) {
@@ -357,6 +369,7 @@ BSONArrayObj* DjondbConnection::find(const std::string& db, const std::string& n
 	cmd.setSelect(select);
 	cmd.setDB(db);
 	cmd.setNameSpace(ns);
+	cmd.setOptions(&options);
 	prepareOptions((Command*)&cmd);
 	_commandWriter->writeCommand(&cmd);
 	

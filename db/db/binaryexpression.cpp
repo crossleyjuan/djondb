@@ -108,6 +108,16 @@ ExpressionResult* evalEqual(const BSONObj& bson, BaseExpression* left, BaseExpre
 	return new ExpressionResult(result);
 }
 
+ExpressionResult* evalNotEqual(const BSONObj& bson, BaseExpression* left, BaseExpression* right) {
+	ExpressionResult* TempResult = evalEqual(bson, left, right);
+
+	bool bresult = *TempResult;
+	ExpressionResult* result = new ExpressionResult(!bresult);
+	delete TempResult;
+
+	return result;
+}
+
 ExpressionResult* evalComparison(const BSONObj& bson, const FILTER_OPERATORS& oper, BaseExpression* left, BaseExpression* right) {
 	ExpressionResult* valLeft = left->eval(bson);
 	ExpressionResult* valRight= right->eval(bson);
@@ -190,6 +200,8 @@ ExpressionResult* BinaryExpression::eval(const BSONObj& bson) {
 	switch (_oper) {
 		case FO_EQUALS:
 			return evalEqual(bson, _left, _right);
+		case FO_NOT_EQUALS:
+			return evalNotEqual(bson, _left, _right);
 		case FO_AND:
 		case FO_OR:
 			return evalAndOr(bson, _oper, _left, _right);

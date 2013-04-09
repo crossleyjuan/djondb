@@ -279,7 +279,7 @@ class TestBSONSuite : public Test::Suite
 			BSONObj* testEmpty = BSONParser::parse("{}");
 			TEST_ASSERT(testEmpty->length() == 0);
 
-			BSONObj* obj = BSONParser::parse("{age: 1, name: 'John:test\\'test2\\'', salary: 3500.25, lnumber: 100000000000}");
+			BSONObj* obj = BSONParser::parse("{age: 1, name: 'John:test\\'test2\\'', salary: 3500.25, lnumber: 100000000000, values: {}, other: 1}");
 			TEST_ASSERT(obj->has("age"));
 			TEST_ASSERT(obj->getInt("age") == 1);
 			TEST_ASSERT(strcmp(obj->getString("name").c_str(), "John:test\\'test2\\'") == 0);
@@ -289,6 +289,11 @@ class TestBSONSuite : public Test::Suite
 
 			TEST_ASSERT(obj->has("lnumber"));
 			TEST_ASSERT(obj->getLong("lnumber") == 100000000000);
+
+			TEST_ASSERT(obj->has("values"));
+
+			TEST_ASSERT(obj->has("other"));
+			TEST_ASSERT(obj->getInt("other") == 1);
 
 			delete obj;
 			delete testEmpty;

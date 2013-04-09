@@ -187,13 +187,14 @@ BSONObj* BSONParser::parseBSON(const char* c, __int32& pos) throw(BSONException)
 					free(value);
 					value = NULL;
 				}
-				if (c[x] == '}')
-					break;
-				else {
+				if (c[x] != '}') {
 					state = 1; // name
 					type = LONG64_TYPE;
 					continue;
 				}
+			}
+			if (c[x] == '}') {
+				break;
 			}
 		}
 		if (c[x] == ':') {

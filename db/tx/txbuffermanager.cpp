@@ -398,12 +398,12 @@ void* TxBufferManager::monitorBuffers(void* arg) {
 }
 
 void TxBufferManager::flushBuffer() {
-	if (_log->isDebug()) _log->debug(2, "TxBufferManager::flushBuffer()");
 
 	_lockActiveBuffers->lock();
 	_lockActiveBuffers->wait(3);
 	_flushingBuffers = true;
 	if (buffersCount() > 1) {
+		if (_log->isDebug()) _log->debug(2, "TxBufferManager::flushBuffer()");
 		TxBuffer* buffer = pop();
 
 		if (_log->isDebug()) _log->debug(2, "Buffer popped up. filename: %s, mainLog: %s", buffer->fileName().c_str(), buffer->mainLog()?"true": "false");

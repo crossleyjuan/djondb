@@ -273,6 +273,10 @@ void StreamManager::saveDatabases() {
 }
 
 bool StreamManager::dropNamespace(const char* db, const char* ns) {
+	// Ensures that the namespaces was loaded from disk if it exists
+	open(db, ns, DATA_FTYPE);
+	open(db, ns, INDEX_FTYPE);
+
 	StreamType* stream = NULL;
 	bool result = false;
 	map<std::string, map<std::string, SpacesType>* >::iterator itspaces = _spaces.find(std::string(db));

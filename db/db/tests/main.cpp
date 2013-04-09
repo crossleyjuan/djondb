@@ -194,6 +194,15 @@ class TestDBSuite: public Test::Suite
 			TEST_ASSERT(result8->type() == ExpressionResult::RT_BOOLEAN);
 			bool bresult8 = *result8;
 			TEST_ASSERT(bresult8 == true);
+
+			BinaryExpression exp9(FO_NOT_EQUALS);
+			exp9.push(new SimpleExpression("$'age'"));
+			exp9.push(new ConstantExpression(36));
+			ExpressionResult* result9 = exp9.eval(obj);
+			TEST_ASSERT(result9->type() == ExpressionResult::RT_BOOLEAN);
+			bool bresult9 = *result9;
+			TEST_ASSERT(bresult9 == true);
+
 		}
 
 		void testUpdate() {
@@ -269,6 +278,14 @@ class TestDBSuite: public Test::Suite
 		void testNamespaces() {
 			cout << "\ntestNamespaces" << endl;
 			BSONObj* obj = BSONParser::parse("{ 'a': 'a'}");
+
+			std::vector<std::string>* nsTemp = controller->namespaces("testnamespacesdb");
+
+			// Cleans up the previous namespaces
+			for (std::vector<std::string>::iterator i = nsTemp->begin(); i != nsTemp->end(); i++) {
+				controller->dropNamespace("testnamespacesdb", i->c_str());
+			}
+			delete nsTemp;
 
 			controller->insert("testnamespacesdb", "ns1", obj);
 			controller->insert("testnamespacesdb", "ns2", obj);
@@ -392,6 +409,12 @@ class TestDBSuite: public Test::Suite
 				TEST_ASSERT(bres);
 
 				parser = FilterParser::parse("($'name' == \"John\")");
+				result = parser->eval(obj);
+				TEST_ASSERT(result->type() == ExpressionResult::RT_BOOLEAN);
+				bres = *result;
+				TEST_ASSERT(bres);
+
+				parser = FilterParser::parse("($'name' != \"Test\")");
 				result = parser->eval(obj);
 				TEST_ASSERT(result->type() == ExpressionResult::RT_BOOLEAN);
 				bres = *result;

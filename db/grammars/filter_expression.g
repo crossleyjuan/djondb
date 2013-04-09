@@ -181,7 +181,7 @@ operand_expr returns [BaseExpression* val]
 	
 NOT	:	'not';
 
-OPER	:	('==' | '>' | '>=' | '<' | '<=' );
+OPER	:	('==' | '>' | '>=' | '<' | '<=' | '!=' );
 OR	:	('o' | 'O') ('R' | 'r');
 AND	:	('a' | 'A') ('n' | 'N') ('d' | 'D');
 

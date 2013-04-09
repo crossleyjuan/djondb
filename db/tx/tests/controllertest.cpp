@@ -27,33 +27,33 @@
 #include "controllertest.h"
 #include "bson.h"
 
-BSONObj* DummyController::insert(const char* db, const char* ns, BSONObj* bson)  {
+BSONObj* DummyController::insert(const char* db, const char* ns, BSONObj* bson, BSONObj* options) {
 	return bson;
 }
 
-bool DummyController::dropNamespace(const char* db, const char* ns)  {
+bool DummyController::dropNamespace(const char* db, const char* ns, BSONObj* options) {
 	return true;
 }
 
-void DummyController::update(const char* db, const char* ns, BSONObj* bson)  {
+void DummyController::update(const char* db, const char* ns, BSONObj* bson, BSONObj* options) {
 }
 
-void DummyController::remove(const char* db, const char* ns, char* documentId, char* revision)  {
+void DummyController::remove(const char* db, const char* ns, const char* documentId, const char* revision, BSONObj* options) {
 }
 
-BSONArrayObj* DummyController::find(const char* db, const char* ns, const char* select, const char* filter) throw (ParseException)  {
+BSONArrayObj* DummyController::find(const char* db, const char* ns, const char* select, const char* filter, BSONObj* options) throw (ParseException) {
 	return new BSONArrayObj();
 }
 
-BSONObj* DummyController::findFirst(const char* db, const char* ns, const char* select, const char* filter) throw (ParseException)  {
+BSONObj* DummyController::findFirst(const char* db, const char* ns, const char* select, const char* filter, BSONObj* options)  throw (ParseException) {
 	return NULL;
 }
 
-std::vector<std::string>* DummyController::dbs() const  {
+std::vector<std::string>* DummyController::dbs(BSONObj* options) const  {
 	return new std::vector<std::string>();
 }
 
-std::vector<std::string>* DummyController::namespaces(const char* db) const  {
+std::vector<std::string>* DummyController::namespaces(const char* db, BSONObj* options) const  {
 	return new std::vector<std::string>();
 }
 
