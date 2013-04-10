@@ -229,6 +229,15 @@ BSONArrayObj* BaseTransaction::find(const char* db, const char* ns, const char* 
 
 					if (match) {
 						map.add(bson->getString("_id"), bson->select(select));
+					} else {
+						// If the record exists and does not match the new filter then
+						// it will be removed from the result list
+						std::string key = bson->getString("_id");
+						if (map.containsKey(key)) {
+							BSONObj* ofound = map.get(key);
+							map.erase(key);
+							delete ofound;
+						}
 					}
 					delete update;
 					delete bson;

@@ -42,6 +42,8 @@ class TestTXSuite: public Test::Suite
 	public:
 		TestTXSuite()
 		{
+			TEST_ADD(TestTXSuite::testSimpleOperations);
+			/*
 			TEST_ADD(TestTXSuite::testTransactionSimplest);
 			TEST_ADD(TestTXSuite::testTransaction);
 			TEST_ADD(TestTXSuite::testTransactionSimpleCommit);
@@ -49,9 +51,35 @@ class TestTXSuite: public Test::Suite
 			TEST_ADD(TestTXSuite::testTransactionRollback);
 			TEST_ADD(TestTXSuite::testTransactionManager);
 			TEST_ADD(TestTXSuite::testTransactionMergedData);
+			*/
 		}
 
 	private:
+
+		void testSimpleOperations() {
+			Logger* log = getLogger(NULL);
+			log->info("testSimpleOperations");
+			
+			BaseTransaction* tx = new BaseTransaction(_controller);
+			tx->dropNamespace("test", "simple-tx");
+			BSONObj test;
+			std::string* id = uuid();
+			test.add("_id", id->c_str());
+			test.add("a", 1);
+			tx->insert("test", "simple-tx", &test);
+			BSONArrayObj* arr = tx->find("test", "simple-tx", "*", "");
+			BSONObj* obj = arr->get(0);
+			obj->add("a", 2);
+			tx->update("test", "simple-tx", obj);
+			delete id;
+			delete obj;
+			delete arr;
+
+			arr = tx->find("test", "simple-tx", "*", "$'a' == 1");
+			TEST_ASSERT(arr->length() == 0);
+
+			log->info("~testSimpleOperations");
+		}
 
 		void testTransactionSimplest()
 		{
