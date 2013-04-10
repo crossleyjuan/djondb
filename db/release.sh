@@ -12,6 +12,10 @@ while getopts s:j:d:u o
 	esac
 done
 
+cd includes
+./update.sh
+cd ..
+
 autoreconf --install --force
 
 if [ ! -z "${DIR}" ]; 
