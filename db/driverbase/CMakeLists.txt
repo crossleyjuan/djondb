@@ -9,4 +9,7 @@ include_directories("${PROJECT_SOURCE_DIR}/network")
 
 add_library(djon-client SHARED djondbconnection.cpp djondbconnectionmanager.cpp)
 
+install (TARGETS djon-client DESTINATION lib)
+install (FILES djondb_client.h DESTINATION include)
+
 target_link_libraries (djon-client djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util)

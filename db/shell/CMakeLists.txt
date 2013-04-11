@@ -11,6 +11,8 @@ include_directories("${PROJECT_SOURCE_DIR}/driverbase")
 
 add_executable(djon-shell shell.cpp linenoise.c)
 
+install (TARGETS djon-shell DESTINATION bin)
+
 target_link_libraries (djon-shell djon-client djon-service djon-network antlr3c pthread uuid rt v8)
 
 
