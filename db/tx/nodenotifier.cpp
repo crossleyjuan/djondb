@@ -99,6 +99,8 @@ void NodeNotifier::sendTransactionOperation(TransactionOperation* operation) {
 void* NodeNotifier::sprocess(void* arg) {
 	NodeNotifier* pthis = (NodeNotifier*)arg;
 	pthis->process();
+
+	return NULL;
 }
 
 void NodeNotifier::process() {

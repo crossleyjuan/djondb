@@ -105,6 +105,7 @@ void DjondbConnection::close() {
 
 const char* DjondbConnection::beginTransaction() {
 	_activeTransactionId = uuid();
+	return _activeTransactionId->c_str();
 }
 
 void DjondbConnection::commitTransaction() {

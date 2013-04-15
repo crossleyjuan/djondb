@@ -84,9 +84,13 @@ bool StdTransaction::commit() {
 	_baseTransaction->addBuffers(buffers);
 
 	_bufferManager->dropControlFile();
+
+	return true;
 }
 
 bool StdTransaction::rollback() {
 	_bufferManager->dropAllBuffers();
 	_bufferManager->dropControlFile();
+
+	return true;
 }

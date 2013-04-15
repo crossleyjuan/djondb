@@ -65,7 +65,6 @@ int sock;
 pthread_mutex_t requests_lock = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t  request_cv =   PTHREAD_COND_INITIALIZER;
 
-Logger* log;
 Thread* m_thread; // Main thread
 
 DBController* __dbController;
@@ -77,7 +76,7 @@ std::map<int, NetworkOutputStream*> __mapOutput;
 
 
 NetworkService::NetworkService() {
-	log = getLogger(NULL);
+	_log = getLogger(NULL);
 	m_thread = NULL;
 	_running = false;
 }
@@ -93,7 +92,7 @@ void NetworkService::start() { //throw (NetworkException*) {
 	if (serverPort.length() > 0) {
 		__networkservice_port = atoi(serverPort.c_str());
 	}
-	if (log->isInfo()) log->info("Starting network service. port: %d", __networkservice_port);
+	if (_log->isInfo()) _log->info("Starting network service. port: %d", __networkservice_port);
 
 	__dbController = new DBController();
 	__dbController->initialize();
@@ -107,7 +106,7 @@ void NetworkService::start() { //throw (NetworkException*) {
 }
 
 void NetworkService::stop() { //throw (NetworkException*) {
-	if (log->isInfo()) log->info("Shutting down the network service");
+	if (_log->isInfo()) _log->info("Shutting down the network service");
 	if (!_running) {
 		throw new NetworkException(new string("The network service is not running. Try starting it first"));
 	}
@@ -133,7 +132,7 @@ void NetworkService::stop() { //throw (NetworkException*) {
 	int res = closesocket(sock);
 #endif
 	if (res != 0) {
-		log->error("The close method returned: " + toString(res));
+		_log->error("The close method returned: " + toString(res));
 	}
 
 	m_thread->join();
@@ -172,6 +171,7 @@ void *startSocketListener(void* arg) {
 #endif
 
 	sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	Logger* log = getLogger(NULL);
 
 	if (sock < 0) {
 		log->error(std::string("Error creating the socked"));
@@ -191,7 +191,7 @@ void *startSocketListener(void* arg) {
 		log->error(std::string("Setting SO_REUSEADDR error"));
 	}
 
-	if (bind(sock, (sockaddr *) &addr, sizeof (addr)) < 0) {
+	if (::bind(sock, (sockaddr *) &addr, sizeof (addr)) < 0) {
 		log->error(std::string("Error binding"));
 	}
 	listen(sock, 5);
@@ -319,6 +319,7 @@ int processRequest(NetworkService* service, void *arg) {
 	NetworkOutputStream* nos = NULL;
 	std::map<int, NetworkInputStream*>::iterator itNis = __mapInput.find(sock);
 	std::map<int, NetworkOutputStream*>::iterator itNos = __mapOutput.find(sock);
+	Logger* log = getLogger(NULL);
 	if (__mapInput.find(sock) == __mapInput.end()) {
 		nis = new NetworkInputStream(sock);
 		nos = new NetworkOutputStream(sock);

@@ -330,12 +330,16 @@ void MMapInputOutputStream::checkAvailableSpace() {
 }
 
 void MMapInputOutputStream::resize(__int32 len) {
+#ifndef WINDOWS
 	void* p = mremap (_addr, _len, len, MREMAP_MAYMOVE);
 	if (p == MAP_FAILED)
 		_addr = NULL;
 	else
 		_addr = (char*)p;
 	_len = len;
+#else
+	assert(false);
+#endif
 }
 
 /* Write 2 bytes in the output (little endian order) */

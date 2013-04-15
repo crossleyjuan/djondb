@@ -27,8 +27,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
-#include <unistd.h>
 #ifndef WINDOWS
+#include <unistd.h>
 #include <dirent.h>
 #include <errno.h>
 #else
@@ -242,8 +242,15 @@ __int64 fileSize(const char* file) {
 
 
 long pageSize() {
+#ifndef WINDOWS
 	long res = sysconf(_SC_PAGE_SIZE);
 	return res;
+#else
+	SYSTEM_INFO systemInfo;
+	GetSystemInfo(&systemInfo);
+	long page = (long)systemInfo.dwAllocationGranularity;
+	return page;
+#endif
 }
 
 char* combinePath(const char* path, const char* path2) {

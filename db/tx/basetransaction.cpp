@@ -136,6 +136,8 @@ bool BaseTransaction::dropNamespace(const char* db, const char* ns, BSONObj* opt
 	oper.ns = NULL;
 
 	_bufferManager->writeOperationToRegister(db, ns, oper);
+
+	return true;
 }
 
 void BaseTransaction::update(const char* db, const char* ns, BSONObj* bson, BSONObj* options) {

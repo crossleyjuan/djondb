@@ -395,6 +395,8 @@ void* TxBufferManager::monitorBuffers(void* arg) {
 		if (log->isDebug()) log->debug(3, "~checking buffers to be flushed");
 	}
 	if (log->isDebug()) log->debug(3, "~TxBufferManager::monitorBuffers(void* arg)");
+
+	return NULL;
 }
 
 void TxBufferManager::flushBuffer() {

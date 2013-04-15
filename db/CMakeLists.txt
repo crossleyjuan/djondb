@@ -9,6 +9,12 @@ configure_file (
 
 include_directories("${PROJECT_BINARY_DIR}")
 
+IF ( WIN32 )
+  include_directories("${PROJECT_SOURCE_DIR}/third_party/pthreads")
+  include_directories("${PROJECT_SOURCE_DIR}/third_party/boost")
+  include_directories("${PROJECT_SOURCE_DIR}/third_party/libantlr3c-3.2/include")
+ENDIF ( WIN32 )
+
 add_subdirectory(util) 
 add_subdirectory(bson) 
 add_subdirectory(cache) 
@@ -19,7 +25,12 @@ add_subdirectory(command)
 add_subdirectory(network) 
 add_subdirectory(service) 
 add_subdirectory(driverbase) 
-add_subdirectory(daemon) 
+IF (NOT WIN32 )
+   add_subdirectory(daemon) 
+ENDIF ( NOT WIN32 )
+IF (WIN32)
+	add_subdirectory(djondb_win)
+ENDIF (WIN32)
 add_subdirectory(shell) 
 
 
