@@ -1,15 +1,12 @@
 include_directories("${PROJECT_SOURCE_DIR}")
 
-IF ( LINUX )
-add_definitions(-fPIC)
-ENDIF (LINUX)
-
 add_library(djon-util util.cpp  fileutil.cpp version.cpp threads.cpp dtime.cpp stringfunctions.cpp errorhandle.cpp logger.cpp datetime.cpp settings.cpp lock.cpp)
+
 IF (WIN32)
 	add_definitions(/clr )	
 	#	set( refs "System.dll" )
 	STRING(REPLACE "/EHsc" "/EHa" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-   STRING(REPLACE "/RTC1" "" CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
+	STRING(REPLACE "/RTC1" "" CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
 	set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ${PROJECT_SOURCE_DIR}/third_party/libs)
 	#Rpcrt4.lib WINMM.LIB antlr3c.lib 
 	LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/third_party/libs)
