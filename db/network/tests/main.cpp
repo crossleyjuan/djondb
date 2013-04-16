@@ -73,7 +73,7 @@ class TestNetworkSuite: public Test::Suite {
 
 	public:
 		TestNetworkSuite() {
-			_host = "localhost";
+			_host = (char*)"localhost";
 			_port = 1243;
 
 			//TEST_ADD(TestNetworkSuite::testInsert);
@@ -108,7 +108,7 @@ class TestNetworkSuite: public Test::Suite {
 
 				BSONObj obj;
 				std::auto_ptr<std::string> guid(uuid());
-				obj.add("_id", *guid.get());
+				obj.add("_id", guid->c_str());
 				int test = rand() % 10;
 				if (test > 0) {
 					ids.push_back(*guid.get());
@@ -132,7 +132,7 @@ class TestNetworkSuite: public Test::Suite {
 					cout << x << " Records sent" << endl;
 				}
 			}
-			FileOutputStream* fosIds = new FileOutputStream("results.txt", "wb");
+			FileOutputStream* fosIds = new FileOutputStream((char*)"results.txt", (char*)"wb");
 			fosIds->writeInt(ids.size());
 			for (std::vector<std::string>::iterator i2 = ids.begin(); i2!= ids.end(); i2++) {
 				std::string s = *i2;
@@ -194,7 +194,7 @@ class TestNetworkSuite: public Test::Suite {
 				std::auto_ptr<FindCommand> cmd(new FindCommand());
 
 				BSONObj obj;
-				obj.add("_id", *guid);
+				obj.add("_id", guid->c_str());
 				//obj->add("last", "Smith");
 				cmd->setFilter("$'_id' == '" + *guid + "'");
 				std::string ns("myns");
@@ -265,7 +265,7 @@ class TestNetworkSuite: public Test::Suite {
 				std::auto_ptr<UpdateCommand> cmd(new UpdateCommand());
 
 				BSONObj obj;
-				obj.add("_id", *guid.get());
+				obj.add("_id", guid->c_str());
 
 				idsUpdated.push_back(*guid.get());
 				char* temp = (char*)malloc(100);
@@ -295,7 +295,7 @@ class TestNetworkSuite: public Test::Suite {
 				std::auto_ptr<FindCommand> cmd (new FindCommand());
 
 				BSONObj obj;
-				obj.add("_id", guid);
+				obj.add("_id", guid.c_str());
 				cmd->setFilter("$'_id' == '" + guid + "'");
 				cmd->setNameSpace("myns");
 				writer->writeCommand(cmd.get());
@@ -308,7 +308,7 @@ class TestNetworkSuite: public Test::Suite {
 				char* temp = (char*)malloc(100);
 					memset(temp, 0, 100);
 				memset(temp, 'b', 99);
-				TEST_ASSERT(strcmp(resObj->getChars("content"), temp) == 0);
+				TEST_ASSERT(resObj->getString("content").compare(temp) == 0);
 				free(temp);
 			}
 			DTime rec = log->recordedTime();

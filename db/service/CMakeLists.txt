@@ -6,5 +6,6 @@ include_directories("${PROJECT_SOURCE_DIR}/db")
 include_directories("${PROJECT_SOURCE_DIR}/tx")
 include_directories("${PROJECT_SOURCE_DIR}/command")
 include_directories("${PROJECT_SOURCE_DIR}/network")
+include_directories("${PROJECT_SOURCE_DIR}/service")
 
 add_library(djon-service service.cpp)

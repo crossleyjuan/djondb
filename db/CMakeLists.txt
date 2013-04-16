@@ -20,6 +20,8 @@ configure_file (
 	"${PROJECT_BINARY_DIR}/config.h"
 	)
 
+enable_testing()
+
 include_directories("${PROJECT_BINARY_DIR}")
 set(CMAKE_INSTALL_PREFIX /usr)
 #SET_TARGET_PROPERTIES(djon-command PROPERTIES COMPILE_FLAGS "-fPIC")

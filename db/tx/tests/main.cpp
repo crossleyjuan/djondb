@@ -23,8 +23,6 @@
 #include "dbcontroller.h"
 #include "bson.h"
 #include "util.h"
-#include "command.h"
-#include "insertcommand.h"
 #include "transactionmanager.h"
 #include <stdlib.h>
 #include <memory>

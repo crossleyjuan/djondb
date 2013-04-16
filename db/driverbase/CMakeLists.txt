@@ -6,6 +6,7 @@ include_directories("${PROJECT_SOURCE_DIR}/db")
 include_directories("${PROJECT_SOURCE_DIR}/tx")
 include_directories("${PROJECT_SOURCE_DIR}/command")
 include_directories("${PROJECT_SOURCE_DIR}/network")
+include_directories("${PROJECT_SOURCE_DIR}/driverbase")
 
 IF (NOT WIN32)
 	add_library(djon-client SHARED djondbconnection.cpp djondbconnectionmanager.cpp)
@@ -18,3 +19,7 @@ install (TARGETS djon-client DESTINATION lib)
 install (FILES djondb_client.h DESTINATION include)
 
 target_link_libraries (djon-client djon-network djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util)
+
+add_executable(test-client tests/main.cpp)
+target_link_libraries (test-client djon-client djon-network djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util cpptest rt uuid)
+add_test(test-client test-client)

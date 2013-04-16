@@ -23,3 +23,8 @@ IF (NOT WIN32)
 	target_link_libraries (djon-util antlr3c pthread)
 ENDIF (NOT WIN32)
 
+include_directories("${PROJECT_SOURCE_DIR}/util")
+add_executable(test-util tests/main.cpp)
+target_link_libraries (test-util djon-util cpptest rt uuid)
+add_test(test-util test-util)
+
