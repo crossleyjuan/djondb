@@ -22,589 +22,391 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <cpptest.h>
+#include <gtest/gtest.h>
 
 
 using namespace std;
 
-class TestUtilSuite : public Test::Suite
+TEST(testUtil, testDates)
 {
-	public:
-		TestUtilSuite() {
-			TEST_ADD(TestUtilSuite::testDates);
-			TEST_ADD(TestUtilSuite::testTimes);
-			TEST_ADD(TestUtilSuite::testStrings);
-			TEST_ADD(TestUtilSuite::testUUID);
-			TEST_ADD(TestUtilSuite::testSettings);
-			TEST_ADD(TestUtilSuite::testFileUtils);
-			TEST_ADD(TestUtilSuite::testCircularQueue);
-			TEST_ADD(TestUtilSuite::testDjonStrings);
+	DateTime dt = DateTime::today(true);
 
-			TEST_ADD(TestUtilSuite::testThreads);
-		}
+	DateTime dt2 = dt.addDays(1);
 
-	private:
-		void testDates()
-		{
-			DateTime dt = DateTime::today(true);
+	EXPECT_TRUE((dt.getDay() + 1) == dt2.getDay());
 
-			DateTime dt2 = dt.addDays(1);
+	// testing day of the week
+	dt = DateTime(2011, 9, 12);
+	EXPECT_TRUE(dt.dayOfTheWeek() == 1);
 
-			TEST_ASSERT((dt.getDay() + 1) == dt2.getDay());
+	// testing day of the week "complex", 29 of febr
+	dt = DateTime(2008, 2, 29);
+	EXPECT_TRUE(dt.dayOfTheWeek() == 5);
 
-			// testing day of the week
-			dt = DateTime(2011, 9, 12);
-			TEST_ASSERT(dt.dayOfTheWeek() == 1);
+	// diff
+	dt = DateTime(2011, 2, 10);
+	dt2 = DateTime(2011, 3, 1);
+	int diff = dt2.daysTo(dt);
+	EXPECT_TRUE(diff == 19);
+}
 
-			// testing day of the week "complex", 29 of febr
-			dt = DateTime(2008, 2, 29);
-			TEST_ASSERT(dt.dayOfTheWeek() == 5);
+TEST(testUtil, testCircularQueue) {
+	CircularQueue<int> c(3);
+	c.push_back(1);
 
-			// diff
-			dt = DateTime(2011, 2, 10);
-			dt2 = DateTime(2011, 3, 1);
-			int diff = dt2.daysTo(dt);
-			TEST_ASSERT(diff == 19);
-		}
+	for (int x = 0; x < 3; x++) {
+		EXPECT_TRUE(c.next() == 1);
+	}
 
-		void testCircularQueue() {
-			CircularQueue<int> c(3);
-			c.push_back(1);
+	for (int x= 0; x < 3; x++) {
+		EXPECT_TRUE(c.previous() == 1);
+	}
 
-			for (int x = 0; x < 3; x++) {
-				TEST_ASSERT(c.next() == 1);
-			}
+	c.push_back(2);
 
-			for (int x= 0; x < 3; x++) {
-				TEST_ASSERT(c.previous() == 1);
-			}
+	EXPECT_TRUE(c.current() == 2);
+	EXPECT_TRUE(c.next() == 1);
+	EXPECT_TRUE(c.next() == 2);
 
-			c.push_back(2);
+	c.push_back(3);
+	EXPECT_TRUE(c.current() == 3);
+	EXPECT_TRUE(c.previous() == 2);
+	EXPECT_TRUE(c.previous() == 1);
+	EXPECT_TRUE(c.previous() == 3);
+	EXPECT_TRUE(c.previous() == 2);
 
-			TEST_ASSERT(c.current() == 2);
-			TEST_ASSERT(c.next() == 1);
-			TEST_ASSERT(c.next() == 2);
+	c.push_back(4);
+	EXPECT_TRUE(c.current() == 4);
+	EXPECT_TRUE(c.previous() == 3);
+	EXPECT_TRUE(c.previous() == 2);
+	EXPECT_TRUE(c.previous() == 4);
 
-			c.push_back(3);
-			TEST_ASSERT(c.current() == 3);
-			TEST_ASSERT(c.previous() == 2);
-			TEST_ASSERT(c.previous() == 1);
-			TEST_ASSERT(c.previous() == 3);
-			TEST_ASSERT(c.previous() == 2);
+	c.push_front(1);
+	EXPECT_TRUE(c.current() == 3);
+	EXPECT_TRUE(c.previous() == 2);
+	EXPECT_TRUE(c.previous() == 1);
+	EXPECT_TRUE(c.previous() == 3);
 
-			c.push_back(4);
-			TEST_ASSERT(c.current() == 4);
-			TEST_ASSERT(c.previous() == 3);
-			TEST_ASSERT(c.previous() == 2);
-			TEST_ASSERT(c.previous() == 4);
+	EXPECT_TRUE(c.pop_back() == 3);
+	EXPECT_TRUE(c.pop_front() == 1);
+	EXPECT_TRUE(c.current() == 2);
+}
 
-			c.push_front(1);
-			TEST_ASSERT(c.current() == 3);
-			TEST_ASSERT(c.previous() == 2);
-			TEST_ASSERT(c.previous() == 1);
-			TEST_ASSERT(c.previous() == 3);
+TEST(testUtil, testTimes)
+{
+	// Testing diff
+	DTime t(15, 40, 0);
+	DTime t2(16, 20, 0);
+	DTime res = t2 - t;
 
-			TEST_ASSERT(c.pop_back() == 3);
-			TEST_ASSERT(c.pop_front() == 1);
-			TEST_ASSERT(c.current() == 2);
-		}
+	EXPECT_TRUE((res.hour() == 0) && (res.minutes() == 40) && (res.seconds() == 0));
 
-		void testTimes()
-		{
-			// Testing diff
-			DTime t(15, 40, 0);
-			DTime t2(16, 20, 0);
-			DTime res = t2 - t;
+	res = t2 - 200;
+	EXPECT_TRUE((res.hour() == 16) && (res.minutes() == 16) && (res.seconds() == 40));
+	// teting add
+}
 
-			TEST_ASSERT((res.hour() == 0) && (res.minutes() == 40) && (res.seconds() == 0));
+TEST(testUtil, testStrings)
+{
+	// Copy chars
+	char* test = "Hello world!";
+	char* res = strcpy(test, strlen(test));
 
-			res = t2 - 200;
-			TEST_ASSERT((res.hour() == 16) && (res.minutes() == 16) && (res.seconds() == 40));
-			// teting add
-		}
+	EXPECT_TRUE(strcmp(test, res) == 0);
+	EXPECT_TRUE(test != res);
+	free(res);
 
-		void testStrings()
-		{
-			// Copy chars
-			char* test = "Hello world!";
-			char* res = strcpy(test, strlen(test));
+	// test offset
+	char* testOffSet = "Hello world!";
+	char* res2 = strcpy(testOffSet, 6, 5);
+	EXPECT_TRUE(strcmp("world", res2) == 0);
+	EXPECT_TRUE(testOffSet != res2);
+	free(res2);
 
-			TEST_ASSERT(strcmp(test, res) == 0);
-			TEST_ASSERT(test != res);
-			free(res);
+	//copy string
+	std::string s = "Hello world!";
+	res = strcpy(s);
+	EXPECT_TRUE(s.compare(res) == 0);
 
-			// test offset
-			char* testOffSet = "Hello world!";
-			char* res2 = strcpy(testOffSet, 6, 5);
-			TEST_ASSERT(strcmp("world", res2) == 0);
-			TEST_ASSERT(testOffSet != res2);
-			free(res2);
+	// ends with
+	bool com = endsWith("test.tex", ".tex");
+	EXPECT_TRUE(com);
+	com = endsWith("test.ss", "test");
+	EXPECT_TRUE(!com);
+	EXPECT_TRUE(endsWith("test/", "/"));
 
-			//copy string
-			std::string s = "Hello world!";
-			res = strcpy(s);
-			TEST_ASSERT(s.compare(res) == 0);
+	bool start = startsWith("testing the starts with", "testing");
+	EXPECT_TRUE(start);
+	start = startsWith("testing", "testing this");
+	EXPECT_TRUE(!start);
+	start = startsWith("testing", "testing");
+	EXPECT_TRUE(start);
 
-			// ends with
-			bool com = endsWith("test.tex", ".tex");
-			TEST_ASSERT(com);
-			com = endsWith("test.ss", "test");
-			TEST_ASSERT(!com);
-			TEST_ASSERT(endsWith("test/", "/"));
+	// tokenizer
+	std::vector<std::string*>* token = tokenizer("test,other,and 1 more", ",");
+	EXPECT_TRUE(token->size() == 3);
+	EXPECT_TRUE(token->at(0)->compare("test") == 0);
+	EXPECT_TRUE(token->at(1)->compare("other") == 0);
+	EXPECT_TRUE(token->at(2)->compare("and 1 more") == 0);
+	delete(token);
 
-			bool start = startsWith("testing the starts with", "testing");
-			TEST_ASSERT(start);
-			start = startsWith("testing", "testing this");
-			TEST_ASSERT(!start);
-			start = startsWith("testing", "testing");
-			TEST_ASSERT(start);
+	// format
+	std::string sformat = format("test %d %s %5.4f", 10, "Hello World!", 3.14159);
+	EXPECT_TRUE(sformat.compare("test 10 Hello World! 3.1416") == 0);
 
-			// tokenizer
-			std::vector<std::string*>* token = tokenizer("test,other,and 1 more", ",");
-			TEST_ASSERT(token->size() == 3);
-			TEST_ASSERT(token->at(0)->compare("test") == 0);
-			TEST_ASSERT(token->at(1)->compare("other") == 0);
-			TEST_ASSERT(token->at(2)->compare("and 1 more") == 0);
-			delete(token);
+	// toString
+	std::string s2 = toString(10.1);
+	EXPECT_TRUE(s2.compare("10.1")== 0);
 
-			// format
-			std::string sformat = format("test %d %s %5.4f", 10, "Hello World!", 3.14159);
-			TEST_ASSERT(sformat.compare("test 10 Hello World! 3.1416") == 0);
+	std::string s3 = toString(3.14159, 2);
+	EXPECT_TRUE(s3.compare("3.14")== 0);
 
-			// toString
-			std::string s2 = toString(10.1);
-			TEST_ASSERT(s2.compare("10.1")== 0);
+	std::string s4 = toString(3);
+	EXPECT_TRUE(s4.compare("3")== 0);
 
-			std::string s3 = toString(3.14159, 2);
-			TEST_ASSERT(s3.compare("3.14")== 0);
+	// split
+	std::vector<std::string> sp = split("test,other,and 1 more", ",");
+	EXPECT_TRUE(sp.size() == 3);
+	EXPECT_TRUE(sp.at(0).compare("test") == 0);
+	EXPECT_TRUE(sp.at(1).compare("other") == 0);
+	EXPECT_TRUE(sp.at(2).compare("and 1 more") == 0);
 
-			std::string s4 = toString(3);
-			TEST_ASSERT(s4.compare("3")== 0);
+	//Count char
+	long c = countChar("testing.this.component.!", '.');
+	EXPECT_TRUE(c == 3);
 
-			// split
-			std::vector<std::string> sp = split("test,other,and 1 more", ",");
-			TEST_ASSERT(sp.size() == 3);
-			TEST_ASSERT(sp.at(0).compare("test") == 0);
-			TEST_ASSERT(sp.at(1).compare("other") == 0);
-			TEST_ASSERT(sp.at(2).compare("and 1 more") == 0);
-
-			//Count char
-			long c = countChar("testing.this.component.!", '.');
-			TEST_ASSERT(c == 3);
-
-			std::vector<std::string> spl = splitLines("test1\r\ntest2");
-			TEST_ASSERT(spl.size() == 2);
-			std::string t1 = spl[1];
-			TEST_ASSERT(spl[0].compare("test1") == 0);
-			TEST_ASSERT(spl[1].compare("test2") == 0);
+	std::vector<std::string> spl = splitLines("test1\r\ntest2");
+	EXPECT_TRUE(spl.size() == 2);
+	std::string t1 = spl[1];
+	EXPECT_TRUE(spl[0].compare("test1") == 0);
+	EXPECT_TRUE(spl[1].compare("test2") == 0);
 
 
-			// Test concat
-			std::string sc1 = "Hello ";
-			std::string sc2 = "World!";
-			std::string resultconcat = concatStrings(sc1, sc2);
-			TEST_ASSERT(resultconcat.compare("Hello World!") == 0);
+	// Test concat
+	std::string sc1 = "Hello ";
+	std::string sc2 = "World!";
+	std::string resultconcat = concatStrings(sc1, sc2);
+	EXPECT_TRUE(resultconcat.compare("Hello World!") == 0);
 
-			// case insensitive comparation
-			const char* sci1 = "TEst";
-			const char* sci2 = "teSt";
-			TEST_ASSERT(compareInsensitive(sci1, sci2));
+	// case insensitive comparation
+	const char* sci1 = "TEst";
+	const char* sci2 = "teSt";
+	EXPECT_TRUE(compareInsensitive(sci1, sci2));
 
-			char* untrimmed = " Hello";
-			char* trimExpected = "Hello";
-			char* result = trim(untrimmed, strlen(untrimmed));
-			TEST_ASSERT(strcmp(trimExpected, result) == 0);
-		}
+	char* untrimmed = " Hello";
+	char* trimExpected = "Hello";
+	char* result = trim(untrimmed, strlen(untrimmed));
+	EXPECT_TRUE(strcmp(trimExpected, result) == 0);
+}
 
-		void testUUID()
-		{
-			std::string* u = uuid();
-			TEST_ASSERT(u != NULL);
-			delete u;
-		}
+TEST(testUtil, testUUID)
+{
+	std::string* u = uuid();
+	EXPECT_TRUE(u != NULL);
+	delete u;
+}
 
-		void testSettings() {
-			std::string folder = getSetting("DATA_DIR");
+TEST(testUtil, testSettings) {
+	std::string folder = getSetting("DATA_DIR");
 
-			TEST_ASSERT(folder.compare("/var/djondb") == 0);
-		}
+	EXPECT_TRUE(folder.compare("/var/djondb") == 0);
+}
 
-		void testFileUtils() {
-			//test mkdir
+TEST(testUtil, testFileUtils) {
+	//test mkdir
 
-			makeDir("/tmp/test/test2");
+	makeDir("/tmp/test/test2");
 
-			TEST_ASSERT(existDir("/tmp/test/test2"));
+	EXPECT_TRUE(existDir("/tmp/test/test2"));
 
-			char* home = getenv("HOME");
-			TEST_ASSERT(checkFileCreation(home));
-			// test directory fail
-			TEST_ASSERT(!checkFileCreation("/"));
+	char* home = getenv("HOME");
+	EXPECT_TRUE(checkFileCreation(home));
+	// test directory fail
+	EXPECT_TRUE(!checkFileCreation("/"));
 
 
-			cout << "\ntesting combine paths" << endl;
+	cout << "\ntesting combine paths" << endl;
 
 #ifndef WINDOWS
-			const char* path1 = "/home/test";
-			const char* path2 = "myfolder/myfile.txt";
-			char* result = combinePath(path1, path2);
-			TEST_ASSERT(strcmp(result, "/home/test/myfolder/myfile.txt") == 0);
-			free(result);
-			
-			const char* path3 = "/home/test/";
-			const char* path4 = "myfolder/myfile.txt";
-			char* result2 = combinePath(path3, path4);
-			TEST_ASSERT(strcmp(result2, "/home/test/myfolder/myfile.txt") == 0);
+	const char* path1 = "/home/test";
+	const char* path2 = "myfolder/myfile.txt";
+	char* result = combinePath(path1, path2);
+	EXPECT_TRUE(strcmp(result, "/home/test/myfolder/myfile.txt") == 0);
+	free(result);
+
+	const char* path3 = "/home/test/";
+	const char* path4 = "myfolder/myfile.txt";
+	char* result2 = combinePath(path3, path4);
+	EXPECT_TRUE(strcmp(result2, "/home/test/myfolder/myfile.txt") == 0);
 #else
-			char* path1 = "c:\\test";
-			char* path2 = "myfolder\\myfile.txt";
-			char* result = combinePath(path1, path2);
-			TEST_ASSERT(strcmp(result, "c:\\test\\myfolder\\myfile.txt") == 0);
-			
-			char* path3 = "c:\\test\\";
-			char* path4 = "myfolder\\myfile.txt";
-			char* result2 = combinePath(path3, path4);
-			TEST_ASSERT(strcmp(result2, "c:\\test\\myfolder\\myfile.txt") == 0);
+	char* path1 = "c:\\test";
+	char* path2 = "myfolder\\myfile.txt";
+	char* result = combinePath(path1, path2);
+	EXPECT_TRUE(strcmp(result, "c:\\test\\myfolder\\myfile.txt") == 0);
+
+	char* path3 = "c:\\test\\";
+	char* path4 = "myfolder\\myfile.txt";
+	char* result2 = combinePath(path3, path4);
+	EXPECT_TRUE(strcmp(result2, "c:\\test\\myfolder\\myfile.txt") == 0);
 #endif
-		}
-
-		void testFunction(const char* x) {
-			djondb::string s("test", 4);
-			TEST_ASSERT(strcmp(s.c_str(), x) == 0);
-		}
-
-		const char* testFunctionWithReturn(djondb::string s) {
-			djondb::string s2 = s;
-                        return s2.c_str();
-                }
-
-		void testDjonStrings() {
-			djondb::string s("test", 4);
-
-			const char* c = s.c_str();
-			__int32 l = s.length();
-			TEST_ASSERT(strcmp(c, "test") == 0);
-			TEST_ASSERT(l == 4);
-
-			djondb::string s2("test", 4);
-			TEST_ASSERT(s == s2);
-
-			djondb::string s3("other", 5);
-			TEST_ASSERT(s != s3);
-
-
-			// Testing copy smart references
-			char* cx = strcpy("Testing", 7);
-			djondb::string s4(cx, 7);
-			djondb::string s5(s4);
-			const char* c4 = s4.c_str();
-			const char* c5 = s5.c_str();
-			// Compare the references, they should be the same
-			TEST_ASSERT(c4 == c5);
-
-			// testing simple copying
-			djondb::string s6(strcpy("Otra", 4), 4);
-			djondb::string* s7 = new djondb::string(s6);
-			delete s7;
-			const char* c6 = s6.c_str();
-			TEST_ASSERT(strcmp(c6, "Otra") == 0);
-
-
-			djondb::string s8(strcpy("Otra", 4), 4);
-			{
-				djondb::string s9 = s8;
-				const char* c9 = s9.c_str();
-				TEST_ASSERT(strcmp(s8.c_str(), c9) == 0);
-			};
-			TEST_ASSERT(strcmp(s8.c_str(), "Otra") == 0);
-
-			// Test null strings
-			djondb::string s10;
-			djondb::string s11(s10);
-
-
-			djondb::string s12("test", 4);
-			const char* cs12 = testFunctionWithReturn(s12);
-			testFunction(s12.c_str());
-			TEST_ASSERT(strcmp(s12.c_str(), cs12) == 0);
-
-
-			djondb::string s13("aaaa", 4);
-			djondb::string s14("bbbb", 4);
-			TEST_ASSERT(s13.compare(s14) < 0);                 
-			TEST_ASSERT(s13.compare(s14.c_str(), 4) < 0);                 
-
-			djondb::string s15("aa", 2);
-			djondb::string s16("aabb", 4);
-			TEST_ASSERT(s15.compare(s16) < 0);                 
-		}
-
-		void testThreads() {
-			cout << "\ntestThreads" << endl;
-			Thread* thread = new Thread(&threadMethodTest);
-			thread->start(NULL);
-
-			Thread* thread2 = new Thread(&threadMethodTest);
-			thread2->start(NULL);
-
-			thread->join();
-			thread2->join();
-
-			delete thread;
-			delete thread2;
-
-			cout << "\nTesting locks" << endl;
-
-			Thread* t1 = new Thread(threadMethodTestLock);
-			Thread* t2 = new Thread(threadMethodTestLock);
-
-			Lock* lock = new Lock();
-			t1->start(lock);
-			t2->start(lock);
-
-			t1->join();
-			t2->join();
-			
-			delete lock;
-			delete t1;
-			delete t2;
-
-			Lock* lwait = new Lock();
-			Thread* t3 = new Thread(&testMethodProduce);
-			Thread* t4 = new Thread(&testMethodConsume);
-
-			t3->start(lwait);
-			t4->start(lwait);
-
-			t3->join();
-			t4->join();
-		}
-
-		static void* threadMethodTest(void* val) {
-			cout << "\ntestMethodTest" << endl;
-
-			Thread::sleep(10000);
-			cout << "\ntestMethodTest finished" << endl;
-		}
-
-		static void* threadMethodTestLock(void* val) {
-			cout << "\ntestMethodTestLock" << endl;
-
-			Lock* lock = (Lock*)val;
-			cout << "Locking" << endl;
-			lock->lock();
-			Thread::sleep(5000);
-			lock->unlock();
-			cout << "Unlocking" << endl;
-			cout << "\ntestMethodTestLock finished" << endl;
-		}
-
-		static void* testMethodProduce(void* val) {
-			cout << "\nProduce method started" << endl;
-			Lock* lock = (Lock*)val;
-
-			cout << "Produce: Sleeping for 3 segs" << endl;
-			Thread::sleep(3000);
-
-			lock->notify();
-			cout << "Produce: notification sent" << endl;
-		}
-
-		static void* testMethodConsume(void* val) {
-			cout << "\nConsume method started" << endl;
-			Lock* lock = (Lock*)val;
-
-			cout << "Consume method waiting" << endl;
-			lock->wait();
-
-			cout << "Consume received notification" << endl;
-		}
-};
-//// Tests unconditional fail TEST_ASSERTs
-////
-//class FailTestSuite : public Test::Suite
-//{
-//public:
-//    FailTestSuite()
-//    {
-//        TEST_ADD(FailTestSuite::success)
-//        TEST_ADD(FailTestSuite::always_fail)
-//
-//    }
-//
-//private:
-//    void success() {}
-//
-//    void always_fail()
-//    {
-//        // This will always fail
-//        //
-//        TEST_FAIL("unconditional fail");
-//    }
-//};
-//
-//// Tests compare TEST_ASSERTs
-////
-//class CompareTestSuite : public Test::Suite
-//{
-//public:
-//    CompareTestSuite()
-//    {
-//        TEST_ADD(CompareTestSuite::success)
-//        TEST_ADD(CompareTestSuite::compare)
-//        TEST_ADD(CompareTestSuite::delta_compare)
-//    }
-//
-//private:
-//    void success() {}
-//
-//    void compare()
-//    {
-//        // Will succeed since the expression evaluates to true
-//        //
-//        TEST_ASSERT(1 + 1 == 2)
-//
-//        // Will fail since the expression evaluates to false
-//        //
-//        TEST_ASSERT(0 == 1);
-//    }
-//
-//    void delta_compare()
-//    {
-//        // Will succeed since the expression evaluates to true
-//        //
-//        TEST_ASSERT_DELTA(0.5, 0.7, 0.3);
-//
-//        // Will fail since the expression evaluates to false
-//        //
-//        TEST_ASSERT_DELTA(0.5, 0.7, 0.1);
-//    }
-//};
-//
-//// Tests throw TEST_ASSERTs
-////
-//class ThrowTestSuite : public Test::Suite
-//{
-//public:
-//    ThrowTestSuite()
-//    {
-//        TEST_ADD(ThrowTestSuite::success)
-//        TEST_ADD(ThrowTestSuite::test_throw)
-//    }
-//
-//private:
-//    void success() {}
-//
-//    void test_throw()
-//    {
-//        // Will fail since the none of the functions throws anything
-//        //
-//        TEST_THROWS_MSG(func(), int, "func() does not throw, expected int exception")
-//        TEST_THROWS_MSG(func_no_throw(), int, "func_no_throw() does not throw, expected int exception")
-//        TEST_THROWS_ANYTHING_MSG(func(), "func() does not throw, expected any exception")
-//        TEST_THROWS_ANYTHING_MSG(func_no_throw(), "func_no_throw() does not throw, expected any exception")
-//
-//        // Will succeed since none of the functions throws anything
-//        //
-//        TEST_THROWS_NOTHING(func())
-//        TEST_THROWS_NOTHING(func_no_throw())
-//
-//        // Will succeed since func_throw_int() throws an int
-//        //
-//        TEST_THROWS(func_throw_int(), int)
-//        TEST_THROWS_ANYTHING(func_throw_int())
-//
-//        // Will fail since func_throw_int() throws an int (not a float)
-//        //
-//        TEST_THROWS_MSG(func_throw_int(), float, "func_throw_int() throws an int, expected a float exception")
-//        TEST_THROWS_NOTHING_MSG(func_throw_int(), "func_throw_int() throws an int, expected no exception at all")
-//    }
-//
-//    void func() {}
-//    void func_no_throw() throw() {}
-//    void func_throw_int() throw(int)
-//    {
-//        throw 13;
-//    }
-//};
-
-enum OutputType
-{
-	Compiler,
-	Html,
-	TextTerse,
-	TextVerbose
-};
-
-	static void
-usage()
-{
-	cout << "usage: mytest [MODE]\n"
-		<< "where MODE may be one of:\n"
-		<< "  --compiler\n"
-		<< "  --html\n"
-		<< "  --text-terse (default)\n"
-		<< "  --text-verbose\n";
-	exit(0);
 }
 
-	static auto_ptr<Test::Output>
-cmdline(int argc, char* argv[])
-{
-	if (argc > 2)
-		usage(); // will not return
-
-	Test::Output* output = 0;
-
-	if (argc == 1)
-		output = new Test::TextOutput(Test::TextOutput::Verbose);
-	else
-	{
-		const char* arg = argv[1];
-		if (strcmp(arg, "--compiler") == 0)
-			output = new Test::CompilerOutput;
-		else if (strcmp(arg, "--html") == 0)
-			output =  new Test::HtmlOutput;
-		else if (strcmp(arg, "--text-terse") == 0)
-			output = new Test::TextOutput(Test::TextOutput::Terse);
-		else if (strcmp(arg, "--text-verbose") == 0)
-			output = new Test::TextOutput(Test::TextOutput::Verbose);
-		else
-		{
-			cout << "invalid commandline argument: " << arg << endl;
-			usage(); // will not return
-		}
-	}
-
-	return auto_ptr<Test::Output>(output);
+void testFunction(const char* x) {
+	djondb::string s("test", 4);
+	EXPECT_TRUE(strcmp(s.c_str(), x) == 0);
 }
 
-// Main test program
-//
-int main(int argc, char* argv[])
-{
-	try
-	{
-		// Demonstrates the ability to use multiple test suites
-		//
-		Test::Suite ts;
-		ts.add(auto_ptr<Test::Suite>(new TestUtilSuite));
-		//        ts.add(auto_ptr<Test::Suite>(new CompareTestSuite));
-		//        ts.add(auto_ptr<Test::Suite>(new ThrowTestSuite));
-
-		// Run the tests
-		//
-		auto_ptr<Test::Output> output(cmdline(argc, argv));
-		ts.run(*output, true);
-
-		Test::HtmlOutput* const html = dynamic_cast<Test::HtmlOutput*>(output.get());
-		if (html)
-			html->generate(cout, true, "MyTest");
-	}
-	catch (...)
-	{
-		cout << "unexpected exception encountered\n";
-		return EXIT_FAILURE;
-	}
-	return EXIT_SUCCESS;
+const char* testFunctionWithReturn(djondb::string s) {
+	djondb::string s2 = s;
+	return s2.c_str();
 }
+
+TEST(testUtil, testDjonStrings) {
+	djondb::string s("test", 4);
+
+	const char* c = s.c_str();
+	__int32 l = s.length();
+	EXPECT_TRUE(strcmp(c, "test") == 0);
+	EXPECT_TRUE(l == 4);
+
+	djondb::string s2("test", 4);
+	EXPECT_TRUE(s == s2);
+
+	djondb::string s3("other", 5);
+	EXPECT_TRUE(s != s3);
+
+
+	// Testing copy smart references
+	char* cx = strcpy("Testing", 7);
+	djondb::string s4(cx, 7);
+	djondb::string s5(s4);
+	const char* c4 = s4.c_str();
+	const char* c5 = s5.c_str();
+	// Compare the references, they should be the same
+	EXPECT_TRUE(c4 == c5);
+
+	// testing simple copying
+	djondb::string s6(strcpy("Otra", 4), 4);
+	djondb::string* s7 = new djondb::string(s6);
+	delete s7;
+	const char* c6 = s6.c_str();
+	EXPECT_TRUE(strcmp(c6, "Otra") == 0);
+
+
+	djondb::string s8(strcpy("Otra", 4), 4);
+	{
+		djondb::string s9 = s8;
+		const char* c9 = s9.c_str();
+		EXPECT_TRUE(strcmp(s8.c_str(), c9) == 0);
+	};
+	EXPECT_TRUE(strcmp(s8.c_str(), "Otra") == 0);
+
+	// Test null strings
+	djondb::string s10;
+	djondb::string s11(s10);
+
+
+	djondb::string s12("test", 4);
+	const char* cs12 = testFunctionWithReturn(s12);
+	testFunction(s12.c_str());
+	EXPECT_TRUE(strcmp(s12.c_str(), cs12) == 0);
+
+
+	djondb::string s13("aaaa", 4);
+	djondb::string s14("bbbb", 4);
+	EXPECT_TRUE(s13.compare(s14) < 0);                 
+	EXPECT_TRUE(s13.compare(s14.c_str(), 4) < 0);                 
+
+	djondb::string s15("aa", 2);
+	djondb::string s16("aabb", 4);
+	EXPECT_TRUE(s15.compare(s16) < 0);                 
+}
+
+static void* testMethodProduce(void* val) {
+	cout << "\nProduce method started" << endl;
+	Lock* lock = (Lock*)val;
+
+	cout << "Produce: Sleeping for 3 segs" << endl;
+	Thread::sleep(3000);
+
+	lock->notify();
+	cout << "Produce: notification sent" << endl;
+
+	return NULL;
+}
+
+static void* testMethodConsume(void* val) {
+	cout << "\nConsume method started" << endl;
+	Lock* lock = (Lock*)val;
+
+	cout << "Consume method waiting" << endl;
+	lock->wait();
+
+	cout << "Consume received notification" << endl;
+
+	return NULL;
+}
+
+static void* threadMethodTest(void* val) {
+	cout << "\ntestMethodTest" << endl;
+
+	Thread::sleep(10000);
+	cout << "\ntestMethodTest finished" << endl;
+	return NULL;
+}
+
+static void* threadMethodTestLock(void* val) {
+	cout << "\ntestMethodTestLock" << endl;
+
+	Lock* lock = (Lock*)val;
+	cout << "Locking" << endl;
+	lock->lock();
+	Thread::sleep(5000);
+	lock->unlock();
+	cout << "Unlocking" << endl;
+	cout << "\ntestMethodTestLock finished" << endl;
+
+	return NULL;
+}
+
+TEST(testUtil, testThreads) {
+	cout << "\ntestThreads" << endl;
+	Thread* thread = new Thread(&threadMethodTest);
+	thread->start(NULL);
+
+	Thread* thread2 = new Thread(&threadMethodTest);
+	thread2->start(NULL);
+
+	thread->join();
+	thread2->join();
+
+	delete thread;
+	delete thread2;
+
+	cout << "\nTesting locks" << endl;
+
+	Thread* t1 = new Thread(threadMethodTestLock);
+	Thread* t2 = new Thread(threadMethodTestLock);
+
+	Lock* lock = new Lock();
+	t1->start(lock);
+	t2->start(lock);
+
+	t1->join();
+	t2->join();
+
+	delete lock;
+	delete t1;
+	delete t2;
+
+	Lock* lwait = new Lock();
+	Thread* t3 = new Thread(&testMethodProduce);
+	Thread* t4 = new Thread(&testMethodConsume);
+
+	t3->start(lwait);
+	t4->start(lwait);
+
+	t3->join();
+	t4->join();
+}
+

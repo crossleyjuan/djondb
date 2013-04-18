@@ -65,7 +65,7 @@ typename Cache<K, V>::iterator Cache<K,V>::end() {
 
 template <class K, class V>
 void Cache<K,V>::erase(iterator position) {
-	return _elements.erase(position);
+	_elements.erase(position);
 }
 
 template <class K, class V>

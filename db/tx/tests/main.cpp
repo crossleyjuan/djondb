@@ -27,382 +27,294 @@
 #include <stdlib.h>
 #include <memory>
 #include <string.h>
-#include <cpptest.h>
+#include <gtest/gtest.h>
 #include <errno.h>
 #include <sstream>
 
 using namespace std;
 
-DBController* _controller;
 
-class TestTXSuite: public Test::Suite
+class TestTX: public testing::Test
 {
-	public:
-		TestTXSuite()
+	protected:
+		DBController* _controller;
+
+		virtual void SetUp()
 		{
-			TEST_ADD(TestTXSuite::testSimpleOperations);
-			/*
-			TEST_ADD(TestTXSuite::testTransactionSimplest);
-			TEST_ADD(TestTXSuite::testTransaction);
-			TEST_ADD(TestTXSuite::testTransactionSimpleCommit);
-			TEST_ADD(TestTXSuite::testTransactionCommit);
-			TEST_ADD(TestTXSuite::testTransactionRollback);
-			TEST_ADD(TestTXSuite::testTransactionManager);
-			TEST_ADD(TestTXSuite::testTransactionMergedData);
-			*/
-		}
+			// Demonstrates the ability to use multiple test suites
+			//
+			std::string sdataDir = getSetting("DATA_DIR");
+			char* dataDir = combinePath(sdataDir.c_str(), "*");
+			std::stringstream ss;
+			ss << "exec rm -rf " << dataDir;
 
-	private:
-
-		void testSimpleOperations() {
-			Logger* log = getLogger(NULL);
-			log->info("testSimpleOperations");
-			
-			BaseTransaction* tx = new BaseTransaction(_controller);
-			tx->dropNamespace("test", "simple-tx");
-			BSONObj test;
-			std::string* id = uuid();
-			test.add("_id", id->c_str());
-			test.add("a", 1);
-			tx->insert("test", "simple-tx", &test);
-			BSONArrayObj* arr = tx->find("test", "simple-tx", "*", "");
-			BSONObj* obj = arr->get(0);
-			obj->add("a", 2);
-			tx->update("test", "simple-tx", obj);
-			delete id;
-			delete obj;
-			delete arr;
-
-			arr = tx->find("test", "simple-tx", "*", "$'a' == 1");
-			TEST_ASSERT(arr->length() == 0);
-
-			log->info("~testSimpleOperations");
-		}
-
-		void testTransactionSimplest()
-		{
-			Logger* log = getLogger(NULL);
-			log->info("testTransactionSimplest");
-			DummyController* controller = new DummyController();
-
-			BaseTransaction* tx = new BaseTransaction(controller);
-
-			tx->dropNamespace("db", "txns");
-
-			delete tx;
-			delete controller;
-
-			controller = new DummyController();
-
-			tx = new BaseTransaction(controller);
-
-			tx->dropNamespace("db", "txns");
-
-			delete tx;
-			delete controller;
-		}
-
-		void testTransaction()
-		{
-			Logger* log = getLogger(NULL);
-			log->info("testTransaction");
-			DummyController* controller = new DummyController();
-
-			BaseTransaction* tx = new BaseTransaction(controller);
-
-			tx->dropNamespace("db", "txns");
-
-			BSONObj o;
-			std::string* id = uuid();
-			o.add("_id", const_cast<char*>(id->c_str()));
-			o.add("name", "John");
-			tx->insert("db", "txns", &o);
-
-			BSONArrayObj* res = tx->find("db", "txns", "*", "");
-
-			TEST_ASSERT(res->length() == 1);
-			BSONObj* test1 = *res->begin();
-			TEST_ASSERT(test1->getString("name").compare("John") == 0);
-			test1->add("name", "Peter");
-			tx->update("db", "txns", test1);
-
-			delete res;
-
-			res = tx->find("db", "txns", "*", "");
-
-			TEST_ASSERT(res->length() == 1);
-			BSONObj* test2 = *res->begin();
-			TEST_ASSERT(test2->getString("name").compare("Peter") == 0);
-
-			delete res;
-			delete tx;
-			delete controller;
-			delete id;
-		}
-
-		void testTransactionSimpleCommit()
-		{
-			Logger* log = getLogger(NULL);
-			log->info("testTransactionSimpleCommit");
-
-			BaseTransaction* tx = new BaseTransaction(_controller);
-			std::string* tuid = uuid();
-			StdTransaction* stx = new StdTransaction(tx, *tuid);
-
-			BSONObj* obj = BSONParser::parse("{name: 'test', lastName: 'testln'}");
-			stx->insert("db", "testcommit", obj);
-
-			log->info("Doing commit");
-			stx->commit();
-			delete stx;
-
-			delete tx;
-			delete obj;
-			log->info("~testTransactionSimpleCommit");
-		}
-
-		void testTransactionRollback()
-		{
-			Logger* log = getLogger(NULL);
-			log->info("testTransactionRollback");
-
-			BaseTransaction* tx = new BaseTransaction(_controller);
-			std::string* tuid = uuid();
-			StdTransaction* stx = new StdTransaction(tx, *tuid);
-
-			BSONObj* obj = BSONParser::parse("{'_id': '1'}");
-			stx->insert("db", "testrollback", obj);
-
-			log->info("Doing rollback");
-			stx->rollback();
-			
-			delete stx;
-
-			delete tx;
-			delete obj;
-			log->info("~testTransactionRollback");
-		}
-
-		void testTransactionCommit()
-		{
-			Logger* log = getLogger(NULL);
-			log->info("testTransactionCommit");
-
-			BaseTransaction* tx = new BaseTransaction(_controller);
-			std::string* tuid = uuid();
-			StdTransaction* stx = new StdTransaction(tx, *tuid);
-
-			stx->dropNamespace("db", "testcommit");
-
-			std::vector<std::string> idsCheck;
-			for (int y = 0; y < 300; y++) {
-				BSONObj o;
-				std::string* id = uuid();
-				o.add("_id", const_cast<char*>(id->c_str()));
-				o.add("name", "John");
-				stx->insert("db", "testcommit", &o);
-				if ((y % 10) == 0) {
-					idsCheck.push_back(*id);
-				}
-				delete id;
+			if (system(ss.str().c_str()) < 0) {
+				cout << "the data dir " << dataDir << " could not be removed. error: " << strerror(errno) << endl;
+				exit(1);
 			}
-
-			for (std::vector<std::string>::iterator i = idsCheck.begin(); i != idsCheck.end(); i++) {
-				std::string id = *i;
-				std::string filter = format("$'_id' == '%s'", id.c_str());
-				BSONObj* res = stx->findFirst("db", "testcommit", "*", filter.c_str());
-				delete res;
-			}
-			log->info("Doing commit");
-			stx->commit();
-			delete stx;
-
-			delete tx;
-			log->info("~testTransactionCommit");
+			free(dataDir);
+			_controller = new DBController();
+			_controller->initialize();
 		}
 
-		void testTransactionMergedData()
-		{
-			Logger* log = getLogger(NULL);
-			log->info("testTransactionMergedData");
-
-			BaseTransaction* tx = new BaseTransaction(_controller);
-			tx->dropNamespace("db", "testcommit");
-
-			BSONObj ooutTX;
-			std::string* idOut = uuid();
-			ooutTX.add("_id", const_cast<char*>(idOut->c_str()));
-			ooutTX.add("name", "JohnOut");
-			tx->insert("db", "testcommit", &ooutTX);
-
-			// Insert out of the transaction
-			std::string* tuid = uuid();
-			StdTransaction* stx = new StdTransaction(tx, *tuid);
-
-			BSONObj o;
-			std::string* id = uuid();
-			o.add("_id", const_cast<char*>(id->c_str()));
-			o.add("name", "John");
-			stx->insert("db", "testcommit", &o);
-
-			BSONArrayObj* res = stx->find("db", "testcommit", "*", "");
-			TEST_ASSERT(res->length() == 2);
-
-			BSONArrayObj* resOut = tx->find("db", "testcommit", "*", "");
-			TEST_ASSERT(resOut->length() == 1);
-
-			stx->commit();
-			delete stx;
-
-			BSONArrayObj* resOut2 = tx->find("db", "testcommit", "*", "");
-			TEST_ASSERT(resOut2->length() == 2);
-
-			delete tx;
-			delete res;
-			delete resOut;
-			delete resOut2;
-			delete tuid;
-			log->info("~testTransactionMergedData");
-		}
-
-
-		void testTransactionManager() {
-			Logger* log = getLogger(NULL);
-			log->info("testTransactionManager");
-
-			// Insert a document in wal
-			BaseTransaction* wal = new BaseTransaction(_controller);
-			wal->dropNamespace("db", "mtx");
-
-			TransactionManager* manager = new TransactionManager(wal);
-
-			BSONObj testA;
-			testA.add("cod", 1);
-			testA.add("name", "William");
-			wal->insert("db", "mtx", &testA);
-
-			std::string* t1 = uuid();
-
-			StdTransaction* transaction = manager->getTransaction(*t1);
-			std::auto_ptr<BSONArrayObj> array(transaction->find("db", "mtx", "*", "$'cod' == 1"));
-			BSONObj* obj1up = array->get(0);
-			obj1up->add("lastName", "Shakespeare");
-			transaction->update("db", "mtx", obj1up);
-
-			std::auto_ptr<BSONArrayObj> array0(wal->find("db", "mtx", "*", "$'cod' == 1"));
-			BSONObj* origin1 = array0->get(0); 
-			TEST_ASSERT(!origin1->has("lastName"));
-
-			std::auto_ptr<BSONArrayObj> array1(transaction->find("db", "mtx", "*", "$'cod' == 1"));
-			BSONObj* objtx1 = array1->get(0);
-			TEST_ASSERT(objtx1->has("lastName"));
-
-			transaction->commit();
-			manager->dropTransaction(*t1);
-
-			std::auto_ptr<BSONArrayObj> array2(wal->find("db", "mtx", "*", "$'cod' == 1"));
-			BSONObj* origin2 = array2->get(0);
-			TEST_ASSERT(origin2->has("lastName"));
-
-			delete t1;
-			delete manager;
-			log->info("~testTransactionManager");
+		virtual void TearDown() {
+			_controller->shutdown();
+			delete _controller;
 		}
 
 };
 
-enum OutputType
-{
-	Compiler,
-	Html,
-	TextTerse,
-	TextVerbose
-};
+TEST_F(TestTX, testSimpleOperations) {
+	Logger* log = getLogger(NULL);
+	log->info("testSimpleOperations");
 
-	static void
-usage()
-{
-	cout << "\nusage: mytest [MODE]\n"
-		<< "where MODE may be one of:\n"
-		<< "  --compiler\n"
-		<< "  --html\n"
-		<< "  --text-terse (default)\n"
-		<< "  --text-verbose\n";
-	exit(0);
+	BaseTransaction* tx = new BaseTransaction(_controller);
+	tx->dropNamespace("test", "simple-tx");
+	BSONObj test;
+	std::string* id = uuid();
+	test.add("_id", id->c_str());
+	test.add("a", 1);
+	tx->insert("test", "simple-tx", &test);
+	BSONArrayObj* arr = tx->find("test", "simple-tx", "*", "");
+	BSONObj* obj = arr->get(0);
+	obj->add("a", 2);
+	tx->update("test", "simple-tx", obj);
+	delete id;
+	delete obj;
+	delete arr;
+
+	arr = tx->find("test", "simple-tx", "*", "$'a' == 1");
+	EXPECT_TRUE(arr->length() == 0);
+
+	log->info("~testSimpleOperations");
 }
 
-	static auto_ptr<Test::Output>
-cmdline(int argc, char* argv[])
+TEST_F(TestTX, testTransactionSimplest)
 {
-	if (argc > 2)
-		usage(); // will not return
+	Logger* log = getLogger(NULL);
+	log->info("testTransactionSimplest");
+	DummyController* controller = new DummyController();
 
-	Test::Output* output = 0;
+	BaseTransaction* tx = new BaseTransaction(controller);
 
-	if (argc == 1)
-		output = new Test::TextOutput(Test::TextOutput::Verbose);
-	else
-	{
-		const char* arg = argv[1];
-		if (strcmp(arg, "--compiler") == 0)
-			output = new Test::CompilerOutput;
-		else if (strcmp(arg, "--html") == 0)
-			output =  new Test::HtmlOutput;
-		else if (strcmp(arg, "--text-terse") == 0)
-			output = new Test::TextOutput(Test::TextOutput::Terse);
-		else if (strcmp(arg, "--text-verbose") == 0)
-			output = new Test::TextOutput(Test::TextOutput::Verbose);
-		else
-		{
-			cout << "\ninvalid commandline argument: " << arg << endl;
-			usage(); // will not return
-		}
-	}
+	tx->dropNamespace("db", "txns");
 
-	return auto_ptr<Test::Output>(output);
+	delete tx;
+	delete controller;
+
+	controller = new DummyController();
+
+	tx = new BaseTransaction(controller);
+
+	tx->dropNamespace("db", "txns");
+
+	delete tx;
+	delete controller;
 }
 
-// Main test program
-//
-int main(int argc, char* argv[])
+TEST_F(TestTX, testTransaction)
 {
-	try
-	{
-		// Demonstrates the ability to use multiple test suites
-		//
-		std::string sdataDir = getSetting("DATA_DIR");
-		char* dataDir = combinePath(sdataDir.c_str(), "*");
-		std::stringstream ss;
-		ss << "exec rm -rf " << dataDir;
+	Logger* log = getLogger(NULL);
+	log->info("testTransaction");
+	DummyController* controller = new DummyController();
 
-		if (system(ss.str().c_str()) < 0) {
-			cout << "the data dir " << dataDir << " could not be removed. error: " << strerror(errno) << endl;
-			exit(1);
+	BaseTransaction* tx = new BaseTransaction(controller);
+
+	tx->dropNamespace("db", "txns");
+
+	BSONObj o;
+	std::string* id = uuid();
+	o.add("_id", const_cast<char*>(id->c_str()));
+	o.add("name", "John");
+	tx->insert("db", "txns", &o);
+
+	BSONArrayObj* res = tx->find("db", "txns", "*", "");
+
+	EXPECT_TRUE(res->length() == 1);
+	BSONObj* test1 = *res->begin();
+	EXPECT_TRUE(test1->getString("name").compare("John") == 0);
+	test1->add("name", "Peter");
+	tx->update("db", "txns", test1);
+
+	delete res;
+
+	res = tx->find("db", "txns", "*", "");
+
+	EXPECT_TRUE(res->length() == 1);
+	BSONObj* test2 = *res->begin();
+	EXPECT_TRUE(test2->getString("name").compare("Peter") == 0);
+
+	delete res;
+	delete tx;
+	delete controller;
+	delete id;
+}
+
+TEST_F(TestTX, testTransactionSimpleCommit)
+{
+	Logger* log = getLogger(NULL);
+	log->info("testTransactionSimpleCommit");
+
+	BaseTransaction* tx = new BaseTransaction(_controller);
+	std::string* tuid = uuid();
+	StdTransaction* stx = new StdTransaction(tx, *tuid);
+
+	BSONObj* obj = BSONParser::parse("{name: 'test', lastName: 'testln'}");
+	stx->insert("db", "testcommit", obj);
+
+	log->info("Doing commit");
+	stx->commit();
+	delete stx;
+
+	delete tx;
+	delete obj;
+	log->info("~testTransactionSimpleCommit");
+}
+
+TEST_F(TestTX, testTransactionRollback)
+{
+	Logger* log = getLogger(NULL);
+	log->info("testTransactionRollback");
+
+	BaseTransaction* tx = new BaseTransaction(_controller);
+	std::string* tuid = uuid();
+	StdTransaction* stx = new StdTransaction(tx, *tuid);
+
+	BSONObj* obj = BSONParser::parse("{'_id': '1'}");
+	stx->insert("db", "testrollback", obj);
+
+	log->info("Doing rollback");
+	stx->rollback();
+
+	delete stx;
+
+	delete tx;
+	delete obj;
+	log->info("~testTransactionRollback");
+}
+
+TEST_F(TestTX, testTransactionCommit)
+{
+	Logger* log = getLogger(NULL);
+	log->info("testTransactionCommit");
+
+	BaseTransaction* tx = new BaseTransaction(_controller);
+	std::string* tuid = uuid();
+	StdTransaction* stx = new StdTransaction(tx, *tuid);
+
+	stx->dropNamespace("db", "testcommit");
+
+	std::vector<std::string> idsCheck;
+	for (int y = 0; y < 300; y++) {
+		BSONObj o;
+		std::string* id = uuid();
+		o.add("_id", const_cast<char*>(id->c_str()));
+		o.add("name", "John");
+		stx->insert("db", "testcommit", &o);
+		if ((y % 10) == 0) {
+			idsCheck.push_back(*id);
 		}
-		free(dataDir);
-		Test::Suite ts;
-		ts.add(auto_ptr<Test::Suite>(new TestTXSuite));
-		//        ts.add(auto_ptr<Test::Suite>(new CompareTestSuite));
-		//        ts.add(auto_ptr<Test::Suite>(new ThrowTestSuite));
-
-		// Run the tests
-		//
-		_controller = new DBController();
-		_controller->initialize();
-		auto_ptr<Test::Output> output(cmdline(argc, argv));
-		ts.run(*output, true);
-
-		Test::HtmlOutput* const html = dynamic_cast<Test::HtmlOutput*>(output.get());
-		if (html)
-			html->generate(cout, true, "MyTest");
-
-		_controller->shutdown();
-		delete _controller;
+		delete id;
 	}
-	catch (...)
-	{
-		cout << "\nunexpected exception encountered\n";
-		return EXIT_FAILURE;
+
+	for (std::vector<std::string>::iterator i = idsCheck.begin(); i != idsCheck.end(); i++) {
+		std::string id = *i;
+		std::string filter = format("$'_id' == '%s'", id.c_str());
+		BSONObj* res = stx->findFirst("db", "testcommit", "*", filter.c_str());
+		delete res;
 	}
-	return EXIT_SUCCESS;
+	log->info("Doing commit");
+	stx->commit();
+	delete stx;
+
+	delete tx;
+	log->info("~testTransactionCommit");
+}
+
+TEST_F(TestTX, testTransactionMergedData)
+{
+	Logger* log = getLogger(NULL);
+	log->info("testTransactionMergedData");
+
+	BaseTransaction* tx = new BaseTransaction(_controller);
+	tx->dropNamespace("db", "testcommit");
+
+	BSONObj ooutTX;
+	std::string* idOut = uuid();
+	ooutTX.add("_id", const_cast<char*>(idOut->c_str()));
+	ooutTX.add("name", "JohnOut");
+	tx->insert("db", "testcommit", &ooutTX);
+
+	// Insert out of the transaction
+	std::string* tuid = uuid();
+	StdTransaction* stx = new StdTransaction(tx, *tuid);
+
+	BSONObj o;
+	std::string* id = uuid();
+	o.add("_id", const_cast<char*>(id->c_str()));
+	o.add("name", "John");
+	stx->insert("db", "testcommit", &o);
+
+	BSONArrayObj* res = stx->find("db", "testcommit", "*", "");
+	EXPECT_TRUE(res->length() == 2);
+
+	BSONArrayObj* resOut = tx->find("db", "testcommit", "*", "");
+	EXPECT_TRUE(resOut->length() == 1);
+
+	stx->commit();
+	delete stx;
+
+	BSONArrayObj* resOut2 = tx->find("db", "testcommit", "*", "");
+	EXPECT_TRUE(resOut2->length() == 2);
+
+	delete tx;
+	delete res;
+	delete resOut;
+	delete resOut2;
+	delete tuid;
+	log->info("~testTransactionMergedData");
+}
+
+
+TEST_F(TestTX, testTransactionManager) {
+	Logger* log = getLogger(NULL);
+	log->info("testTransactionManager");
+
+	// Insert a document in wal
+	BaseTransaction* wal = new BaseTransaction(_controller);
+	wal->dropNamespace("db", "mtx");
+
+	TransactionManager* manager = new TransactionManager(wal);
+
+	BSONObj testA;
+	testA.add("cod", 1);
+	testA.add("name", "William");
+	wal->insert("db", "mtx", &testA);
+
+	std::string* t1 = uuid();
+
+	StdTransaction* transaction = manager->getTransaction(*t1);
+	std::auto_ptr<BSONArrayObj> array(transaction->find("db", "mtx", "*", "$'cod' == 1"));
+	BSONObj* obj1up = array->get(0);
+	obj1up->add("lastName", "Shakespeare");
+	transaction->update("db", "mtx", obj1up);
+
+	std::auto_ptr<BSONArrayObj> array0(wal->find("db", "mtx", "*", "$'cod' == 1"));
+	BSONObj* origin1 = array0->get(0); 
+	EXPECT_TRUE(!origin1->has("lastName"));
+
+	std::auto_ptr<BSONArrayObj> array1(transaction->find("db", "mtx", "*", "$'cod' == 1"));
+	BSONObj* objtx1 = array1->get(0);
+	EXPECT_TRUE(objtx1->has("lastName"));
+
+	transaction->commit();
+	manager->dropTransaction(*t1);
+
+	std::auto_ptr<BSONArrayObj> array2(wal->find("db", "mtx", "*", "$'cod' == 1"));
+	BSONObj* origin2 = array2->get(0);
+	EXPECT_TRUE(origin2->has("lastName"));
+
+	delete t1;
+	delete manager;
+	log->info("~testTransactionManager");
 }

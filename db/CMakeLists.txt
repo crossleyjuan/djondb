@@ -4,7 +4,26 @@ project (djondb)
 
 IF ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
 	set(LINUX true)
+	set(PLATFORM_ESSENCIAL_LIBS, " rt uuid")
 ENDIF ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
+
+
+IF ("${CMAKE_SYSTEM_NAME}" MATCHES "Windows")
+	set(WIN32 true)
+	IF( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )
+		set(PLATFORM_NAME "x64")
+	ENDIF( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )
+	IF( NOT CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )
+		set(PLATFORM_NAME "Win32")
+	ENDIF( NOT CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )
+	set(LIBRARY_PREFIX "${PROJECT_SOURCE_DIR}/third_party/libs/${PLATFORM_NAME}")
+	set(LIBRARY_SUFFIX ".lib")
+	set(PLATFORM_ESSENCIAL_LIBS, "")
+ENDIF ("${CMAKE_SYSTEM_NAME}" MATCHES "Windows")
+
+IF ("${CMAKE_SYSTEM_NAME}" MATCHES "Darwin")
+	set(DARWIN true)
+ENDIF ("${CMAKE_SYSTEM_NAME}" MATCHES "Darwin")
 
 IF (LINUX)
 	IF( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )
@@ -13,7 +32,6 @@ IF (LINUX)
 	ENDIF( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )
 
 ENDIF (LINUX)
-
 
 configure_file (
 	"${PROJECT_SOURCE_DIR}/config.h.in"
@@ -24,7 +42,6 @@ enable_testing()
 
 include_directories("${PROJECT_BINARY_DIR}")
 set(CMAKE_INSTALL_PREFIX /usr)
-#SET_TARGET_PROPERTIES(djon-command PROPERTIES COMPILE_FLAGS "-fPIC")
 
 IF ( WIN32 )
 	include_directories("${PROJECT_SOURCE_DIR}/third_party/pthreads")
@@ -50,3 +67,11 @@ IF (WIN32)
 ENDIF (WIN32)
 add_subdirectory(shell) 
 
+add_subdirectory(util/tests) 
+add_subdirectory(bson/tests) 
+add_subdirectory(cache/tests) 
+add_subdirectory(filesystem/tests) 
+add_subdirectory(db/tests) 
+add_subdirectory(tx/tests) 
+add_subdirectory(command/tests) 
+add_subdirectory(network/tests) 
