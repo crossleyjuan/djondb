@@ -23,6 +23,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <gtest/gtest.h>
+#ifdef WINDOWS
+#include <Shlobj.h>
+#endif
 
 
 using namespace std;
@@ -209,17 +212,31 @@ TEST(testUtil, testUUID)
 TEST(testUtil, testSettings) {
 	std::string folder = getSetting("DATA_DIR");
 
+#ifndef WINDOWS
 	EXPECT_TRUE(folder.compare("/var/djondb") == 0);
+#else
+	EXPECT_TRUE(folder.compare("") == 0);
+#endif
 }
 
 TEST(testUtil, testFileUtils) {
 	//test mkdir
-
-	makeDir("/tmp/test/test2");
-
-	EXPECT_TRUE(existDir("/tmp/test/test2"));
-
+#ifndef WINDOWS
+	const char* tmpDir = "/tmp/test/test2";
 	char* home = getenv("HOME");
+#else
+	const char* tmpDir = "c:\\temp\\tests2";
+	WCHAR path[MAX_PATH];
+	char* home = (char*)malloc(MAX_PATH);
+	memset(home, 0, MAX_PATH);
+	if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_PROFILE, NULL, 0, path))) {
+		wcstombs(home, path, MAX_PATH);
+	}
+#endif
+	makeDir(tmpDir);
+
+	EXPECT_TRUE(existDir(tmpDir));
+
 	EXPECT_TRUE(checkFileCreation(home));
 	// test directory fail
 	EXPECT_TRUE(!checkFileCreation("/"));
@@ -249,6 +266,7 @@ TEST(testUtil, testFileUtils) {
 	char* result2 = combinePath(path3, path4);
 	EXPECT_TRUE(strcmp(result2, "c:\\test\\myfolder\\myfile.txt") == 0);
 #endif
+	free(home);
 }
 
 void testFunction(const char* x) {

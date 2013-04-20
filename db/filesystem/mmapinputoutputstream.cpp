@@ -35,9 +35,25 @@
 #include <unistd.h>
 #include <fcntl.h>
 #else
+#include <strsafe.h>
+#include <windows.h>
 #endif
 
-MMapInputOutputStream::MMapInputOutputStream(const char* fileName, __int32 offset, __int32 pages)
+char* getLastErrorMessage() {
+#ifndef WINDOWS
+	char* error = strerror(errno);
+#else
+	LPTSTR lpMsgBuf;
+	DWORD dw = GetLastError();
+	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, dw, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &lpMsgBuf, 0, NULL );
+	char* error = strcpy((char*)lpMsgBuf, strlen((char*)lpMsgBuf));
+	LocalFree(lpMsgBuf);
+#endif
+	return error;
+}
+
+
+MMapInputOutputStream::MMapInputOutputStream(const char* fileName, __int64 offset, __int32 pages)
 {
 	Logger* log = getLogger(NULL);
 	_fileName = fileName;
@@ -90,72 +106,95 @@ MMapInputOutputStream::MMapInputOutputStream(const char* fileName, __int32 offse
 #else
 	 // Create the test file. Open it "Create Always" to overwrite any
 	 // existing file. The data is re-created below
-	 _pFile = CreateFile(fileName,
-			 GENERIC_READ,
-			 FILE_SHARE_READ | FILE_SHARE_WRITE,
-			 NULL,
-			 OPEN_EXISTING,
-			 FILE_ATTRIBUTE_NORMAL,
-			 NULL);
+	if (!existFile(fileName)) {
+		 _pFile = CreateFile(fileName,
+				 GENERIC_WRITE,
+				 FILE_SHARE_READ | FILE_SHARE_WRITE,
+				 NULL,
+				 CREATE_NEW,
+				 FILE_ATTRIBUTE_NORMAL,
+				 NULL);
 
-	 if (_pFile == INVALID_HANDLE_VALUE)
-	 {
-		 DWORD error = GetLastError();
+		long psize = pageSize();
+		__int64 maxLen = (pages * psize) + offset;
+		 SetFilePointer(_pFile, maxLen, NULL, FILE_BEGIN);
+		 int newPos;
+		 DWORD dwWritten;
+		 WriteFile(_pFile, "a", 1, &dwWritten, NULL);
+
+		 CloseHandle(_pFile);
 	 }
 
-	 SYSTEM_INFO SysInfo;  // system information; used to get granularity
-	 // Get the system allocation granularity.
-	 GetSystemInfo(&SysInfo);
-	 DWORD dwSysGran = SysInfo.dwAllocationGranularity;
+	_pFile = CreateFile(fileName,
+			GENERIC_READ | GENERIC_WRITE,
+			FILE_SHARE_READ | FILE_SHARE_WRITE,
+			NULL,
+			OPEN_EXISTING,
+			FILE_ATTRIBUTE_NORMAL,
+			NULL);
 
-	 // Now calculate a few variables. Calculate the file offsets as
-	 // 64-bit values, and then get the low-order 32 bits for the
-	 // function calls.
+	_len = fileSize(fileName);
+	long psize = pageSize();
+	__int64 maxLen = (pages * psize) + offset;
+	if (_len < maxLen) {
+		 SetFilePointer(_pFile, maxLen, NULL, FILE_BEGIN);
+		 DWORD dwWritten;
+		 WriteFile(_pFile, "a", 1, &dwWritten, NULL);
 
-	 // To calculate where to start the file mapping, round down the
-	 // offset of the data into the file to the nearest multiple of the
-	 // system allocation granularity.
-	 DWORD dwFileMapStart; // where to start the file map view
-	 dwFileMapStart = (0 / dwSysGran) * dwSysGran;
+		_len = maxLen;
+	}
 
-	 _len = GetFileSize(_pFile,  NULL);
+    DWORD offsetHigh = ((offset >> 32) & 0xFFFFFFFF);
+    DWORD offsetLow = (offset & 0xFFFFFFFF);
+
+    DWORD lenHigh = ((_len >> 32) & 0xFFFFFFFF);
+    DWORD lenLow = (_len & 0xFFFFFFFF);
+
+	if (_pFile == INVALID_HANDLE_VALUE)
+	 {
+		char* error = getLastErrorMessage();
+		log->error(error);
+		free(error);
+		exit(1);
+	 }
 
 	 // Create a file mapping object for the file
 	 // Note that it is a good idea to ensure the file size is not zero
 	 _hMapFile = CreateFileMapping( _pFile,          // current file handle
 			 NULL,           // default security
-			 PAGE_READONLY, // read/write permission
-			 0,              // size of mapping object, high
-			 0,  // size of mapping object, low
+			 PAGE_READWRITE, // read/write permission
+			 lenHigh,              // size of mapping object, high
+			 lenLow,  // size of mapping object, low
 			 NULL);          // name of mapping object
 
 	 if (_hMapFile == NULL)
 	 {
-		 log->error("Error mapping the file: %s. errno: %d", fileName, GetLastError());
-		 exit(1);
+		char* error = getLastErrorMessage();
+		log->error(error);
+		free(error);
+		exit(1);
 	 }
 
 	 // Map the view and test the results.
 	 LPVOID lpMapAddress = MapViewOfFile(_hMapFile,            // handle to
 			 // mapping object
-			 FILE_MAP_READ, // read/write
-			 0,                   // high-order 32
-			 // bits of file
-			 // offset
-			 0,      // low-order 32
-			 // bits of file
-			 // offset
-			 _len);      // number of bytes
+			 FILE_MAP_ALL_ACCESS, //FILE_MAP_READ, // read/write
+			 offsetHigh,                   // high-order 32 bits of file offset
+			 offsetLow ,      // low-order 32 bits of file offset
+			 (pages * psize));      // number of bytes
 	 // to map
 	 if (lpMapAddress == NULL)
 	 {
-		 log->error("Error mapping the file: %s. errno: %d", fileName, GetLastError());
-		 exit(1);
+		char* error = getLastErrorMessage();
+		log->error(error);
+		free(error);
+		exit(1);
 	 }
 
 	 // Calculate the pointer to the data.
 	 _addr = (char*)lpMapAddress;
 	 _initaddr = _addr;
+	
 #endif
 	 _open = true;
 }

@@ -411,9 +411,49 @@ bool BSONObj::operator ==(const BSONObj& obj) const {
 		if (other == NULL) {
 			return false;
 		}
-		if (*content != *other) {
+		if (content->type() != other->type()) {
 			return false;
 		}
+		bool result;
+		switch (content->type()) {
+			case INT_TYPE: {
+									result = *((BSONContentInt*)content) == *((BSONContentInt*)other);
+									break;
+								}
+			case DOUBLE_TYPE: {
+										result = *((BSONContentDouble*)content) == *((BSONContentDouble*)other);
+										break;
+									}
+			case LONG64_TYPE: 
+			case LONG_TYPE: {
+									 result = *((BSONContentLong*)content) == *((BSONContentLong*)other);
+									 break;
+								 }
+			case PTRCHAR_TYPE: 
+			case STRING_TYPE: {
+										result = *((BSONContentString*)content) == *((BSONContentString*)other);
+										break;
+									}
+			case BSON_TYPE: {
+									 result = *((BSONContentBSON*)content) == *((BSONContentBSON*)other);
+									 break;
+								 }
+			case BSONARRAY_TYPE: {
+											result = *((BSONContentBSONArray*)content) == *((BSONContentBSONArray*)other);
+											break;
+										}
+			case NULL_TYPE: {
+									 result = true;
+									 break;
+								 }
+			case UNKNOWN_TYPE: 
+			default:
+										{
+											result = *((BSONContentInt*)content) == *((BSONContentInt*)other);
+											break;
+										}
+		}
+		return result;
 	}
 	return true;
 }
@@ -438,8 +478,50 @@ bool BSONObj::operator !=(const BSONObj& obj) const {
 		if (other == NULL) {
 			return true;
 		}
-		if (*content != *other) {
+		if (content->type() != other->type()) {
 			return true;
+		}
+		bool result;
+		switch (content->type()) {
+			case INT_TYPE: {
+									result = *((BSONContentInt*)content) != *((BSONContentInt*)other);
+									break;
+								}
+			case DOUBLE_TYPE: {
+										result = *((BSONContentDouble*)content) != *((BSONContentDouble*)other);
+										break;
+									}
+			case LONG64_TYPE: 
+			case LONG_TYPE: {
+									 result = *((BSONContentLong*)content) != *((BSONContentLong*)other);
+									 break;
+								 }
+			case PTRCHAR_TYPE: 
+			case STRING_TYPE: {
+										result = *((BSONContentString*)content) != *((BSONContentString*)other);
+										break;
+									}
+			case BSON_TYPE: {
+									 result = *((BSONContentBSON*)content) != *((BSONContentBSON*)other);
+									 break;
+								 }
+			case BSONARRAY_TYPE: {
+											result = *((BSONContentBSONArray*)content) != *((BSONContentBSONArray*)other);
+											break;
+										}
+			case NULL_TYPE: {
+									 result = true;
+									 break;
+								 }
+			case UNKNOWN_TYPE: 
+			default:
+										{
+											result = *((BSONContentInt*)content) != *((BSONContentInt*)other);
+											break;
+										}
+		}
+		if (result) {
+			return result;
 		}
 	}
 	return false;

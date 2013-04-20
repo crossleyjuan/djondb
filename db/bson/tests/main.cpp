@@ -28,6 +28,7 @@ using namespace std;
 
 TEST(testBSON, testBSON)
 {
+	SCOPED_TRACE("testBSON");
 	cout << "testBSON" << endl;
 	BSONObj* obj = new BSONObj();
 	// Add in
@@ -79,15 +80,14 @@ TEST(testBSON, testBSON)
 	EXPECT_TRUE(el2 != NULL);
 
 	// test a non existant attribute
-	obj->getLong("xx");
-	EXPECT_THROW("The getLong should throw an exception", BSONException);
+	EXPECT_THROW(obj->getLong("xx"), BSONException);
 
-	obj->getString("xxx");
-	EXPECT_THROW("The getString should throw an exception", BSONException);
+	EXPECT_THROW(obj->getString("xxx"), BSONException);
 	delete obj;
 }
 
 TEST(testBSON, testEquals) {
+	SCOPED_TRACE("testBSON");
 	cout << "\ntestEquals" << endl;
 	BSONObj obj1;
 	obj1.add("int", 1);
@@ -99,19 +99,20 @@ TEST(testBSON, testEquals) {
 	obj2.add("double", 1.2);
 	obj2.add("string", (char*)"Test");
 
-	EXPECT_TRUE(obj1 == obj2);
+	EXPECT_TRUE(obj1 == obj2) << "obj1 and obj2 should be evaluated to equal";
 
 	obj2.add("string2", (char*)"Test");
-	EXPECT_TRUE(obj1 != obj2);
+	EXPECT_TRUE(obj1 != obj2) << "obj1 and obj2 should be evaluated to not equal";
 	obj1.add("string2", (char*)"Test");
-	EXPECT_TRUE(obj1 == obj2);
+	EXPECT_TRUE(obj1 == obj2) << "obj1 and obj2 should be evaluated to equal";
 
 	obj1.add("test", 1);
 	obj2.add("other", 2);
-	EXPECT_TRUE(obj1 != obj2);
+	EXPECT_TRUE(obj1 != obj2) << "obj1 and obj2 should be evaluated to not equal";
 }
 TEST(testBSON, testBigBSON)
 {
+	SCOPED_TRACE("testBSON");
 	cout << "testBigBSON" << endl;
 	BSONObj* obj = new BSONObj();
 
@@ -155,6 +156,7 @@ TEST(testBSON, testBigBSON)
 
 TEST(testBSON, testCopyBSON)
 {
+	SCOPED_TRACE("testBSON");
 	cout << "testCopyBSON" << endl;
 
 	BSONObj* objOrig = new BSONObj();
@@ -211,6 +213,7 @@ TEST(testBSON, testCopyBSON)
 
 TEST(testBSON, testToChar)
 {
+	SCOPED_TRACE("testBSON");
 	cout << "testToChar" << endl;
 
 	BSONObj obj;
@@ -244,6 +247,7 @@ TEST(testBSON, testToChar)
 
 TEST(testBSON, testParserSimple)
 {
+	SCOPED_TRACE("testBSON");
 	cout << "testParserSimple" << endl;
 
 	BSONObj* testEmpty = BSONParser::parse("{}");
@@ -271,6 +275,7 @@ TEST(testBSON, testParserSimple)
 
 TEST(testBSON, testParserTrivial)
 {
+	SCOPED_TRACE("testBSON");
 	cout << "testParserTrivial" << endl;
 
 	BSONObj* obj = BSONParser::parse("{age: '1'}");
@@ -286,6 +291,7 @@ TEST(testBSON, testParserTrivial)
 
 TEST(testBSON, testParserRelation)
 {
+	SCOPED_TRACE("testBSON");
 	cout << "testParserRelation" << endl;
 
 	BSONObj* obj = BSONParser::parse("{age: 1, name: 'John', rel1: {innertext: 'inner text', salary: 150000, rent: 10000}}");
@@ -307,6 +313,7 @@ TEST(testBSON, testParserRelation)
 
 TEST(testBSON, testParserArray)
 {
+	SCOPED_TRACE("testBSON");
 	cout << "testParserArray" << endl;
 
 	BSONArrayObj* array = BSONParser::parseArray("[{age: 1, name: 'John', salary: 3500.25, rel1: {innertext: 'inner text'}}, {age: 2, name: 'John2', salary: 23500.25, rel1: {innertext: 'inner text2'}}]");
@@ -334,6 +341,7 @@ TEST(testBSON, testParserArray)
 
 TEST(testBSON, testParserCollection)
 {
+	SCOPED_TRACE("testBSON");
 	cout << "testParserCollection" << endl;
 
 	BSONObj* obj = BSONParser::parse("{age: 1, name: 'John', salary: 3500.25, rel1: [{innertext: 'inner text'}, {innertext: 'inner text'}, {innertext: 'inner text'}, {innertext: 'inner text'} ] }");
@@ -372,23 +380,6 @@ TEST(testBSON, testParserDoubleRelation)
 	EXPECT_TRUE(obj->getBSON("rel1")->getBSON("innerrel1") != NULL);
 	EXPECT_TRUE(strcmp(obj->getBSON("rel1")->getBSON("innerrel1")->getString("innertext").c_str(), "text2") == 0);
 	delete obj;
-}
-
-TEST(testBSON, testComparison) {
-	cout << "testComparison" << endl;
-
-	// This method will test comparison from contents of two BSONObj
-
-	BSONObj* obj1 = BSONParser::parse("{int: 1, double: 2, text: 'name'}");
-	BSONObj* obj2 = BSONParser::parse("{int: 1, double: 2, text: 'name'}");
-
-	EXPECT_TRUE(*obj1->getContent("int") == *obj2->getContent("int"));
-	EXPECT_TRUE(*obj1->getContent("double") == *obj2->getContent("double"));
-	EXPECT_TRUE(*obj1->getContent("text") == *obj2->getContent("text"));
-	EXPECT_TRUE(!(*obj1->getContent("text") == *obj2->getContent("double")));
-
-	delete obj1;
-	delete obj2;
 }
 
 TEST(testBSON, testAutocasting) {

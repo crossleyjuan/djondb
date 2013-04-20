@@ -103,7 +103,14 @@ TEST(testFilesystem, testMMap)
 TEST(testFilesystem, testMMapIO)
 {
 	cout << "\ntestMMapIO\n" << endl;
-	MMapInputOutputStream streamo("testmmap.dat", 0, 4);
+	char* fileName;
+#ifndef WINDOWS
+	fileName = "/tmp/testmmap.dat";
+#else
+	makeDir("C:\\temp");
+	fileName = "C:\\temp\\testmmap.dat";
+#endif
+	MMapInputOutputStream streamo(fileName, 0, 4);
 	streamo.writeChars("Hello World!", 12);
 	streamo.writeShortInt(2);
 	streamo.writeShortInt(127);
@@ -133,8 +140,15 @@ TEST(testFilesystem, testMMapIOOffset)
 	cout << "\ntestMMapIOOffset\n" << endl;
 	long ps = pageSize();
 
-	__int32 offset = 4 * ps * 1024 * 1024;
-	MMapInputOutputStream streamo("testmmap.dat", offset, 10);
+	__int64 offset = 4 * ps;
+	char* fileName;
+#ifndef WINDOWS
+	fileName = "/tmp/testmmap.dat";
+#else
+	makeDir("C:\\temp");
+	fileName = "C:\\temp\\testmmap.dat";
+#endif
+	MMapInputOutputStream streamo(fileName, offset, 10);
 	streamo.writeChars("Hello World!", 12);
 	streamo.writeShortInt(2);
 	streamo.writeShortInt(127);
@@ -299,6 +313,7 @@ TEST(testFilesystem, testBSONStreams)
 
 TEST(testFilesystem, testBSONSelect) {
 	cout << "\ntestBSONSelect\n" << endl;
+	SCOPED_TRACE("file-system");
 	std::auto_ptr<BSONObj> objTest(BSONParser::parse("{age: 1, name: 'John', salary: 3500.25, simplerel: {test: 'inner value', test2: 'inner value2', test3: 3, test4: 3.5}, rel1: [{innertext: 'inner text', test2: 'text2'}, {innertext: 'inner text', test2: 'text333'}, {innertext: 'inner text', test2: 'text4'}, {innertext: 'inner text'} ] }"));
 	MemoryStream ms;
 	BSONOutputStream bos(&ms);
