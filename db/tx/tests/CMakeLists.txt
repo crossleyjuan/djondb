@@ -7,7 +7,12 @@ include_directories("${PROJECT_SOURCE_DIR}/db")
 include_directories("${PROJECT_SOURCE_DIR}/tx")
 
 add_executable(test-tx main.cpp controllertest.cpp)
-target_link_libraries (test-tx djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}/gtest.lib ${LIBRARY_PREFIX}/gtest_main.lib ${PLATFORM_ESSENCIAL_LIBS})
+IF (NOT WIN32)
+	target_link_libraries (test-tx djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}gtest${LIBRARY_SUFFIX} ${LIBRARY_PREFIX}gtest_main${LIBRARY_SUFFIX} rt uuid)
+ENDIF (NOT WIN32)
+IF (WIN32)
+	target_link_libraries (test-tx djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}gtest${LIBRARY_SUFFIX} ${LIBRARY_PREFIX}gtest_main${LIBRARY_SUFFIX})
+ENDIF (WIN32)
 
 add_test(test-tx test-tx)
 

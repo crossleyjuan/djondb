@@ -44,6 +44,7 @@
 #include <stdlib.h>
 #include "command.h"
 #include <gtest/gtest.h>
+#include <memory>
 
 #ifdef WINDOWS
 #include <Windows.h>

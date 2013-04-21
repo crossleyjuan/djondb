@@ -8,7 +8,12 @@ include_directories("${PROJECT_SOURCE_DIR}/tx")
 include_directories("${PROJECT_SOURCE_DIR}/command")
 
 add_executable(test-command main.cpp)
-target_link_libraries (test-command djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}/gtest.lib ${LIBRARY_PREFIX}/gtest_main.lib ${PLATFORM_ESSENCIAL_LIBS})
+IF (NOT WIN32)
+	target_link_libraries (test-command djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}gtest${LIBRARY_SUFFIX} ${LIBRARY_PREFIX}gtest_main${LIBRARY_SUFFIX} rt uuid)
+ENDIF (NOT WIN32)
+IF (WIN32)
+	target_link_libraries (test-command djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}gtest${LIBRARY_SUFFIX} ${LIBRARY_PREFIX}gtest_main${LIBRARY_SUFFIX})
+ENDIF (WIN32)
 
 add_test(test-command test-command)
 
