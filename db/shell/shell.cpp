@@ -932,11 +932,11 @@ void RunShell(v8::Handle<v8::Context> context) {
 				lastCmd = cmd;
 				_commands.push_back(std::string(cmd));
 				if ((startsWith(cmd, "exit")) || (startsWith(cmd, "quit"))) {
-					if (strlen(cmd) < 5)
+					if (strlen(cmd) <= 5)
 						cmd = "quit();";
 				}
 				if (startsWith(cmd, "help")) {
-					if (strlen(cmd) < 5)
+					if (strlen(cmd) <= 5)
 						cmd = "help();";
 				}
 				ExecuteString(v8::String::New(cmd), name, true, true);
