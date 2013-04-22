@@ -265,8 +265,8 @@ TEST(testUtil, testFileUtils) {
 	char* path4 = "myfolder\\myfile.txt";
 	char* result2 = combinePath(path3, path4);
 	EXPECT_TRUE(strcmp(result2, "c:\\test\\myfolder\\myfile.txt") == 0);
-#endif
 	free(home);
+#endif
 }
 
 void testFunction(const char* x) {
