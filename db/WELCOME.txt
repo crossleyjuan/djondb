@@ -1,0 +1,10 @@
+djondb
+======
+
+Welcome to djondb installer!
+
+This package will install all the required files to run djondb, including server, shell and libraries.
+
+Feel free to contact us at info@djondb.com if you have any suggestion or comment.
+
+djondb Team
