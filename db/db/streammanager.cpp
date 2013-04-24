@@ -189,7 +189,7 @@ StreamType* StreamManager::open(const char* db, const char* ns, FILE_TYPE type) 
 		streams->insert(pair<FILE_TYPE, StreamType*>(type, output));
 	} else {
 		SpacesType space;
-		space.ns = *ns;
+		space.ns = sns;
 		space.streams = new map<FILE_TYPE, StreamType*>();
 		space.streams->insert(pair<FILE_TYPE, StreamType*>(type, output));
 		spaces->insert(pair<std::string, SpacesType>(sns, space));

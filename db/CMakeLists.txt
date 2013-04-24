@@ -43,6 +43,17 @@ include_directories("${PROJECT_BINARY_DIR}")
 
 INCLUDE(InstallRequiredSystemLibraries)
 
+#debian variables
+SET(CPACK_DEBIAN_PACKAGE_NAME "djondb")
+SET(CPACK_DEBIAN_PACKAGE_VERSION "0.3.0")
+SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libantlr3c-3.2-0, libuuid1 (>= 2.17.2), libstdc++6 (>= 4.5), libv8-dev (>= 3.1)")
+SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Enterprise NoSQL Server 
+ djondb is a NoSQL document store created to be 
+  easy to use and ready enterprise level. Your 
+   data is save with djondb.")
+SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "djondb <info@djondb.com>")
+SET(CPACK_DEBIAN_PACKAGE_SECTION "database")
+
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "djondb installer")
 SET(CPACK_PACKAGE_VENDOR "djondb")
 SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.txt")
@@ -107,7 +118,7 @@ IF (WIN32)
 ENDIF (WIN32)
 add_subdirectory(shell) 
 
-IF (${CMAKE_BUILD_TYPE}  MATCHES "Linux")
+IF (${CMAKE_BUILD_TYPE} MATCHES "Debug")
 	add_subdirectory(util/tests) 
 	add_subdirectory(bson/tests) 
 	add_subdirectory(cache/tests) 
@@ -116,4 +127,4 @@ IF (${CMAKE_BUILD_TYPE}  MATCHES "Linux")
 	add_subdirectory(tx/tests) 
 	add_subdirectory(command/tests) 
 	add_subdirectory(network/tests) 
-ENDIF (${CMAKE_BUILD_TYPE}  MATCHES "Linux")
+ENDIF (${CMAKE_BUILD_TYPE}  MATCHES "Debug")

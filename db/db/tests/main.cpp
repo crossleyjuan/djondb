@@ -52,14 +52,15 @@
 using namespace std;
 
 
+
 class TestDB: public testing::Test
 {
 	protected:
-		DBController* controller;
+		static DBController* controller;
 		std::vector<std::string> __ids;
 
 	protected:
-		virtual void SetUp()
+		static void SetUpTestCase()
 		{
 			remove("sp1.customer.dat");
 			remove("sp1.customer.idx");
@@ -101,7 +102,7 @@ class TestDB: public testing::Test
 			controller->initialize();
 		}
 
-		virtual void TearDown() {
+		static void TearDownTestCase() {
 			controller->shutdown();
 		}
 
@@ -192,6 +193,8 @@ class TestDB: public testing::Test
 		}
 
 };
+
+DBController* TestDB::controller = NULL;
 
 TEST_F(TestDB, testExpressions) {
 	cout << "\ntestExpressions" << endl;
@@ -908,6 +911,7 @@ TEST_F(TestDB, testFindPrevious)
 	}
 }
 
+/* 
 TEST_F(TestDB, testManualIndex)
 {
 	cout << "\ntestManualIndex" << endl;
@@ -936,6 +940,7 @@ TEST_F(TestDB, testManualIndex)
 		x++;
 	} while (strncmp(chr, "end", 3) != 0);
 }
+*/
 
 TEST_F(TestDB, testIndexPage) {
 	std::vector<std::string> ids;
@@ -982,6 +987,7 @@ TEST_F(TestDB, testIndexPage) {
 	testIndex(ids);
 }
 
+/*
 TEST_F(TestDB, testMassiveInsertIndex)
 {
 	std::set<std::string> keys;
@@ -1011,6 +1017,7 @@ TEST_F(TestDB, testMassiveInsertIndex)
 	}
 
 }
+*/
 
 TEST_F(TestDB, testSimpleIndex)
 {
