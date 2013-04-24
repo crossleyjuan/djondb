@@ -1045,6 +1045,7 @@ std::vector<std::string> generateGuids(int count) {
 	return ids;
 }
 
+/* 
 TEST_F(TestDB, testHighMemIndex)
 {
 	cout << "\ntestHighMemIndex" << endl;
@@ -1053,18 +1054,18 @@ TEST_F(TestDB, testHighMemIndex)
 	cout << "testing " << x << " ids" << endl;
 	std::vector<std::string> ids = generateGuids(x);
 	testIndex(ids);
-	/*
-		cout << "testing 100 ids" << endl;
-		ids = generateGuids(100);
-		testIndex(ids);
-		cout << "testing 1000 ids" << endl;
-		ids = generateGuids(1000);
-		testIndex(ids);
-		cout << "testing 1000000 ids" << endl;
-		ids = generateGuids(1000);
-		testIndex(ids);
-		*/
+	
+//		cout << "testing 100 ids" << endl;
+//		ids = generateGuids(100);
+//		testIndex(ids);
+//		cout << "testing 1000 ids" << endl;
+//		ids = generateGuids(1000);
+//		testIndex(ids);
+//		cout << "testing 1000000 ids" << endl;
+//		ids = generateGuids(1000);
+//		testIndex(ids);
 }
+*/
 
 TEST_F(TestDB, testComplexIndex)
 {
