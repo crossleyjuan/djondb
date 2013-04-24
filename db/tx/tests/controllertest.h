@@ -39,7 +39,7 @@ using namespace std;
 class DummyController: public Controller
 {
 	public:
-		virtual BSONObj* insert(const char* db, const char* ns, BSONObj* bson, BSONObj* options);
+		virtual const BSONObj* insert(const char* db, const char* ns, BSONObj* bson, BSONObj* options);
 		virtual bool dropNamespace(const char* db, const char* ns, BSONObj* options);
 		virtual void update(const char* db, const char* ns, BSONObj* bson, BSONObj* options);
 		virtual void remove(const char* db, const char* ns, const char* documentId, const char* revision, BSONObj* options);

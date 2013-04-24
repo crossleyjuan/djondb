@@ -22,9 +22,14 @@ ENDIF ( WIN32 )
 
 IF (NOT WIN32)
 	add_executable(djon-shell shell.cpp linenoise.c)
-	target_link_libraries (djon-shell djon-client djon-service djon-network djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util antlr3c pthread uuid rt v8)
 ENDIF (NOT WIN32)
 
+IF (LINUX)
+	target_link_libraries (djon-shell djon-client djon-service djon-network djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util antlr3c pthread uuid rt v8)
+ENDIF (LINUX)
+IF (DARWIN)
+	target_link_libraries (djon-shell djon-client djon-service djon-network djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util antlr3c pthread v8)
+ENDIF (DARWIN)
 install (TARGETS djon-shell DESTINATION bin)
 
 

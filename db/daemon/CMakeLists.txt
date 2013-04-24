@@ -12,4 +12,10 @@ add_executable(djondbd main.cpp)
 
 install (TARGETS djondbd DESTINATION bin)
 
-target_link_libraries (djondbd djon-client djon-service djon-network antlr3c pthread uuid rt)
+IF (LINUX)
+		  target_link_libraries (djondbd djon-client djon-service djon-network antlr3c pthread uuid rt)
+ENDIF (LINUX)
+
+IF (DARWIN)
+		  target_link_libraries (djondbd djon-client djon-service djon-network antlr3c pthread)
+ENDIF (DARWIN)

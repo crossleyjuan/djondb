@@ -369,7 +369,7 @@ void MMapInputOutputStream::checkAvailableSpace() {
 }
 
 void MMapInputOutputStream::resize(__int32 len) {
-#ifndef WINDOWS
+#ifdef LINUX
 	void* p = mremap (_addr, _len, len, MREMAP_MAYMOVE);
 	if (p == MAP_FAILED)
 		_addr = NULL;

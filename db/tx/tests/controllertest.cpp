@@ -27,7 +27,7 @@
 #include "controllertest.h"
 #include "bson.h"
 
-BSONObj* DummyController::insert(const char* db, const char* ns, BSONObj* bson, BSONObj* options) {
+const BSONObj* DummyController::insert(const char* db, const char* ns, BSONObj* bson, BSONObj* options) {
 	return bson;
 }
 
