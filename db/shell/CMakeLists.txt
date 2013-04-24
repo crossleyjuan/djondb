@@ -25,7 +25,7 @@ IF (NOT WIN32)
 	target_link_libraries (djon-shell djon-client djon-service djon-network djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util antlr3c pthread uuid rt v8)
 ENDIF (NOT WIN32)
 
-install (TARGETS djon-shell DESTINATION bin)
+install (TARGETS djon-shell DESTINATION .)
 
 
 
