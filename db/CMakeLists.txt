@@ -40,7 +40,46 @@ configure_file (
 enable_testing()
 
 include_directories("${PROJECT_BINARY_DIR}")
-set(CMAKE_INSTALL_PREFIX /usr)
+
+INCLUDE(InstallRequiredSystemLibraries)
+
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "djondb installer")
+SET(CPACK_PACKAGE_VENDOR "djondb")
+SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/../LICENSE")
+SET(CPACK_PACKAGE_VERSION_MAJOR "0")
+SET(CPACK_PACKAGE_VERSION_MINOR "3")
+SET(CPACK_PACKAGE_VERSION_PATCH "0")
+SET(CPACK_PACKAGE_INSTALL_DIRECTORY "djondb ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}")
+
+IF(WIN32 AND NOT UNIX)
+  # There is a bug in NSI that does not handle full unix paths properly. Make
+  # sure there is at least one set of four (4) backlasshes.
+  #SET(CPACK_PACKAGE_ICON "${CMake_SOURCE_DIR}/Utilities/Release\\\\InstallIcon.bmp")
+  #SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\MyExecutable.exe")
+  SET(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY}")
+  SET(CPACK_NSIS_HELP_LINK "http:\\\\\\\\djondb.com")
+  SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\djondb.com")
+  SET(CPACK_NSIS_CONTACT "info@djondb.com")
+  SET(CPACK_NSIS_MODIFY_PATH ON)
+ELSE(WIN32 AND NOT UNIX)
+  SET(CPACK_STRIP_FILES "djondb_win.exe")
+  SET(CPACK_STRIP_FILES "djon_shell.exe")
+  SET(CPACK_SOURCE_STRIP_FILES "")
+ENDIF(WIN32 AND NOT UNIX)
+SET(CPACK_PACKAGE_EXECUTABLES "djondb" "djondb")
+
+IF (WIN32)
+	INSTALL(FILES ${LIBRARY_PREFIX}/pthreadVC2.dll
+		           ${LIBRARY_PREFIX}/v8.dll
+            DESTINATION .)
+ENDIF (WIN32)
+
+INCLUDE(CPack)
+
+IF (NOT WIN32)
+	set(CMAKE_INSTALL_PREFIX /usr)
+ENDIF (NOT WIN32)
 
 IF ( WIN32 )
 	include_directories("${PROJECT_SOURCE_DIR}/third_party/pthreads")
@@ -66,11 +105,13 @@ IF (WIN32)
 ENDIF (WIN32)
 add_subdirectory(shell) 
 
-add_subdirectory(util/tests) 
-add_subdirectory(bson/tests) 
-add_subdirectory(cache/tests) 
-add_subdirectory(filesystem/tests) 
-add_subdirectory(db/tests) 
-add_subdirectory(tx/tests) 
-add_subdirectory(command/tests) 
-add_subdirectory(network/tests) 
+IF (${CMAKE_BUILD_TYPE}  MATCHES "Linux")
+	add_subdirectory(util/tests) 
+	add_subdirectory(bson/tests) 
+	add_subdirectory(cache/tests) 
+	add_subdirectory(filesystem/tests) 
+	add_subdirectory(db/tests) 
+	add_subdirectory(tx/tests) 
+	add_subdirectory(command/tests) 
+	add_subdirectory(network/tests) 
+ENDIF (${CMAKE_BUILD_TYPE}  MATCHES "Linux")
