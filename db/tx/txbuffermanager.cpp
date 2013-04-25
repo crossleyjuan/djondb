@@ -45,6 +45,7 @@ TxBufferManager::TxBufferManager(Controller* controller, const char* file, bool 
 	_dataDir = getSetting("DATA_DIR");
 	_controller = controller;
 	_lockActiveBuffers = new Lock();
+	_lockWait = new Lock();
 	_flushingBuffers = false;
 	_runningMonitor = false;
 	_monitorThread = NULL;
@@ -150,6 +151,9 @@ TxBufferManager::~TxBufferManager() {
 	_controlFile->close();
 	delete _controlFile;
 	delete _lockActiveBuffers;
+	// Releases the waits
+	_lockWait->notify();
+	delete _lockWait;
 	delete _activeBuffers;
 	delete _vactiveBuffers;
 	delete _reusableBuffers;
@@ -258,7 +262,7 @@ void TxBufferManager::addBuffer(TxBuffer* buffer) {
 	_vactiveBuffers->push_back(buffer);
 	_buffersCount++;
 	if (_log->isDebug()) _log->debug(2, "_lockActiveBuffers->unlock() %d", (long)_lockActiveBuffers);
-	_lockActiveBuffers->notify();
+	_lockWait->notify();
 	_lockActiveBuffers->unlock();
 }
 
@@ -401,8 +405,9 @@ void* TxBufferManager::monitorBuffers(void* arg) {
 
 void TxBufferManager::flushBuffer() {
 
-	_lockActiveBuffers->lock();
-	_lockActiveBuffers->wait(3);
+	// This achieves the Producer/Consumer pattern, just waits for elements to flush
+	_lockWait->lock();
+	_lockWait->wait(3);
 	_flushingBuffers = true;
 	if (buffersCount() > 1) {
 		if (_log->isDebug()) _log->debug(2, "TxBufferManager::flushBuffer()");
@@ -469,7 +474,7 @@ void TxBufferManager::flushBuffer() {
 			dropBuffer(buffer);
 		}
 	}
-	_lockActiveBuffers->unlock();
+	_lockWait->unlock();
 	_flushingBuffers = false;
 }
 

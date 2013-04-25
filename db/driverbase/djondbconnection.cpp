@@ -188,17 +188,17 @@ bool DjondbConnection::insert(const std::string& db, const std::string& ns, cons
 	if (!isOpen()) {
 		throw DjondbException(D_ERROR_CONNECTION, "Not connected to any server");
 	}
-	BSONObj obj(bson);
+	BSONObj* obj = new BSONObj(bson);
 	InsertCommand cmd;
 	cmd.setDB(db);
-	if (!obj.has("_id")) {
+	if (!obj->has("_id")) {
 		std::string* id = uuid();
-		obj.add("_id", const_cast<char*>(id->c_str()));
+		obj->add("_id", const_cast<char*>(id->c_str()));
 		delete id;
 	}
-	if (!obj.has("_revision")) {
+	if (!obj->has("_revision")) {
 		std::string* rev = uuid();
-		obj.add("_revision", const_cast<char*>(rev->c_str()));
+		obj->add("_revision", const_cast<char*>(rev->c_str()));
 		delete rev;
 	}
 	cmd.setBSON(obj);

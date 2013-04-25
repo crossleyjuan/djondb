@@ -84,9 +84,9 @@ TEST(TestNetwork, testInsert) {
 
 		std::auto_ptr<InsertCommand> cmd(new InsertCommand());
 
-		BSONObj obj;
+		BSONObj* obj = new BSONObj();
 		std::auto_ptr<std::string> guid(uuid());
-		obj.add("_id", guid->c_str());
+		obj->add("_id", guid->c_str());
 		int test = rand() % 10;
 		if (test > 0) {
 			ids.push_back(*guid.get());
@@ -96,7 +96,7 @@ TEST(TestNetwork, testInsert) {
 		memset(temp, 0, 2000);
 		memset(temp, 'a', 1999);
 		int len = strlen(temp);
-		obj.add("content", temp);
+		obj->add("content", temp);
 		free(temp);
 		//obj->add("last", "Smith");
 		cmd->setBSON(obj);

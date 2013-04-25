@@ -89,7 +89,9 @@ class TxBufferManager
 		std::queue<TxBuffer*>*  _activeBuffers;
 		std::vector<TxBuffer*>* _vactiveBuffers;
 		std::queue<TxBuffer*>*  _reusableBuffers;
+
 		Lock* _lockActiveBuffers;
+		Lock* _lockWait;
 		Thread* _monitorThread;
 		bool _runningMonitor;
 		std::map<std::string, int*>* _buffersByLog;

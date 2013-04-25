@@ -55,11 +55,10 @@ InsertCommand* parseInsert(InputStream* is)  {
 
 	std::auto_ptr<BSONInputStream> bsonis(new BSONInputStream(is));
 	BSONObj* obj = bsonis->readBSON();
-	command->setBSON(*obj);
+	command->setBSON(obj);
 
 	delete ns;
 	delete db;
-	delete obj;
 	return command;
 }
 

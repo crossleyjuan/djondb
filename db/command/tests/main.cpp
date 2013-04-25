@@ -44,9 +44,9 @@ TEST(TestCommand, testInsertCommand) {
 	InsertCommand cmd;
 	cmd.setDB("testdb");
 	cmd.setNameSpace("test.namespace.db");
-	BSONObj obj;
-	obj.add("name", "Cross");
-	obj.add("age", 18);
+	BSONObj* obj = new BSONObj();
+	obj->add("name", "Cross");
+	obj->add("age", 18);
 	cmd.setBSON(obj);
 
 	commandWriter->writeCommand(&cmd);
@@ -61,7 +61,7 @@ TEST(TestCommand, testInsertCommand) {
 	EXPECT_TRUE(rdCmd != NULL);
 	EXPECT_TRUE(rdCmd->nameSpace()->compare("test.namespace.db") == 0);
 	EXPECT_TRUE(rdCmd->DB()->compare("testdb") == 0);
-	BSONObj* objResult = rdCmd->bson();
+	const BSONObj* objResult = rdCmd->bson();
 	EXPECT_TRUE(objResult != NULL);
 	EXPECT_TRUE(objResult->has("name"));	
 	EXPECT_TRUE(objResult->getString("name").compare("Cross") == 0);
@@ -83,9 +83,9 @@ TEST(TestCommand, testOptionsCommand) {
 	cmd.setNameSpace("test.namespace.db");
 	cmd.setOptions(options);
 
-	BSONObj obj;
-	obj.add("name", "Cross");
-	obj.add("age", 18);
+	BSONObj* obj = new BSONObj();
+	obj->add("name", "Cross");
+	obj->add("age", 18);
 	cmd.setBSON(obj);
 
 	commandWriter->writeCommand(&cmd);
@@ -100,7 +100,7 @@ TEST(TestCommand, testOptionsCommand) {
 	EXPECT_TRUE(rdCmd != NULL);
 	EXPECT_TRUE(rdCmd->nameSpace()->compare("test.namespace.db") == 0);
 	EXPECT_TRUE(rdCmd->DB()->compare("testdb") == 0);
-	BSONObj* objResult = rdCmd->bson();
+	const BSONObj* objResult = rdCmd->bson();
 	EXPECT_TRUE(objResult != NULL);
 	EXPECT_TRUE(objResult->has("name"));	
 	EXPECT_TRUE(objResult->getString("name").compare("Cross") == 0);

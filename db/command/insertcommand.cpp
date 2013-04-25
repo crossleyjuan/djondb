@@ -88,11 +88,11 @@ const std::string* InsertCommand::nameSpace() const {
 	return _namespace;
 }
 
-void InsertCommand::setBSON(const BSONObj bson) {
-	_bson = new BSONObj(bson);
+void InsertCommand::setBSON(BSONObj* bson) {
+	_bson = bson;
 }
 
-BSONObj* InsertCommand::bson() const {
+const BSONObj* InsertCommand::bson() const {
 	return _bson;
 }
 

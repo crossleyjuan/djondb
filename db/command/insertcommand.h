@@ -22,8 +22,14 @@ class InsertCommand: public Command {
         const std::string* DB() const;
         void setNameSpace(const std::string ns);
         const std::string* nameSpace() const;
-        void setBSON(const BSONObj bson);
-        BSONObj* bson() const;
+
+		  //! Sets the BSONObj to be inserted in the database
+		  /*!
+			The InsertCommand will get ownership of the parameter, the caller should not delete/free it
+			\param bson bson to be inserted
+			* */
+        void setBSON(BSONObj* bson);
+        const BSONObj* bson() const;
     private:
         std::string* _namespace;
         std::string* _db;
