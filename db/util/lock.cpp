@@ -26,6 +26,8 @@
  */
 #include "lock.h"
 #include "logger.h"
+#include <errno.h>
+#include <string.h>
 
 Lock::Lock() {
 	pthread_mutexattr_t mutexattr;
@@ -55,18 +57,28 @@ void Lock::unlock() {
 }
 
 void Lock::wait() {
+	lock();
 	pthread_cond_wait(&_cond, &_mutexLock);
+	unlock();
 }
 
 void Lock::wait(__int32 timeout) {
+	lock();
 	struct timespec timeToWait;
-	time_t now;
 	int rt;
 
-	time(&now);
-
-	timeToWait.tv_sec = now+timeout;
-	pthread_cond_timedwait(&_cond, &_mutexLock, &timeToWait);
+	timeToWait.tv_sec = time(NULL)+timeout;
+	bool wait = true;
+	while (wait) {
+		rt = pthread_cond_timedwait(&_cond, &_mutexLock, &timeToWait);
+		if (rt == ETIMEDOUT) {
+			wait = false;
+		} else if (rt > 0) {
+			getLogger(NULL)->error(strerror(errno));
+			wait = false;
+		}
+	}
+	unlock();
 }
 
 void Lock::notify() {

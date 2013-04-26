@@ -262,9 +262,7 @@ void TxBufferManager::addBuffer(TxBuffer* buffer) {
 	_vactiveBuffers->push_back(buffer);
 	_buffersCount++;
 	if (_log->isDebug()) _log->debug(2, "_lockActiveBuffers->unlock() %d", (long)_lockActiveBuffers);
-	_lockWait->lock();
 	_lockWait->notify();
-	_lockWait->unlock();
 	_lockActiveBuffers->unlock();
 }
 
@@ -408,7 +406,6 @@ void* TxBufferManager::monitorBuffers(void* arg) {
 void TxBufferManager::flushBuffer() {
 
 	// This achieves the Producer/Consumer pattern, just waits for elements to flush
-	_lockWait->lock();
 	_lockWait->wait(3);
 	_flushingBuffers = true;
 	if (buffersCount() > 1) {
@@ -476,7 +473,6 @@ void TxBufferManager::flushBuffer() {
 			dropBuffer(buffer);
 		}
 	}
-	_lockWait->unlock();
 	_flushingBuffers = false;
 }
 
