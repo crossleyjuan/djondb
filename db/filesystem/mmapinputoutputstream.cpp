@@ -69,15 +69,17 @@ MMapInputOutputStream::MMapInputOutputStream(const char* fileName, __int64 offse
 		 _pFile = ::open(fileName, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
 	 }
 	 if (_pFile > -1) {
-		 _len = fileSize(fileName);
+		 long fileLength = fileSize(fileName);
 		 long psize = pageSize();
-		 __int64 maxLen = (pages * psize) + offset;
-		 if (_len < maxLen) {
-			 _len = maxLen;
+		 _len = (pages * psize);
+		 __int64 fileLenRequired = _len + offset;
+		 // if the file does not have enough space then it will expanded to 
+		 // the required size
+		 if (fileLength < fileLenRequired) {
+			 lseek(_pFile, fileLenRequired, SEEK_SET);
+			 write(_pFile, "", 1);
+			 lseek(_pFile, 0, SEEK_SET);
 		 }
-		 lseek(_pFile, _len, SEEK_SET);
-		 write(_pFile, "", 1);
-		 lseek(_pFile, 0, SEEK_SET);
 
 		 bool shared = true;
 		 bool advise = true;
@@ -106,7 +108,7 @@ MMapInputOutputStream::MMapInputOutputStream(const char* fileName, __int64 offse
 #else
 	 // Create the test file. Open it "Create Always" to overwrite any
 	 // existing file. The data is re-created below
-	if (!existFile(fileName)) {
+	 if (!existFile(fileName)) {
 		 _pFile = CreateFile(fileName,
 				 GENERIC_WRITE,
 				 FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -115,8 +117,8 @@ MMapInputOutputStream::MMapInputOutputStream(const char* fileName, __int64 offse
 				 FILE_ATTRIBUTE_NORMAL,
 				 NULL);
 
-		long psize = pageSize();
-		__int64 maxLen = (pages * psize) + offset;
+		 long psize = pageSize();
+		 __int64 maxLen = (pages * psize) + offset;
 		 SetFilePointer(_pFile, maxLen, NULL, FILE_BEGIN);
 		 int newPos;
 		 DWORD dwWritten;
@@ -125,37 +127,36 @@ MMapInputOutputStream::MMapInputOutputStream(const char* fileName, __int64 offse
 		 CloseHandle(_pFile);
 	 }
 
-	_pFile = CreateFile(fileName,
-			GENERIC_READ | GENERIC_WRITE,
-			FILE_SHARE_READ | FILE_SHARE_WRITE,
-			NULL,
-			OPEN_EXISTING,
-			FILE_ATTRIBUTE_NORMAL,
-			NULL);
+	 _pFile = CreateFile(fileName,
+			 GENERIC_READ | GENERIC_WRITE,
+			 FILE_SHARE_READ | FILE_SHARE_WRITE,
+			 NULL,
+			 OPEN_EXISTING,
+			 FILE_ATTRIBUTE_NORMAL,
+			 NULL);
 
-	_len = fileSize(fileName);
-	long psize = pageSize();
-	__int64 maxLen = (pages * psize) + offset;
-	if (_len < maxLen) {
+	 long fileLen = fileSize(fileName);
+	 long psize = pageSize();
+	 _len = (pages * psize);
+	 __int64 maxLen = _len + offset;
+	 if (_len < maxLen) {
 		 SetFilePointer(_pFile, maxLen, NULL, FILE_BEGIN);
 		 DWORD dwWritten;
 		 WriteFile(_pFile, "a", 1, &dwWritten, NULL);
+	 }
 
-		_len = maxLen;
-	}
+	 DWORD offsetHigh = ((offset >> 32) & 0xFFFFFFFF);
+	 DWORD offsetLow = (offset & 0xFFFFFFFF);
 
-    DWORD offsetHigh = ((offset >> 32) & 0xFFFFFFFF);
-    DWORD offsetLow = (offset & 0xFFFFFFFF);
+	 DWORD lenHigh = ((_len >> 32) & 0xFFFFFFFF);
+	 DWORD lenLow = (_len & 0xFFFFFFFF);
 
-    DWORD lenHigh = ((_len >> 32) & 0xFFFFFFFF);
-    DWORD lenLow = (_len & 0xFFFFFFFF);
-
-	if (_pFile == INVALID_HANDLE_VALUE)
+	 if (_pFile == INVALID_HANDLE_VALUE)
 	 {
-		char* error = getLastErrorMessage();
-		log->error(error);
-		free(error);
-		exit(1);
+		 char* error = getLastErrorMessage();
+		 log->error(error);
+		 free(error);
+		 exit(1);
 	 }
 
 	 // Create a file mapping object for the file
@@ -169,10 +170,10 @@ MMapInputOutputStream::MMapInputOutputStream(const char* fileName, __int64 offse
 
 	 if (_hMapFile == NULL)
 	 {
-		char* error = getLastErrorMessage();
-		log->error(error);
-		free(error);
-		exit(1);
+		 char* error = getLastErrorMessage();
+		 log->error(error);
+		 free(error);
+		 exit(1);
 	 }
 
 	 // Map the view and test the results.
@@ -185,16 +186,16 @@ MMapInputOutputStream::MMapInputOutputStream(const char* fileName, __int64 offse
 	 // to map
 	 if (lpMapAddress == NULL)
 	 {
-		char* error = getLastErrorMessage();
-		log->error(error);
-		free(error);
-		exit(1);
+		 char* error = getLastErrorMessage();
+		 log->error(error);
+		 free(error);
+		 exit(1);
 	 }
 
 	 // Calculate the pointer to the data.
 	 _addr = (char*)lpMapAddress;
 	 _initaddr = _addr;
-	
+
 #endif
 	 _open = true;
 }

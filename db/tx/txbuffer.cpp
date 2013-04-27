@@ -34,7 +34,7 @@ TxBuffer::TxBuffer(const TxBufferManager* manager, const char* file, __int64 off
 	std::string path = getSetting("DATA_DIR");
 	char* fileName = combinePath(path.c_str(), file);
 	_stream = new MMapInputOutputStream(fileName, offset, maxLen);
-	_startOffset = 0;
+	_startOffset = offset;
 	_bufferLength = bufferLen;
 	_maxLength = maxLen;
 	_mainLog = mainLog;
@@ -118,26 +118,26 @@ double TxBuffer::readDoubleIEEE() {
 /* Read a chars */
 char* TxBuffer::readChars() {
 	char* r = _stream->readChars();
-	_currentPos = _stream->currentPos() - _startOffset;
+	_currentPos = _stream->currentPos();
 	return r;
 };
 
 char* TxBuffer::readChars(__int32 length) {
 	char* r = _stream->readChars(length);
-	_currentPos = _stream->currentPos() - _startOffset;
+	_currentPos = _stream->currentPos();
 	return r;
 };
 
 const char* TxBuffer::readFull() {
 	const char* r = _stream->readFull();
-	_currentPos = _stream->currentPos() - _startOffset;
+	_currentPos = _stream->currentPos();
 	return r;
 };
 
 
 std::string* TxBuffer::readString() {
 	std::string* r = _stream->readString();
-	_currentPos = _stream->currentPos() - _startOffset;
+	_currentPos = _stream->currentPos();
 	return r;
 };
 
@@ -185,13 +185,13 @@ void TxBuffer::writeDoubleIEEE(double v) {
 /* Write a char */
 void TxBuffer::writeChars(const char* text, __int32 len) {
 	_stream->writeChars(text, len);
-	_bufferLength = _stream->currentPos() - _startOffset;
+	_bufferLength = _stream->currentPos();
 	_currentPos = _bufferLength;
 };
 
 void TxBuffer::writeString(const std::string& text) {
 	_stream->writeString(text);
-	_bufferLength = _stream->currentPos() - _startOffset;
+	_bufferLength = _stream->currentPos();
 	_currentPos = _bufferLength;
 };
 
@@ -201,7 +201,7 @@ void TxBuffer::seek(__int64 pos, SEEK_DIRECTION direction) {
 		_currentPos = pos;
 	} else {
 		_stream->seek(pos, direction);
-		_currentPos = _stream->currentPos() - _startOffset;
+		_currentPos = _stream->currentPos();
 	}
 };
 

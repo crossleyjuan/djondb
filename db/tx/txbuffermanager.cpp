@@ -109,6 +109,12 @@ void TxBufferManager::loadBuffers() {
 
 	__int32 buffers = _controlFile->readInt();
 
+	// The buffers are circular, this means that some
+	// buffers are in the front of the control file but
+	// they are at the tail of the queue
+	std::vector<TxBuffer*> front;
+	std::vector<TxBuffer*> tail;
+	bool addToTail = true;
 	for (__int32 x = 0; x < buffers; x++) {
 		__int32 controlPosition = _controlFile->currentPos();
 		char flag = _controlFile->readChar();
@@ -120,11 +126,24 @@ void TxBufferManager::loadBuffers() {
 		buffer->setControlPosition(controlPosition);
 
 		if (flag & 0x01) {
-			addBuffer(buffer);
+			if (addToTail) {
+				tail.push_back(buffer);
+			} else {
+				front.push_back(buffer);
+			}
 		} else {
+			addToTail = false;
 			addReusable(buffer);
 		}
 		free(logFileName);
+	}
+	for (std::vector<TxBuffer*>::iterator iter = front.begin(); iter != front.end(); iter++) {
+		TxBuffer* buffer = *iter;
+		addBuffer(buffer);
+	}
+	for (std::vector<TxBuffer*>::iterator iter = tail.begin(); iter != tail.end(); iter++) {
+		TxBuffer* buffer = *iter;
+		addBuffer(buffer);
 	}
 }
 
@@ -135,19 +154,19 @@ TxBufferManager::~TxBufferManager() {
 	}
 
 	/*
-	while (!_activeBuffers->empty()) {
+		while (!_activeBuffers->empty()) {
 		TxBuffer* buffer =  _activeBuffers->front();
 		_activeBuffers->pop();
 		buffer->close();
 		delete buffer;
-	}
-	while (!_reusableBuffers->empty()) {
+		}
+		while (!_reusableBuffers->empty()) {
 		TxBuffer* buffer = _reusableBuffers->front();
 		_reusableBuffers->pop();
 		buffer->close();
 		delete buffer;
-	}
-	*/
+		}
+		*/
 	_controlFile->close();
 	delete _controlFile;
 	delete _lockActiveBuffers;
@@ -343,7 +362,7 @@ TxBuffer* TxBufferManager::pop() {
 	if (_log->isDebug()) _log->debug(3, "_controlFile->acquireLock();");
 	_controlFile->acquireLock();
 	_controlFile->seek(controlPos);
-	_controlFile->writeChar((char)0x01); // reusable
+	_controlFile->writeChar((char)0x02); // reusable
 	_buffersCount--;
 	if (_log->isDebug()) _log->debug(3, "_controlFile->releaseLock();");
 	_controlFile->releaseLock();
@@ -404,9 +423,8 @@ void* TxBufferManager::monitorBuffers(void* arg) {
 }
 
 void TxBufferManager::flushBuffer() {
-
 	// This achieves the Producer/Consumer pattern, just waits for elements to flush
-	_lockWait->wait(3);
+	_lockWait->wait(1);
 	_flushingBuffers = true;
 	if (buffersCount() > 1) {
 		if (_log->isDebug()) _log->debug(2, "TxBufferManager::flushBuffer()");
