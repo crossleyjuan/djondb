@@ -316,8 +316,8 @@ void MMapInputOutputStream::seek(__int64 i, SEEK_DIRECTION direction) {
 		_addr = _initaddr + i;
 		_pos = i;
 	} else {
-		log->error(std::string("Unsupported direction in Memory Mapped Files")); 
-		assert(false);
+		_addr = _initaddr + _len - i;
+		_pos = _len - i;
 	}
 }
 
