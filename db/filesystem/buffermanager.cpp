@@ -112,7 +112,7 @@ void BufferManager::loadBuffers() {
 		__int64 startOffset = _controlFile->readLong();
 		__int64 bufferLen = _controlFile->readLong();
 		char* logFileName = _controlFile->readChars();
-		Buffer* buffer = new Buffer(this, logFileName, startOffset, bufferLen, _buffersSize / pageSize());
+		Buffer* buffer = new Buffer(this, logFileName, startOffset, _buffersSize, _buffersSize / pageSize());
 		buffer->setControlPosition(controlPosition);
 
 		if (flag & 0x01) {

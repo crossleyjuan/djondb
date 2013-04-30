@@ -30,6 +30,7 @@
 #include "expressionresult.h"
 #include "memorystream.h"
 #include "bsonoutputstream.h"
+#include "bsoninputstream.h"
 #include "buffermanager.h"
 #include "buffer.h"
 #include <string.h>
@@ -130,7 +131,6 @@ Index::Index(const Index& orig) {
 BPlusIndexP::BPlusIndexP(std::set<std::string> keys, const char* fileName): IndexAlgorithm(keys)
 {
 	_bufferManager = new BufferManager(fileName);
-	_helperStream = new MemoryStream();
 
 	initializeIndex();
 }
@@ -138,7 +138,12 @@ BPlusIndexP::BPlusIndexP(std::set<std::string> keys, const char* fileName): Inde
 void BPlusIndexP::initializeIndex() {
 	int buffersCount = _bufferManager->buffersCount();
 
-	_head = new IndexPage();
+	if (buffersCount > 0) {
+		loadIndex();
+	} else {
+		_head = new IndexPage();
+		persistPage(_head);
+	}
 }
 
 BPlusIndexP::~BPlusIndexP()
@@ -149,7 +154,7 @@ BPlusIndexP::~BPlusIndexP()
 	}
 
 	delete _bufferManager;
-	delete _helperStream;
+	//delete _helperStream;
 }
 
 void BPlusIndexP::add(const BSONObj& elem, const djondb::string documentId, long filePos, long indexPos)
@@ -581,6 +586,28 @@ void persistIndexElement(MemoryStream* stream, Index* index) {
 	delete bos;
 }
 
+Index* retrieveIndexElement(MemoryStream* stream) {
+	BSONInputStream* bis = new BSONInputStream(stream);
+	int i = stream->readInt();
+	Index* index = NULL;
+	if (i == 1) {
+		index = new Index();
+		BSONObj* key = bis->readBSON();
+		index->key = key;
+		std::string documentId(stream->readChars());
+		index->documentId = djondb::string(documentId.c_str(), documentId.length());
+		index->posData = stream->readLong();
+		index->indexPos = stream->readLong();
+	} else {
+		delete bis->readBSON();
+		free(stream->readChars());
+		stream->readLong();
+		stream->readLong();
+	}
+	delete bis;
+	return index;
+}
+
 void persistPointer(MemoryStream* stream, IndexPage* pointer) {
 	if (pointer != NULL) {
 		stream->writeInt(1);
@@ -593,36 +620,130 @@ void persistPointer(MemoryStream* stream, IndexPage* pointer) {
 	}
 }
 
+IndexPage* retrievePointer(MemoryStream* stream) {
+	int flag = stream->readInt();
+
+	IndexPage* result = NULL;
+	if (flag == 1) {
+		result = new IndexPage();
+		result->setBufferIndex(stream->readInt());
+		result->setBufferPos(stream->readInt());
+	} else {
+		stream->readInt();
+		stream->readInt();
+	}
+	return result;
+}
+
+void BPlusIndexP::loadIndex() {
+	Buffer* buffer = _bufferManager->getBuffer(0);
+	buffer->seek(0);
+
+	__int32 index = buffer->readLong();
+	__int64 pos = buffer->readLong();
+
+	_head = new IndexPage();
+	_head->setBufferIndex(index);
+	_head->setBufferPos(pos);
+	loadPage(_head);
+}
+
+void BPlusIndexP::loadPage(IndexPage* page) {
+	Buffer* buffer = _bufferManager->getBuffer(page->bufferIndex());
+	buffer->seek(page->bufferPos());
+
+	__int32 size = buffer->readInt();
+	char* data = buffer->readChars();
+
+	MemoryStream* helperStream = new MemoryStream(data, size);
+	helperStream->seek(0);
+
+	helperStream->readInt(); // BUCKET_MAX_ELEMENTS
+
+	page->size = helperStream->readInt();
+
+	for (int x = 0; x < BUCKET_MAX_ELEMENTS; x++) {
+		Index* index = retrieveIndexElement(helperStream);
+		page->elements[x] = index;
+
+		IndexPage* pointer = retrievePointer(helperStream);
+		page->pointers[x] = pointer;
+	}	
+
+	// Recovers the last pointer
+	page->pointers[BUCKET_MAX_ELEMENTS] = retrievePointer(helperStream);
+
+	// Recovers siblings 
+	page->leftSibling = retrievePointer(helperStream);
+	page->rightSibling = retrievePointer(helperStream);
+	page->parentElement = retrievePointer(helperStream);
+
+	for (int x = 0; x <= BUCKET_MAX_ELEMENTS; x++) {
+		IndexPage* temp = page->pointers[x];
+		if (temp != NULL) {
+			loadPage(temp);
+		}
+	}
+	delete helperStream;
+}
+
 void BPlusIndexP::persistPage(IndexPage* page) {
 	Buffer* buffer = NULL;
-	_helperStream->seek(0);
+	MemoryStream* helperStream = new MemoryStream();
+	helperStream->seek(0);
 
-	_helperStream->writeInt(BUCKET_MAX_ELEMENTS);
+	helperStream->writeInt(BUCKET_MAX_ELEMENTS);
+
+	helperStream->writeInt(page->size);
 
 	for (int x = 0; x < BUCKET_MAX_ELEMENTS; x++) {
 		Index* index = page->elements[x];
 
-		persistIndexElement(_helperStream, index);
+		persistIndexElement(helperStream, index);
 
 		IndexPage* pointer = page->pointers[x];
-		persistPointer(_helperStream, pointer);
+		persistPointer(helperStream, pointer);
 	}	
 
 	// Persist the last pointer
-	persistPointer(_helperStream, page->pointers[BUCKET_MAX_ELEMENTS]);
+	persistPointer(helperStream, page->pointers[BUCKET_MAX_ELEMENTS]);
 
-	char* pageContent = _helperStream->toChars();
-	__int32 size = _helperStream->size();
+	// Persist siblings 
+	persistPointer(helperStream, page->leftSibling);
+	persistPointer(helperStream, page->rightSibling);
+	persistPointer(helperStream, page->parentElement);
+
+	char* pageContent = helperStream->toChars();
+	__int32 size = helperStream->size();
 
 	if (page->bufferIndex() > -1) {
 		buffer = _bufferManager->getBuffer(page->bufferIndex());
 		buffer->seek(page->bufferPos());
 	} else {
-		buffer = _bufferManager->getCurrentBuffer(size);
+		if (_bufferManager->buffersCount() > 1) {
+			buffer = _bufferManager->getCurrentBuffer(size);
+		} else {
+			// The buffer 0 will have the head position
+			// this will force the buffer to be created
+			_bufferManager->getCurrentBuffer(size, true);
+			// Now this will force to retrieve the buffer in pos 1
+			buffer = _bufferManager->getCurrentBuffer(size, true);
+		}
 		page->setBufferIndex(buffer->bufferIndex());
 		buffer->seek(0, FROMEND_SEEK);
 		page->setBufferPos(buffer->currentPos());
 	}
+	buffer->writeInt(size);
 	buffer->writeChars(pageContent, size);
+
+	if (page->parentElement == NULL) {
+		// head position will be recorded in the first buffer
+		Buffer* controlBuffer = _bufferManager->getBuffer(0);
+		controlBuffer->seek(0);
+		controlBuffer->writeLong(page->bufferIndex());
+		controlBuffer->writeLong(page->bufferPos());
+	}
+
+	delete helperStream;
 }
 

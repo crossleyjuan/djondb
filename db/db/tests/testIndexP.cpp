@@ -22,6 +22,7 @@
 // =====================================================================================
 #include "bplusindexp.h"
 #include "bson.h"
+#include <sstream>
 
 #include <gtest/gtest.h>
 
@@ -35,9 +36,45 @@ TEST(testIndexP, testSimple) {
 		BSONObj o;
 		std::string* id = uuid();
 		o.add("_id", id->c_str());
-		index.add(o, djondb::string(id->c_str(), id->length()), 100, 10);
+		char* temp = strcpy(const_cast<char*>(id->c_str()), id->length());
+		index.add(o, djondb::string(temp, id->length()), 100, 10);
 		delete id;
 	}
 
 }
 
+TEST(testIndexP, testRecover) {
+	std::set<std::string> keys;
+	keys.insert("_id");
+
+	BPlusIndexP* index = new BPlusIndexP(keys, "testIndex2");
+
+	std::vector<std::string> ids;
+	for (int x = 0; x < 10; x++) {
+		BSONObj o;
+		std::stringstream ss;
+		ss << x;
+		std::string id = ss.str();
+		o.add("_id", id.c_str());
+		int n = rand() % 100;
+		if (n > 0) {
+			ids.push_back(id);
+		}
+		char* temp = strcpy(const_cast<char*>(id.c_str()), id.length());
+		index->add(o, djondb::string(temp, id.length()), 100, 10);
+	}
+
+	delete index;
+
+	index = new BPlusIndexP(keys, "testIndex2");
+	for (std::vector<std::string>::iterator i = ids.begin(); i != ids.end(); i++) {
+		std::string guid = *i;
+		BSONObj o;
+		o.add("_id", guid.c_str());
+		Index* idx = index->find(&o);
+		ASSERT_TRUE(idx != NULL);
+		ASSERT_TRUE(idx->key->has("_id"));
+		EXPECT_TRUE(idx->key->getString("_id").compare(guid) == 0);
+	}
+	delete index;
+}

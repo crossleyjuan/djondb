@@ -124,7 +124,6 @@ class BPlusIndexP: public IndexAlgorithm
 	private:
 		IndexPage* _head;
 		BufferManager* _bufferManager;
-		MemoryStream* _helperStream;              /* This stream is used as reusable resource to serialize pages */
 
 	private:
 		IndexPage* findIndexPage(IndexPage* start, djondb::string key) const;
@@ -142,6 +141,9 @@ class BPlusIndexP: public IndexAlgorithm
 		void moveElements(IndexPage* source, IndexPage* destination, int startIndex, int endIndex);
 		void initializeIndex();
 		void persistPage(IndexPage* page);
+
+		void loadIndex();
+		void loadPage(IndexPage* page);
 };
 
 #endif // BPLUSINDEXP_H
