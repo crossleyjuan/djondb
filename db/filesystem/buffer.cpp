@@ -29,6 +29,7 @@
 #include "buffermanager.h"
 #include "mmapinputoutputstream.h"
 #include "lock.h"
+#include <assert.h>
 
 Buffer::Buffer(const BufferManager* manager, const char* file, __int64 offset, __int64 bufferLen, __int64 maxLen) {
 	std::string path = getSetting("DATA_DIR");
@@ -147,55 +148,59 @@ std::string* Buffer::readString() {
 void Buffer::writeChar(unsigned char v) {
 	_stream->writeChar(v);
 	_bufferLength += sizeof(unsigned char);
-	_currentPos = _bufferLength;
+	_currentPos =+ sizeof(unsigned char);
 };
 
 /* Write 2 bytes in the output (little endian order) */
 void Buffer::writeShortInt(__int16 v) {
 	_stream->writeShortInt(v);
 	_bufferLength += sizeof(__int16);
-	_currentPos = _bufferLength;
+	_currentPos += sizeof(__int16);
 };
 
 /* Write 4 bytes in the output (little endian order) */
 void Buffer::writeInt(__int32 v) {
 	_stream->writeInt(v);
 	_bufferLength += sizeof(__int32);
-	_currentPos = _bufferLength;
+	_currentPos += sizeof(__int32);
 };
 
 /* Write 4 bytes in the output (little endian order) */
 void Buffer::writeLong(__int64 v) {
 	_stream->writeLong(v);
 	_bufferLength += sizeof(__int64);
-	_currentPos = _bufferLength;
+	_currentPos += sizeof(__int64);
 };
 
 /* Write a 4 byte float in the output */
 void Buffer::writeFloatIEEE(float v) {
 	_stream->writeFloatIEEE(v);
 	_bufferLength += sizeof(float);
-	_currentPos = _bufferLength;
+	_currentPos += sizeof(float);
 };
 
 /* Write a 8 byte double in the output */
 void Buffer::writeDoubleIEEE(double v) {
 	_stream->writeDoubleIEEE(v);
 	_bufferLength += sizeof(double);
-	_currentPos = _bufferLength;
+	_currentPos += sizeof(double);
 };
 
 /* Write a char */
 void Buffer::writeChars(const char* text, __int32 len) {
+	__int64 pos = _stream->currentPos();
 	_stream->writeChars(text, len);
-	_bufferLength = _stream->currentPos();
-	_currentPos = _bufferLength;
+	__int32 written = _stream->currentPos();
+	_bufferLength += written;
+	_currentPos += written;
 };
 
 void Buffer::writeString(const std::string& text) {
+	__int64 pos = _stream->currentPos();
 	_stream->writeString(text);
-	_bufferLength = _stream->currentPos();
-	_currentPos = _bufferLength;
+	__int32 written = _stream->currentPos();
+	_bufferLength += written;
+	_currentPos += written;
 };
 
 void Buffer::seek(__int64 pos, SEEK_DIRECTION direction) {
@@ -221,7 +226,7 @@ const std::string Buffer::fileName() const {
 };
 
 bool Buffer::eof() {
-	return (_bufferLength - _currentPos) == 0; 
+	return (_bufferLength - _currentPos) <= 0; 
 };
 
 void Buffer::close() {

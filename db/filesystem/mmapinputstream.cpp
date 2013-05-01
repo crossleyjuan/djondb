@@ -27,6 +27,7 @@
 #include <boost/crc.hpp>
 #include <limits.h>
 #include <errno.h>
+#include <cmath>
 #include <assert.h>
 
 #ifndef WINDOWS
@@ -50,12 +51,17 @@ MMapInputStream::MMapInputStream(const char* fileName, __int32 offset)
 	_pFile = ::open(fileName, O_RDONLY);
 	if (_pFile > -1) {
 		_len = fileSize(fileName);
+		// this will ensure that the size of the mmap is greater than the size required
+		// avoiding truncate
+		long psize = pageSize();
+		int pages = ceil((double)_len / (double)psize);
+		 __int64 fileLenRequired = pages * psize;
 		bool shared = false;
 		bool advise = true;
 #ifdef LINUX
-		_addr = reinterpret_cast<char *>(mmap(NULL, _len, PROT_READ, MAP_FILE | (shared?MAP_SHARED:MAP_PRIVATE) | MAP_POPULATE , _pFile, offset));
+		_addr = reinterpret_cast<char *>(mmap(NULL, fileLenRequired, PROT_READ, MAP_FILE | (shared?MAP_SHARED:MAP_PRIVATE) | MAP_POPULATE , _pFile, offset));
 #else
-		_addr = reinterpret_cast<char *>(mmap(NULL, _len, PROT_READ, MAP_FILE | (shared?MAP_SHARED:MAP_PRIVATE), _pFile, offset));
+		_addr = reinterpret_cast<char *>(mmap(NULL, fileLenRequired, PROT_READ, MAP_FILE | (shared?MAP_SHARED:MAP_PRIVATE), _pFile, offset));
 #endif
 		_initaddr = _addr;    
 		if (_addr == MAP_FAILED) {

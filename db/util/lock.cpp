@@ -74,7 +74,7 @@ void Lock::wait(__int32 timeout) {
 		if (rt == ETIMEDOUT) {
 			wait = false;
 		} else if (rt > 0) {
-			getLogger(NULL)->error(strerror(errno));
+			getLogger(NULL)->error("pthread_cond_timedwait rt: %d, error: %d, description: %s", rt, errno, strerror(errno));
 			wait = false;
 		}
 	}

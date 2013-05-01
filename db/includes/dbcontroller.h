@@ -27,15 +27,15 @@ class DBController: public Controller
         void initialize(std::string dataDir);
         void shutdown();
 
-        const BSONObj* insert(const char* db, const char* ns, BSONObj* bson);
-		  bool dropNamespace(const char* db, const char* ns);
-        void update(const char* db, const char* ns, BSONObj* bson);
-        void remove(const char* db, const char* ns, const char* documentId, const char* revision);
-        BSONArrayObj* find(const char* db, const char* ns, const char* select, const char* filter) throw (ParseException);
-        BSONObj* findFirst(const char* db, const char* ns, const char* select, const char* filter) throw (ParseException);
+        const BSONObj* insert(const char* db, const char* ns, BSONObj* bson, BSONObj* options = NULL);
+		  bool dropNamespace(const char* db, const char* ns, BSONObj* options = NULL);
+        void update(const char* db, const char* ns, BSONObj* bson, BSONObj* options = NULL);
+        void remove(const char* db, const char* ns, const char* documentId, const char* revision, BSONObj* options = NULL);
+        BSONArrayObj* find(const char* db, const char* ns, const char* select, const char* filter, BSONObj* options = NULL) throw (ParseException);
+        BSONObj* findFirst(const char* db, const char* ns, const char* select, const char* filter, BSONObj* options = NULL) throw (ParseException);
         BSONObj* readBSON(StreamType* stream);
-		  std::vector<std::string>* dbs() const;
-		  std::vector<std::string>* namespaces(const char* db) const;
+		  std::vector<std::string>* dbs(BSONObj* options = NULL) const;
+		  std::vector<std::string>* namespaces(const char* db, BSONObj* options = NULL) const;
 
 		  static void fillRequiredFields(BSONObj* bson);
 	 protected:
@@ -46,7 +46,7 @@ class DBController: public Controller
 		  std::string _dataDir;
 
 	 private:
-		  BSONArrayObj* findFullScan(const char* db, const char* ns, const char* select, FilterParser* parser) throw (ParseException);
+		  BSONArrayObj* findFullScan(const char* db, const char* ns, const char* select, FilterParser* parser, BSONObj* options) throw (ParseException);
 		  void clearCache();
 		  long checkStructure(BSONObj* bson);
 		  void updateIndex(const char* db, const char* ns, Index* index, long filePos);

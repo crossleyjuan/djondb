@@ -37,6 +37,10 @@ class WrapConnection: public node::ObjectWrap
 		static v8::Handle<v8::Value> dbs(const v8::Arguments& args);
 		static v8::Handle<v8::Value> namespaces(const v8::Arguments& args);
 
+		static v8::Handle<v8::Value> beginTransaction(const v8::Arguments& args);
+		static v8::Handle<v8::Value> commitTransaction(const v8::Arguments& args);
+		static v8::Handle<v8::Value> rollbackTransaction(const v8::Arguments& args);
+
 		static v8::Handle<v8::Value> host(const v8::Arguments& args);
 
 		static v8::Persistent<v8::Function> constructor;

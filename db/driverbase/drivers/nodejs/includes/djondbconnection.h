@@ -51,8 +51,11 @@ namespace djondb {
 			BSONObj* findByKey(const std::string& db, const std::string& ns, const std::string& select, const std::string& id);
 			BSONObj* findByKey(const std::string& db, const std::string& ns, const std::string& id);
 			BSONArrayObj* find(const std::string& db, const std::string& ns);
+			BSONArrayObj* find(const std::string& db, const std::string& ns, const BSONObj& options);
 			BSONArrayObj* find(const std::string& db, const std::string& ns, const std::string& filter);
+			BSONArrayObj* find(const std::string& db, const std::string& ns, const std::string& filter, const BSONObj& options);
 			BSONArrayObj* find(const std::string& db, const std::string& ns, const std::string& select, const std::string& filter);
+			BSONArrayObj* find(const std::string& db, const std::string& ns, const std::string& select, const std::string& filter, const BSONObj& options);
 			bool update(const std::string& db, const std::string& ns, const std::string& json);
 			bool update(const std::string& db, const std::string& ns, const BSONObj& bson);
 			bool remove(const std::string& db, const std::string& ns, const std::string& id, const std::string& revision);

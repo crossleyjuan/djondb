@@ -42,6 +42,7 @@ class IndexPage {
 
 		void moveElements(int startPoint, int count);
 		void movePointers(int startPoint, int count);
+
 };
 
 class BPlusIndex: public IndexAlgorithm

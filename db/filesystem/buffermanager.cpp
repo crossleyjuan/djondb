@@ -32,10 +32,10 @@
 #include <stdlib.h>
 #include <errno.h>
 
-__int64 TX_DEFAULT_BUFFER_SIZE = pageSize() * 20;
+__int64 DEFAULT_BUFFER_SIZE = pageSize() * 20;
 
 BufferManager::BufferManager(const char* file) {
-	_buffersSize = TX_DEFAULT_BUFFER_SIZE;
+	_buffersSize = DEFAULT_BUFFER_SIZE;
 	_buffersCount = 0;
 	_dataDir = getSetting("DATA_DIR");
 	_lockActiveBuffers = new Lock();
@@ -230,7 +230,7 @@ Buffer* BufferManager::getCurrentBuffer(__int32 minimumSize, bool forceNewBuffer
 		result->seek(result->currentPos());
 	}
 	if ((forceNewBuffer) || (result == NULL) 
-			|| ((_buffersSize - result->currentPos()) < minimumSize)) {
+			|| (result->spaceLeft() < minimumSize)) {
 
 		bool newBuffer;
 		int flag = 0x01;

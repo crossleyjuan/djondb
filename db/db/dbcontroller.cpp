@@ -115,11 +115,15 @@ void DBController::initialize(std::string dataDir) {
 			StreamType* stream = StreamManager::getStreamManager()->open(db->c_str(), ns->c_str(), type);
 
 			if (type == INDEX_FTYPE) {
+				std::set<std::string> skeys;
+				skeys.insert("_id");
+
+				IndexAlgorithm* impl = IndexFactory::indexFactory.index(db->c_str(), ns->c_str(), skeys);
+				/* 
 				long currentPos = stream->currentPos();
 				stream->seek(0);
 
 				int records = 0;
-				IndexAlgorithm* impl = NULL;
 				while (!stream->eof()) {
 					BSONObj* obj = readBSON(stream);
 
@@ -129,7 +133,6 @@ void DBController::initialize(std::string dataDir) {
 							std::string key = i->first;
 							skeys.insert(key);
 						}
-						impl = IndexFactory::indexFactory.index(db->c_str(), ns->c_str(), skeys);
 					}
 					long indexPos = stream->readLong();
 					long posData = stream->readLong();
@@ -142,6 +145,7 @@ void DBController::initialize(std::string dataDir) {
 				stream->seek(currentPos);
 
 				if (_logger->isInfo()) _logger->info("db: %s, ns: %s, Index initialized. Records: %d", db->c_str(), ns->c_str(), records);
+			*/
 			}
 		}
 	}

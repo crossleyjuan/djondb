@@ -171,7 +171,9 @@ TxBufferManager::~TxBufferManager() {
 	delete _controlFile;
 	delete _lockActiveBuffers;
 	// Releases the waits
+	_lockWait->lock();
 	_lockWait->notify();
+	_lockWait->unlock();
 	delete _lockWait;
 	delete _activeBuffers;
 	delete _vactiveBuffers;
@@ -281,7 +283,9 @@ void TxBufferManager::addBuffer(TxBuffer* buffer) {
 	_vactiveBuffers->push_back(buffer);
 	_buffersCount++;
 	if (_log->isDebug()) _log->debug(2, "_lockActiveBuffers->unlock() %d", (long)_lockActiveBuffers);
+	_lockWait->lock();
 	_lockWait->notify();
+	_lockWait->unlock();
 	_lockActiveBuffers->unlock();
 }
 
@@ -400,6 +404,10 @@ void TxBufferManager::stopMonitor() {
 		if (_log->isDebug()) _log->debug(2, "x  TxBufferManager::stopMonitor() before notify");
 		_lockActiveBuffers->notify();
 		_lockActiveBuffers->unlock();
+		// Release any thread that could be waiting for this lock
+		_lockWait->lock();
+		_lockWait->notify();
+		_lockWait->unlock();
 		if (_log->isDebug()) _log->debug(2, "x  TxBufferManager::stopMonitor() after notify");
 		if (_monitorThread != NULL) _monitorThread->join();
 		if (_log->isDebug()) _log->debug(2, "x  TxBufferManager::stopMonitor() after join");
@@ -424,7 +432,7 @@ void* TxBufferManager::monitorBuffers(void* arg) {
 
 void TxBufferManager::flushBuffer() {
 	// This achieves the Producer/Consumer pattern, just waits for elements to flush
-	_lockWait->wait(1);
+	_lockWait->wait();
 	_flushingBuffers = true;
 	if (buffersCount() > 1) {
 		if (_log->isDebug()) _log->debug(2, "TxBufferManager::flushBuffer()");

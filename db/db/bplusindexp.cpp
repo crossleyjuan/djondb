@@ -128,7 +128,7 @@ Index::Index(const Index& orig) {
 	this->indexPos = orig.indexPos;
 }
 
-BPlusIndexP::BPlusIndexP(std::set<std::string> keys, const char* fileName): IndexAlgorithm(keys)
+BPlusIndexP::BPlusIndexP(const char* fileName)
 {
 	_bufferManager = new BufferManager(fileName);
 
@@ -194,6 +194,14 @@ bool IndexPage::isLeaf() const {
 	return true;
 }
 
+bool IndexPage::isLoaded() const {
+	return _loaded;
+}
+
+void IndexPage::setLoaded(bool loaded) {
+	_loaded = loaded;
+}
+
 void IndexPage::movePointers(int startPoint, int count) {
 	shiftRightArray((void**)pointers, startPoint, count, BUCKET_MAX_ELEMENTS + 1);
 }
@@ -206,8 +214,11 @@ bool IndexPage::isFull() const {
 	return size >= BUCKET_MAX_ELEMENTS;
 }
 
-Index* BPlusIndexP::findIndex(IndexPage* start, djondb::string key) const {
+Index* BPlusIndexP::findIndex(IndexPage* start, djondb::string key) {
 	Logger* log = getLogger(NULL);
+	if (!start->isLoaded()) {
+		start->loadPage(_bufferManager);
+	}
 	for (int x = 0; x < start->size; x++) {
 		Index* current = start->elements[x];
 		//INDEXPOINTERTYPE testKey = current->key->toChar();
@@ -232,8 +243,11 @@ Index* BPlusIndexP::findIndex(IndexPage* start, djondb::string key) const {
 	}
 }
 
-IndexPage* BPlusIndexP::findIndexPage(IndexPage* start, djondb::string key) const {
+IndexPage* BPlusIndexP::findIndexPage(IndexPage* start, djondb::string key) {
 	Logger* log = getLogger(NULL);
+	if (!start->isLoaded()) {
+		start->loadPage(_bufferManager);
+	}
 	if (start->isLeaf()) {
 		return start;
 	} else {
@@ -260,7 +274,6 @@ IndexPage* BPlusIndexP::findIndexPage(IndexPage* start, djondb::string key) cons
 	}
 }
 
-
 void refreshParentRelationship(IndexPage* page) {
 	for (int x = 0; x < BUCKET_MAX_ELEMENTS + 1; x++) {
 		if (page->pointers[x] != NULL) {
@@ -285,6 +298,7 @@ IndexPage::IndexPage() {
 	parentElement = NULL;
 	size = 0;
 	_leaf = true;
+	_loaded = false;
 	this->_bufferIndex = -1;
 	this->_bufferPos = -1;
 	leftSibling = NULL;
@@ -344,6 +358,14 @@ void BPlusIndexP::splitAddLeaf(IndexPage* page, Index* index) {
 	int midPoint = (BUCKET_MAX_ELEMENTS / 2);
 	copyArray((void**)tmpelements, (void**)page->elements, 0, midPoint, 0);
 	page->size = (BUCKET_MAX_ELEMENTS / 2) + 1;
+	// Clean up the elements moved to the rightPage
+	for (int x = page->size; x < BUCKET_MAX_ELEMENTS; x++) {
+		page->elements[x] = NULL;
+		page->pointers[x] = NULL;
+	}
+	// cleans the last one
+	page->pointers[BUCKET_MAX_ELEMENTS] = NULL;
+
 	//copyArray((void**)tmppointers, (void**)page->pointers, 0, midPoint + 1, 0);
 	copyArray((void**)tmpelements, (void**)rightPage->elements, midPoint + 1, BUCKET_MAX_ELEMENTS, 0);
 	rightPage->size = (BUCKET_MAX_ELEMENTS / 2) + 1;
@@ -398,6 +420,13 @@ void BPlusIndexP::splitAddInner(IndexPage* page, Index* index, IndexPage* rightP
 	page->size = (BUCKET_MAX_ELEMENTS / 2) + 1;
 	copyArray((void**)tmpelements, (void**)newRightPage->elements, midPoint + 1, BUCKET_MAX_ELEMENTS, 0);
 	copyArray((void**)tmppointers, (void**)newRightPage->pointers, midPoint + 2, BUCKET_MAX_ELEMENTS + 1, 1);
+	// Clean up the elements moved to the rightPage
+	for (int x = page->size; x < BUCKET_MAX_ELEMENTS; x++) {
+		page->elements[x] = NULL;
+		page->pointers[x] = NULL;
+	}
+	// cleans the last one
+	page->pointers[BUCKET_MAX_ELEMENTS] = NULL;
 
 	newRightPage->size = (BUCKET_MAX_ELEMENTS / 2) + 1;
 	refreshParentRelationship(newRightPage);
@@ -490,7 +519,7 @@ std::list<Index*> BPlusIndexP::find(FilterParser* parser) {
 	std::list<Index*> result;
 
 	if (_head != NULL) {
-		std::list<Index*> partial = _head->find(parser);
+		std::list<Index*> partial = _head->find(_bufferManager, parser);
 		result.insert(result.begin(), partial.begin(), partial.end());
 	}
 
@@ -544,10 +573,16 @@ void IndexPage::debug() const {
 }
 
 
-std::list<Index*> IndexPage::find(FilterParser* parser) const {
+std::list<Index*> IndexPage::find(BufferManager* manager, FilterParser* parser) {
+	if (!isLoaded()) {
+		loadPage(manager);
+	}
 	std::list<Index*> result;
 	for (int x = 0; x < size; x++) {
 		BSONObj* key = elements[x]->key;
+		if (key->getString("_id").compare("c597-43e1-ae9b-6f5451b28295") == 0) {
+			cout << "Hey!" << endl;
+		}
 		bool match = false;
 		ExpressionResult* expresult = parser->eval(*key);
 		if (expresult->type() == ExpressionResult::RT_BOOLEAN) {
@@ -561,7 +596,7 @@ std::list<Index*> IndexPage::find(FilterParser* parser) const {
 	for (int x = 0; x <= size; x++) {
 		IndexPage* innerPage = pointers[x];
 		if (innerPage != NULL) {
-			std::list<Index*> inner = innerPage->find(parser);
+			std::list<Index*> inner = innerPage->find(manager, parser);
 			result.insert(result.begin(), inner.begin(), inner.end());
 		}
 	}
@@ -609,7 +644,7 @@ Index* retrieveIndexElement(MemoryStream* stream) {
 }
 
 void persistPointer(MemoryStream* stream, IndexPage* pointer) {
-	if (pointer != NULL) {
+	if ((pointer != NULL) && (pointer->bufferIndex() > -1)) {
 		stream->writeInt(1);
 		stream->writeInt(pointer->bufferIndex());
 		stream->writeInt(pointer->bufferPos());
@@ -632,6 +667,7 @@ IndexPage* retrievePointer(MemoryStream* stream) {
 		stream->readInt();
 		stream->readInt();
 	}
+	//assert((result == NULL) || (result->bufferIndex() > -1));
 	return result;
 }
 
@@ -642,52 +678,80 @@ void BPlusIndexP::loadIndex() {
 	__int32 index = buffer->readLong();
 	__int64 pos = buffer->readLong();
 
+	__int32 keysCount = buffer->readInt();
+	for (int x = 0; x < keysCount; x++) {
+		std::string* key = buffer->readString();
+		_keys.insert(*key);
+		delete key;
+	}
 	_head = new IndexPage();
 	_head->setBufferIndex(index);
 	_head->setBufferPos(pos);
-	loadPage(_head);
+	_head->loadPage(_bufferManager);
 }
 
-void BPlusIndexP::loadPage(IndexPage* page) {
-	Buffer* buffer = _bufferManager->getBuffer(page->bufferIndex());
-	buffer->seek(page->bufferPos());
+void BPlusIndexP::setKeys(std::set<std::string> keys) {
+	IndexAlgorithm::setKeys(keys);
+	Buffer* buffer = _bufferManager->getBuffer(0);
 
-	__int32 size = buffer->readInt();
+	buffer->seek(sizeof(__int64) + sizeof(__int64));
+	buffer->writeInt(_keys.size());
+	for (std::set<std::string>::iterator i = keys.begin(); i != keys.end(); i++) {
+		buffer->writeString(*i);
+	}
+}
+
+void IndexPage::loadPage(BufferManager* manager) {
+	Buffer* buffer = manager->getBuffer(bufferIndex());
+	buffer->seek(bufferPos());
+
+	__int32 bsize = buffer->readInt();
 	char* data = buffer->readChars();
 
-	MemoryStream* helperStream = new MemoryStream(data, size);
+	MemoryStream* helperStream = new MemoryStream(data, bsize);
 	helperStream->seek(0);
 
 	helperStream->readInt(); // BUCKET_MAX_ELEMENTS
 
-	page->size = helperStream->readInt();
+	size = helperStream->readInt();
 
+	IndexPage* tempPointer = NULL;
 	for (int x = 0; x < BUCKET_MAX_ELEMENTS; x++) {
 		Index* index = retrieveIndexElement(helperStream);
-		page->elements[x] = index;
+		elements[x] = index;
 
-		IndexPage* pointer = retrievePointer(helperStream);
-		page->pointers[x] = pointer;
+		tempPointer = retrievePointer(helperStream);
+		pointers[x] = tempPointer;
+		if (tempPointer != NULL) {
+			tempPointer->parentElement = this;
+		}
 	}	
 
 	// Recovers the last pointer
-	page->pointers[BUCKET_MAX_ELEMENTS] = retrievePointer(helperStream);
+	tempPointer = retrievePointer(helperStream);
+	pointers[BUCKET_MAX_ELEMENTS] = tempPointer;
+	if (tempPointer != NULL) {
+		tempPointer->parentElement = this;
+	}
 
 	// Recovers siblings 
-	page->leftSibling = retrievePointer(helperStream);
-	page->rightSibling = retrievePointer(helperStream);
-	page->parentElement = retrievePointer(helperStream);
+	leftSibling = retrievePointer(helperStream);
+	rightSibling = retrievePointer(helperStream);
+	setLoaded(true);
 
-	for (int x = 0; x <= BUCKET_MAX_ELEMENTS; x++) {
+	/* 
+		for (int x = 0; x <= BUCKET_MAX_ELEMENTS; x++) {
 		IndexPage* temp = page->pointers[x];
-		if (temp != NULL) {
-			loadPage(temp);
+		if ((temp != NULL) && (temp->bufferIndex() > -1)) {
+		loadPage(temp);
 		}
-	}
+		}
+		*/
 	delete helperStream;
 }
 
 void BPlusIndexP::persistPage(IndexPage* page) {
+	//assert((page->size > 0) || (page->parentElement == NULL));
 	Buffer* buffer = NULL;
 	MemoryStream* helperStream = new MemoryStream();
 	helperStream->seek(0);
@@ -711,7 +775,6 @@ void BPlusIndexP::persistPage(IndexPage* page) {
 	// Persist siblings 
 	persistPointer(helperStream, page->leftSibling);
 	persistPointer(helperStream, page->rightSibling);
-	persistPointer(helperStream, page->parentElement);
 
 	char* pageContent = helperStream->toChars();
 	__int32 size = helperStream->size();
@@ -743,6 +806,8 @@ void BPlusIndexP::persistPage(IndexPage* page) {
 		controlBuffer->writeLong(page->bufferIndex());
 		controlBuffer->writeLong(page->bufferPos());
 	}
+
+	page->setLoaded(true);
 
 	delete helperStream;
 }

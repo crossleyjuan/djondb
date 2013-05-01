@@ -433,7 +433,7 @@ v8::Handle<v8::Value> beginTransaction(const v8::Arguments& args) {
 	bool result = __djonConnection->beginTransaction();
 
 	if (result) {
-		printf("Transaction started");
+		printf("Transaction started\n");
 	} else {
 		printf("Error: Transaction not started");
 	}
@@ -452,7 +452,7 @@ v8::Handle<v8::Value> commitTransaction(const v8::Arguments& args) {
 	}
 	__djonConnection->commitTransaction();
 
-	printf("Transaction committed");
+	printf("Transaction committed\n");
 	return v8::String::New("");
 }
 
@@ -468,7 +468,7 @@ v8::Handle<v8::Value> rollbackTransaction(const v8::Arguments& args) {
 	}
 	__djonConnection->rollbackTransaction();
 
-	printf("Transaction rollbacked");
+	printf("Transaction rollbacked\n");
 	return v8::String::New("");
 }
 

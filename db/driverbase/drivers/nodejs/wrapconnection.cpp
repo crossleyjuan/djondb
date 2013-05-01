@@ -108,6 +108,12 @@ void WrapConnection::Init(Handle<Object> target) {
 			FunctionTemplate::New(namespaces)->GetFunction());
 	tpl->PrototypeTemplate()->Set(String::NewSymbol("host"),
 			FunctionTemplate::New(host)->GetFunction());
+	tpl->PrototypeTemplate()->Set(String::NewSymbol("beginTransaction"),
+			FunctionTemplate::New(beginTransaction)->GetFunction());
+	tpl->PrototypeTemplate()->Set(String::NewSymbol("commitTransaction"),
+			FunctionTemplate::New(commitTransaction)->GetFunction());
+	tpl->PrototypeTemplate()->Set(String::NewSymbol("rollbackTransaction"),
+			FunctionTemplate::New(rollbackTransaction)->GetFunction());
 
 	constructor = Persistent<Function>::New(tpl->GetFunction());
 	//target->Set(String::NewSymbol("WrapConnection"), constructor);
@@ -376,6 +382,54 @@ v8::Handle<v8::Value> WrapConnection::namespaces(const v8::Arguments& args) {
 	}
 	delete ns;
 	return scope.Close(result);
+}
+
+v8::Handle<v8::Value> WrapConnection::beginTransaction(const v8::Arguments& args) {
+	if (args.Length() > 0) {
+		return v8::ThrowException(v8::String::New("usage: beginTransaction()"));
+	}
+
+	v8::HandleScope handle_scope;
+
+	WrapConnection* obj = ObjectWrap::Unwrap<WrapConnection>(args.This());
+	if ((obj == NULL) || (obj->_con == NULL)) {
+		return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
+	}
+	obj->_con->beginTransaction();
+
+	return v8::Undefined();
+}
+
+v8::Handle<v8::Value> WrapConnection::commitTransaction(const v8::Arguments& args) {
+	if (args.Length() > 0) {
+		return v8::ThrowException(v8::String::New("usage: commitTransaction()"));
+	}
+
+	v8::HandleScope handle_scope;
+
+	WrapConnection* obj = ObjectWrap::Unwrap<WrapConnection>(args.This());
+	if ((obj == NULL) || (obj->_con == NULL)) {
+		return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
+	}
+	obj->_con->commitTransaction();
+
+	return v8::Undefined();
+}
+
+v8::Handle<v8::Value> WrapConnection::rollbackTransaction(const v8::Arguments& args) {
+	if (args.Length() > 0) {
+		return v8::ThrowException(v8::String::New("usage: rollbackTransaction()"));
+	}
+
+	v8::HandleScope handle_scope;
+
+	WrapConnection* obj = ObjectWrap::Unwrap<WrapConnection>(args.This());
+	if ((obj == NULL) || (obj->_con == NULL)) {
+		return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
+	}
+	obj->_con->rollbackTransaction();
+
+	return v8::Undefined();
 }
 
 Handle<Value> WrapConnection::host(const v8::Arguments& args) {

@@ -358,7 +358,6 @@ void MMapInputOutputStream::writeChar (unsigned char v) {
 	memcpy(_addr, (char*)&v, 1);
 	_addr++;
 	_pos++;
-	_len++;
 }
 
 void MMapInputOutputStream::checkAvailableSpace() {
@@ -403,7 +402,6 @@ void MMapInputOutputStream::writeFloatIEEE (float v) {
 	memcpy(_addr, (char*)&v, sizeof(float));
 	_addr += sizeof(float);
 	_pos += sizeof(float);
-	_len += sizeof(float);
 }
 
 /* Write a 8 byte double in the output */
@@ -412,7 +410,6 @@ void MMapInputOutputStream::writeDoubleIEEE (double v) {
 	memcpy(_addr, (char*)&v, sizeof(double));
 	_addr += sizeof(double);
 	_pos += sizeof(double);
-	_len += sizeof(double);
 }
 
 /* Write a char */
@@ -420,7 +417,6 @@ void MMapInputOutputStream::writeChars(const char* text, __int32 len) {
 	writeData<__int32>(len);
 	memcpy(_addr, text, len);
 	_addr += len;
-	_len += len;
 	_pos += len;
 }
 

@@ -75,7 +75,7 @@ class IndexPage {
 		bool isLeaf() const;
 		bool isFull() const;
 		bool _leaf;
-		std::list<Index*> find(FilterParser* parser) const;
+		std::list<Index*> find(BufferManager* manager, FilterParser* parser);
 		int findInsertPosition(Index* index) const;
 
 		void moveElements(int startPoint, int count);
@@ -98,10 +98,26 @@ class IndexPage {
 		}
 
 		int size;
-	private:
+		/**
+		 * @brief The property loaded indicates if the elements are ready to be read or the
+		 * page needs to be loaded from disk
+		 *
+		 * @return 
+		 */
+		bool isLoaded() const;
+		/**
+		 * @brief The property loaded indicates if the elements are ready to be read or the
+		 * page needs to be loaded from disk
+		 *
+		 * @param loaded
+		 */
+		void setLoaded(bool loaded);
 
+		void loadPage(BufferManager* manager);
+	private:
 		__int32 _bufferIndex; /* this contains the index of the buffer where is persisted */
 		__int32 _bufferPos; /* This contains the position within the buffer */
+		bool _loaded;
 };
 
 /**
@@ -110,7 +126,7 @@ class IndexPage {
 class BPlusIndexP: public IndexAlgorithm
 {
 	public:
-		BPlusIndexP(std::set<std::string> keys, const char* fileName);
+		BPlusIndexP(const char* fileName);
 		virtual ~BPlusIndexP();
 
 		virtual void add(const BSONObj& elem, djondb::string documentId, long filePos, long indexPos);
@@ -119,6 +135,7 @@ class BPlusIndexP: public IndexAlgorithm
 		virtual std::list<Index*> find(FilterParser* parser);
 
 		void debug();
+		virtual void setKeys(std::set<std::string> keys);
 		
 	protected:
 	private:
@@ -126,8 +143,8 @@ class BPlusIndexP: public IndexAlgorithm
 		BufferManager* _bufferManager;
 
 	private:
-		IndexPage* findIndexPage(IndexPage* start, djondb::string key) const;
-		Index* findIndex(IndexPage* start, djondb::string key) const;
+		IndexPage* findIndexPage(IndexPage* start, djondb::string key);
+		Index* findIndex(IndexPage* start, djondb::string key);
 		void insertIndexElement(IndexPage* page, Index* index);
 		void dispose(IndexPage* page);
 		void createRoot(Index* element, IndexPage* left, IndexPage* right);
@@ -143,7 +160,6 @@ class BPlusIndexP: public IndexAlgorithm
 		void persistPage(IndexPage* page);
 
 		void loadIndex();
-		void loadPage(IndexPage* page);
 };
 
 #endif // BPLUSINDEXP_H

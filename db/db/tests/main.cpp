@@ -33,6 +33,7 @@
 #include <math.h>
 #include "fileoutputstream.h"
 #include "fileinputstream.h"
+//#include "bplusindexp.h"
 #include "bplusindex.h"
 #include "filterparser.h"
 #include "indexfactory.h"
@@ -48,6 +49,7 @@
 
 #include    <antlr3treeparser.h>
 #include    <antlr3defs.h>
+#include <memory>
 
 using namespace std;
 
@@ -111,6 +113,7 @@ class TestDB: public testing::Test
 			std::set<std::string> keys;
 			keys.insert("_id");
 			std::auto_ptr<BPlusIndex> tree(new BPlusIndex(keys));
+			//std::auto_ptr<BPlusIndexP> tree(new BPlusIndexP(keys, "testIndex"));
 
 			Logger* log = getLogger(NULL);
 
@@ -917,7 +920,7 @@ TEST_F(TestDB, testManualIndex)
 	cout << "\ntestManualIndex" << endl;
 	std::set<std::string> keys;
 	keys.insert("_id");
-	std::auto_ptr<BPlusIndex> tree(new BPlusIndex(keys));
+	std::auto_ptr<BPlusIndexP> tree(new BPlusIndexP(keys));
 
 	Logger* log = getLogger(NULL);
 
@@ -992,7 +995,7 @@ TEST_F(TestDB, testMassiveInsertIndex)
 {
 	std::set<std::string> keys;
 	keys.insert("_id");
-	std::auto_ptr<BPlusIndex> tree(new BPlusIndex(keys));
+	std::auto_ptr<BPlusIndexP> tree(new BPlusIndexP(keys));
 
 	Logger* log = getLogger(NULL);
 
