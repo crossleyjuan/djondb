@@ -37,6 +37,7 @@ bool __running;
 char* _host = "localhost";
 int _port = 1243;
 
+/*
 TEST(TestDriver, testConnection) {
 	cout << "\ntestConnection\n" << endl;
 
@@ -52,6 +53,7 @@ TEST(TestDriver, testConnection) {
 		FAIL() << "Cannot establish a connection with the server";
 	}
 }
+*/
 
 TEST(TestDriver, testDbsNamespaces) {
 	DjondbConnection* conn = DjondbConnectionManager::getConnection(_host);
@@ -350,22 +352,22 @@ TEST(TestDriver, testUpdate) {
 	for (x =0; x < count; x++) {
 		std::auto_ptr<std::string> guid(fisIds->readString());
 
-		BSONObj obj;
-		obj.add("_id", const_cast<char*>(guid->c_str()));
+		BSONObj* obj = conn->findByKey("db", "driverbase.test", guid->c_str());
 
 		idsUpdated.push_back(*guid.get());
 		char* temp = (char*)malloc(100);
 		memset(temp, 0, 100);
 		memset(temp, 'b', 99);
 		int len = strlen(temp);
-		obj.add("content", temp);
+		obj->add("content", temp);
 		free(temp);
 
-		conn->update("db", "driverbase.test", obj);
+		conn->update("db", "driverbase.test", *obj);
 
 		if ((count > 9) && (x % (count / 10)) == 0) {
 			cout << "\n" << x << " Records received" << endl;
 		}
+		delete obj;
 	}
 
 	log->stopTimeRecord();
@@ -469,7 +471,6 @@ TEST(TestDriver, testTransactions) {
 		ontx.add("name", "TestOutTx");
 		connection->insert("testdb", "tx", ontx);
 
-
 		// Now the transaction is started
 		const char* trans = connection->beginTransaction();
 
@@ -513,7 +514,7 @@ TEST(TestDriver, testTransactions) {
 		res2 = connection->findByKey("testdb", "tx", "001");
 		EXPECT_TRUE(res2 != NULL);
 		if (res2 != NULL) {
-			EXPECT_TRUE(res2->getString("id").compare("id") == 0);
+			EXPECT_TRUE(res2->getString("_id").compare("001") == 0);
 			delete res2;
 		}
 
