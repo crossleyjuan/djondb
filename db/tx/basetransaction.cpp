@@ -183,7 +183,9 @@ BSONArrayObj* BaseTransaction::find(const char* db, const char* ns, const char* 
 	std::list<TransactionOperation*>* operations = findOperations(db, ns);
 	LinkedMap<std::string, BSONObj*> map(compareStrings);
 
-	BSONArrayObj* origList = _controller->find(db, ns, select, filter, options);
+	// this uses the "*" to select all the fields, later in this method
+	// the correct select will be used to create the result
+	BSONArrayObj* origList = _controller->find(db, ns, "*", filter, options);
 	if (origList != NULL) {
 		for (BSONArrayObj::iterator itOrig = origList->begin(); itOrig != origList->end(); itOrig++) {
 			BSONObj* obj = *itOrig;
@@ -275,7 +277,9 @@ BSONArrayObj* BaseTransaction::find(const char* db, const char* ns, const char* 
 	BSONArrayObj* result = new BSONArrayObj();
 	for (LinkedMap<std::string, BSONObj*>::iterator it = map.begin(); it != map.end(); it++) {
 		BSONObj* r = it->second;
-		result->add(*r);
+		BSONObj* bresult = r->select(select);
+		result->add(*bresult);
+		delete bresult;
 	}
 	map.clear();
 	delete parser;
