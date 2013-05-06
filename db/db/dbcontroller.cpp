@@ -50,7 +50,6 @@ DBController::DBController()
 
 DBController::~DBController()
 {
-	delete _logger;
 }
 
 void DBController::shutdown() {

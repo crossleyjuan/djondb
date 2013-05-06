@@ -55,7 +55,6 @@ int _tmain(int argc, _TCHAR* argv[])
 		}
 		Thread::sleep(5000);
 	}
-	delete log;
 	return 0;
 }
 

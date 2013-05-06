@@ -15,6 +15,15 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bsonbufferedarrayobj.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bsonbufferedcontent.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bsonbufferedobj.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="bsoninputstream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -30,10 +39,22 @@
     <ClInclude Include="fileinputstream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="fileinputstreamw32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="fileoutputstream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="inputoutputstream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="inputstream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="memorystream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mmapinputstream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="networkinputstream.h">
@@ -47,6 +68,12 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="bsonbufferedarrayobj.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bsonbufferedobj.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="bsoninputstream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -59,7 +86,16 @@
     <ClCompile Include="fileinputstream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="fileinputstreamw32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="fileoutputstream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="memorystream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mmapinputstream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="networkinputstream.cpp">

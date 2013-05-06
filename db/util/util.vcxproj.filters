@@ -15,63 +15,72 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="util\DateTime.h">
+    <ClInclude Include="datetime.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="defs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="util\dtime.h">
+    <ClInclude Include="djon_error_codes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="util\errorHandle.h">
+    <ClInclude Include="dtime.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="util\fileutil.h">
+    <ClInclude Include="errorhandle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="util\logger.h">
+    <ClInclude Include="fileutil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="util\stringfunctions.h">
+    <ClInclude Include="logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="util\threads.h">
+    <ClInclude Include="settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stringfunctions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="threads.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="util\version.h">
+    <ClInclude Include="version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="util\DateTime.cpp">
+    <ClCompile Include="datetime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="util\dtime.cpp">
+    <ClCompile Include="dtime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="util\errorHandle.cpp">
+    <ClCompile Include="errorhandle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="util\fileutil.cpp">
+    <ClCompile Include="fileutil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="util\logger.cpp">
+    <ClCompile Include="logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="util\stringfunctions.cpp">
+    <ClCompile Include="settings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="util\threads.cpp">
+    <ClCompile Include="stringfunctions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="threads.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="util\version.cpp">
+    <ClCompile Include="version.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

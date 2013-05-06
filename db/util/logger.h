@@ -48,6 +48,7 @@ class Logger {
 
 	public:
 		Logger(void* clazz);
+		virtual ~Logger();
 		bool isDebug();
 		bool isInfo();
 		bool isWarn();

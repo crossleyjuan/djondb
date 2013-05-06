@@ -72,7 +72,6 @@ DjondbConnection::DjondbConnection(const DjondbConnection& orig) {
 DjondbConnection::~DjondbConnection()
 {
 	internalClose();
-	delete _logger;
 }
 
 bool DjondbConnection::open() {

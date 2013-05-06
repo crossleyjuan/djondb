@@ -15,21 +15,21 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="connection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="connectionmanager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="djondb_client.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="djondbconnection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="djondbconnectionmanager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="connection.cpp">
+    <ClCompile Include="djondbconnection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="connectionmanager.cpp">
+    <ClCompile Include="djondbconnectionmanager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

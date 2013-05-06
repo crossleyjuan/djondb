@@ -27,10 +27,25 @@
     <ClInclude Include="commandwriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="dropnamespacecommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="findcommand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="insertcommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="removecommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="showdbscommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shownamespacescommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shutdowncommand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="updatecommand.h">
@@ -50,10 +65,25 @@
     <ClCompile Include="commandwriter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="dropnamespacecommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="findcommand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="insertcommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="removecommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="showdbscommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shownamespacescommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shutdowncommand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="updatecommand.cpp">

@@ -248,6 +248,10 @@ Logger::Logger(void* clazz) {
 	}
 }
 
+Logger::~Logger() {
+	cout << "end" << endl;
+}
+
 void Logger::print(std::string type, std::string text) {
 #ifndef WINDOWS
 	if (isDaemon()) {

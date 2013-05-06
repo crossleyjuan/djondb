@@ -15,10 +15,40 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="baseexpression.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="binaryexpression.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="bplusindex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="constantexpression.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="dbcontroller.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dbfileinputstream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dbfilestream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="expressionresult.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="filter_expressionLexer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="filter_expressionParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="filterdefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="filterparser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="index.h">
@@ -30,12 +60,48 @@
     <ClInclude Include="indexmanager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="simpleexpression.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="streammanager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="unaryexpression.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="binaryexpression.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="bplusindex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="constantexpression.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="dbcontroller.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dbfileinputstream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dbfilestream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="expressionresult.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="filter_expressionLexer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="filter_expressionParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="filterdefs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="filterparser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="indexfactory.cpp">
@@ -44,5 +110,17 @@
     <ClCompile Include="indexmanager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="simpleexpression.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="streammanager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="unaryexpression.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\filtergrammar\filter.tokens" />
   </ItemGroup>
 </Project>

@@ -12,6 +12,8 @@
 
 #define SERVER_PORT 1243
 
+#include "util.h"
+
 class NetworkService {
 public:
     NetworkService();
@@ -25,6 +27,7 @@ public:
 	 void setRunning(bool);
 private:
 	 bool _running;
+	 Logger* _log;
 };
 
 

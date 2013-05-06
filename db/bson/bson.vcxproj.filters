@@ -24,10 +24,16 @@
     <ClInclude Include="bsoncontent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="bsondefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="bsonobj.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="bsonparser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bsonutil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="defs.h">
@@ -45,6 +51,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="bsonparser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bsonutil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
