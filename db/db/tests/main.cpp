@@ -33,8 +33,8 @@
 #include <math.h>
 #include "fileoutputstream.h"
 #include "fileinputstream.h"
-//#include "bplusindexp.h"
-#include "bplusindex.h"
+#include "bplusindexp.h"
+//#include "bplusindex.h"
 #include "filterparser.h"
 #include "indexfactory.h"
 #include "math.h"
@@ -112,8 +112,9 @@ class TestDB: public testing::Test
 		{
 			std::set<std::string> keys;
 			keys.insert("_id");
-			std::auto_ptr<BPlusIndex> tree(new BPlusIndex(keys));
-			//std::auto_ptr<BPlusIndexP> tree(new BPlusIndexP(keys, "testIndex"));
+			//std::auto_ptr<BPlusIndex> tree(new BPlusIndex(keys));
+			std::auto_ptr<BPlusIndexP> tree(new BPlusIndexP("testIndex"));
+			tree->setKeys(keys);
 
 			Logger* log = getLogger(NULL);
 
@@ -1075,6 +1076,9 @@ TEST_F(TestDB, testComplexIndex)
 	cout << "\ntestComplexIndex" << endl;
 	cout << "testing 10 ids" << endl;
 	std::vector<std::string> ids = generateGuids(10);
+	for (std::vector<std::string>::iterator i = ids.begin(); i != ids.end(); i++) {
+		cout << i->c_str() << endl;
+	}
 	testIndex(ids);
 	/*
 		cout << "testing 100 ids" << endl;

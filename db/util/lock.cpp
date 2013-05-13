@@ -35,13 +35,12 @@ Lock::Lock() {
 	pthread_mutexattr_settype(&mutexattr, PTHREAD_MUTEX_RECURSIVE);
 
 	pthread_mutex_init(&_mutexLock, &mutexattr);
-	
-	pthread_cond_init(&_cond, NULL);
+
+	_condInitialized = false;
 }
 
 Lock::~Lock() {
 	pthread_mutex_destroy(&_mutexLock);
-	pthread_cond_destroy(&_cond);
 }
 
 void Lock::lock() {
@@ -56,20 +55,35 @@ void Lock::unlock() {
 	pthread_mutex_unlock(&_mutexLock);
 }
 
+void Lock::initializeCondition() {
+	if (!_condInitialized) {
+		pthread_cond_init(&_cond, NULL);
+		_condInitialized = true;
+	}
+}
+
+void Lock::destroyCondition() {
+	if (_condInitialized) {
+		pthread_cond_destroy(&_cond);
+		_condInitialized = false;
+	}
+}
+
 void Lock::wait() {
-	lock();
+	initializeCondition();
 	pthread_cond_wait(&_cond, &_mutexLock);
-	unlock();
+	destroyCondition();
 }
 
 void Lock::wait(__int32 timeout) {
-	lock();
 	struct timespec timeToWait;
 	int rt;
 
-	timeToWait.tv_sec = time(NULL)+timeout;
+	initializeCondition();
 	bool wait = true;
 	while (wait) {
+		clock_gettime(CLOCK_REALTIME, &timeToWait);
+		timeToWait.tv_sec += timeout;
 		rt = pthread_cond_timedwait(&_cond, &_mutexLock, &timeToWait);
 		if (rt == ETIMEDOUT) {
 			wait = false;
@@ -78,9 +92,11 @@ void Lock::wait(__int32 timeout) {
 			wait = false;
 		}
 	}
-	unlock();
+	destroyCondition();
 }
 
 void Lock::notify() {
-	pthread_cond_signal(&_cond);
+	if (_condInitialized) {
+		pthread_cond_signal(&_cond);
+	}
 }

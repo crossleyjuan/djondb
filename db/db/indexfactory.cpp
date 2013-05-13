@@ -19,8 +19,8 @@
 #include "indexfactory.h"
 
 #include "bson.h"
-#include "bplusindex.h"
-//#include "bplusindexp.h"
+//#include "bplusindex.h"
+#include "bplusindexp.h"
 #include <stdio.h>
 #include <sstream>
 #include <string>
@@ -200,11 +200,9 @@ IndexAlgorithm* IndexFactory::index(const char* db, const char* ns, const std::s
 		memcpy(indexFileName, db, strlen(db));
 		memcpy(indexFileName + strlen(db), "/", 1);
 		memcpy(indexFileName + strlen(db) + 1, ns, strlen(ns));
-		indexImpl = new BPlusIndex(keys);
-		/* 
-		indexImpl = new BPlusIndex(indexFileName);
+		//indexImpl = new BPlusIndex(keys);
+		indexImpl = new BPlusIndexP(indexFileName);
 		indexImpl->setKeys(keys);
-		*/
 		algorithms->push_back(indexImpl);
 		free(indexFileName);
 	}

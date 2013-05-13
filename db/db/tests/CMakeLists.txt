@@ -21,6 +21,18 @@ IF (WIN32)
 	target_link_libraries (test-indexp djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}gtest${LIBRARY_SUFFIX} ${LIBRARY_PREFIX}gtest_main${LIBRARY_SUFFIX})
 ENDIF (WIN32)
 
+IF (NOT WIN32)
+	add_custom_command(TARGET test-indexp
+		POST_BUILD
+		COMMAND cp ${PROJECT_SOURCE_DIR}/db/tests/*.csv ${PROJECT_BINARY_DIR}/db/tests/)
+ENDIF (NOT WIN32)
+
+IF (WIN32)
+	add_custom_command(TARGET test-indexp
+		POST_BUILD
+		COMMAND copy ${PROJECT_SOURCE_DIR}/db/tests/*.csv ${PROJECT_BINARY_DIR}/db/tests/)
+ENDIF (WIN32)
+
 add_test(test-db test-db)
 add_test(test-indexp test-indexp)
 

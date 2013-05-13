@@ -44,9 +44,15 @@ class Lock {
 		void wait();
 		void wait(__int32 timeout);
 		void notify();
+
+	private:
+		void initializeCondition();
+		void destroyCondition();
+
 	private:
 		pthread_mutex_t _mutexLock;
 		pthread_cond_t  _cond;
+		bool _condInitialized;
 };
 
 #endif /* LOCK_INCLUDED_H */

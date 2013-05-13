@@ -340,14 +340,30 @@ TEST(testUtil, testDjonStrings) {
 	EXPECT_TRUE(s15.compare(s16) < 0);                 
 }
 
+std::vector<int> pcList;
+
+int MAX_NUMBER = 10000;
+
 static void* testMethodProduce(void* val) {
 	cout << "\nProduce method started" << endl;
 	Lock* lock = (Lock*)val;
 
 	cout << "Produce: Sleeping for 3 segs" << endl;
-	Thread::sleep(3000);
 
-	lock->notify();
+	for (int x= 0; x < MAX_NUMBER; x++) {
+		if (pcList.size() >= 10) {
+			lock->lock();
+			lock->wait(1);
+			lock->unlock();
+		} else {
+			pcList.push_back(x);
+			if (pcList.size() > 5) {
+				lock->lock();
+				lock->notify();
+				lock->unlock();
+			}
+		}
+	}
 	cout << "Produce: notification sent" << endl;
 
 	return NULL;
@@ -358,7 +374,20 @@ static void* testMethodConsume(void* val) {
 	Lock* lock = (Lock*)val;
 
 	cout << "Consume method waiting" << endl;
-	lock->wait();
+	int x = 0; // last receieved number
+	while (x < MAX_NUMBER) {
+		if (pcList.size() == 0) {
+			lock->lock();
+			printf("Waiting for more numbers\n");
+			lock->wait(1);
+			lock->unlock();
+		} else {
+			x = *pcList.begin();
+			pcList.erase(pcList.begin());
+			printf("Last received: %d\n", x);
+		}
+
+	}
 
 	cout << "Consume received notification" << endl;
 

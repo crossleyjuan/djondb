@@ -28,40 +28,93 @@
 
 #include <gtest/gtest.h>
 
-/* 
 TEST(testIndexP, generateNames) {
-	FileInputStream* fisNames = new FileInputStream("names.csv", "r");
-	const char* fullNames = fisNames->readFull();
-	FileInputStream* fisLastNames = new FileInputStream("last.csv", "r");
-	const char* fullLast = fisLastNames->readFull();
+	// this will avoid overriding previously generated names and keep consistent the results
+	if (!existFile("names.txt")) {
+		FileInputStream* fisNames = new FileInputStream("names.csv", "r");
+		const char* fullNames = fisNames->readFull();
+		FileInputStream* fisLastNames = new FileInputStream("last.csv", "r");
+		const char* fullLast = fisLastNames->readFull();
 
-	std::vector<string> names = split(fullNames, "\r");
-	cout << names.size() << endl;
-	std::vector<string> lastNames = split(fullLast, "\r");
-	cout << lastNames.size() << endl;
+		std::vector<string> names = split(fullNames, "\r");
+		cout << names.size() << endl;
+		std::vector<string> lastNames = split(fullLast, "\r");
+		cout << lastNames.size() << endl;
 
-	FileOutputStream* fos = new FileOutputStream("names.txt", "w+");
-	for (int x = 0; x < 1000000; x++) {
-		int i = rand() % names.size();
-		std::string name = names.at(i);
-		
-		i = rand() % lastNames.size();
-		std::string lastName = lastNames.at(i);
+		FileOutputStream* fos = new FileOutputStream("names.txt", "w+");
+		for (int x = 0; x < 10000000; x++) {
+			int i = rand() % names.size();
+			std::string name = names.at(i);
 
-		std::string fullName = name + " " + lastName;
+			i = rand() % lastNames.size();
+			std::string lastName = lastNames.at(i);
 
-		fos->writeString(fullName);
+			std::string fullName = name + " " + lastName;
+
+			fos->writeString(fullName);
+		}
+
+		fos->close();
+		fisNames->close();
+		fisLastNames->close();
+
+		delete fos;
+		delete fisNames;
+		delete fisLastNames;
+	}
+}
+
+TEST(testIndexP, testRecoverNames) {
+	Logger* log = getLogger(NULL);
+	std::set<std::string> keys;
+	keys.insert("_id");
+
+	BPlusIndexP* index = new BPlusIndexP("testIndexNames");
+	index->setKeys(keys);
+
+	FileInputStream* fis = new FileInputStream("names.txt", "r");
+
+	cout << "Adding names to the index" << endl;
+	std::vector<std::string> names;
+	int x = 0;
+	while (true) {
+		if (fis->eof()) {
+			cout << "No more names" << endl;
+			break;
+		}
+		if (x >= 100) {
+			break;
+		}
+		x++;
+		BSONObj o;
+		std::string* name = fis->readString();
+		o.add("_id", name->c_str());
+		char* temp = strcpy(const_cast<char*>(name->c_str()), name->length());
+		index->add(o, djondb::string(temp, name->length()), 100, 10);
+		index->debug();
+		if (log->isDebug()) log->debug("===============================================================================");
+		names.push_back(*name);
+		delete name;
 	}
 
-	fos->close();
-	fisNames->close();
-	fisLastNames->close();
+	index->debug();
+	delete index;
+	cout << "Finding names from the index" << endl;
 
-	delete fos;
-	delete fisNames;
-	delete fisLastNames;
+	index = new BPlusIndexP("testIndexNames");
+	index->setKeys(keys);
+	index->debug();
+	for (std::vector<std::string>::iterator i = names.begin(); i != names.end(); i++) {
+		std::string name = *i;
+		BSONObj o;
+		o.add("_id", name.c_str());
+		Index* idx = index->find(&o);
+		ASSERT_TRUE(idx != NULL) << "_id " << name.c_str() << " not found";
+		ASSERT_TRUE(idx->key->has("_id")) << "Retrieved index for _id " << name.c_str() << " does not returned the _id";
+		EXPECT_TRUE(idx->key->getString("_id").compare(name) == 0) << "Recovered a wrong key, expected: " << name.c_str() << " and retrived: " << idx->key->getString("_id").c_str();
+	}
+	delete index;
 }
-*/
 
 TEST(testIndexP, testSimple) {
 	std::set<std::string> keys;
@@ -79,49 +132,6 @@ TEST(testIndexP, testSimple) {
 		delete id;
 	}
 
-}
-
-TEST(testIndexP, testRecoverNames) {
-	std::set<std::string> keys;
-	keys.insert("_id");
-
-	BPlusIndexP* index = new BPlusIndexP("testIndexNames");
-	index->setKeys(keys);
-
-	FileInputStream* fis = new FileInputStream("names.txt", "r");
-
-	std::vector<std::string> names;
-	while (!fis->eof()) {
-		for (int x = 0; x < 10; x++) {
-			BSONObj o;
-			std::stringstream ss;
-			ss << x;
-			std::string* name = fis->readString();
-			o.add("_id", name->c_str());
-			char* temp = strcpy(const_cast<char*>(name->c_str()), name->length());
-			index->add(o, djondb::string(temp, name->length()), 100, 10);
-			index->debug();
-			names.push_back(*name);
-			delete name;
-		}
-	}
-
-	index->debug();
-	delete index;
-
-	index = new BPlusIndexP("testIndexNames");
-	index->setKeys(keys);
-	index->debug();
-	for (std::vector<std::string>::iterator i = names.begin(); i != names.end(); i++) {
-		std::string name = *i;
-		BSONObj o;
-		o.add("_id", name.c_str());
-		Index* idx = index->find(&o);
-		ASSERT_TRUE(idx != NULL);
-		ASSERT_TRUE(idx->key->has("_id"));
-		EXPECT_TRUE(idx->key->getString("_id").compare(name) == 0);
-	}
-	delete index;
 }
 
 TEST(testIndexP, testRecoverRandom) {

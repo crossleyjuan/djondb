@@ -361,10 +361,11 @@ void BPlusIndexP::splitAddLeaf(IndexPage* page, Index* index) {
 	// Clean up the elements moved to the rightPage
 	for (int x = page->size; x < BUCKET_MAX_ELEMENTS; x++) {
 		page->elements[x] = NULL;
-		page->pointers[x] = NULL;
+		page->pointers[x + 1] = NULL;
 	}
 	// cleans the last one
 	page->pointers[BUCKET_MAX_ELEMENTS] = NULL;
+	refreshParentRelationship(page);
 
 	//copyArray((void**)tmppointers, (void**)page->pointers, 0, midPoint + 1, 0);
 	copyArray((void**)tmpelements, (void**)rightPage->elements, midPoint + 1, BUCKET_MAX_ELEMENTS, 0);
@@ -377,10 +378,10 @@ void BPlusIndexP::splitAddLeaf(IndexPage* page, Index* index) {
 	Index* copyElement = new Index(*rightPage->elements[0]);
 	if (parentElement == NULL) {
 		createRoot(copyElement, page, rightPage);
-		parentElement = _head;
 	} else {
 		addElement(parentElement, copyElement, rightPage);
 	}
+	parentElement = rightPage->parentElement;
 
 	free(tmpelements);
 	refreshParentRelationship(parentElement);
@@ -423,10 +424,11 @@ void BPlusIndexP::splitAddInner(IndexPage* page, Index* index, IndexPage* rightP
 	// Clean up the elements moved to the rightPage
 	for (int x = page->size; x < BUCKET_MAX_ELEMENTS; x++) {
 		page->elements[x] = NULL;
-		page->pointers[x] = NULL;
+		page->pointers[x + 1] = NULL;
 	}
 	// cleans the last one
 	page->pointers[BUCKET_MAX_ELEMENTS] = NULL;
+	refreshParentRelationship(page);
 
 	newRightPage->size = (BUCKET_MAX_ELEMENTS / 2) + 1;
 	refreshParentRelationship(newRightPage);
@@ -437,10 +439,11 @@ void BPlusIndexP::splitAddInner(IndexPage* page, Index* index, IndexPage* rightP
 
 	if (parentElement == NULL) {
 		createRoot(element, page, newRightPage);
-		parentElement = _head;
 	} else {
 		addElement(parentElement, element, newRightPage);
 	}
+	parentElement = newRightPage->parentElement;
+
 	shiftLeftArray((void**)newRightPage->elements, 0, 1, BUCKET_MAX_ELEMENTS - 1);
 	shiftLeftArray((void**)newRightPage->pointers, 0, 1, BUCKET_MAX_ELEMENTS);
 	newRightPage->size--;
