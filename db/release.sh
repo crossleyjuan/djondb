@@ -16,37 +16,38 @@ cd includes
 ./update.sh
 cd ..
 
-autoreconf --install --force
-
 if [ ! -z "${DIR}" ]; 
 then
 	mkdir -p $DIR
 fi
 
-rm -rf obj
-mkdir obj
-cd obj
-../configure --prefix=/usr
+#rm -rf build
+mkdir build
+cd build
+cmake ..
 make
+cpack -G DEB
+
 make DESTDIR=`pwd` install
-rm usr/bin/test* rm -rf ../debian/usr
-cp -R usr ../debian/
-# cp /usr/lib/x86_64-linux-gnu/libantlr3c-3.2.so.0 ../debian/usr/lib
-# cp /usr/lib/libv8.so.3.7.12.22 ../debian/usr/lib
+sudo make install
+
+debfile="djondb_`uname`_`uname -i`${SUFFIX}.deb"
+deb=`find djondb*.deb`
+mv $deb $debfile
+
+if [ ! -z "${DIR}" ]; 
+then
+	cp $debfile $DIR
+fi
 
 cd ..
-sh debian.sh $@
-
-mkdir -p debian_dev/usr/lib
-cp debian/usr/lib/libdjon-client* debian_dev/usr/lib/
-
-sh debian_dev.sh $@
-# scp djondb.deb crossleyjuan@d-jon.com:html/downloads/djondb.deb
 
 cd driverbase/drivers
 
 ./update.sh
 ./php.sh $@
+
+exit;
 ./java.sh $@
 ./csharp.sh $@
 

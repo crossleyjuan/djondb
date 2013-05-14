@@ -122,15 +122,36 @@ public class DjondbConnection : IDisposable {
     return ret;
   }
 
+  public BSONArrayObj find(string db, string ns, BSONObj options) {
+    IntPtr cPtr = djonwrapperPINVOKE.DjondbConnection_find__SWIG_1(swigCPtr, db, ns, BSONObj.getCPtr(options));
+    BSONArrayObj ret = (cPtr == IntPtr.Zero) ? null : new BSONArrayObj(cPtr, false);
+    if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
   public BSONArrayObj find(string db, string ns, string filter) {
-    IntPtr cPtr = djonwrapperPINVOKE.DjondbConnection_find__SWIG_1(swigCPtr, db, ns, filter);
+    IntPtr cPtr = djonwrapperPINVOKE.DjondbConnection_find__SWIG_2(swigCPtr, db, ns, filter);
+    BSONArrayObj ret = (cPtr == IntPtr.Zero) ? null : new BSONArrayObj(cPtr, false);
+    if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public BSONArrayObj find(string db, string ns, string filter, BSONObj options) {
+    IntPtr cPtr = djonwrapperPINVOKE.DjondbConnection_find__SWIG_3(swigCPtr, db, ns, filter, BSONObj.getCPtr(options));
     BSONArrayObj ret = (cPtr == IntPtr.Zero) ? null : new BSONArrayObj(cPtr, false);
     if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public BSONArrayObj find(string db, string ns, string select, string filter) {
-    IntPtr cPtr = djonwrapperPINVOKE.DjondbConnection_find__SWIG_2(swigCPtr, db, ns, select, filter);
+    IntPtr cPtr = djonwrapperPINVOKE.DjondbConnection_find__SWIG_4(swigCPtr, db, ns, select, filter);
+    BSONArrayObj ret = (cPtr == IntPtr.Zero) ? null : new BSONArrayObj(cPtr, false);
+    if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public BSONArrayObj find(string db, string ns, string select, string filter, BSONObj options) {
+    IntPtr cPtr = djonwrapperPINVOKE.DjondbConnection_find__SWIG_5(swigCPtr, db, ns, select, filter, BSONObj.getCPtr(options));
     BSONArrayObj ret = (cPtr == IntPtr.Zero) ? null : new BSONArrayObj(cPtr, false);
     if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
     return ret;

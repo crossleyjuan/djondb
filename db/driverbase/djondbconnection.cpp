@@ -33,6 +33,8 @@
 #include "djondbconnectionmanager.h"
 #include "commitcommand.h"
 #include "rollbackcommand.h"
+#include "dqlParser.h"
+#include "dqlLexer.h"
 #include "util.h"
 #include "bson.h"
 
@@ -404,3 +406,72 @@ bool DjondbConnection::dropNamespace(const std::string& db, const std::string& n
 
 	return true;
 }
+
+BSONArrayObj* DjondbConnection::executeQuery(const std::string& query) {
+	Command* cmd = parseCommand(query);
+
+	prepareOptions((Command*)&cmd);
+	_commandWriter->writeCommand(cmd);
+	cmd->readResult(_inputStream);
+	BSONArrayObj* result = NULL;
+	if (cmd->commandType() == FIND) {
+		BSONArrayObj* tmp = (BSONArrayObj*)cmd->result();
+		if (tmp != NULL) {
+			result = new BSONArrayObj(*tmp);
+			delete tmp;
+		}
+	}
+	delete cmd;
+	return result;
+}
+
+bool DjondbConnection::executeUpdate(const std::string& query) {
+	Command* cmd = parseCommand(query);
+
+	prepareOptions((Command*)&cmd);
+	_commandWriter->writeCommand(cmd);
+	cmd->readResult(_inputStream);
+	delete cmd;
+	return true;
+}
+
+Command* DjondbConnection::parseCommand(const std::string& expression) {
+	Logger* log = getLogger(NULL);
+	Command* cmd = NULL;
+
+	int errorCode = -1;
+	const char* errorMessage;
+	if (expression.length() != 0) {
+		//throw (ParseException) {
+		pANTLR3_INPUT_STREAM           input;
+		pdqlLexer               lex;
+		pANTLR3_COMMON_TOKEN_STREAM    tokens;
+		pdqlParser              parser;
+
+		const char* cexpr = expression.c_str();
+		if (log->isDebug()) log->debug("query expression: %s, len: %d, Size Hint: %d", cexpr, strlen(cexpr), ANTLR3_SIZE_HINT);
+		input  = antlr3NewAsciiStringInPlaceStream((pANTLR3_UINT8)cexpr, strlen(cexpr), (pANTLR3_UINT8)"name");
+		lex    = dqlLexerNew                (input);
+		tokens = antlr3CommonTokenStreamSourceNew  (ANTLR3_SIZE_HINT, TOKENSOURCE(lex));
+		parser = dqlParserNew               (tokens);
+
+		cmd = parser ->start_point(parser);
+
+		if (parser->pParser->rec->state->exception != NULL) {
+			errorCode = 1;
+			errorMessage = (char*)parser->pParser->rec->state->exception->message;
+		}
+
+		// Must manually clean up
+		//
+		parser ->free(parser);
+		tokens ->free(tokens);
+		lex    ->free(lex);
+		input  ->close(input);
+	}
+	if (errorCode > -1) {
+		throw ParseException(errorCode, errorMessage);
+	}
+
+	return cmd;
+	}

@@ -4683,6 +4683,54 @@ ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_find__SWIG_1) {
   djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
+  BSONObj *arg4 = 0 ;
+  std::string temp2 ;
+  std::string temp3 ;
+  zval **args[4];
+  BSONArrayObj *result = 0 ;
+  
+  SWIG_ResetError();
+  if(ZEND_NUM_ARGS() != 4 || zend_get_parameters_array_ex(4, args) != SUCCESS) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_djondb__DjondbConnection, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of DjondbConnection_find. Expected SWIGTYPE_p_djondb__DjondbConnection");
+    }
+  }
+  if(!arg1) SWIG_PHP_Error(E_ERROR, "this pointer is NULL");
+  
+  convert_to_string_ex(args[1]);
+  temp2.assign(Z_STRVAL_PP(args[1]), Z_STRLEN_PP(args[1]));
+  arg2 = &temp2;
+  
+  
+  convert_to_string_ex(args[2]);
+  temp3.assign(Z_STRVAL_PP(args[2]), Z_STRLEN_PP(args[2]));
+  arg3 = &temp3;
+  
+  {
+    if(SWIG_ConvertPtr(*args[3], (void **) &arg4, SWIGTYPE_p_BSONObj, 0) < 0 || arg4 == NULL) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 4 of DjondbConnection_find. Expected SWIGTYPE_p_BSONObj");
+    }
+  }
+  result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(BSONObj const &)*arg4);
+  
+  SWIG_SetPointerZval(return_value, (void *)result, SWIGTYPE_p_BSONArrayObj, 0);
+  
+  
+  
+  return;
+fail:
+  SWIG_FAIL();
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_find__SWIG_2) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
+  std::string *arg2 = 0 ;
+  std::string *arg3 = 0 ;
   std::string *arg4 = 0 ;
   std::string temp2 ;
   std::string temp3 ;
@@ -4729,7 +4777,63 @@ fail:
 }
 
 
-ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_find__SWIG_2) {
+ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_find__SWIG_3) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
+  std::string *arg2 = 0 ;
+  std::string *arg3 = 0 ;
+  std::string *arg4 = 0 ;
+  BSONObj *arg5 = 0 ;
+  std::string temp2 ;
+  std::string temp3 ;
+  std::string temp4 ;
+  zval **args[5];
+  BSONArrayObj *result = 0 ;
+  
+  SWIG_ResetError();
+  if(ZEND_NUM_ARGS() != 5 || zend_get_parameters_array_ex(5, args) != SUCCESS) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_djondb__DjondbConnection, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of DjondbConnection_find. Expected SWIGTYPE_p_djondb__DjondbConnection");
+    }
+  }
+  if(!arg1) SWIG_PHP_Error(E_ERROR, "this pointer is NULL");
+  
+  convert_to_string_ex(args[1]);
+  temp2.assign(Z_STRVAL_PP(args[1]), Z_STRLEN_PP(args[1]));
+  arg2 = &temp2;
+  
+  
+  convert_to_string_ex(args[2]);
+  temp3.assign(Z_STRVAL_PP(args[2]), Z_STRLEN_PP(args[2]));
+  arg3 = &temp3;
+  
+  
+  convert_to_string_ex(args[3]);
+  temp4.assign(Z_STRVAL_PP(args[3]), Z_STRLEN_PP(args[3]));
+  arg4 = &temp4;
+  
+  {
+    if(SWIG_ConvertPtr(*args[4], (void **) &arg5, SWIGTYPE_p_BSONObj, 0) < 0 || arg5 == NULL) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 5 of DjondbConnection_find. Expected SWIGTYPE_p_BSONObj");
+    }
+  }
+  result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4,(BSONObj const &)*arg5);
+  
+  SWIG_SetPointerZval(return_value, (void *)result, SWIGTYPE_p_BSONArrayObj, 0);
+  
+  
+  
+  
+  return;
+fail:
+  SWIG_FAIL();
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_find__SWIG_4) {
   djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
@@ -4787,9 +4891,73 @@ fail:
 }
 
 
+ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_find__SWIG_5) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
+  std::string *arg2 = 0 ;
+  std::string *arg3 = 0 ;
+  std::string *arg4 = 0 ;
+  std::string *arg5 = 0 ;
+  BSONObj *arg6 = 0 ;
+  std::string temp2 ;
+  std::string temp3 ;
+  std::string temp4 ;
+  std::string temp5 ;
+  zval **args[6];
+  BSONArrayObj *result = 0 ;
+  
+  SWIG_ResetError();
+  if(ZEND_NUM_ARGS() != 6 || zend_get_parameters_array_ex(6, args) != SUCCESS) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_djondb__DjondbConnection, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of DjondbConnection_find. Expected SWIGTYPE_p_djondb__DjondbConnection");
+    }
+  }
+  if(!arg1) SWIG_PHP_Error(E_ERROR, "this pointer is NULL");
+  
+  convert_to_string_ex(args[1]);
+  temp2.assign(Z_STRVAL_PP(args[1]), Z_STRLEN_PP(args[1]));
+  arg2 = &temp2;
+  
+  
+  convert_to_string_ex(args[2]);
+  temp3.assign(Z_STRVAL_PP(args[2]), Z_STRLEN_PP(args[2]));
+  arg3 = &temp3;
+  
+  
+  convert_to_string_ex(args[3]);
+  temp4.assign(Z_STRVAL_PP(args[3]), Z_STRLEN_PP(args[3]));
+  arg4 = &temp4;
+  
+  
+  convert_to_string_ex(args[4]);
+  temp5.assign(Z_STRVAL_PP(args[4]), Z_STRLEN_PP(args[4]));
+  arg5 = &temp5;
+  
+  {
+    if(SWIG_ConvertPtr(*args[5], (void **) &arg6, SWIGTYPE_p_BSONObj, 0) < 0 || arg6 == NULL) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 6 of DjondbConnection_find. Expected SWIGTYPE_p_BSONObj");
+    }
+  }
+  result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4,(std::string const &)*arg5,(BSONObj const &)*arg6);
+  
+  SWIG_SetPointerZval(return_value, (void *)result, SWIGTYPE_p_BSONArrayObj, 0);
+  
+  
+  
+  
+  
+  return;
+fail:
+  SWIG_FAIL();
+}
+
+
 ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_find) {
   int argc;
-  zval **argv[5];
+  zval **argv[6];
   
   argc = ZEND_NUM_ARGS();
   zend_get_parameters_array_ex(argc,argv);
@@ -4824,10 +4992,62 @@ ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_find) {
         _v = ( Z_TYPE_PP(argv[2]) == IS_STRING ) ? 1 : 0;
         
         if (_v) {
+          {
+            void *tmp;
+            _v = (SWIG_ConvertPtr(*argv[3], (void**)&tmp, SWIGTYPE_p_BSONObj, 0) >= 0);
+          }
+          if (_v) {
+            _wrap_DjondbConnection_find__SWIG_1(INTERNAL_FUNCTION_PARAM_PASSTHRU); return;
+          }
+        }
+      }
+    }
+  }
+  if (argc == 4) {
+    int _v;
+    {
+      void *tmp;
+      _v = (SWIG_ConvertPtr(*argv[0], (void**)&tmp, SWIGTYPE_p_djondb__DjondbConnection, 0) >= 0);
+    }
+    if (_v) {
+      _v = ( Z_TYPE_PP(argv[1]) == IS_STRING ) ? 1 : 0;
+      
+      if (_v) {
+        _v = ( Z_TYPE_PP(argv[2]) == IS_STRING ) ? 1 : 0;
+        
+        if (_v) {
           _v = ( Z_TYPE_PP(argv[3]) == IS_STRING ) ? 1 : 0;
           
           if (_v) {
-            _wrap_DjondbConnection_find__SWIG_1(INTERNAL_FUNCTION_PARAM_PASSTHRU); return;
+            _wrap_DjondbConnection_find__SWIG_2(INTERNAL_FUNCTION_PARAM_PASSTHRU); return;
+          }
+        }
+      }
+    }
+  }
+  if (argc == 5) {
+    int _v;
+    {
+      void *tmp;
+      _v = (SWIG_ConvertPtr(*argv[0], (void**)&tmp, SWIGTYPE_p_djondb__DjondbConnection, 0) >= 0);
+    }
+    if (_v) {
+      _v = ( Z_TYPE_PP(argv[1]) == IS_STRING ) ? 1 : 0;
+      
+      if (_v) {
+        _v = ( Z_TYPE_PP(argv[2]) == IS_STRING ) ? 1 : 0;
+        
+        if (_v) {
+          _v = ( Z_TYPE_PP(argv[3]) == IS_STRING ) ? 1 : 0;
+          
+          if (_v) {
+            {
+              void *tmp;
+              _v = (SWIG_ConvertPtr(*argv[4], (void**)&tmp, SWIGTYPE_p_BSONObj, 0) >= 0);
+            }
+            if (_v) {
+              _wrap_DjondbConnection_find__SWIG_3(INTERNAL_FUNCTION_PARAM_PASSTHRU); return;
+            }
           }
         }
       }
@@ -4852,7 +5072,39 @@ ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_find) {
             _v = ( Z_TYPE_PP(argv[4]) == IS_STRING ) ? 1 : 0;
             
             if (_v) {
-              _wrap_DjondbConnection_find__SWIG_2(INTERNAL_FUNCTION_PARAM_PASSTHRU); return;
+              _wrap_DjondbConnection_find__SWIG_4(INTERNAL_FUNCTION_PARAM_PASSTHRU); return;
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 6) {
+    int _v;
+    {
+      void *tmp;
+      _v = (SWIG_ConvertPtr(*argv[0], (void**)&tmp, SWIGTYPE_p_djondb__DjondbConnection, 0) >= 0);
+    }
+    if (_v) {
+      _v = ( Z_TYPE_PP(argv[1]) == IS_STRING ) ? 1 : 0;
+      
+      if (_v) {
+        _v = ( Z_TYPE_PP(argv[2]) == IS_STRING ) ? 1 : 0;
+        
+        if (_v) {
+          _v = ( Z_TYPE_PP(argv[3]) == IS_STRING ) ? 1 : 0;
+          
+          if (_v) {
+            _v = ( Z_TYPE_PP(argv[4]) == IS_STRING ) ? 1 : 0;
+            
+            if (_v) {
+              {
+                void *tmp;
+                _v = (SWIG_ConvertPtr(*argv[5], (void**)&tmp, SWIGTYPE_p_BSONObj, 0) >= 0);
+              }
+              if (_v) {
+                _wrap_DjondbConnection_find__SWIG_5(INTERNAL_FUNCTION_PARAM_PASSTHRU); return;
+              }
             }
           }
         }

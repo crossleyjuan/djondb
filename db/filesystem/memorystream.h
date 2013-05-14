@@ -33,6 +33,7 @@ class MemoryStream: public InputStream, public OutputStream
 		virtual char* readChars();
 		virtual char* readChars(__int32 length);
 		virtual const char* readFull();
+		virtual const size_t readRaw(char* ptr, size_t count);
 
 		virtual std::string* readString();
 
@@ -50,6 +51,7 @@ class MemoryStream: public InputStream, public OutputStream
 		/* Write a char */
 		virtual void writeChars(const char* text, __int32 len);
 		virtual void writeString(const std::string& text);
+		virtual void writeRaw(const char * ptr, size_t count);
 
 		virtual void seek(__int64 pos, SEEK_DIRECTION direction = FROMSTART_SEEK);
 		virtual __int64 currentPos() const;

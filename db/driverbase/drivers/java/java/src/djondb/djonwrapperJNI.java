@@ -98,8 +98,11 @@ public class djonwrapperJNI {
   public final static native long DjondbConnection_findByKey__SWIG_0(long jarg1, DjondbConnection jarg1_, String jarg2, String jarg3, String jarg4, String jarg5);
   public final static native long DjondbConnection_findByKey__SWIG_1(long jarg1, DjondbConnection jarg1_, String jarg2, String jarg3, String jarg4);
   public final static native long DjondbConnection_find__SWIG_0(long jarg1, DjondbConnection jarg1_, String jarg2, String jarg3);
-  public final static native long DjondbConnection_find__SWIG_1(long jarg1, DjondbConnection jarg1_, String jarg2, String jarg3, String jarg4);
-  public final static native long DjondbConnection_find__SWIG_2(long jarg1, DjondbConnection jarg1_, String jarg2, String jarg3, String jarg4, String jarg5);
+  public final static native long DjondbConnection_find__SWIG_1(long jarg1, DjondbConnection jarg1_, String jarg2, String jarg3, long jarg4, BSONObj jarg4_);
+  public final static native long DjondbConnection_find__SWIG_2(long jarg1, DjondbConnection jarg1_, String jarg2, String jarg3, String jarg4);
+  public final static native long DjondbConnection_find__SWIG_3(long jarg1, DjondbConnection jarg1_, String jarg2, String jarg3, String jarg4, long jarg5, BSONObj jarg5_);
+  public final static native long DjondbConnection_find__SWIG_4(long jarg1, DjondbConnection jarg1_, String jarg2, String jarg3, String jarg4, String jarg5);
+  public final static native long DjondbConnection_find__SWIG_5(long jarg1, DjondbConnection jarg1_, String jarg2, String jarg3, String jarg4, String jarg5, long jarg6, BSONObj jarg6_);
   public final static native boolean DjondbConnection_update__SWIG_0(long jarg1, DjondbConnection jarg1_, String jarg2, String jarg3, String jarg4);
   public final static native boolean DjondbConnection_update__SWIG_1(long jarg1, DjondbConnection jarg1_, String jarg2, String jarg3, long jarg4, BSONObj jarg4_);
   public final static native boolean DjondbConnection_remove(long jarg1, DjondbConnection jarg1_, String jarg2, String jarg3, String jarg4, String jarg5);

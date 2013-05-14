@@ -16,9 +16,9 @@ mkdir php
 sh update-php.sh
 OS=`uname -s`
 if test "$OS" = "Darwin"; then
-cp ../../obj/usr/lib/libdjon-client.0.dylib ../../obj/usr/lib/libdjon-client.dylib php/
+cp ../../build/usr/lib/libdjon-client.0.dylib ../../build/usr/lib/libdjon-client.dylib php/
 else
-cp ../../obj/usr/lib/libdjon-client.la php/
+cp ../../build/usr/lib/libdjon-client.so php/
 fi
 
 swig -c++ -php -outdir php -o php/djonphpdriver.cpp driver.i

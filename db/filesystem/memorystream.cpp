@@ -116,6 +116,10 @@ void MemoryStream::write(const char *ptr, size_t count) {
 	}
 }
 
+void MemoryStream::writeRaw(const char *ptr, size_t count) {
+	write(ptr, count);
+}
+
 size_t MemoryStream::read( char* ptr, size_t count) {
 	if (count > (_length - _currentBufferPos)) {
 		count = _length - _currentBufferPos;
@@ -135,6 +139,10 @@ size_t MemoryStream::read( char* ptr, size_t count) {
 		readed += read(ptr + offset, space);
 	}
 	return readed;
+}
+
+const size_t MemoryStream::readRaw(char* ptr, size_t count) {
+	return read(ptr, count);
 }
 
 /* Write 1 byte in the output */

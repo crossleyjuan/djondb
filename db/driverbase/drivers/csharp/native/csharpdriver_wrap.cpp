@@ -2521,7 +2521,39 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_DjondbConnection_find__SWIG_0(void * jarg1,
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_DjondbConnection_find__SWIG_1(void * jarg1, char * jarg2, char * jarg3, char * jarg4) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_DjondbConnection_find__SWIG_1(void * jarg1, char * jarg2, char * jarg3, void * jarg4) {
+  void * jresult ;
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
+  std::string *arg2 = 0 ;
+  std::string *arg3 = 0 ;
+  BSONObj *arg4 = 0 ;
+  BSONArrayObj *result = 0 ;
+  
+  arg1 = (djondb::DjondbConnection *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  if (!jarg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg3_str(jarg3);
+  arg3 = &arg3_str; 
+  arg4 = (BSONObj *)jarg4;
+  if (!arg4) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "BSONObj const & type is null", 0);
+    return 0;
+  } 
+  result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(BSONObj const &)*arg4);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_DjondbConnection_find__SWIG_2(void * jarg1, char * jarg2, char * jarg3, char * jarg4) {
   void * jresult ;
   djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   std::string *arg2 = 0 ;
@@ -2554,7 +2586,46 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_DjondbConnection_find__SWIG_1(void * jarg1,
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_DjondbConnection_find__SWIG_2(void * jarg1, char * jarg2, char * jarg3, char * jarg4, char * jarg5) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_DjondbConnection_find__SWIG_3(void * jarg1, char * jarg2, char * jarg3, char * jarg4, void * jarg5) {
+  void * jresult ;
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
+  std::string *arg2 = 0 ;
+  std::string *arg3 = 0 ;
+  std::string *arg4 = 0 ;
+  BSONObj *arg5 = 0 ;
+  BSONArrayObj *result = 0 ;
+  
+  arg1 = (djondb::DjondbConnection *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  if (!jarg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg3_str(jarg3);
+  arg3 = &arg3_str; 
+  if (!jarg4) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg4_str(jarg4);
+  arg4 = &arg4_str; 
+  arg5 = (BSONObj *)jarg5;
+  if (!arg5) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "BSONObj const & type is null", 0);
+    return 0;
+  } 
+  result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4,(BSONObj const &)*arg5);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_DjondbConnection_find__SWIG_4(void * jarg1, char * jarg2, char * jarg3, char * jarg4, char * jarg5) {
   void * jresult ;
   djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   std::string *arg2 = 0 ;
@@ -2589,6 +2660,52 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_DjondbConnection_find__SWIG_2(void * jarg1,
   std::string arg5_str(jarg5);
   arg5 = &arg5_str; 
   result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4,(std::string const &)*arg5);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_DjondbConnection_find__SWIG_5(void * jarg1, char * jarg2, char * jarg3, char * jarg4, char * jarg5, void * jarg6) {
+  void * jresult ;
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
+  std::string *arg2 = 0 ;
+  std::string *arg3 = 0 ;
+  std::string *arg4 = 0 ;
+  std::string *arg5 = 0 ;
+  BSONObj *arg6 = 0 ;
+  BSONArrayObj *result = 0 ;
+  
+  arg1 = (djondb::DjondbConnection *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg2_str(jarg2);
+  arg2 = &arg2_str; 
+  if (!jarg3) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg3_str(jarg3);
+  arg3 = &arg3_str; 
+  if (!jarg4) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg4_str(jarg4);
+  arg4 = &arg4_str; 
+  if (!jarg5) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  std::string arg5_str(jarg5);
+  arg5 = &arg5_str; 
+  arg6 = (BSONObj *)jarg6;
+  if (!arg6) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "BSONObj const & type is null", 0);
+    return 0;
+  } 
+  result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4,(std::string const &)*arg5,(BSONObj const &)*arg6);
   jresult = (void *)result; 
   return jresult;
 }

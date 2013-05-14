@@ -102,13 +102,28 @@ public class DjondbConnection {
     return (cPtr == 0) ? null : new BSONArrayObj(cPtr, false);
   }
 
+  public BSONArrayObj find(String db, String ns, BSONObj options) {
+    long cPtr = djonwrapperJNI.DjondbConnection_find__SWIG_1(swigCPtr, this, db, ns, BSONObj.getCPtr(options), options);
+    return (cPtr == 0) ? null : new BSONArrayObj(cPtr, false);
+  }
+
   public BSONArrayObj find(String db, String ns, String filter) {
-    long cPtr = djonwrapperJNI.DjondbConnection_find__SWIG_1(swigCPtr, this, db, ns, filter);
+    long cPtr = djonwrapperJNI.DjondbConnection_find__SWIG_2(swigCPtr, this, db, ns, filter);
+    return (cPtr == 0) ? null : new BSONArrayObj(cPtr, false);
+  }
+
+  public BSONArrayObj find(String db, String ns, String filter, BSONObj options) {
+    long cPtr = djonwrapperJNI.DjondbConnection_find__SWIG_3(swigCPtr, this, db, ns, filter, BSONObj.getCPtr(options), options);
     return (cPtr == 0) ? null : new BSONArrayObj(cPtr, false);
   }
 
   public BSONArrayObj find(String db, String ns, String select, String filter) {
-    long cPtr = djonwrapperJNI.DjondbConnection_find__SWIG_2(swigCPtr, this, db, ns, select, filter);
+    long cPtr = djonwrapperJNI.DjondbConnection_find__SWIG_4(swigCPtr, this, db, ns, select, filter);
+    return (cPtr == 0) ? null : new BSONArrayObj(cPtr, false);
+  }
+
+  public BSONArrayObj find(String db, String ns, String select, String filter, BSONObj options) {
+    long cPtr = djonwrapperJNI.DjondbConnection_find__SWIG_5(swigCPtr, this, db, ns, select, filter, BSONObj.getCPtr(options), options);
     return (cPtr == 0) ? null : new BSONArrayObj(cPtr, false);
   }
 

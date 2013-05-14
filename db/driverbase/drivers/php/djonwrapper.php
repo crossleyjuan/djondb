@@ -583,11 +583,12 @@ class DjondbConnection {
 		}
 	}
 
-	function find($db,$ns,$filter_or_select=null,$filter=null) {
+	function find($db,$ns,$options_or_filter_or_select=null,$options_or_filter=null,$options=null) {
 		switch (func_num_args()) {
 		case 2: $r=DjondbConnection_find($this->_cPtr,$db,$ns); break;
-		case 3: $r=DjondbConnection_find($this->_cPtr,$db,$ns,$filter_or_select); break;
-		default: $r=DjondbConnection_find($this->_cPtr,$db,$ns,$filter_or_select,$filter);
+		case 3: $r=DjondbConnection_find($this->_cPtr,$db,$ns,$options_or_filter_or_select); break;
+		case 4: $r=DjondbConnection_find($this->_cPtr,$db,$ns,$options_or_filter_or_select,$options_or_filter); break;
+		default: $r=DjondbConnection_find($this->_cPtr,$db,$ns,$options_or_filter_or_select,$options_or_filter,$options);
 		}
 		if (!is_resource($r)) return $r;
 		switch (get_resource_type($r)) {

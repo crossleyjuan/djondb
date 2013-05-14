@@ -527,3 +527,25 @@ TEST(TestDriver, testTransactions) {
 	}
 }
 
+TEST(TestDriver, testDQL) {
+
+	cout << "\ntestDQL\n" << endl;
+
+	DjondbConnection* connection = DjondbConnectionManager::getConnection(_host);
+
+	if (connection->open()) {
+		connection->dropNamespace("db", "TestQL");
+
+		char* ql = "Insert { 'name': 'John', 'last': 'Smith'} INTO db:TestQL";
+		connection->executeUpdate(ql);
+
+		char* qlFind = "Select * FROM db:TestQL";
+		BSONArrayObj* result = connection->executeQuery(qlFind);
+
+		qlFind = "Select $'a', $'b' FROM db:TestQL";
+		result = connection->executeQuery(qlFind);
+
+	   ASSERT_TRUE(result->length() == 1);
+	}
+
+}

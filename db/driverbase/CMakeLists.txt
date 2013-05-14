@@ -8,10 +8,10 @@ include_directories("${PROJECT_SOURCE_DIR}/command")
 include_directories("${PROJECT_SOURCE_DIR}/network")
 
 IF (NOT WIN32)
-	add_library(djon-client SHARED djondbconnection.cpp djondbconnectionmanager.cpp)
+	add_library(djon-client SHARED djondbconnection.cpp djondbconnectionmanager.cpp dqlParser.cpp dqlLexer.cpp )
 ENDIF (NOT WIN32)
 IF (WIN32)
-	add_library(djon-client djondbconnection.cpp djondbconnectionmanager.cpp)
+	add_library(djon-client djondbconnection.cpp djondbconnectionmanager.cpp dqlParser.cpp dqlLexer.cpp)
 ENDIF (WIN32)
 
 install (TARGETS djon-client DESTINATION lib)
