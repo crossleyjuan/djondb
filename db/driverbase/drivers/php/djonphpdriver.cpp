@@ -5333,6 +5333,74 @@ fail:
 }
 
 
+ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_executeQuery) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
+  std::string *arg2 = 0 ;
+  std::string temp2 ;
+  zval **args[2];
+  BSONArrayObj *result = 0 ;
+  
+  SWIG_ResetError();
+  if(ZEND_NUM_ARGS() != 2 || zend_get_parameters_array_ex(2, args) != SUCCESS) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_djondb__DjondbConnection, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of DjondbConnection_executeQuery. Expected SWIGTYPE_p_djondb__DjondbConnection");
+    }
+  }
+  if(!arg1) SWIG_PHP_Error(E_ERROR, "this pointer is NULL");
+  
+  convert_to_string_ex(args[1]);
+  temp2.assign(Z_STRVAL_PP(args[1]), Z_STRLEN_PP(args[1]));
+  arg2 = &temp2;
+  
+  result = (BSONArrayObj *)(arg1)->executeQuery((std::string const &)*arg2);
+  
+  SWIG_SetPointerZval(return_value, (void *)result, SWIGTYPE_p_BSONArrayObj, 0);
+  
+  
+  return;
+fail:
+  SWIG_FAIL();
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_executeUpdate) {
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
+  std::string *arg2 = 0 ;
+  std::string temp2 ;
+  zval **args[2];
+  bool result;
+  
+  SWIG_ResetError();
+  if(ZEND_NUM_ARGS() != 2 || zend_get_parameters_array_ex(2, args) != SUCCESS) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_djondb__DjondbConnection, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of DjondbConnection_executeUpdate. Expected SWIGTYPE_p_djondb__DjondbConnection");
+    }
+  }
+  if(!arg1) SWIG_PHP_Error(E_ERROR, "this pointer is NULL");
+  
+  convert_to_string_ex(args[1]);
+  temp2.assign(Z_STRVAL_PP(args[1]), Z_STRLEN_PP(args[1]));
+  arg2 = &temp2;
+  
+  result = (bool)(arg1)->executeUpdate((std::string const &)*arg2);
+  {
+    ZVAL_BOOL(return_value,(result)?1:0);
+  }
+  
+  return;
+fail:
+  SWIG_FAIL();
+}
+
+
 ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_dropNamespace) {
   djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   std::string *arg2 = 0 ;
@@ -5960,6 +6028,8 @@ static zend_function_entry djonwrapper_functions[] = {
  SWIG_ZEND_NAMED_FE(djondbconnection_find,_wrap_DjondbConnection_find,NULL)
  SWIG_ZEND_NAMED_FE(djondbconnection_update,_wrap_DjondbConnection_update,NULL)
  SWIG_ZEND_NAMED_FE(djondbconnection_remove,_wrap_DjondbConnection_remove,NULL)
+ SWIG_ZEND_NAMED_FE(djondbconnection_executequery,_wrap_DjondbConnection_executeQuery,NULL)
+ SWIG_ZEND_NAMED_FE(djondbconnection_executeupdate,_wrap_DjondbConnection_executeUpdate,NULL)
  SWIG_ZEND_NAMED_FE(djondbconnection_dropnamespace,_wrap_DjondbConnection_dropNamespace,NULL)
  SWIG_ZEND_NAMED_FE(djondbconnection_dbs,_wrap_DjondbConnection_dbs,NULL)
  SWIG_ZEND_NAMED_FE(djondbconnection_namespaces,_wrap_DjondbConnection_namespaces,NULL)

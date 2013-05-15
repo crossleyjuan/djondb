@@ -605,6 +605,20 @@ class DjondbConnection {
 		return DjondbConnection_remove($this->_cPtr,$db,$ns,$id,$revision);
 	}
 
+	function executeQuery($query) {
+		$r=DjondbConnection_executeQuery($this->_cPtr,$query);
+		if (is_resource($r)) {
+			$c=substr(get_resource_type($r), (strpos(get_resource_type($r), '__') ? strpos(get_resource_type($r), '__') + 2 : 3));
+			if (class_exists($c)) return new $c($r);
+			return new BSONArrayObj($r);
+		}
+		return $r;
+	}
+
+	function executeUpdate($query) {
+		return DjondbConnection_executeUpdate($this->_cPtr,$query);
+	}
+
 	function dropNamespace($db,$ns) {
 		return DjondbConnection_dropNamespace($this->_cPtr,$db,$ns);
 	}

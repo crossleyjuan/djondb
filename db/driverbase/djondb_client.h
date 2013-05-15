@@ -6,5 +6,6 @@
 #include "util.h"
 #include "djondbconnection.h"
 #include "djondbconnectionmanager.h"
+#include "djonv8.h"
 
 #endif // DJONDB_CLIENT_H_INCLUDED

@@ -99,6 +99,8 @@ ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_findByKey);
 ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_find);
 ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_update);
 ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_remove);
+ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_executeQuery);
+ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_executeUpdate);
 ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_dropNamespace);
 ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_dbs);
 ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_namespaces);
