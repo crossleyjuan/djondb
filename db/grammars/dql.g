@@ -70,6 +70,7 @@ query_expr	returns [Command* val]
      BSONObj options;
      MemoryStream ms(500);
      $val = cmd;
+     bool allfields = false;
 }
 	:	SELECT (TOP top=NUMBER {
 #ifdef WINDOWS
@@ -81,16 +82,19 @@ query_expr	returns [Command* val]
     	    cmd->setOptions(&options);
 	})? (ALL_FIELDS {
 	    cmd->setSelect("*");
+	    allfields = true;
 	}| (x1=XPATH {
 	    std::string t1((char*)$x1.text->chars);
 	    ms.writeRaw(t1.c_str(), t1.length());
-	} (COMMA x2=XPATH)* {
+	} (COMMA x2=XPATH {
 	    std::string t2((char*)$x2.text->chars);
 	    ms.writeRaw(", ", 2);
 	    ms.writeRaw(t2.c_str(), t2.length());
-	}) {
-	    cmd->setSelect(ms.toChars());
+	})*) {
 	}) FROM d1=DB_NS {
+	   if (!allfields) {
+	    cmd->setSelect(ms.toChars());
+	   }
 	    cmd->setDB(std::string((char*)$d1.text->chars));
 	} COLON ns=DB_NS {
 	    cmd->setNameSpace(std::string((char*)$ns.text->chars));

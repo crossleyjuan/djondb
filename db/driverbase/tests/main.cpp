@@ -38,19 +38,19 @@ char* _host = "localhost";
 int _port = 1243;
 
 /*
-TEST(TestDriver, testConnection) {
+	TEST(TestDriver, testConnection) {
 
 	DjondbConnection* conn = DjondbConnectionManager::getConnection(_host);
 
 	EXPECT_THROW(conn->insert("db1", "ns1", "{ name: 'Test'  }"), DjondbException) << "If the client is not connected then an exception should be thrown";
 
-	// test connection and then shutdown the server
-	if (conn->open()) {
-		conn->shutdown();
-		EXPECT_THROW(conn->insert("db1", "ns1", "{ name: 'Test'  }"), DjondbException); 
-	} else {
-		FAIL() << "Cannot establish a connection with the server";
-	}
+// test connection and then shutdown the server
+if (conn->open()) {
+conn->shutdown();
+EXPECT_THROW(conn->insert("db1", "ns1", "{ name: 'Test'  }"), DjondbException); 
+} else {
+FAIL() << "Cannot establish a connection with the server";
+}
 }
 */
 
@@ -532,22 +532,30 @@ TEST(TestDriver, testDQL) {
 
 		char* qlFind = "Select * FROM db:TestQL";
 		BSONArrayObj* result = connection->executeQuery(qlFind);
-	   ASSERT_TRUE(result->length() == 1);
-	   ASSERT_TRUE(result->get(0)->has("name"));
-	   ASSERT_TRUE(result->get(0)->getString("name").compare("John") == 0);
+		ASSERT_TRUE(result->length() == 1);
+		ASSERT_TRUE(result->get(0)->has("name"));
+		ASSERT_TRUE(result->get(0)->getString("name").compare("John") == 0);
 		delete result;
 
 		ql = "Insert { 'name': 'Peter', 'last': 'Strauss', 'age': 25} INTO db:TestQL";
 		connection->executeUpdate(ql);
 
+		qlFind = "Select $'name' FROM db:TestQL where $'age' > 15";
+		result = connection->executeQuery(qlFind);
+		ASSERT_TRUE(result->length() == 1);
+		ASSERT_TRUE(result->get(0)->has("name"));
+		ASSERT_TRUE(result->get(0)->getString("name").compare("Peter") == 0);
+		ASSERT_TRUE(!result->get(0)->has("last"));
+		delete result;
+
 		qlFind = "Select $'name', $'age' FROM db:TestQL where $'age' > 15";
 		result = connection->executeQuery(qlFind);
-	   ASSERT_TRUE(result->length() == 1);
-	   ASSERT_TRUE(result->get(0)->has("name"));
-	   ASSERT_TRUE(result->get(0)->getString("name").compare("Peter") == 0);
-	   ASSERT_TRUE(result->get(0)->has("age"));
-	   ASSERT_TRUE(result->get(0)->getInt("age") == 25);
-	   ASSERT_TRUE(!result->get(0)->has("last"));
+		ASSERT_TRUE(result->length() == 1);
+		ASSERT_TRUE(result->get(0)->has("name"));
+		ASSERT_TRUE(result->get(0)->getString("name").compare("Peter") == 0);
+		ASSERT_TRUE(result->get(0)->has("age"));
+		ASSERT_TRUE(result->get(0)->getInt("age") == 25);
+		ASSERT_TRUE(!result->get(0)->has("last"));
 		delete result;
 
 		ql = "Insert { 'name': 'Mary', 'last': 'May'} INTO db:TestQL";
@@ -555,7 +563,7 @@ TEST(TestDriver, testDQL) {
 
 		qlFind = "Select TOP 2 * FROM db:TestQL";
 		result = connection->executeQuery(qlFind);
-	   ASSERT_TRUE(result->length() == 2);
+		ASSERT_TRUE(result->length() == 2);
 		delete result;
 	}
 
