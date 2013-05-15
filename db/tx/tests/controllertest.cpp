@@ -27,33 +27,33 @@
 #include "controllertest.h"
 #include "bson.h"
 
-const BSONObj* DummyController::insert(const char* db, const char* ns, BSONObj* bson, BSONObj* options) {
+const BSONObj* DummyController::insert(const char* db, const char* ns, BSONObj* bson, const BSONObj* options) {
 	return bson;
 }
 
-bool DummyController::dropNamespace(const char* db, const char* ns, BSONObj* options) {
+bool DummyController::dropNamespace(const char* db, const char* ns, const BSONObj* options) {
 	return true;
 }
 
-void DummyController::update(const char* db, const char* ns, BSONObj* bson, BSONObj* options) {
+void DummyController::update(const char* db, const char* ns, BSONObj* bson, const BSONObj* options) {
 }
 
-void DummyController::remove(const char* db, const char* ns, const char* documentId, const char* revision, BSONObj* options) {
+void DummyController::remove(const char* db, const char* ns, const char* documentId, const char* revision, const BSONObj* options) {
 }
 
-BSONArrayObj* DummyController::find(const char* db, const char* ns, const char* select, const char* filter, BSONObj* options) throw (ParseException) {
+BSONArrayObj* DummyController::find(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options) throw (ParseException) {
 	return new BSONArrayObj();
 }
 
-BSONObj* DummyController::findFirst(const char* db, const char* ns, const char* select, const char* filter, BSONObj* options)  throw (ParseException) {
+BSONObj* DummyController::findFirst(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options)  throw (ParseException) {
 	return NULL;
 }
 
-std::vector<std::string>* DummyController::dbs(BSONObj* options) const  {
+std::vector<std::string>* DummyController::dbs(const BSONObj* options) const  {
 	return new std::vector<std::string>();
 }
 
-std::vector<std::string>* DummyController::namespaces(const char* db, BSONObj* options) const  {
+std::vector<std::string>* DummyController::namespaces(const char* db, const BSONObj* options) const  {
 	return new std::vector<std::string>();
 }
 

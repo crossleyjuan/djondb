@@ -54,7 +54,7 @@ static void reportOverride(pANTLR3_BASE_RECOGNIZER recognizer) {
 }
 
 start_point	returns [Command* val]
-	:	dql {
+	:	dql EOF {
 	    $val = $dql.val;
 	};
 
@@ -156,11 +156,11 @@ filter_expr :	boolean_expr ;
 
 boolean_expr 
 	:	b1=boolean_term 
-	(OR b2=boolean_term);
+	(OR b2=boolean_term)*;
 
 boolean_term 
 	:	b1=boolean_value
-	 (AND b2=boolean_value);
+	 (AND b2=boolean_value)*;
 	
 boolean_value
 	:	parenthesized_boolean  |

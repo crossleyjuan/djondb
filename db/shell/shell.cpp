@@ -85,6 +85,8 @@ bool ExecuteString(v8::Handle<v8::String> source,
 		bool report_exceptions);
 v8::Handle<v8::Value> Print(const v8::Arguments& args);
 v8::Handle<v8::Value> find(const v8::Arguments& args);
+v8::Handle<v8::Value> executeUpdate(const v8::Arguments& args);
+v8::Handle<v8::Value> executeQuery(const v8::Arguments& args);
 v8::Handle<v8::Value> dropNamespace(const v8::Arguments& args);
 v8::Handle<v8::Value> showDbs(const v8::Arguments& args);
 v8::Handle<v8::Value> showNamespaces(const v8::Arguments& args);
@@ -110,6 +112,8 @@ static bool run_shell;
 char* commands[] = {
 	"print",
 	"find",
+	"executeQuery",
+	"executeUpdate",
 	"dropNamespace",
 	"showDbs",
 	"showNamespaces",
@@ -218,6 +222,10 @@ v8::Persistent<v8::Context> CreateShellContext() {
 	global->Set(v8::String::New("help"), v8::FunctionTemplate::New(help));
 	// Bind the global 'shutdown' function to the C++ Load callback.
 	global->Set(v8::String::New("shutdown"), v8::FunctionTemplate::New(shutdown));
+	// Bind the gloabl 'executeQuery' function to the C++ executeQuery callback.
+	global->Set(v8::String::New("executeQuery"), v8::FunctionTemplate::New(executeQuery));
+	// Bind the gloabl 'executeUpdate' function to the C++ executeUpdate callback.
+	global->Set(v8::String::New("executeUpdate"), v8::FunctionTemplate::New(executeUpdate));
 
 	return v8::Context::New(NULL, global);
 }
@@ -537,6 +545,8 @@ v8::Handle<v8::Value> help(const v8::Arguments& args) {
 			printf("commit()\n\tCommits the current transaction.\n");
 			printf("connect('hostname', [port])\n\tEstablish a connection with a server.\n");
 			printf("dropNamespace('db', 'namespace');\n\tDrops a namespace from the db.\n");
+			printf("executeQuery('select query');\n\tExecutes a query using dql format.\n");
+			printf("executeUpdate('update query');\n\tExecutes an insert, update, remove command using dql.\n");
 			printf("find('db', 'namespace'[, 'select'][, 'filter']);\n\tExecutes a find using the provided filter.\n");
 			printf("help();\n\tThis help\n");
 			printf("insert('db', 'namespace', { json...object});\n\tInserts a new document.\n");
@@ -654,6 +664,61 @@ v8::Handle<v8::Value> connect(const v8::Arguments& args) {
 			__djonConnection = NULL;
 		}
 		return v8::String::New("");
+	} catch (DjondbException e) {
+		return v8::ThrowException(v8::String::New(e.what()));
+	}
+}
+
+v8::Handle<v8::Value> executeUpdate(const v8::Arguments& args) {
+	if (args.Length() != 1) {
+		return v8::ThrowException(v8::String::New("usage: executeUpdate(query)"));
+	}
+
+	v8::HandleScope handle_scope;
+	v8::String::Utf8Value str(args[0]);
+	std::string query = ToCString(str);
+
+	try {
+		if (__djonConnection == NULL) {
+			return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
+		}
+		__djonConnection->executeUpdate(query);
+
+		return v8::Undefined();
+	} catch (ParseException e) {
+		return v8::ThrowException(v8::String::New(e.what()));
+	} catch (DjondbException e) {
+		return v8::ThrowException(v8::String::New(e.what()));
+	}
+}
+
+v8::Handle<v8::Value> executeQuery(const v8::Arguments& args) {
+	if (args.Length() != 1) {
+		return v8::ThrowException(v8::String::New("usage: executeQuery(dql)"));
+	}
+
+	if (__djonConnection == NULL) {
+		return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
+	}
+	v8::HandleScope handle_scope;
+	v8::String::Utf8Value strQuery(args[0]);
+	std::string query = ToCString(strQuery);
+
+	try {
+		BSONArrayObj* result = __djonConnection->executeQuery(query);
+
+		if (result != NULL) {
+			char* str = result->toChar();
+
+			v8::Handle<v8::Value> jsonValue = parseJSON(v8::String::New(str));
+			free(str);
+			delete result;
+			return jsonValue;
+		} else {
+			return v8::Undefined();
+		}
+	} catch (ParseException e) {
+		return v8::ThrowException(v8::String::New(e.what()));
 	} catch (DjondbException e) {
 		return v8::ThrowException(v8::String::New(e.what()));
 	}

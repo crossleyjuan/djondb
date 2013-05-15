@@ -55,14 +55,14 @@ class BaseTransaction: public Controller
 		virtual ~BaseTransaction();
 
 		void loadControlFile();
-		virtual const BSONObj* insert(const char* db, const char* ns, BSONObj* bson, BSONObj* options = NULL);
-		virtual bool dropNamespace(const char* db, const char* ns, BSONObj* options = NULL);
-		virtual void update(const char* db, const char* ns, BSONObj* bson, BSONObj* options = NULL);
-		virtual void remove(const char* db, const char* ns, const char* documentId, const char* revision, BSONObj* options = NULL);
-		virtual BSONArrayObj* find(const char* db, const char* ns, const char* select, const char* filter, BSONObj* options = NULL) throw (ParseException);
-		virtual BSONObj* findFirst(const char* db, const char* ns, const char* select, const char* filter, BSONObj* options = NULL) throw (ParseException);
-		virtual std::vector<std::string>* dbs(BSONObj* options = NULL) const;
-		virtual std::vector<std::string>* namespaces(const char* db, BSONObj* options = NULL) const;
+		virtual const BSONObj* insert(const char* db, const char* ns, BSONObj* bson, const BSONObj* options = NULL);
+		virtual bool dropNamespace(const char* db, const char* ns, const BSONObj* options = NULL);
+		virtual void update(const char* db, const char* ns, BSONObj* bson, const BSONObj* options = NULL);
+		virtual void remove(const char* db, const char* ns, const char* documentId, const char* revision, const BSONObj* options = NULL);
+		virtual BSONArrayObj* find(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options = NULL) throw (ParseException);
+		virtual BSONObj* findFirst(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options = NULL) throw (ParseException);
+		virtual std::vector<std::string>* dbs(const BSONObj* options = NULL) const;
+		virtual std::vector<std::string>* namespaces(const char* db, const BSONObj* options = NULL) const;
 
 		Controller* controller() const;
 		void addBuffers(std::vector<TxBuffer*> buffers);

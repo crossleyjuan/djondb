@@ -39,13 +39,13 @@ using namespace std;
 class Controller 
 {
 	public:
-		virtual const BSONObj* insert(const char* db, const char* ns, BSONObj* bson, BSONObj* options = NULL) = 0;
-		virtual bool dropNamespace(const char* db, const char* ns, BSONObj* options = NULL) = 0;
-		virtual void update(const char* db, const char* ns, BSONObj* bson, BSONObj* options = NULL) = 0;
-		virtual void remove(const char* db, const char* ns, const char* documentId, const char* revision, BSONObj* options = NULL) = 0;
-		virtual BSONArrayObj* find(const char* db, const char* ns, const char* select, const char* filter, BSONObj* options = NULL) throw (ParseException) = 0;
-		virtual BSONObj* findFirst(const char* db, const char* ns, const char* select, const char* filter, BSONObj* options = NULL) throw (ParseException) = 0;
-		virtual std::vector<std::string>* dbs(BSONObj* options = NULL) const = 0;
-		virtual std::vector<std::string>* namespaces(const char* db, BSONObj* options = NULL) const = 0;
+		virtual const BSONObj* insert(const char* db, const char* ns, BSONObj* bson, const BSONObj* options = NULL) = 0;
+		virtual bool dropNamespace(const char* db, const char* ns, const BSONObj* options = NULL) = 0;
+		virtual void update(const char* db, const char* ns, BSONObj* bson, const BSONObj* options = NULL) = 0;
+		virtual void remove(const char* db, const char* ns, const char* documentId, const char* revision, const BSONObj* options = NULL) = 0;
+		virtual BSONArrayObj* find(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options = NULL) throw (ParseException) = 0;
+		virtual BSONObj* findFirst(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options = NULL) throw (ParseException) = 0;
+		virtual std::vector<std::string>* dbs(const BSONObj* options = NULL) const = 0;
+		virtual std::vector<std::string>* namespaces(const char* db, const BSONObj* options = NULL) const = 0;
 };
 #endif // CONTROLLER_INCLUDED_H

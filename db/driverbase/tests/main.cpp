@@ -39,7 +39,6 @@ int _port = 1243;
 
 /*
 TEST(TestDriver, testConnection) {
-	cout << "\ntestConnection\n" << endl;
 
 	DjondbConnection* conn = DjondbConnectionManager::getConnection(_host);
 
@@ -96,7 +95,6 @@ TEST(TestDriver, testDropNamespace) {
 }
 
 TEST(TestDriver, testInsertComplex) {
-	cout << "\nTesting complex" << endl;
 	DjondbConnection* conn = DjondbConnectionManager::getConnection(_host);
 
 	if (!conn->open()) {
@@ -410,8 +408,6 @@ TEST(TestDriver, testUpdate) {
 }
 
 TEST(TestDriver, testUpdateValidations) {
-	cout << "\ntestUpdateValidations\n" << endl;
-
 	DjondbConnection* conn = DjondbConnectionManager::getConnection(_host);
 
 	if (!conn->open()) {
@@ -425,8 +421,6 @@ TEST(TestDriver, testUpdateValidations) {
 }
 
 TEST(TestDriver, testRemove) {
-	cout << "\ntestRemove\n" << endl;
-
 	DjondbConnection* conn = DjondbConnectionManager::getConnection(_host);
 
 	if (!conn->open()) {
@@ -528,24 +522,41 @@ TEST(TestDriver, testTransactions) {
 }
 
 TEST(TestDriver, testDQL) {
-
-	cout << "\ntestDQL\n" << endl;
-
 	DjondbConnection* connection = DjondbConnectionManager::getConnection(_host);
 
 	if (connection->open()) {
 		connection->dropNamespace("db", "TestQL");
 
-		char* ql = "Insert { 'name': 'John', 'last': 'Smith'} INTO db:TestQL";
+		char* ql = "Insert { 'name': 'John', 'last': 'Smith', 'age': 15} INTO db:TestQL";
 		connection->executeUpdate(ql);
 
 		char* qlFind = "Select * FROM db:TestQL";
 		BSONArrayObj* result = connection->executeQuery(qlFind);
-
-		qlFind = "Select $'a', $'b' FROM db:TestQL";
-		result = connection->executeQuery(qlFind);
-
 	   ASSERT_TRUE(result->length() == 1);
+	   ASSERT_TRUE(result->get(0)->has("name"));
+	   ASSERT_TRUE(result->get(0)->getString("name").compare("John") == 0);
+		delete result;
+
+		ql = "Insert { 'name': 'Peter', 'last': 'Strauss', 'age': 25} INTO db:TestQL";
+		connection->executeUpdate(ql);
+
+		qlFind = "Select $'name', $'age' FROM db:TestQL where $'age' > 15";
+		result = connection->executeQuery(qlFind);
+	   ASSERT_TRUE(result->length() == 1);
+	   ASSERT_TRUE(result->get(0)->has("name"));
+	   ASSERT_TRUE(result->get(0)->getString("name").compare("Peter") == 0);
+	   ASSERT_TRUE(result->get(0)->has("age"));
+	   ASSERT_TRUE(result->get(0)->getInt("age") == 25);
+	   ASSERT_TRUE(!result->get(0)->has("last"));
+		delete result;
+
+		ql = "Insert { 'name': 'Mary', 'last': 'May'} INTO db:TestQL";
+		connection->executeUpdate(ql);
+
+		qlFind = "Select TOP 2 * FROM db:TestQL";
+		result = connection->executeQuery(qlFind);
+	   ASSERT_TRUE(result->length() == 2);
+		delete result;
 	}
 
 }

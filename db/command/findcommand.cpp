@@ -63,7 +63,7 @@ void FindCommand::execute() {
 	Logger* log = getLogger(NULL);
 	if (log->isDebug()) log->debug("executing find command on %s", nameSpace()->c_str());
 
-	_findresult = dbController()->find(const_cast<char*>(DB()->c_str()), const_cast<char*>(nameSpace()->c_str()), select()->c_str(), filter()->c_str());
+	_findresult = dbController()->find(const_cast<char*>(DB()->c_str()), const_cast<char*>(nameSpace()->c_str()), select()->c_str(), filter()->c_str(), options());
 }
 
 void* FindCommand::result() {
@@ -76,7 +76,11 @@ void* FindCommand::result() {
 void FindCommand::writeCommand(OutputStream* out) const {
 	out->writeString(*_db);
 	out->writeString(*_namespace);
-	out->writeString(*_filter);
+	if (_filter != NULL) {
+		out->writeString(*_filter);
+	} else {
+		out->writeString("");
+	}
 	out->writeString(*_select);
 }
 

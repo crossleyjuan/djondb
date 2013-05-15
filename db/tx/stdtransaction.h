@@ -55,14 +55,14 @@ class StdTransaction: public BaseTransaction
 		StdTransaction(const StdTransaction& orig);
 		virtual ~StdTransaction();
 
-		virtual const BSONObj* insert(char* db, char* ns, BSONObj* bson, BSONObj* options = NULL);
-		virtual bool dropNamespace(char* db, char* ns, BSONObj* options = NULL);
-		virtual void update(char* db, char* ns, BSONObj* bson, BSONObj* options = NULL);
-		virtual void remove(char* db, char* ns, char* documentId, char* revision, BSONObj* options = NULL);
-		virtual BSONArrayObj* find(char* db, char* ns, const char* select, const char* filter, BSONObj* options = NULL) throw (ParseException);
-		virtual BSONObj* findFirst(char* db, char* ns, const char* select, const char* filter, BSONObj* options = NULL) throw (ParseException);
-		virtual std::vector<std::string>* dbs(BSONObj* options = NULL) const;
-		virtual std::vector<std::string>* namespaces(const char* db, BSONObj* options = NULL) const;
+		virtual const BSONObj* insert(char* db, char* ns, BSONObj* bson, const BSONObj* options = NULL);
+		virtual bool dropNamespace(char* db, char* ns, const BSONObj* options = NULL);
+		virtual void update(char* db, char* ns, BSONObj* bson, const BSONObj* options = NULL);
+		virtual void remove(char* db, char* ns, char* documentId, char* revision, const BSONObj* options = NULL);
+		virtual BSONArrayObj* find(char* db, char* ns, const char* select, const char* filter, const BSONObj* options = NULL) throw (ParseException);
+		virtual BSONObj* findFirst(char* db, char* ns, const char* select, const char* filter, const BSONObj* options = NULL) throw (ParseException);
+		virtual std::vector<std::string>* dbs(const BSONObj* options = NULL) const;
+		virtual std::vector<std::string>* namespaces(const char* db, const BSONObj* options = NULL) const;
 
 		virtual bool commit();
 		virtual bool rollback();

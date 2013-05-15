@@ -110,7 +110,7 @@ std::list<TransactionOperation*>* BaseTransaction::findOperations(const char* db
 	return result;
 }
 
-const BSONObj* BaseTransaction::insert(const char* db, const char* ns, BSONObj* bson, BSONObj* options) {
+const BSONObj* BaseTransaction::insert(const char* db, const char* ns, BSONObj* bson, const BSONObj* options) {
 	TransactionOperation oper;
 	oper.code = TXO_INSERT;
 	oper.db = strcpy(db);
@@ -128,7 +128,7 @@ const BSONObj* BaseTransaction::insert(const char* db, const char* ns, BSONObj* 
 	return bson;
 }
 
-bool BaseTransaction::dropNamespace(const char* db, const char* ns, BSONObj* options) {
+bool BaseTransaction::dropNamespace(const char* db, const char* ns, const BSONObj* options) {
 	TransactionOperation oper;
 	oper.code = TXO_DROPNAMESPACE;
 	oper.operation = NULL;
@@ -140,7 +140,7 @@ bool BaseTransaction::dropNamespace(const char* db, const char* ns, BSONObj* opt
 	return true;
 }
 
-void BaseTransaction::update(const char* db, const char* ns, BSONObj* bson, BSONObj* options) {
+void BaseTransaction::update(const char* db, const char* ns, BSONObj* bson, const BSONObj* options) {
 	TransactionOperation oper;
 	oper.code = TXO_UPDATE;
 	oper.db = strcpy(db);
@@ -156,7 +156,7 @@ void BaseTransaction::update(const char* db, const char* ns, BSONObj* bson, BSON
 	delete bsonOper;
 }
 
-void BaseTransaction::remove(const char* db, const char* ns, const char* documentId, const char* revision, BSONObj* options) {
+void BaseTransaction::remove(const char* db, const char* ns, const char* documentId, const char* revision, const BSONObj* options) {
 	TransactionOperation oper;
 	oper.code = TXO_REMOVE;
 	oper.db = strcpy(db);
@@ -179,7 +179,7 @@ bool compareStrings(std::string s1, std::string s2) {
 	return s1.compare(s2) == 0;
 }
 
-BSONArrayObj* BaseTransaction::find(const char* db, const char* ns, const char* select, const char* filter, BSONObj* options) throw (ParseException) {
+BSONArrayObj* BaseTransaction::find(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options) throw (ParseException) {
 	std::list<TransactionOperation*>* operations = findOperations(db, ns);
 	LinkedMap<std::string, BSONObj*> map(compareStrings);
 
@@ -274,12 +274,35 @@ BSONArrayObj* BaseTransaction::find(const char* db, const char* ns, const char* 
 		delete operation;
 	}
 
+	__int64 maxResults = 3000;
+	if ((options != NULL) && options->has("limit")) {
+		BSONContent* content = options->getContent("limit");
+		if (content->type() == INT_TYPE) {
+			maxResults = options->getInt("limit");
+		} else if (content->type() == LONG_TYPE) {
+			maxResults = options->getLong("limit");
+		}
+	} else {
+		std::string smax = getSetting("max_results");
+		if (smax.length() > 0) {
+#ifdef WINDOWS
+			maxResults = _atoi64(smax.c_str());
+#else
+			maxResults = atoll(smax.c_str());
+#endif
+		}
+	}
+	__int64 count = 0;
 	BSONArrayObj* result = new BSONArrayObj();
 	for (LinkedMap<std::string, BSONObj*>::iterator it = map.begin(); it != map.end(); it++) {
 		BSONObj* r = it->second;
 		BSONObj* bresult = r->select(select);
 		result->add(*bresult);
+		count++;
 		delete bresult;
+		if (count >= maxResults) {
+			break;
+		}
 	}
 	map.clear();
 	delete parser;
@@ -289,7 +312,7 @@ BSONArrayObj* BaseTransaction::find(const char* db, const char* ns, const char* 
 	return result;
 }
 
-BSONObj* BaseTransaction::findFirst(const char* db, const char* ns, const char* select, const char* filter, BSONObj* options) throw (ParseException) {
+BSONObj* BaseTransaction::findFirst(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options) throw (ParseException) {
 	BSONArrayObj* fullList = find(db, ns, select, filter, options);
 
 	BSONObj* result = NULL;
@@ -304,11 +327,11 @@ BSONObj* BaseTransaction::findFirst(const char* db, const char* ns, const char* 
 	return result;
 }
 
-std::vector<std::string>* BaseTransaction::dbs(BSONObj* options) const {
+std::vector<std::string>* BaseTransaction::dbs(const BSONObj* options) const {
 	return _controller->dbs(options);
 }
 
-std::vector<std::string>* BaseTransaction::namespaces(const char* db, BSONObj* options) const {
+std::vector<std::string>* BaseTransaction::namespaces(const char* db, const BSONObj* options) const {
 	std::list<TransactionOperation*>* operations = findOperations(db, NULL);
 
 	std::vector<std::string>* nss = _controller->namespaces(db, options);

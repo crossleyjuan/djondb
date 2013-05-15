@@ -410,7 +410,7 @@ bool DjondbConnection::dropNamespace(const std::string& db, const std::string& n
 BSONArrayObj* DjondbConnection::executeQuery(const std::string& query) {
 	Command* cmd = parseCommand(query);
 
-	prepareOptions((Command*)&cmd);
+	prepareOptions(cmd);
 	_commandWriter->writeCommand(cmd);
 	cmd->readResult(_inputStream);
 	BSONArrayObj* result = NULL;
@@ -428,7 +428,7 @@ BSONArrayObj* DjondbConnection::executeQuery(const std::string& query) {
 bool DjondbConnection::executeUpdate(const std::string& query) {
 	Command* cmd = parseCommand(query);
 
-	prepareOptions((Command*)&cmd);
+	prepareOptions(cmd);
 	_commandWriter->writeCommand(cmd);
 	cmd->readResult(_inputStream);
 	delete cmd;

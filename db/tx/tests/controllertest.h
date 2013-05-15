@@ -39,13 +39,13 @@ using namespace std;
 class DummyController: public Controller
 {
 	public:
-		virtual const BSONObj* insert(const char* db, const char* ns, BSONObj* bson, BSONObj* options);
-		virtual bool dropNamespace(const char* db, const char* ns, BSONObj* options);
-		virtual void update(const char* db, const char* ns, BSONObj* bson, BSONObj* options);
-		virtual void remove(const char* db, const char* ns, const char* documentId, const char* revision, BSONObj* options);
-		virtual BSONArrayObj* find(const char* db, const char* ns, const char* select, const char* filter, BSONObj* options) throw (ParseException);
-		virtual BSONObj* findFirst(const char* db, const char* ns, const char* select, const char* filter, BSONObj* options) throw (ParseException);
-		virtual std::vector<std::string>* dbs(BSONObj* options) const;
-		virtual std::vector<std::string>* namespaces(const char* db, BSONObj* options) const;
+		virtual const BSONObj* insert(const char* db, const char* ns, BSONObj* bson, const BSONObj* options);
+		virtual bool dropNamespace(const char* db, const char* ns, const BSONObj* options);
+		virtual void update(const char* db, const char* ns, BSONObj* bson, const BSONObj* options);
+		virtual void remove(const char* db, const char* ns, const char* documentId, const char* revision, const BSONObj* options);
+		virtual BSONArrayObj* find(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options) throw (ParseException);
+		virtual BSONObj* findFirst(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options) throw (ParseException);
+		virtual std::vector<std::string>* dbs(const BSONObj* options) const;
+		virtual std::vector<std::string>* namespaces(const char* db, const BSONObj* options) const;
 };
 #endif /* CONTROLLERTEST_INCLUDED_H */

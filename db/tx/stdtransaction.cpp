@@ -44,35 +44,35 @@ StdTransaction::StdTransaction(const StdTransaction& orig)
 StdTransaction::~StdTransaction() {
 }
 
-const BSONObj* StdTransaction::insert(char* db, char* ns, BSONObj* bson, BSONObj* options) {
+const BSONObj* StdTransaction::insert(char* db, char* ns, BSONObj* bson, const BSONObj* options) {
 	return BaseTransaction::insert(db, ns, bson, options);
 }
 
-bool StdTransaction::dropNamespace(char* db, char* ns, BSONObj* options) {
+bool StdTransaction::dropNamespace(char* db, char* ns, const BSONObj* options) {
 	return BaseTransaction::dropNamespace(db, ns, options);
 }
 
-void StdTransaction::update(char* db, char* ns, BSONObj* bson, BSONObj* options) {
+void StdTransaction::update(char* db, char* ns, BSONObj* bson, const BSONObj* options) {
 	BaseTransaction::update(db, ns, bson, options);
 }
 
-void StdTransaction::remove(char* db, char* ns, char* documentId, char* revision, BSONObj* options) {
+void StdTransaction::remove(char* db, char* ns, char* documentId, char* revision, const BSONObj* options) {
 	BaseTransaction::remove(db, ns, documentId, revision, options);
 }
 
-BSONArrayObj* StdTransaction::find(char* db, char* ns, const char* select, const char* filter, BSONObj* options) throw (ParseException) {
+BSONArrayObj* StdTransaction::find(char* db, char* ns, const char* select, const char* filter, const BSONObj* options) throw (ParseException) {
 	return BaseTransaction::find(db, ns, select, filter, options);
 }
 
-BSONObj* StdTransaction::findFirst(char* db, char* ns, const char* select, const char* filter, BSONObj* options) throw (ParseException) {
+BSONObj* StdTransaction::findFirst(char* db, char* ns, const char* select, const char* filter, const BSONObj* options) throw (ParseException) {
 	return BaseTransaction::findFirst(db, ns, select, filter, options);
 }
 
-std::vector<std::string>* StdTransaction::dbs(BSONObj* options) const {
+std::vector<std::string>* StdTransaction::dbs(const BSONObj* options) const {
 	return BaseTransaction::dbs(options);
 }
 
-std::vector<std::string>* StdTransaction::namespaces(const char* db, BSONObj* options) const {
+std::vector<std::string>* StdTransaction::namespaces(const char* db, const BSONObj* options) const {
 	return BaseTransaction::namespaces(db, options);
 }
 

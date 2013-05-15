@@ -201,7 +201,7 @@ void DBController::fillRequiredFields(BSONObj* obj) {
 	obj->add("_status", 1); // Active
 }
 
-const BSONObj* DBController::insert(const char* db, const char* ns, BSONObj* obj, BSONObj* options) {
+const BSONObj* DBController::insert(const char* db, const char* ns, BSONObj* obj, const BSONObj* options) {
 	if (_logger->isDebug()) _logger->debug(2, "DBController::insert ns: %s, bson: %s", ns, obj->toChar());
 	StreamType* streamData = StreamManager::getStreamManager()->open(db, ns, DATA_FTYPE);
 
@@ -222,7 +222,7 @@ const BSONObj* DBController::insert(const char* db, const char* ns, BSONObj* obj
 	return obj;
 }
 
-void DBController::update(const char* db, const char* ns, BSONObj* obj, BSONObj* options) {
+void DBController::update(const char* db, const char* ns, BSONObj* obj, const BSONObj* options) {
 	if (_logger->isDebug()) _logger->debug(2, "DBController::update ns: %s, bson: %s", ns, obj->toChar());
 	StreamType* streamData = StreamManager::getStreamManager()->open(db, ns, DATA_FTYPE);
 
@@ -253,7 +253,7 @@ void DBController::update(const char* db, const char* ns, BSONObj* obj, BSONObj*
 	//CacheManager::objectCache()->add(id, new BSONObj(*obj));
 }
 
-void DBController::remove(const char* db, const char* ns, const char* documentId, const char* revision, BSONObj* options) {
+void DBController::remove(const char* db, const char* ns, const char* documentId, const char* revision, const BSONObj* options) {
 	if (_logger->isDebug()) _logger->debug(2, "DBController::update db: %s, ns: %s, documentId: %s, revision: %s", db, ns, documentId, revision);
 	StreamType* streamData = StreamManager::getStreamManager()->open(db, ns, DATA_FTYPE);
 
@@ -328,7 +328,7 @@ void DBController::insertIndex(const char* db, const char* ns, BSONObj* bson, lo
 	out->writeLong(filePos);
 }
 
-BSONArrayObj* DBController::find(const char* db, const char* ns, const char* select, const char* filter, BSONObj* options) throw(ParseException) {
+BSONArrayObj* DBController::find(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options) throw(ParseException) {
 	if (_logger->isDebug()) _logger->debug(2, "DBController::find db: %s, ns: %s, select: %s, filter: %s", db, ns, select, filter);
 
 	BSONArrayObj* result;
@@ -377,7 +377,7 @@ BSONArrayObj* DBController::find(const char* db, const char* ns, const char* sel
 	return result;
 }
 
-BSONObj* DBController::findFirst(const char* db, const char* ns, const char* select, const char* filter, BSONObj* options) throw(ParseException) {
+BSONObj* DBController::findFirst(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options) throw(ParseException) {
 	if (_logger->isDebug()) _logger->debug(2, "DBController::findFirst db: %s, ns: %s, select: %s, filter: %s", db, ns, select, filter);
 	std::string filedir = _dataDir + db;
 	filedir = filedir + FILESEPARATOR;
@@ -433,7 +433,7 @@ BSONObj* DBController::findFirst(const char* db, const char* ns, const char* sel
 	return bsonResult;
 }
 
-BSONArrayObj* DBController::findFullScan(const char* db, const char* ns, const char* select, FilterParser* parser, BSONObj* options) throw(ParseException) {
+BSONArrayObj* DBController::findFullScan(const char* db, const char* ns, const char* select, FilterParser* parser, const BSONObj* options) throw(ParseException) {
 	if (_logger->isDebug()) _logger->debug(2, "DBController::findFullScan with parser db: %s, ns: %s", db, ns);
 	std::string filedir = _dataDir + db;
 	filedir = filedir + FILESEPARATOR;
@@ -478,7 +478,12 @@ BSONArrayObj* DBController::findFullScan(const char* db, const char* ns, const c
 
 	__int64 maxResults = 3000;
 	if ((options != NULL) && options->has("limit")) {
-		maxResults = options->getInt("limit");
+		BSONContent* content = options->getContent("limit");
+		if (content->type() == INT_TYPE) {
+			maxResults = options->getInt("limit");
+		} else if (content->type() == LONG_TYPE) {
+			maxResults = options->getLong("limit");
+		}
 	} else {
 		std::string smax = getSetting("max_results");
 		if (smax.length() > 0) {
@@ -522,14 +527,14 @@ BSONArrayObj* DBController::findFullScan(const char* db, const char* ns, const c
 	return result;
 }
 
-std::vector<std::string>* DBController::dbs(BSONObj* options) const {
+std::vector<std::string>* DBController::dbs(const BSONObj* options) const {
 	return StreamManager::getStreamManager()->dbs();
 }
 
-std::vector<std::string>* DBController::namespaces(const char* db, BSONObj* options) const {
+std::vector<std::string>* DBController::namespaces(const char* db, const BSONObj* options) const {
 	return StreamManager::getStreamManager()->namespaces(db);
 }
 
-bool DBController::dropNamespace(const char* db, const char* ns, BSONObj* options) {
+bool DBController::dropNamespace(const char* db, const char* ns, const BSONObj* options) {
 	return StreamManager::getStreamManager()->dropNamespace(db, ns);
 }
