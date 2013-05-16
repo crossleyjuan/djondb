@@ -114,6 +114,10 @@ void WrapConnection::Init(Handle<Object> target) {
 			FunctionTemplate::New(commitTransaction)->GetFunction());
 	tpl->PrototypeTemplate()->Set(String::NewSymbol("rollbackTransaction"),
 			FunctionTemplate::New(rollbackTransaction)->GetFunction());
+	tpl->PrototypeTemplate()->Set(String::NewSymbol("executeUpdate"),
+			FunctionTemplate::New(executeUpdate)->GetFunction());
+	tpl->PrototypeTemplate()->Set(String::NewSymbol("executeQuery"),
+			FunctionTemplate::New(executeQuery)->GetFunction());
 
 	constructor = Persistent<Function>::New(tpl->GetFunction());
 	//target->Set(String::NewSymbol("WrapConnection"), constructor);
@@ -445,3 +449,61 @@ Handle<Value> WrapConnection::host(const v8::Arguments& args) {
 void WrapConnection::setConnection(djondb::DjondbConnection* con) {
 	this->_con = con;
 }
+
+v8::Handle<v8::Value> WrapConnection::executeUpdate(const v8::Arguments& args) {
+	if (args.Length() != 1) {
+		return v8::ThrowException(v8::String::New("usage: executeUpdate(query)"));
+	}
+
+	v8::HandleScope handle_scope;
+	v8::String::Utf8Value str(args[0]);
+	std::string query = ToCString(str);
+
+	try {
+		WrapConnection* obj = ObjectWrap::Unwrap<WrapConnection>(args.This());
+		if ((obj == NULL) || (obj->_con == NULL)) {
+			return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
+		}
+		obj->_con->executeUpdate(query);
+
+		return v8::Undefined();
+	} catch (ParseException e) {
+		return v8::ThrowException(v8::String::New(e.what()));
+	} catch (DjondbException e) {
+		return v8::ThrowException(v8::String::New(e.what()));
+	}
+}
+
+v8::Handle<v8::Value> WrapConnection::executeQuery(const v8::Arguments& args) {
+	if (args.Length() != 1) {
+		return v8::ThrowException(v8::String::New("usage: executeQuery(dql)"));
+	}
+
+	WrapConnection* obj = ObjectWrap::Unwrap<WrapConnection>(args.This());
+	if ((obj == NULL) || (obj->_con == NULL)) {
+		return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
+	}
+	v8::HandleScope handle_scope;
+	v8::String::Utf8Value strQuery(args[0]);
+	std::string query = ToCString(strQuery);
+
+	try {
+		BSONArrayObj* result = obj->_con->executeQuery(query);
+
+		if (result != NULL) {
+			char* str = result->toChar();
+
+			v8::Handle<v8::Value> jsonValue = parseJSON(v8::String::New(str));
+			free(str);
+			delete result;
+			return handle_scope.Close(jsonValue);
+		} else {
+			return v8::Undefined();
+		}
+	} catch (ParseException e) {
+		return v8::ThrowException(v8::String::New(e.what()));
+	} catch (DjondbException e) {
+		return v8::ThrowException(v8::String::New(e.what()));
+	}
+}
+
