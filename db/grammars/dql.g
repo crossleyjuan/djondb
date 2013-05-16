@@ -174,12 +174,16 @@ parenthesized_boolean
 	: LPAREN boolean_expr RPAREN;
 	
 nonparentherized_boolean 
-	: u1=unary_expr  ( OPER u2=unary_expr );
+	: u1=unary_expr  ( OPER u2=unary_expr )*;
 
-
-		
 unary_expr
-	: (c1=constant_expr | x1=xpath_expr);
+	: (c1=constant_expr | x1=xpath_expr | e1=exists_expr | n1=not_expr);
+
+exists_expr
+	: EXISTS LPAREN xpath_expr RPAREN;
+	
+not_expr
+	: (NOT LPAREN e1=exists_expr RPAREN) | (NOT e2=exists_expr);
 	
 xpath_expr
 	: XPATH;
@@ -223,6 +227,7 @@ INTO	:	('i'|'I')('n'|'N')('t'|'T')('o'|'O');
 WITH	:	('w'|'W')('i'|'I')('t'|'T')('h'|'H');
 NOT	:	('n'|'N')('o'|'O')('t'|'T');
 OPER	:	('==' | '>' | '>=' | '<' | '<=' | '!=' );
+EXISTS	:	('e'|'E')('x'|'X')('i'|'I')('s'|'S')('t'|'T')('s'|'S');
 OR	:	('o' | 'O') ('R' | 'r');
 AND	:	('a' | 'A') ('n' | 'N') ('d' | 'D');
 TOP	:	('t'|'T')('o'|'O')('p'|'P');

@@ -511,6 +511,30 @@ TEST_F(TestDB, testFilterExpressionParser) {
 		bres = *result;
 		EXPECT_TRUE(bres);
 
+		parser = FilterParser::parse("exists($'age')");
+		result = parser->eval(obj);
+		EXPECT_TRUE(result->type() == ExpressionResult::RT_BOOLEAN);
+		bres = *result;
+		EXPECT_TRUE(bres);
+
+		parser = FilterParser::parse("exists($'notexistfield')");
+		result = parser->eval(obj);
+		EXPECT_TRUE(result->type() == ExpressionResult::RT_BOOLEAN);
+		bres = *result;
+		EXPECT_TRUE(!bres);
+
+		parser = FilterParser::parse("not exists($'notexistfield')");
+		result = parser->eval(obj);
+		EXPECT_TRUE(result->type() == ExpressionResult::RT_BOOLEAN);
+		bres = *result;
+		EXPECT_TRUE(bres);
+
+		parser = FilterParser::parse("not exists($'age')");
+		result = parser->eval(obj);
+		EXPECT_TRUE(result->type() == ExpressionResult::RT_BOOLEAN);
+		bres = *result;
+		EXPECT_TRUE(!bres);
+
 	} catch (ParseException& e) {
 		FAIL() << "A ParseException should not rise in this method";
 	}

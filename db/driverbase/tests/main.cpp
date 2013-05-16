@@ -565,6 +565,24 @@ TEST(TestDriver, testDQL) {
 		result = connection->executeQuery(qlFind);
 		ASSERT_TRUE(result->length() == 2);
 		delete result;
+
+		ql = "Insert { 'name': 'Test Not Exist', 'other': '1'} INTO db:TestQL";
+		connection->executeUpdate(ql);
+
+		qlFind = "Select * FROM db:TestQL where not exists($'last')";
+		result = connection->executeQuery(qlFind);
+		ASSERT_TRUE(result->length() == 1);
+		ASSERT_TRUE(result->get(0)->has("name"));
+		ASSERT_TRUE(result->get(0)->getString("name").compare("Test Not Exist") == 0);
+		delete result;
+
+		qlFind = "Select * FROM db:TestQL where exists($'other')";
+		result = connection->executeQuery(qlFind);
+		ASSERT_TRUE(result->length() == 1);
+		ASSERT_TRUE(result->get(0)->has("other"));
+		ASSERT_TRUE(result->get(0)->getString("other").compare("1") == 0);
+		delete result;
+
 	}
 
 }

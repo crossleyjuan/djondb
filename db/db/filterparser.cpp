@@ -321,7 +321,7 @@ FilterParser* FilterParser::parse(const std::string& expression) throw(ParseExce
 		rootExpression = parser ->start_point(parser);
 		xpathTokens = __parser_tokens();
 		if (parser->pParser->rec->state->exception != NULL) {
-			errorCode = 1;
+			errorCode = D_ERROR_PARSEERROR;
 			errorMessage = (char*)parser->pParser->rec->state->exception->message;
 		}
 
