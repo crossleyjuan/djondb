@@ -774,9 +774,11 @@ TEST_F(TestDB, testFindPartial) {
 
 	BSONObj* obj = BSONParser::parse(record.c_str());
 
+	controller->dropNamespace("testdb", "partial");
+
 	controller->insert("testdb", "partial", obj);
 
-	BSONArrayObj* result = controller->find("testdb", "partial", "*", "$\"name\", $\"lastName\"");
+	BSONArrayObj* result = controller->find("testdb", "partial", "$\"name\", $\"lastName\"", "");
 
 	EXPECT_TRUE(result != NULL);
 	if (result != NULL) {
@@ -788,8 +790,6 @@ TEST_F(TestDB, testFindPartial) {
 			BSONObj* test = *result->begin();
 
 			EXPECT_TRUE(*test == testObj);
-
-			delete test;
 		}
 		delete result;
 	}
@@ -838,7 +838,7 @@ TEST_F(TestDB, testFindsByFilter)
 	EXPECT_TRUE(found->length() == 8); 
 	delete found;
 
-	found = controller->find("dbtest", "find.filter", "*", "$\"name\": \"Juan\"");
+	found = controller->find("dbtest", "find.filter", "*", "$\"name\" == \"Juan\"");
 	EXPECT_TRUE(found->length() == 7); 
 	delete found;
 
@@ -1098,10 +1098,11 @@ TEST_F(TestDB, testHighMemIndex)
 TEST_F(TestDB, testComplexIndex)
 {
 	cout << "\ntestComplexIndex" << endl;
-	cout << "testing 10 ids" << endl;
+	Logger* log = getLogger(NULL);
+	log->debug("Testing 10 ids");
 	std::vector<std::string> ids = generateGuids(10);
 	for (std::vector<std::string>::iterator i = ids.begin(); i != ids.end(); i++) {
-		cout << i->c_str() << endl;
+		log->debug("guid: %s", i->c_str());
 	}
 	testIndex(ids);
 	/*
@@ -1203,3 +1204,40 @@ TEST_F(TestDB, testErrorHandling) {
 	// EXPECT_TRUE(parser == NULL);
 }
 
+
+/* Not supported yet, this will require some code */
+/*
+TEST_F(TestDB, testId) {
+	cout << "Testing different id types" << endl;
+
+	cout << "Testing string ids" << endl;
+	controller->dropNamespace("TestDB", "TestIds");
+	// Lets start with the easy one (String)
+	BSONObj obj;
+	obj.add("_id", "test");
+	obj.add("data", "asdfasdf");
+
+	controller->insert("TestDB", "TestIds", &obj);
+
+	BSONArrayObj* result = controller->find("TestDB", "TestIds", "*", "$'_id' == 'test'");
+
+	ASSERT_TRUE(result != NULL);
+	ASSERT_TRUE(result->length() == 1);
+	EXPECT_TRUE(obj == *result->get(0));
+
+	cout << "Testing int ids" << endl;
+	controller->dropNamespace("TestDB", "TestIdsWithInt");
+
+	BSONObj obj2;
+	obj2.add("_id", (__int32)10);
+	obj2.add("data", "asdfasdf");
+
+	controller->insert("TestDB", "TestIdsWithInt", &obj2);
+
+	BSONArrayObj* result2 = controller->find("TestDB", "TestIdsWithInt", "*", "$'_id' == 10");
+
+	ASSERT_TRUE(result2 != NULL);
+	ASSERT_TRUE(result2->length() == 1);
+	EXPECT_TRUE(obj2 == *result2->get(0));
+}
+*/

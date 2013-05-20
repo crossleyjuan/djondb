@@ -92,6 +92,12 @@ void BSONObj::add(std::string key, const BSONObj& val) {
 	_elements.insert(pair<std::string, BSONContent* >(key, content));
 }
 
+void BSONObj::add(std::string key, const BSONContent& val) {
+	remove(key);
+	BSONContent* content = val.clone(); 
+	_elements.insert(pair<std::string, BSONContent* >(key, content));
+}
+
 void BSONObj::add(std::string key, const BSONArrayObj& val) {
 	remove(key);
 	BSONContentBSONArray* content = new BSONContentBSONArray(new BSONArrayObj(val)); 
@@ -152,7 +158,7 @@ char* BSONObj::toChar() {
 								 }
 			case LONG_TYPE: {
 									 BSONContentLong* blong = (BSONContentLong*)content;
-									 sprintf(result + pos, "%lld", (__int64)*blong);
+									 sprintf(result + pos, "%ld", (__int64)*blong);
 									 break;
 								 }
 			case DOUBLE_TYPE: {
@@ -393,12 +399,14 @@ BSONContent* BSONObj::getXpath(const std::string& xpath) const {
 }
 
 bool BSONObj::operator ==(const BSONObj& obj) const {
+	/* 
 	if (this->has("_id") && obj.has("_id")) {
 		BSONContent* idThis = this->getContent("_id");
 		BSONContent* idOther = obj.getContent("_id");
 
 		return (*idThis == *idOther);
 	}
+	*/
 	// Element count
 	if (this->length() != obj.length()) {
 		return false;

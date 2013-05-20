@@ -20,9 +20,12 @@
 
 #include <string>
 #include <set>
+#include "bsondefs.h"
 
 std::set<std::string> bson_splitSelect(const char* select);
 char* bson_subselect(const char* select, const char* elment);
+
+void* convert(BSONTYPE fromType, BSONTYPE toType, void* value);
 
 #endif // BSONUTIL_INCLUDE_H
 

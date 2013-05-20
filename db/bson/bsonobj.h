@@ -24,6 +24,7 @@ class BSONObj
         void add(std::string, const char*, __int32);
         void add(std::string, const BSONObj&);
         void add(std::string, const BSONArrayObj&);
+        void add(std::string, const BSONContent&);
 
         virtual bool has(std::string) const;
 
