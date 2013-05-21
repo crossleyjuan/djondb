@@ -23,15 +23,11 @@ echo $res->toChar()."\n";
 
 echo "nickname: ";
 
-$res = $c->find('phpdb', 'superheroes', '$"nicknames.name" == "Spiderman"');
+$res = $c->find('phpdb', 'superheroes', '*', '$"lastName" == "Parker"');
 
 echo $res->toChar()."\n";
 
-$res = $c->find('phpdb', 'superheroes', '$"lastName" == "Parker"');
-
-echo $res->toChar()."\n";
-
-$res = $c->find('phpdb', 'superheroes', '$"name" == "Peter"');
+$res = $c->find('phpdb', 'superheroes', '*', '$"name" == "Peter"');
 				
 echo "With objects";
 

@@ -901,7 +901,7 @@ SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_BSONObj_1add_1_1SWIG_13(JNIEn
     arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
     if (!arg3) return ;
   }
-  (arg1)->add(arg2,arg3);
+  (arg1)->add(arg2,(char const *)arg3);
   if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
 }
 
@@ -930,7 +930,7 @@ SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_BSONObj_1add_1_1SWIG_14(JNIEn
     if (!arg3) return ;
   }
   arg4 = (__int32)jarg4; 
-  (arg1)->add(arg2,arg3,arg4);
+  (arg1)->add(arg2,(char const *)arg3,arg4);
   if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
 }
 
@@ -986,6 +986,32 @@ SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_BSONObj_1add_1_1SWIG_16(JNIEn
     return ;
   } 
   (arg1)->add(arg2,(BSONArrayObj const &)*arg3);
+}
+
+
+SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_BSONObj_1add_1_1SWIG_17(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jlong jarg3) {
+  BSONObj *arg1 = (BSONObj *) 0 ;
+  std::string arg2 ;
+  BSONContent *arg3 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(BSONObj **)&jarg1; 
+  if(!jarg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null string");
+    return ;
+  } 
+  const char *arg2_pstr = (const char *)jenv->GetStringUTFChars(jarg2, 0); 
+  if (!arg2_pstr) return ;
+  (&arg2)->assign(arg2_pstr);
+  jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
+  arg3 = *(BSONContent **)&jarg3;
+  if (!arg3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "BSONContent const & reference is null");
+    return ;
+  } 
+  (arg1)->add(arg2,(BSONContent const &)*arg3);
 }
 
 
@@ -1630,6 +1656,36 @@ SWIGEXPORT jstring JNICALL Java_djondb_djonwrapperJNI_bson_1subselect(JNIEnv *je
   if (result) jresult = jenv->NewStringUTF((const char *)result);
   if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
   if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_convert(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3) {
+  jlong jresult = 0 ;
+  BSONTYPE arg1 ;
+  BSONTYPE arg2 ;
+  void *arg3 = (void *) 0 ;
+  BSONTYPE *argp1 ;
+  BSONTYPE *argp2 ;
+  void *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  argp1 = *(BSONTYPE **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null BSONTYPE");
+    return 0;
+  }
+  arg1 = *argp1; 
+  argp2 = *(BSONTYPE **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null BSONTYPE");
+    return 0;
+  }
+  arg2 = *argp2; 
+  arg3 = *(void **)&jarg3; 
+  result = (void *)convert(arg1,arg2,arg3);
+  *(void **)&jresult = result; 
   return jresult;
 }
 
@@ -2438,6 +2494,56 @@ SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1remove(
   arg5 = &arg5_str;
   jenv->ReleaseStringUTFChars(jarg5, arg5_pstr); 
   result = (bool)(arg1)->remove((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4,(std::string const &)*arg5);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1executeQuery(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+  jlong jresult = 0 ;
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
+  std::string *arg2 = 0 ;
+  BSONArrayObj *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(djondb::DjondbConnection **)&jarg1; 
+  if(!jarg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null string");
+    return 0;
+  }
+  const char *arg2_pstr = (const char *)jenv->GetStringUTFChars(jarg2, 0); 
+  if (!arg2_pstr) return 0;
+  std::string arg2_str(arg2_pstr);
+  arg2 = &arg2_str;
+  jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
+  result = (BSONArrayObj *)(arg1)->executeQuery((std::string const &)*arg2);
+  *(BSONArrayObj **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1executeUpdate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+  jboolean jresult = 0 ;
+  djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
+  std::string *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(djondb::DjondbConnection **)&jarg1; 
+  if(!jarg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null string");
+    return 0;
+  }
+  const char *arg2_pstr = (const char *)jenv->GetStringUTFChars(jarg2, 0); 
+  if (!arg2_pstr) return 0;
+  std::string arg2_str(arg2_pstr);
+  arg2 = &arg2_str;
+  jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
+  result = (bool)(arg1)->executeUpdate((std::string const &)*arg2);
   jresult = (jboolean)result; 
   return jresult;
 }

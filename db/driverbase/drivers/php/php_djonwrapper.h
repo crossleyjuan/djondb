@@ -85,6 +85,7 @@ ZEND_NAMED_FUNCTION(_wrap_ParseException_what);
 ZEND_NAMED_FUNCTION(_wrap_ParseException_errorCode);
 ZEND_NAMED_FUNCTION(_wrap_bson_splitSelect);
 ZEND_NAMED_FUNCTION(_wrap_bson_subselect);
+ZEND_NAMED_FUNCTION(_wrap_convert);
 ZEND_NAMED_FUNCTION(_wrap_new_DjondbConnection);
 ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_beginTransaction);
 ZEND_NAMED_FUNCTION(_wrap_DjondbConnection_commitTransaction);

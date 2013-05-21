@@ -139,6 +139,15 @@ public class DjondbConnection {
     return djonwrapperJNI.DjondbConnection_remove(swigCPtr, this, db, ns, id, revision);
   }
 
+  public BSONArrayObj executeQuery(String query) {
+    long cPtr = djonwrapperJNI.DjondbConnection_executeQuery(swigCPtr, this, query);
+    return (cPtr == 0) ? null : new BSONArrayObj(cPtr, false);
+  }
+
+  public boolean executeUpdate(String query) {
+    return djonwrapperJNI.DjondbConnection_executeUpdate(swigCPtr, this, query);
+  }
+
   public boolean dropNamespace(String db, String ns) {
     return djonwrapperJNI.DjondbConnection_dropNamespace(swigCPtr, this, db, ns);
   }

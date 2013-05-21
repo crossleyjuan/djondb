@@ -6,7 +6,6 @@ setup.py file for djondb python driver
 
 from distutils.core import setup, Extension
 
-
 pydjondb_module = Extension('_pydjondb',
 		sources=['djonpythondriver.cpp'],
 		include_dirs=['include'],
@@ -14,7 +13,7 @@ pydjondb_module = Extension('_pydjondb',
 		)
 
 setup (name = 'pydjondb',
-		version = '0.220130106',
+		version = '0.3',
 		author      = "Cross",
 		author_email = "cross@djondb.com",
 		license = "GPL",

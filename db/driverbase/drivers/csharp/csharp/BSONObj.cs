@@ -83,6 +83,11 @@ public class BSONObj : IDisposable {
     if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
   }
 
+  public void add(string arg0, SWIGTYPE_p_BSONContent arg1) {
+    djonwrapperPINVOKE.BSONObj_add__SWIG_7(swigCPtr, arg0, SWIGTYPE_p_BSONContent.getCPtr(arg1));
+    if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
+  }
+
   public virtual bool has(string arg0) {
     bool ret = djonwrapperPINVOKE.BSONObj_has(swigCPtr, arg0);
     if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();

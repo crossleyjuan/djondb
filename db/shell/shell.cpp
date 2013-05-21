@@ -51,6 +51,7 @@
 #include <stdlib.h>
 
 #include "djondb_client.h"
+#include "djonv8.h"
 #include <vector>
 #include <sstream> 
 #ifndef WINDOWS
@@ -72,9 +73,9 @@
 
 using namespace djondb;
 
-DjondbConnection* __djonConnection;
-
 CircularQueue<std::string> _commands(10);
+
+DjondbConnection* __djonConnection;
 
 v8::Persistent<v8::Context> CreateShellContext();
 int RunMain(int argc, char* argv[]);

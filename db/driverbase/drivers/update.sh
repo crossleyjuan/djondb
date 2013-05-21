@@ -8,6 +8,7 @@ cp ../../includes/bsonutil.h .
 cp ../../includes/djondbconnection.h .
 cp ../../includes/djondb_client.h .
 cp ../../includes/djondbconnectionmanager.h .
+cp ../../includes/djonv8.h . 
 cp ../../includes/constantexpression.h .
 cp ../../includes/expressionresult.h .
 cp ../../includes/dbcontroller.h .

@@ -10,6 +10,7 @@ cp bsonutil.h nodejs/includes/
 cp djondbconnection.h nodejs/includes/
 cp djondb_client.h nodejs/includes/
 cp djondbconnectionmanager.h nodejs/includes/
+cp djonv8.h nodejs/includes/
 cp constantexpression.h nodejs/includes/
 cp expressionresult.h nodejs/includes/
 cp dbcontroller.h nodejs/includes/

@@ -71,6 +71,10 @@ public class BSONObj {
     djonwrapperJNI.BSONObj_add__SWIG_6(swigCPtr, this, arg0, BSONArrayObj.getCPtr(arg1), arg1);
   }
 
+  public void add(String arg0, SWIGTYPE_p_BSONContent arg1) {
+    djonwrapperJNI.BSONObj_add__SWIG_7(swigCPtr, this, arg0, SWIGTYPE_p_BSONContent.getCPtr(arg1));
+  }
+
   public boolean has(String arg0) {
     return djonwrapperJNI.BSONObj_has(swigCPtr, this, arg0);
   }

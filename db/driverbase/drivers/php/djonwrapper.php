@@ -53,6 +53,8 @@ abstract class djonwrapper {
 
 	const FO_GREATEREQUALTHAN = FO_GREATEREQUALTHAN;
 
+	const FO_EXISTS = FO_EXISTS;
+
 	const ET_CONSTANT = 0;
 
 	const ET_SIMPLE = ET_SIMPLE;
@@ -71,6 +73,10 @@ abstract class djonwrapper {
 
 	static function bson_subselect($select,$elment) {
 		return bson_subselect($select,$elment);
+	}
+
+	static function convert($fromType,$toType,$value) {
+		return convert($fromType,$toType,$value);
 	}
 
 	const SERVER_PORT = SERVER_PORT;

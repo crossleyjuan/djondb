@@ -175,6 +175,19 @@ public class DjondbConnection : IDisposable {
     return ret;
   }
 
+  public BSONArrayObj executeQuery(string query) {
+    IntPtr cPtr = djonwrapperPINVOKE.DjondbConnection_executeQuery(swigCPtr, query);
+    BSONArrayObj ret = (cPtr == IntPtr.Zero) ? null : new BSONArrayObj(cPtr, false);
+    if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public bool executeUpdate(string query) {
+    bool ret = djonwrapperPINVOKE.DjondbConnection_executeUpdate(swigCPtr, query);
+    if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
   public bool dropNamespace(string db, string ns) {
     bool ret = djonwrapperPINVOKE.DjondbConnection_dropNamespace(swigCPtr, db, ns);
     if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();

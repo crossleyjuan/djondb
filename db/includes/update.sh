@@ -7,6 +7,7 @@ cp ../bson/bsonutil.h .
 cp ../driverbase/djondbconnection.h .
 cp ../driverbase/djondb_client.h .
 cp ../driverbase/djondbconnectionmanager.h .
+cp ../driverbase/djonv8.h .
 cp ../db/constantexpression.h .
 cp ../db/expressionresult.h .
 cp ../db/dbcontroller.h .

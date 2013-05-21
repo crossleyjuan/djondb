@@ -11,6 +11,7 @@ cp bsonutil.h php/includes/
 cp djondbconnection.h php/includes/
 cp djondb_client.h php/includes/
 cp djondbconnectionmanager.h php/includes/
+cp djonv8.h php/includes/
 cp constantexpression.h php/includes/
 cp expressionresult.h php/includes/
 cp dbcontroller.h php/includes/

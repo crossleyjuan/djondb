@@ -27,6 +27,13 @@ public class djonwrapper {
     return ret;
   }
 
+  public static SWIGTYPE_p_void convert(SWIGTYPE_p_BSONTYPE fromType, SWIGTYPE_p_BSONTYPE toType, SWIGTYPE_p_void value) {
+    IntPtr cPtr = djonwrapperPINVOKE.convert(SWIGTYPE_p_BSONTYPE.getCPtr(fromType), SWIGTYPE_p_BSONTYPE.getCPtr(toType), SWIGTYPE_p_void.getCPtr(value));
+    SWIGTYPE_p_void ret = (cPtr == IntPtr.Zero) ? null : new SWIGTYPE_p_void(cPtr, false);
+    if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
   public static readonly int SERVER_PORT = djonwrapperPINVOKE.SERVER_PORT_get();
 }
 

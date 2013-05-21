@@ -48,7 +48,7 @@
 
 using namespace djondb;
 
-DjondbConnection* __djonConnection;
+DjondbConnection* __djonGlobalCon;
 
 // Extracts a C string from a V8 Utf8Value.
 std::string ToCString(const v8::String::Utf8Value& value) {
@@ -109,10 +109,10 @@ v8::Handle<v8::Value> insert(const v8::Arguments& args) {
 	}
 
 	try {
-		if (__djonConnection == NULL) {
+		if (__djonGlobalCon == NULL) {
 			return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
 		}
-		__djonConnection->insert(db, ns, json);
+		__djonGlobalCon->insert(db, ns, json);
 
 		return v8::String::New("");
 	} catch (DjondbException e) {
@@ -140,10 +140,10 @@ v8::Handle<v8::Value> update(const v8::Arguments& args) {
 	}
 
 	try {
-		if (__djonConnection == NULL) {
+		if (__djonGlobalCon == NULL) {
 			return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
 		}
-		__djonConnection->update(db, ns, json);
+		__djonGlobalCon->update(db, ns, json);
 
 		return v8::String::New("");
 	} catch (DjondbException e) {
@@ -167,10 +167,10 @@ v8::Handle<v8::Value> remove(const v8::Arguments& args) {
 	std::string revision = ToCString(str4);
 
 	try {
-		if (__djonConnection == NULL) {
+		if (__djonGlobalCon == NULL) {
 			return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
 		}
-		__djonConnection->remove(db, ns, id, revision);
+		__djonGlobalCon->remove(db, ns, id, revision);
 
 		return v8::String::New("");
 	} catch (DjondbException e) {
@@ -186,10 +186,10 @@ v8::Handle<v8::Value> shutdown(const v8::Arguments& args) {
 	v8::HandleScope handle_scope;
 
 	try {
-		if (__djonConnection == NULL) {
+		if (__djonGlobalCon == NULL) {
 			return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
 		}
-		__djonConnection->shutdown();
+		__djonGlobalCon->shutdown();
 
 		return v8::String::New("");
 	} catch (DjondbException e) {
@@ -209,10 +209,10 @@ v8::Handle<v8::Value> dropNamespace(const v8::Arguments& args) {
 	std::string ns = ToCString(str);
 
 	try {
-		if (__djonConnection == NULL) {
+		if (__djonGlobalCon == NULL) {
 			return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
 		}
-		bool result = __djonConnection->dropNamespace(db, ns);
+		bool result = __djonGlobalCon->dropNamespace(db, ns);
 
 		if (result) {
 			printf("ns dropped: %s", ns.c_str());
@@ -232,10 +232,10 @@ v8::Handle<v8::Value> beginTransaction(const v8::Arguments& args) {
 
 	v8::HandleScope handle_scope;
 
-	if (__djonConnection == NULL) {
+	if (__djonGlobalCon == NULL) {
 		return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
 	}
-	bool result = __djonConnection->beginTransaction();
+	bool result = __djonGlobalCon->beginTransaction();
 
 	if (result) {
 		printf("Transaction started\n");
@@ -252,10 +252,10 @@ v8::Handle<v8::Value> commitTransaction(const v8::Arguments& args) {
 
 	v8::HandleScope handle_scope;
 
-	if (__djonConnection == NULL) {
+	if (__djonGlobalCon == NULL) {
 		return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
 	}
-	__djonConnection->commitTransaction();
+	__djonGlobalCon->commitTransaction();
 
 	printf("Transaction committed\n");
 	return v8::String::New("");
@@ -268,10 +268,10 @@ v8::Handle<v8::Value> rollbackTransaction(const v8::Arguments& args) {
 
 	v8::HandleScope handle_scope;
 
-	if (__djonConnection == NULL) {
+	if (__djonGlobalCon == NULL) {
 		return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
 	}
-	__djonConnection->rollbackTransaction();
+	__djonGlobalCon->rollbackTransaction();
 
 	printf("Transaction rollbacked\n");
 	return v8::String::New("");
@@ -285,10 +285,10 @@ v8::Handle<v8::Value> showDbs(const v8::Arguments& args) {
 	v8::HandleScope handle_scope;
 
 	try {
-		if (__djonConnection == NULL) {
+		if (__djonGlobalCon == NULL) {
 			return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
 		}
-		std::vector<std::string>* dbs = __djonConnection->dbs();
+		std::vector<std::string>* dbs = __djonGlobalCon->dbs();
 
 		v8::Handle<v8::Array> result = v8::Array::New();
 		int index = 0;
@@ -314,10 +314,10 @@ v8::Handle<v8::Value> showNamespaces(const v8::Arguments& args) {
 	std::string db = ToCString(strDB);
 
 	try {
-		if (__djonConnection == NULL) {
+		if (__djonGlobalCon == NULL) {
 			return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
 		}
-		std::vector<std::string>* ns = __djonConnection->namespaces(db);
+		std::vector<std::string>* ns = __djonGlobalCon->namespaces(db);
 
 		v8::Handle<v8::Array> result = v8::Array::New();
 		int index = 0;
@@ -338,7 +338,7 @@ v8::Handle<v8::Value> find(const v8::Arguments& args) {
 		return v8::ThrowException(v8::String::New("usage: find(db, namespace)\nfind(db, namespace, filter)\nfind(db, namespace, select, filter)"));
 	}
 
-	if (__djonConnection == NULL) {
+	if (__djonGlobalCon == NULL) {
 		return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
 	}
 	v8::HandleScope handle_scope;
@@ -368,7 +368,7 @@ v8::Handle<v8::Value> find(const v8::Arguments& args) {
 		*/
 
 	try {
-		BSONArrayObj* result = __djonConnection->find(db, ns, select, filter);
+		BSONArrayObj* result = __djonGlobalCon->find(db, ns, select, filter);
 
 		char* str = result->toChar();
 
@@ -415,20 +415,20 @@ v8::Handle<v8::Value> connect(const v8::Arguments& args) {
 	v8::String::Utf8Value str(args[0]);
 	std::string server = ToCString(str);
 	try {
-		if (__djonConnection != NULL) {
-			__djonConnection->close();
+		if (__djonGlobalCon != NULL) {
+			__djonGlobalCon->close();
 		}
 		int port = SERVER_PORT;
 		if (args.Length() == 2) {
 			port = args[1]->Int32Value();	
 		}
-		__djonConnection = DjondbConnectionManager::getConnection(server, port);
-		if (__djonConnection->open()) {
+		__djonGlobalCon = DjondbConnectionManager::getConnection(server, port);
+		if (__djonGlobalCon->open()) {
 			printf("Connected to %s\n", server.c_str());
 		} else {
 			printf("Could not connect to: %s\n", server.c_str());
-			__djonConnection->close();
-			__djonConnection = NULL;
+			__djonGlobalCon->close();
+			__djonGlobalCon = NULL;
 		}
 		return v8::String::New("");
 	} catch (DjondbException e) {
@@ -446,10 +446,10 @@ v8::Handle<v8::Value> executeUpdate(const v8::Arguments& args) {
 	std::string query = ToCString(str);
 
 	try {
-		if (__djonConnection == NULL) {
+		if (__djonGlobalCon == NULL) {
 			return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
 		}
-		__djonConnection->executeUpdate(query);
+		__djonGlobalCon->executeUpdate(query);
 
 		return v8::Undefined();
 	} catch (ParseException e) {
@@ -464,7 +464,7 @@ v8::Handle<v8::Value> executeQuery(const v8::Arguments& args) {
 		return v8::ThrowException(v8::String::New("usage: executeQuery(dql)"));
 	}
 
-	if (__djonConnection == NULL) {
+	if (__djonGlobalCon == NULL) {
 		return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
 	}
 	v8::HandleScope handle_scope;
@@ -472,7 +472,7 @@ v8::Handle<v8::Value> executeQuery(const v8::Arguments& args) {
 	std::string query = ToCString(strQuery);
 
 	try {
-		BSONArrayObj* result = __djonConnection->executeQuery(query);
+		BSONArrayObj* result = __djonGlobalCon->executeQuery(query);
 
 		if (result != NULL) {
 			char* str = result->toChar();

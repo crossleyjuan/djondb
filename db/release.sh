@@ -47,7 +47,6 @@ cd driverbase/drivers
 ./update.sh
 ./php.sh $@
 
-exit;
 ./java.sh $@
 ./csharp.sh $@
 
