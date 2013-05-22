@@ -14,7 +14,9 @@ IF (WIN32)
 	add_library(djon-client djondbconnection.cpp djondbconnectionmanager.cpp dqlParser.cpp dqlLexer.cpp djonv8.cpp)
 ENDIF (WIN32)
 
-install (TARGETS djon-client DESTINATION lib)
+install (TARGETS djon-client 
+	DESTINATION lib
+	PERMISSIONS OWNER_READ GROUP_READ WORLD_READ OWNER_WRITE OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE)
 install (FILES djondb_client.h DESTINATION include)
 
 IF (LINUX)

@@ -328,7 +328,50 @@ BSONObj* BaseTransaction::findFirst(const char* db, const char* ns, const char* 
 }
 
 std::vector<std::string>* BaseTransaction::dbs(const BSONObj* options) const {
-	return _controller->dbs(options);
+	std::list<TransactionOperation*>* operations = findOperations(NULL, NULL);
+
+	std::vector<std::string>* dbss = _controller->dbs(options);
+
+	std::set<std::string> sresult;
+	for (std::vector<std::string>::iterator it = dbss->begin(); it != dbss->end(); it++) {
+		sresult.insert(*it);
+	}
+
+	for (std::list<TransactionOperation*>::iterator i = operations->begin(); i != operations->end(); i++) {
+		TransactionOperation* operation = *i;
+		std::string operdb(operation->db);
+		switch (operation->code) {
+			case TXO_INSERT: 
+				{
+					std::set<std::string>::iterator it = sresult.find(operdb);
+					if (it == sresult.end()) {
+						sresult.insert(operdb);
+					}
+				};
+				break;
+			case TXO_DROPNAMESPACE:
+				{
+					std::set<std::string>::iterator it = sresult.find(operdb);
+					if (it != sresult.end()) {
+						sresult.erase(it);
+					}
+				};
+				break;
+		}
+		free(operation->db);
+		free(operation->ns);
+		delete operation;
+	}
+
+	delete operations;
+
+	std::vector<std::string>* result = new std::vector<std::string>();
+
+	for (std::set<std::string>::iterator it = sresult.begin(); it != sresult.end(); it++) {
+		result->push_back(*it);
+	}
+
+	return result;
 }
 
 std::vector<std::string>* BaseTransaction::namespaces(const char* db, const BSONObj* options) const {
