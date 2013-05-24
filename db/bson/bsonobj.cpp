@@ -58,6 +58,12 @@ BSONObj::~BSONObj()
 	}
 	*/
 
+void BSONObj::add(std::string key, bool val) {
+	remove(key);
+	BSONContentBoolean* content = new BSONContentBoolean(val); 
+	_elements.insert(pair<std::string, BSONContent* >(key, content));
+}
+
 void BSONObj::add(std::string key, __int32 val) {
 	remove(key);
 	BSONContentInt* content = new BSONContentInt(val); 
@@ -151,6 +157,11 @@ char* BSONObj::toChar() {
 											free(chrbsonarray);
 											break;
 										}
+			case BOOL_TYPE:  {
+									 BSONContentBoolean* bb = (BSONContentBoolean*)content;
+									 sprintf(result + pos, "%s", ((bool)*bb?"true": "false"));
+									 break;
+								 }
 			case INT_TYPE:  {
 									 BSONContentInt* bint = (BSONContentInt*)content;
 									 sprintf(result + pos, "%d", (__int32)*bint);
@@ -192,6 +203,16 @@ char* BSONObj::toChar() {
 	if (log->isDebug()) log->debug("toChar result: %s", cresult);
 
 	return cresult;
+}
+
+bool BSONObj::getBoolean(std::string key) const throw(BSONException) {
+	BSONContent* content = getContent(key);
+	if ((content != NULL) && (content->type() == BOOL_TYPE)) {
+		BSONContentBoolean* bb = (BSONContentBoolean*)content;
+		return *bb;
+	} else {
+		throw BSONException(format("key not found %s", key.c_str()).c_str());
+	}
 }
 
 __int32 BSONObj::getInt(std::string key) const throw(BSONException) {
@@ -309,6 +330,10 @@ BSONObj::BSONObj(const BSONObj& orig) {
 		BSONContent* origContent = i->second;
 		BSONContent* content;
 		switch (origContent->type()) {
+			case BOOL_TYPE: {
+									content = new BSONContentBoolean(*(BSONContentBoolean*)origContent);
+									break;
+								}
 			case INT_TYPE: {
 									content = new BSONContentInt(*(BSONContentInt*)origContent);
 									break;
@@ -424,6 +449,10 @@ bool BSONObj::operator ==(const BSONObj& obj) const {
 		}
 		bool result;
 		switch (content->type()) {
+			case BOOL_TYPE: {
+									result = *((BSONContentBoolean*)content) == *((BSONContentBoolean*)other);
+									break;
+								}
 			case INT_TYPE: {
 									result = *((BSONContentInt*)content) == *((BSONContentInt*)other);
 									break;
@@ -491,6 +520,10 @@ bool BSONObj::operator !=(const BSONObj& obj) const {
 		}
 		bool result;
 		switch (content->type()) {
+			case BOOL_TYPE: {
+									result = *((BSONContentBoolean*)content) != *((BSONContentBoolean*)other);
+									break;
+								}
 			case INT_TYPE: {
 									result = *((BSONContentInt*)content) != *((BSONContentInt*)other);
 									break;
@@ -574,6 +607,13 @@ BSONObj* BSONObj::select(const char* sel) const {
 						} else {
 							result->add(key, *innerArray);
 						}
+						break;
+					}
+				case BOOL_TYPE: 
+					{
+						BSONContentBoolean* bb = (BSONContentBoolean*)origContent;
+						bool val = *bb;
+						result->add(key, val);
 						break;
 					}
 				case INT_TYPE: 

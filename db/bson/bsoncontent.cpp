@@ -29,6 +29,22 @@ BSONContent::BSONContent(BSONTYPE type) {
 	this->_type = type;
 }
 
+BSONContentBoolean::BSONContentBoolean(bool element):
+	BSONContent(BOOL_TYPE)
+{
+	_element = element;
+}
+
+BSONContentBoolean::BSONContentBoolean(const BSONContentBoolean& orig):
+	BSONContent(BOOL_TYPE)
+{
+	this->_element = orig._element;
+}
+
+BSONContentBoolean* BSONContentBoolean::clone() const {
+	return new BSONContentBoolean(*this);
+}
+
 BSONContentInt::BSONContentInt(__int32 element):
 	BSONContent(INT_TYPE)
 {
@@ -128,6 +144,9 @@ BSONContentBSONArray* BSONContentBSONArray::clone() const {
 BSONContent::~BSONContent() {
 }
 
+BSONContentBoolean::~BSONContentBoolean() {
+}
+
 BSONContentInt::~BSONContentInt() {
 }
 
@@ -154,6 +173,18 @@ bool BSONContent::operator ==(const BSONContent& content) {
 
 bool BSONContent::operator !=(const BSONContent& content) {
 	throw BSONException("cannot compare BSONContents");
+}
+
+bool BSONContentBoolean::operator ==(const BSONContentBoolean& content) {
+	bool i1 = _element;
+	bool i2 = (BSONContentBoolean)content;
+	return (i1 == i2);
+}
+
+bool BSONContentBoolean::operator !=(const BSONContentBoolean& content) {
+	bool i1 = _element;
+	bool i2 = (BSONContentBoolean)content;
+	return (i1 != i2);
 }
 
 bool BSONContentInt::operator ==(const BSONContentInt& content) {
@@ -227,8 +258,16 @@ bool BSONContentBSONArray::operator !=(const BSONContentBSONArray& content) {
 }
 
 
+BSONContent::operator bool() const {
+	throw BSONException("This operator should be overriden by the inherited class");
+}
+
 BSONContent::operator __int32() const {
 	throw BSONException("This operator should be overriden by the inherited class");
+}
+
+BSONContentBoolean::operator bool() const {
+	return _element; 
 }
 
 BSONContentInt::operator __int32() const {

@@ -293,7 +293,7 @@ Index* DBController::findIndex(const char* db, const char* ns, BSONObj* bson) {
 	IndexAlgorithm* impl = IndexFactory::indexFactory.index(db, ns, "_id");
 
 	BSONObj indexBSON;
-	indexBSON.add("_id", bson->getDJString("_id"));
+	indexBSON.add("_id", (const char*)bson->getDJString("_id"));
 	Index* index = impl->find(&indexBSON);
 
 	return index;

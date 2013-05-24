@@ -108,6 +108,7 @@ TEST(TestDriver, testInsertComplex) {
 	std::string* id = uuid();
 	obj.add("_id", const_cast<char*>(id->c_str()));
 	obj.add("name", "John");
+	obj.add("alive", true);
 	BSONObj inner;
 	inner.add("innername", "Test");
 	obj.add("inner", inner);
@@ -241,6 +242,7 @@ TEST(TestDriver, testFinds) {
 	BSONObj test;
 	std::string* guid = uuid();
 	test.add("_id", const_cast<char*>(guid->c_str()));
+	test.add("bool", true);
 	test.add("int", 1);
 	test.add("long", (__int64) 10L);
 	test.add("longmax",(__int64) LONG_MAX);
@@ -253,6 +255,8 @@ TEST(TestDriver, testFinds) {
 	BSONObj* objResult = conn->findByKey("db", "driver.test", "*", *guid);
 
 	EXPECT_TRUE(objResult != NULL);
+	EXPECT_TRUE(objResult->has("bool"));
+	EXPECT_TRUE(objResult->getBoolean("bool"));
 	EXPECT_TRUE(objResult->has("int"));
 	EXPECT_TRUE(objResult->getInt("int") == 1);
 	EXPECT_TRUE(objResult->has("long"));
@@ -269,7 +273,7 @@ TEST(TestDriver, testFinds) {
 TEST(TestDriver, testFindByFilter) {
 	// Insert record to search for
 
-	BSONObj* obj = BSONParser::parse("{'name': 'Test', 'inner': { 'x': 1 }}");
+	BSONObj* obj = BSONParser::parse("{'name': 'Test', 'bool': true, 'inner': { 'x': 1 }}");
 
 	//delete id;
 
@@ -305,6 +309,12 @@ TEST(TestDriver, testFindByFilter) {
 
 	char* temp = objR->toChar();
 	cout << "\nobj: " << temp << endl;
+
+	result = conn->find("db", "test.filter2", "*", "$'bool' == true");
+	EXPECT_TRUE(result->length() == 1);
+
+	result = conn->find("db", "test.filter2", "*", "$'bool'");
+	EXPECT_TRUE(result->length() == 1);
 
 	result = conn->find("db", "test.filter2", "*", "$'name' == 'Test'");
 	EXPECT_TRUE(result->length() == 1);

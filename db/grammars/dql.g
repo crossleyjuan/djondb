@@ -191,7 +191,7 @@ xpath_expr
 id_expr	: ID;
 
 constant_expr
-	: (NUMBER | STRING);
+	: (NUMBER | STRING | BOOLEAN);
 
 operand_expr
 	: OPER;
@@ -209,6 +209,9 @@ json_expr	: LBRAN json_fieldname COLON json_const
 json_fieldname
 	: STRING;
 	
+BOOLEAN	:	TRUE | FALSE;
+TRUE	:	('t'|'T')('r'|'R')('u'|'U')('e'|'E');
+FALSE	:	('f'|'F')('a'|'A')('l'|'L')('s'|'S')('e'|'E');
 NUMBER :	'0'..'9'+;
 fragment LETTER :	'a'..'z' | 'A'..'Z';
 fragment ID	:	LETTER (LETTER | NUMBER | '_' | '.')*;

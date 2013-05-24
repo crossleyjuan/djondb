@@ -243,7 +243,6 @@ v8::Handle<v8::Value> WrapConnection::find(const v8::Arguments& args) {
 		char* str = result->toChar();
 
 		v8::Handle<v8::Value> jsonValue = parseJSON(v8::String::New(str));
-		free(str);
 		delete result;
 		return scope.Close(jsonValue);
 	} catch (ParseException e) {
@@ -479,24 +478,23 @@ v8::Handle<v8::Value> WrapConnection::executeQuery(const v8::Arguments& args) {
 		return v8::ThrowException(v8::String::New("usage: executeQuery(dql)"));
 	}
 
+	v8::HandleScope scope;
+	v8::String::Utf8Value strQuery(args[0]);
+	std::string query = ToCString(strQuery);
+
 	WrapConnection* obj = ObjectWrap::Unwrap<WrapConnection>(args.This());
 	if ((obj == NULL) || (obj->_con == NULL)) {
 		return v8::ThrowException(v8::String::New("You're not connected to any db, please use: connect(server, [port])"));
 	}
-	v8::HandleScope handle_scope;
-	v8::String::Utf8Value strQuery(args[0]);
-	std::string query = ToCString(strQuery);
-
 	try {
 		BSONArrayObj* result = obj->_con->executeQuery(query);
 
+		char* str;
 		if (result != NULL) {
-			char* str = result->toChar();
+			str = result->toChar();
 
-			v8::Handle<v8::Value> jsonValue = parseJSON(v8::String::New(str));
-			free(str);
 			delete result;
-			return handle_scope.Close(jsonValue);
+			return scope.Close(parseJSON(v8::String::New(str)));
 		} else {
 			return v8::Undefined();
 		}

@@ -132,6 +132,11 @@ BSONObj* BSONParser::parseBSON(const char* c, __int32& pos) throw(BSONException)
 				len = 0;
 				memset(buffer, 0, lenBuffer);
 				switch (type) {
+					case BOOL_TYPE:{
+										  bool bVal = strcmp((char*)value, "true") == 0;
+										  res->add(name, bVal);
+										  break;
+									  }
 					case INT_TYPE:{
 										  __int32 iVal = atoi((char*)value);
 										  res->add(name, iVal);

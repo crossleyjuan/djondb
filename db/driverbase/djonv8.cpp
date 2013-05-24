@@ -480,7 +480,7 @@ v8::Handle<v8::Value> executeQuery(const v8::Arguments& args) {
 			v8::Handle<v8::Value> jsonValue = parseJSON(v8::String::New(str));
 			free(str);
 			delete result;
-			return jsonValue;
+			return handle_scope.Close(jsonValue);
 		} else {
 			return v8::Undefined();
 		}

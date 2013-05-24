@@ -225,6 +225,7 @@ TEST_F(TestDB, testExpressions) {
 	BSONObj obj;
 	obj.add("age", 35);
 	obj.add("name", "John");
+	obj.add("alive", true);
 	BSONObj inner;
 	inner.add("i", 100);
 	obj.add("child", inner);
@@ -270,6 +271,11 @@ TEST_F(TestDB, testExpressions) {
 	bool bresult9 = *result9;
 	EXPECT_TRUE(bresult9 == true);
 
+	SimpleExpression exp10("$'alive'");
+	ExpressionResult* result10 = exp10.eval(obj);
+	EXPECT_TRUE(result10->type() == ExpressionResult::RT_BOOLEAN);
+	bool bresult10 = *result10;
+	EXPECT_TRUE(bresult10);
 }
 
 TEST_F(TestDB, testUpdate) {

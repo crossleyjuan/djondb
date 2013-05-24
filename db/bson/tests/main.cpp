@@ -37,6 +37,7 @@ TEST(testBSON, testBSON)
 	obj->add("string2", (const char*)"t");
 	obj->add("long", (__int64) 10000000000L);
 	obj->add("double", 1.1);
+	obj->add("bool", true);
 
 	BSONObj rel;
 	rel.add("innertext", (char*)"inner text");
@@ -64,6 +65,9 @@ TEST(testBSON, testBSON)
 
 	EXPECT_TRUE(obj->has("double"));
 	EXPECT_TRUE(obj->getDouble("double") == 1.1);
+
+	EXPECT_TRUE(obj->has("bool"));
+	EXPECT_TRUE(obj->getBoolean("bool"));
 
 	EXPECT_TRUE(obj->has("rel1"));
 	EXPECT_TRUE(strcmp(obj->getBSON("rel1")->getString("innertext").c_str(), "inner text") == 0);
