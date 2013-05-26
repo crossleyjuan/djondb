@@ -73,6 +73,13 @@ unsigned char Buffer::readChar() {
 	return c;
 };
 
+/* Reads 1 bytes in the input (little endian order) */
+bool Buffer::readBoolean() {
+	bool r = (char)_stream->readChar();
+	_currentPos += sizeof(char);
+	return r;
+};
+
 /* Reads 2 bytes in the input (little endian order) */
 __int16 Buffer::readShortInt() {
 	__int16 r = _stream->readShortInt();
@@ -149,6 +156,13 @@ void Buffer::writeChar(unsigned char v) {
 	_stream->writeChar(v);
 	_bufferLength += sizeof(unsigned char);
 	_currentPos =+ sizeof(unsigned char);
+};
+
+/* Write 2 bytes in the output (little endian order) */
+void Buffer::writeBoolean(bool v) {
+	_stream->writeChar((char)v);
+	_bufferLength += sizeof(char);
+	_currentPos += sizeof(char);
 };
 
 /* Write 2 bytes in the output (little endian order) */

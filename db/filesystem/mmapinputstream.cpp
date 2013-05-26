@@ -160,6 +160,12 @@ unsigned char MMapInputStream::readChar() {
 	return v;
 }
 
+/* Reads 1 bytes in the input (little endian order) */
+bool MMapInputStream::readBoolean() {
+	bool result = (bool)readData<char>();
+	return result;
+}
+
 /* Reads 2 bytes in the input (little endian order) */
 __int16 MMapInputStream::readShortInt () {
 	__int16 result = readData<__int16>();

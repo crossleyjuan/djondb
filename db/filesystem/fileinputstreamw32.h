@@ -13,6 +13,8 @@ public:
     virtual ~FileInputStreamW32();
 
     virtual unsigned char readChar();
+	 /* Reads 1 bytes in the input (little endian order) */
+	 virtual bool readBoolean ();
     /* Reads 2 bytes in the input (little endian order) */
     virtual __int16 readShortInt ();
     /* Reads 4 bytes in the input (little endian order) */

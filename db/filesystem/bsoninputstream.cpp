@@ -79,6 +79,19 @@ BSONObj* BSONInputStream::readBSON(const char* select) const {
 									 delete inner;
 									 break;
 								 }
+			case BOOL_TYPE: {
+									if (include) {
+										bool b = _inputStream->readBoolean();
+										obj->add(*key.get(), b);
+#ifdef DEBUG
+										if (log->isDebug()) log->debug("BSONInputStream::readBSON key: %s, value: %s", key->c_str(), i? "true": "false");
+#endif
+									} else {
+										// Jumps to the next pos
+										_inputStream->seek(_inputStream->currentPos() + sizeof(bool));
+									}
+									break;
+								}
 			case INT_TYPE: {
 									if (include) {
 										__int32 i = _inputStream->readInt();

@@ -73,6 +73,13 @@ unsigned char TxBuffer::readChar() {
 	return c;
 };
 
+/* Reads 1 bytes in the input (little endian order) */
+bool TxBuffer::readBoolean() {
+	bool r = _stream->readBoolean();
+	_currentPos += sizeof(bool);
+	return r;
+};
+
 /* Reads 2 bytes in the input (little endian order) */
 __int16 TxBuffer::readShortInt() {
 	__int16 r = _stream->readShortInt();
@@ -144,6 +151,13 @@ std::string* TxBuffer::readString() {
 void TxBuffer::writeChar(unsigned char v) {
 	_stream->writeChar(v);
 	_bufferLength += sizeof(unsigned char);
+	_currentPos = _bufferLength;
+};
+
+/* Write 1 bytes in the output (little endian order) */
+void TxBuffer::writeBoolean(bool v) {
+	_stream->writeBoolean(v);
+	_bufferLength += sizeof(char);
 	_currentPos = _bufferLength;
 };
 

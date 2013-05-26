@@ -178,6 +178,11 @@ void BSONBufferedObj::initialize() {
 		bool include = false;
 		_values[x] = pCurrentElement;
 		switch (*_types[x]) {
+			case BOOL_TYPE: {
+									pCurrentElement += sizeof(char);
+									_bufferBSONLen += sizeof(char);
+									break;
+								};
 			case INT_TYPE: {
 									pCurrentElement += sizeof(__int32);
 									_bufferBSONLen += sizeof(__int32);
@@ -275,6 +280,11 @@ char* BSONBufferedObj::toChar() {
 									 free(chr);
 									 break;
 									 */
+			case BOOL_TYPE: {
+									bool val = *(bool*)_values[i];
+									sprintf(result + pos, "%s", val?"true": "false");
+									break;
+								}
 			case INT_TYPE: {
 									__int32 val = *(__int32*)_values[i];
 									sprintf(result + pos, "%d", val);
@@ -315,6 +325,15 @@ char* BSONBufferedObj::toChar() {
 	char* cresult = strcpy(result);
 
 	return cresult;
+}
+
+bool BSONBufferedObj::getBoolean(std::string key) const throw(BSONException) {
+	char* value = getValue(const_cast<char*>(key.c_str()));
+	if (value == NULL) {
+		throw BSONException(format("key not found %s", key.c_str()).c_str());
+	} else {
+		return *(bool*)value;
+	}
 }
 
 __int32 BSONBufferedObj::getInt(std::string key) const throw(BSONException) {
@@ -388,6 +407,9 @@ BSONContent* BSONBufferedObj::getContent(std::string key) const {
 					break;
 				}
 			case BSONARRAY_TYPE:
+			case BOOL_TYPE:
+				len = sizeof(char);
+				break;
 			case INT_TYPE:
 				len = sizeof(__int32);
 				break;
@@ -505,6 +527,12 @@ BSONObj* BSONBufferedObj::select(const char* sel) const {
 						BSONArrayObj* innerSubArray = innerArray->select(subselect);
 						result->add(key, *innerSubArray);
 						delete innerSubArray;
+						break;
+					}
+				case BOOL_TYPE: 
+					{
+						bool val = getBoolean(key);
+						result->add(key, val);
 						break;
 					}
 				case INT_TYPE: 

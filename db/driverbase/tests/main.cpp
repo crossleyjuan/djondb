@@ -239,6 +239,8 @@ TEST(TestDriver, testFinds) {
 		exit(0);
 	}
 
+	conn->dropNamespace("db", "driver.test");
+
 	BSONObj test;
 	std::string* guid = uuid();
 	test.add("_id", const_cast<char*>(guid->c_str()));
@@ -288,8 +290,7 @@ TEST(TestDriver, testFindByFilter) {
 	// Drops the current namespace to start from scratch
 	conn->dropNamespace("db", "test.filter2");
 
-	conn->insert("db", "test.filter2", *obj);
-
+	conn->insert("db", "test.filter2", *obj); 
 	// doing search
 	//
 

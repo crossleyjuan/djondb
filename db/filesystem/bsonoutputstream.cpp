@@ -54,6 +54,11 @@ void BSONOutputStream::writeBSON(const BSONObj& bson) {
 									 writeBSON(*inner); 
 									 break;
 								 }
+			case BOOL_TYPE: {
+									BSONContentBoolean* bb = (BSONContentBoolean*)cont;
+									_outputStream->writeBoolean(*bb);
+									break;
+								}
 			case INT_TYPE: {
 									BSONContentInt* bint = (BSONContentInt*)cont;
 									_outputStream->writeInt(*bint);

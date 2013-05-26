@@ -16,6 +16,8 @@ class NetworkOutputStream: public OutputStream
 		virtual ~NetworkOutputStream();
 
 		virtual void writeChar (unsigned char v);
+		/* Write 1 bytes in the output (little endian order) */
+		virtual void writeBoolean (bool v);
 		/* Write 2 bytes in the output (little endian order) */
 		virtual void writeShortInt (__int16 v);
 		/* Write 4 bytes in the output (little endian order) */

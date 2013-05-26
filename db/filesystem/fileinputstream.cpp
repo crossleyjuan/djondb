@@ -93,6 +93,12 @@ unsigned char FileInputStream::readChar() {
 	return v;
 }
 
+/* Reads 1 bytes in the input (little endian order) */
+bool FileInputStream::readBoolean () {
+	bool result = (bool)readData<char>();
+	return result;
+}
+
 /* Reads 2 bytes in the input (little endian order) */
 __int16 FileInputStream::readShortInt () {
 	__int16 result = readData<__int16>();

@@ -212,6 +212,12 @@ unsigned char MMapInputOutputStream::readChar() {
 	return v;
 }
 
+/* Reads 1 bytes in the input (little endian order) */
+bool MMapInputOutputStream::readBoolean () {
+	bool result = (bool)readData<char>();
+	return result;
+}
+
 /* Reads 2 bytes in the input (little endian order) */
 __int16 MMapInputOutputStream::readShortInt () {
 	__int16 result = readData<__int16>();
@@ -379,6 +385,11 @@ void MMapInputOutputStream::resize(__int32 len) {
 #else
 	assert(false);
 #endif
+}
+
+/* Write 1 bytes in the output (little endian order) */
+void MMapInputOutputStream::writeBoolean (bool v) {
+	writeData<char>((char)v);
 }
 
 /* Write 2 bytes in the output (little endian order) */

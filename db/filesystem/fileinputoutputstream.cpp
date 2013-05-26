@@ -109,6 +109,12 @@ void FileInputOutputStream::writeChar (unsigned char v)
 	write((char*)&v, 1);
 }
 
+/* Write 1 bytes in the output (little endian order) */
+void FileInputOutputStream::writeBoolean (bool v)
+{
+	writeData<char>((char)v);
+}
+
 /* Write 2 bytes in the output (little endian order) */
 void FileInputOutputStream::writeShortInt (__int16 v)
 {
@@ -226,6 +232,12 @@ const std::string FileInputOutputStream::fileName() const {
 unsigned char FileInputOutputStream::readChar() {
 	unsigned char v = 0;
 	read((char*)&v, 1);
+	return v;
+}
+
+/* Reads 1 bytes in the input (little endian order) */
+bool FileInputOutputStream::readBoolean () {
+	bool v = (bool)readData<char>();
 	return v;
 }
 

@@ -56,6 +56,12 @@ void DBFileStream::writeChar (unsigned char v)
 	_stream->writeChar(v);
 }
 
+/* Write 1 bytes in the output (little endian order) */
+void DBFileStream::writeBoolean (bool v)
+{
+	_stream->writeBoolean(v);
+}
+
 /* Write 2 bytes in the output (little endian order) */
 void DBFileStream::writeShortInt (__int16 v)
 {
@@ -121,6 +127,11 @@ const std::string DBFileStream::fileName() const {
 
 unsigned char DBFileStream::readChar() {
 	return _stream->readChar();
+}
+
+/* Reads 1 bytes in the input (little endian order) */
+bool DBFileStream::readBoolean () {
+	return _stream->readBoolean();
 }
 
 /* Reads 2 bytes in the input (little endian order) */

@@ -380,6 +380,7 @@ TEST_F(TestDB, testFilterExpressionParser) {
 		obj.add("age", 35);
 		obj.add("state", 1);
 		obj.add("name", "John");
+		obj.add("alive", true);
 		obj.add("llong", (__int64)LLONG_MAX);
 
 		FilterParser* parser = NULL;
@@ -392,6 +393,18 @@ TEST_F(TestDB, testFilterExpressionParser) {
 		EXPECT_TRUE(bres);
 
 		parser = FilterParser::parse("$'age' == 35");
+		result = parser->eval(obj);
+		EXPECT_TRUE(result->type() == ExpressionResult::RT_BOOLEAN);
+		bres = *result;
+		EXPECT_TRUE(bres);
+
+		parser = FilterParser::parse("$'alive'");
+		result = parser->eval(obj);
+		EXPECT_TRUE(result->type() == ExpressionResult::RT_BOOLEAN);
+		bres = *result;
+		EXPECT_TRUE(bres);
+
+		parser = FilterParser::parse("$'alive' == true");
 		result = parser->eval(obj);
 		EXPECT_TRUE(result->type() == ExpressionResult::RT_BOOLEAN);
 		bres = *result;

@@ -17,6 +17,8 @@ public:
     virtual ~MMapInputOutputStream();
 
     virtual unsigned char readChar();
+		/* Reads 1 bytes in the input (little endian order) */
+		virtual bool readBoolean ();
     /* Reads 2 bytes in the input (little endian order) */
     virtual __int16 readShortInt ();
     /* Reads 4 bytes in the input (little endian order) */
@@ -48,6 +50,8 @@ public:
 	 virtual bool isClosed();
 
 	 virtual void writeChar (unsigned char v);
+	 /* Write 1 bytes in the output (little endian order) */
+	 virtual void writeBoolean (bool v);
 	 /* Write 2 bytes in the output (little endian order) */
 	 virtual void writeShortInt (__int16 v);
 	 /* Write 4 bytes in the output (little endian order) */

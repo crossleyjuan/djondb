@@ -151,6 +151,12 @@ void MemoryStream::writeChar (unsigned char v)
 	write((char*)&v, 1);
 }
 
+/* Write 1 bytes in the output (little endian order) */
+void MemoryStream::writeBoolean (bool v)
+{
+	writeData<char>((char)v);
+}
+
 /* Write 2 bytes in the output (little endian order) */
 void MemoryStream::writeShortInt (__int16 v)
 {
@@ -221,6 +227,12 @@ void MemoryStream::flush() {
 unsigned char MemoryStream::readChar() {
 	unsigned char v = 0;
 	read((char*)&v,  1);
+	return v;
+}
+
+/* Reads 2 bytes in the input (little endian order) */
+bool MemoryStream::readBoolean () {
+	bool v = (bool)readData<char>();
 	return v;
 }
 

@@ -257,7 +257,12 @@ TEST(testBSON, testParserSimple)
 	BSONObj* testEmpty = BSONParser::parse("{}");
 	EXPECT_TRUE(testEmpty->length() == 0);
 
-	BSONObj* obj = BSONParser::parse("{age: 1, name: 'John:test\\'test2\\'', salary: 3500.25, lnumber: 100000000000, values: {}, other: 1}");
+	char* json = (char*)malloc(1000);
+	memset(json, 0, 1000);
+	sprintf(json, "{age: 1, name: 'John:test\\'test2\\'', Notboolean: false, boolean: true, salary: 3500.25, lnumber: %lld, values: {}, other: 1}", LONG_MAX);
+	BSONObj* obj = BSONParser::parse(json);
+	free(json);
+	
 	EXPECT_TRUE(obj->has("age"));
 	EXPECT_TRUE(obj->getInt("age") == 1);
 	EXPECT_TRUE(strcmp(obj->getString("name").c_str(), "John:test\\'test2\\'") == 0);
@@ -265,8 +270,14 @@ TEST(testBSON, testParserSimple)
 	EXPECT_TRUE(obj->has("salary"));
 	EXPECT_TRUE(obj->getDouble("salary") == 3500.25);
 
+	EXPECT_TRUE(obj->has("boolean"));
+	EXPECT_TRUE(obj->getBoolean("boolean"));
+
+	EXPECT_TRUE(obj->has("Notboolean"));
+	EXPECT_TRUE(!obj->getBoolean("Notboolean"));
+
 	EXPECT_TRUE(obj->has("lnumber"));
-	EXPECT_TRUE(obj->getLong("lnumber") == 100000000000);
+	EXPECT_TRUE(obj->getLong("lnumber") == LONG_MAX);
 
 	EXPECT_TRUE(obj->has("values"));
 

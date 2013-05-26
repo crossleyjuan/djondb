@@ -196,21 +196,21 @@ constant_expr returns [BaseExpression* val]
 	    
 	    $val = new ConstantExpression(text);
 	    free (text);
-	} | BOOLEAN {
-	    char* ptext = (char*)$BOOLEAN->chars;
-	    char* text = (char*)malloc(strlen(ptext) - 1);
-	    memset(text, 0, strlen(ptext) - 1);
-	    memcpy(text, ptext + 1, strlen(ptext) - 2);
-	    
-	    $val = new ConstantExpression(text);
-	    free (text);
+	} | be=boolean_val {
+	    $val = new ConstantExpression($be.val);
 	});
 
 operand_expr returns [BaseExpression* val]
 	: OPER;
+
+boolean_val returns [bool val]
+	: TRUE {
+		$val = true;
+	} | FALSE {
+		$val = true;
+	};
 	
 NOT	:	('n'|'N')('o'|'O')('t'|'T');
-BOOLEAN	:	TRUE | FALSE;
 TRUE	:	('t'|'T')('r'|'R')('u'|'U')('e'|'E');
 FALSE	:	('f'|'F')('a'|'A')('l'|'L')('s'|'S')('e'|'E');
 

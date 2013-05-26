@@ -16,6 +16,8 @@ class DBFileInputStream: public InputStream
         virtual ~DBFileInputStream();
 
         virtual unsigned char readChar();
+        /* Reads 1 bytes in the input (little endian order) */
+        virtual bool readBoolean ();
         /* Reads 2 bytes in the input (little endian order) */
         virtual short int readShortInt ();
         /* Reads 4 bytes in the input (little endian order) */

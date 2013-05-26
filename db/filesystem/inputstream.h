@@ -15,6 +15,8 @@ public:
     InputStream() {};
 
     virtual unsigned char readChar() = 0;
+    /* Reads 1 bytes in the input (little endian order) */
+    virtual bool readBoolean () = 0;
     /* Reads 2 bytes in the input (little endian order) */
     virtual __int16 readShortInt () = 0;
     /* Reads 2 bytes in the input (little endian order) */

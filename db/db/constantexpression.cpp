@@ -32,16 +32,30 @@
 :BaseExpression(ET_CONSTANT)
 {
 	_expression = strcpy(expression, strlen(expression));
+	_boolValue = NULL;
 	_intValue = NULL;
 	_longValue = NULL;
 	_doubleValue = NULL;
 	_value = new ExpressionResult(djondb::string(strcpy(_expression, strlen(_expression)), strlen(_expression)));
 }
 
+	ConstantExpression::ConstantExpression(bool expression)
+:BaseExpression(ET_CONSTANT)
+{
+	_expression = NULL;
+	_boolValue = new bool();
+	*_boolValue = expression;
+	_intValue = NULL;
+	_longValue = NULL;
+	_doubleValue = NULL;
+	_value = new ExpressionResult(*_boolValue);
+}
+
 	ConstantExpression::ConstantExpression(__int32 expression)
 :BaseExpression(ET_CONSTANT)
 {
 	_expression = NULL;
+	_boolValue = NULL;
 	_intValue = new __int32();
 	*_intValue = expression;
 	_longValue = NULL;
@@ -53,6 +67,7 @@
 :BaseExpression(ET_CONSTANT)
 {
 	_expression = NULL;
+	_boolValue = NULL;
 	_intValue = NULL;
 	_longValue = new __int64();
 	*_longValue = expression;
@@ -64,6 +79,7 @@
 :BaseExpression(ET_CONSTANT)
 {
 	_expression = NULL;
+	_boolValue = NULL;
 	_intValue = NULL;
 	_doubleValue = new double();
 	*_doubleValue = expression;
@@ -86,6 +102,7 @@ ConstantExpression::~ConstantExpression() {
 		delete _value;
 	}
 	if (_expression != NULL) free(_expression);
+	if (_boolValue != NULL) delete _boolValue;
 	if (_intValue != NULL) delete _intValue;
 	if (_doubleValue != NULL) delete _doubleValue;
 	_value = NULL;
@@ -99,6 +116,8 @@ BaseExpression* ConstantExpression::copyExpression() {
 	ConstantExpression* result;
 	if (_expression != NULL) {
 		result = new ConstantExpression(this->_expression);
+	} else if (_boolValue != NULL) {
+		result = new ConstantExpression(*this->_boolValue);
 	} else if (_intValue != NULL) {
 		result = new ConstantExpression(*this->_intValue);
 	} else if (_longValue != NULL) {
