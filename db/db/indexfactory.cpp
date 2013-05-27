@@ -195,11 +195,10 @@ IndexAlgorithm* IndexFactory::index(const char* db, const char* ns, const std::s
 
 	IndexAlgorithm* indexImpl = findIndex(algorithms, keys);
 	if (indexImpl == NULL) {
-		char* indexFileName = (char*)malloc(strlen(db) + strlen(ns) + 2);
-		memset(indexFileName, 0, strlen(db) + strlen(ns) + 2);
-		memcpy(indexFileName, db, strlen(db));
-		memcpy(indexFileName + strlen(db), "/", 1);
-		memcpy(indexFileName + strlen(db) + 1, ns, strlen(ns));
+		int len = strlen(db) + strlen(ns) + strlen(".ixp") + 20;
+		char* indexFileName = (char*)malloc(len);
+		memset(indexFileName, 0, len);
+		sprintf(indexFileName, "%s/%s.ixp", db, ns), 
 		//indexImpl = new BPlusIndex(keys);
 		indexImpl = new BPlusIndexP(indexFileName);
 		indexImpl->setKeys(keys);

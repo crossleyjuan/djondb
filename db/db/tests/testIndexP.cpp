@@ -90,7 +90,7 @@ TEST(testIndexP, testRecoverNames) {
 		std::string* name = fis->readString();
 		o.add("_id", name->c_str());
 		char* temp = strcpy(const_cast<char*>(name->c_str()), name->length());
-		index->add(o, djondb::string(temp, name->length()), 100, 10);
+		index->add(o, djondb::string(temp, name->length()), 100);
 		index->debug();
 		if (log->isDebug()) log->debug("===============================================================================");
 		names.push_back(*name);
@@ -128,7 +128,7 @@ TEST(testIndexP, testSimple) {
 		std::string* id = uuid();
 		o.add("_id", id->c_str());
 		char* temp = strcpy(const_cast<char*>(id->c_str()), id->length());
-		index.add(o, djondb::string(temp, id->length()), 100, 10);
+		index.add(o, djondb::string(temp, id->length()), 100);
 		delete id;
 	}
 
@@ -153,7 +153,7 @@ TEST(testIndexP, testRecoverRandom) {
 			ids.push_back(id);
 		}
 		char* temp = strcpy(const_cast<char*>(id.c_str()), id.length());
-		index->add(o, djondb::string(temp, id.length()), 100, 10);
+		index->add(o, djondb::string(temp, id.length()), 100);
 		index->debug();
 	}
 

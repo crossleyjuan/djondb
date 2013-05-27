@@ -39,7 +39,10 @@ DBFileStream::DBFileStream(InputOutputStream* stream) {
 		_versionOffset = stream->currentPos();
 		free(version);
 	} else {
-		_dbVersion = new Version("0.1");
+		_dbVersion = new Version("0.300000000");
+		stream->seek(0);
+		stream->writeChars("djondb_dat", strlen("djondb_dat"));
+		stream->writeChars("0.300000000", strlen("0.300000000"));
 	}
 	seek(0, FROMEND_SEEK);
 	free(mark);
@@ -191,4 +194,18 @@ bool DBFileStream::isClosed() {
 
 Version* DBFileStream::version() const {
 	return _dbVersion;
+}
+
+void DBFileStream::updateVersion(Version* version) {
+	long pos = _stream->currentPos();
+	_stream->seek(0);
+	char* mark = _stream->readChars();
+	// check if the file is marked as versioned file
+	if (strcmp(mark, "djondb_dat") == 0) {
+		std::string sversion = *version;
+		_stream->writeChars(sversion.c_str(), sversion.length());
+	}
+	free(mark);
+
+	_stream->seek(pos);
 }

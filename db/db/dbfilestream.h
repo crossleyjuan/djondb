@@ -65,6 +65,7 @@ class DBFileStream: public InputOutputStream
         virtual bool isClosed();
 
 		  Version* version() const;
+		  void updateVersion(Version* version);
 
 	 private:
 		  InputOutputStream* _stream;

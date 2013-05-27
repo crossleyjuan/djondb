@@ -91,12 +91,16 @@ IF (WIN32)
 	INSTALL(FILES ${LIBRARY_PREFIX}/pthreadVC2.dll
 		           ${LIBRARY_PREFIX}/v8.dll
             DESTINATION .)
+			INSTALL(FILES ${PROJECT_SOURCE_DIR}/other/djondb.conf
+            DESTINATION bin)
 ENDIF (WIN32)
 
 INCLUDE(CPack)
 
 IF (NOT WIN32)
 	set(CMAKE_INSTALL_PREFIX /usr)
+	INSTALL(FILES ${PROJECT_SOURCE_DIR}/other/djondb.conf
+		DESTINATION /etc)
 ENDIF (NOT WIN32)
 
 IF ( WIN32 )

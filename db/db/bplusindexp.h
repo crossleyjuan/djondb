@@ -129,7 +129,8 @@ class BPlusIndexP: public IndexAlgorithm
 		BPlusIndexP(const char* fileName);
 		virtual ~BPlusIndexP();
 
-		virtual void add(const BSONObj& elem, djondb::string documentId, long filePos, long indexPos);
+		virtual void add(const BSONObj& elem, djondb::string documentId, long filePos);
+		virtual bool update(const BSONObj& elem, djondb::string documentId, long filePos);
 		virtual Index* find(BSONObj* const elem);
 		virtual void remove(const BSONObj& elem);
 		virtual std::list<Index*> find(FilterParser* parser);

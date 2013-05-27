@@ -53,7 +53,7 @@ BufferManager::BufferManager(const char* file) {
 void BufferManager::initialize(const char* file) {
 	std::string controlFileName = std::string(file) + ".trc";
 	char* fullcontrolFileName = combinePath(_dataDir.c_str(), controlFileName.c_str());
-	std::string fileName = std::string(file) + ".log";
+	std::string fileName = std::string(file);
 	char* fullLogFileName = combinePath(_dataDir.c_str(), fileName.c_str());
 	_logFileName = strcpy(const_cast<char*>(fileName.c_str()), fileName.length());
 

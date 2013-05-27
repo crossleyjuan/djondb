@@ -33,6 +33,7 @@ class ExpressionResult;
 class ConstantExpression: public BaseExpression {
 	public:
 		ConstantExpression(char* expression);
+		ConstantExpression(bool expression);
 		ConstantExpression(__int32 expression);
 		ConstantExpression(__int64 expression);
 		ConstantExpression(double expression);
@@ -43,6 +44,7 @@ class ConstantExpression: public BaseExpression {
 		virtual BaseExpression* copyExpression();
 	private:
 		char* _expression;
+		bool* _boolValue;
 		__int32* _intValue;
 		__int64* _longValue;
 		double* _doubleValue;

@@ -136,7 +136,7 @@ class TestDB: public testing::Test
 						tree->debug();
 					}
 				}
-				tree->add(id, djondb::string(sid.c_str(), sid.length()), 0, 0);
+				tree->add(id, djondb::string(sid.c_str(), sid.length()), 0);
 
 				/*
 					Index* test = tree->find(&id);

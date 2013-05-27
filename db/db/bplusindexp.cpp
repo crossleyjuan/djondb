@@ -157,14 +157,37 @@ BPlusIndexP::~BPlusIndexP()
 	//delete _helperStream;
 }
 
-void BPlusIndexP::add(const BSONObj& elem, const djondb::string documentId, long filePos, long indexPos)
+void BPlusIndexP::add(const BSONObj& elem, const djondb::string documentId, long filePos)
 {
 	Index* index = new Index();
 	index->key = new BSONObj(elem);
 	index->documentId = documentId;
 	index->posData = filePos;
-	index->indexPos = indexPos;
+	index->indexPos = 0; // Not in use anymore
 	insertIndexElement(_head, index);
+}
+
+bool BPlusIndexP::update(const BSONObj& elem, const djondb::string documentId, long filePos)
+{
+	Index* index = new Index();
+	index->key = new BSONObj(elem);
+	index->documentId = documentId;
+	index->posData = filePos;
+	index->indexPos = 0; // Not in use anymore
+
+	djondb::string key = index->key->getDJString("_id");
+	//char* key = index->key->toChar();
+	IndexPage* pageFound = findIndexPage(_head, key);
+
+	Index* current = findIndex(pageFound, key);
+	bool found = false;
+	if (current != NULL) {
+		found = true;
+		current->posData = filePos;
+		persistPage(pageFound);
+	}
+	delete index;
+	return found;
 }
 
 Index* BPlusIndexP::find(BSONObj* const elem)

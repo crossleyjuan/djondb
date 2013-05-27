@@ -40,7 +40,7 @@ DBFileInputStream::DBFileInputStream(InputStream* stream) {
 		_versionOffset = stream->currentPos();
 		free(version);
 	} else {
-		_dbVersion = new Version("0.1");
+		_dbVersion = new Version("0.300000000");
 		stream->seek(0);
 	}
 	free(mark);
@@ -153,3 +153,4 @@ bool DBFileInputStream::isClosed() {
 Version* DBFileInputStream::version() const {
 	return _dbVersion;
 }
+

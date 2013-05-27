@@ -86,6 +86,41 @@ void DBController::initialize() {
 	_initialized = true;
 }
 
+/* 
+ * Executes the migration of the indexes format that were saved before 0.3
+ **/
+void DBController::migrateIndex0_3(const char* db, const char* ns, InputStream* stream, IndexAlgorithm* impl) {
+	long currentPos = stream->currentPos();
+	stream->seek(0);
+
+	int records = 0;
+	BSONInputStream* bis = new BSONInputStream(stream);
+	while (!stream->eof()) {
+		BSONObj* obj = bis->readBSON();
+
+		if (!impl) {
+			std::set<std::string> skeys;
+			for (BSONObj::const_iterator i = obj->begin(); i != obj->end(); i++) {
+				std::string key = i->first;
+				skeys.insert(key);
+			}
+		}
+		long indexPos = stream->readLong();
+		long posData = stream->readLong();
+		if (obj->has("_id")) {
+			insertIndex(db, ns, obj, posData);
+			records++;
+		}
+		delete obj;
+	}
+
+	stream->close();
+
+	if (_logger->isInfo()) _logger->info("db: %s, ns: %s, Index migrated to version 0.3. Records: %d", db, ns, records);
+
+	delete bis;
+}
+
 void DBController::initialize(std::string dataDir) {
 	if (_logger->isInfo()) _logger->info("DBController initializing. Data dir: %s", dataDir.c_str());
 
@@ -115,37 +150,46 @@ void DBController::initialize(std::string dataDir) {
 			StreamType* stream = StreamManager::getStreamManager()->open(db->c_str(), ns->c_str(), type);
 
 			if (type == INDEX_FTYPE) {
+				StreamType* dbstream = StreamManager::getStreamManager()->open(db->c_str(), ns->c_str(), DATA_FTYPE);
 				std::set<std::string> skeys;
 				skeys.insert("_id");
 
 				IndexAlgorithm* impl = IndexFactory::indexFactory.index(db->c_str(), ns->c_str(), skeys);
+				// If the database is version lesser than 0.3 then the indexes should
+				// be migrated to the new format
+				Version vindex("0.300000000");
+				if (*dbstream->version() < vindex) {
+					migrateIndex0_3(db->c_str(), ns->c_str(), stream, impl);
+					removeFile(stream->fileName().c_str());
+					((DBFileStream*)dbstream)->updateVersion(&vindex);
+				}
 				/* 
-				long currentPos = stream->currentPos();
-				stream->seek(0);
+					long currentPos = stream->currentPos();
+					stream->seek(0);
 
-				int records = 0;
-				while (!stream->eof()) {
+					int records = 0;
+					while (!stream->eof()) {
 					BSONObj* obj = readBSON(stream);
 
 					if (!impl) {
-						std::set<std::string> skeys;
-						for (BSONObj::const_iterator i = obj->begin(); i != obj->end(); i++) {
-							std::string key = i->first;
-							skeys.insert(key);
-						}
+					std::set<std::string> skeys;
+					for (BSONObj::const_iterator i = obj->begin(); i != obj->end(); i++) {
+					std::string key = i->first;
+					skeys.insert(key);
+					}
 					}
 					long indexPos = stream->readLong();
 					long posData = stream->readLong();
 					if (obj->has("_id")) {
-						impl->add(*obj, obj->getDJString("_id"), posData, indexPos);
-						records++;
+					impl->add(*obj, obj->getDJString("_id"), posData, indexPos);
+					records++;
 					}
 					delete obj;
-				}
-				stream->seek(currentPos);
+					}
+					stream->seek(currentPos);
 
-				if (_logger->isInfo()) _logger->info("db: %s, ns: %s, Index initialized. Records: %d", db->c_str(), ns->c_str(), records);
-			*/
+					if (_logger->isInfo()) _logger->info("db: %s, ns: %s, Index initialized. Records: %d", db->c_str(), ns->c_str(), records);
+					*/
 			}
 		}
 	}
@@ -242,7 +286,7 @@ void DBController::update(const char* db, const char* ns, BSONObj* obj, const BS
 	// Back to the end of the stream
 	streamData->seek(currentPos);
 
-	updateIndex(db, ns, index, streamData->currentPos());
+	updateIndex(db, ns, obj, streamData->currentPos());
 
 	obj->add("_status", 1); // Active
 
@@ -299,17 +343,13 @@ Index* DBController::findIndex(const char* db, const char* ns, BSONObj* bson) {
 	return index;
 }
 
-void DBController::updateIndex(const char* db, const char* ns, Index* index, long filePos) {
-	index->posData = filePos;
+void DBController::updateIndex(const char* db, const char* ns, BSONObj* bson, long filePos) {
+	BSONObj indexBSON;
+	djondb::string id = bson->getDJString("_id");
+	indexBSON.add("_id", (char*)id);
 
-	StreamType* out = StreamManager::getStreamManager()->open(db, ns, INDEX_FTYPE);
-	long currentPos = out->currentPos();
-	out->seek(index->indexPos);
-	BSONObj* key = index->key;
-	writeBSON(out, key);
-	out->writeLong(index->indexPos);
-	out->writeLong(index->posData);
-	out->seek(currentPos);
+	IndexAlgorithm* impl = IndexFactory::indexFactory.index(db, ns, "_id");
+	impl->update(indexBSON, id, filePos);
 }
 
 void DBController::insertIndex(const char* db, const char* ns, BSONObj* bson, long filePos) {
@@ -319,13 +359,7 @@ void DBController::insertIndex(const char* db, const char* ns, BSONObj* bson, lo
 
 	IndexAlgorithm* impl = IndexFactory::indexFactory.index(db, ns, "_id");
 
-	StreamType* out = StreamManager::getStreamManager()->open(db, ns, INDEX_FTYPE);
-
-	impl->add(indexBSON, id, filePos, out->currentPos());
-
-	writeBSON(out, &indexBSON);
-	out->writeLong(out->currentPos());
-	out->writeLong(filePos);
+	impl->add(indexBSON, id, filePos);
 }
 
 BSONArrayObj* DBController::find(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options) throw(ParseException) {
