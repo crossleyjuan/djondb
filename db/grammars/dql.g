@@ -91,12 +91,12 @@ query_expr	returns [Command* val]
 	    ms.writeRaw(", ", 2);
 	    ms.writeRaw(t2.c_str(), t2.length());
 	})*) {
-	}) FROM d1=DB_NS {
+	}) FROM d1=ID {
 	   if (!allfields) {
 	    cmd->setSelect(ms.toChars());
 	   }
 	    cmd->setDB(std::string((char*)$d1.text->chars));
-	} COLON ns=DB_NS {
+	} COLON ns=ID {
 	    cmd->setNameSpace(std::string((char*)$ns.text->chars));
 	} (WHERE filter=filter_expr {
 	    cmd->setFilter(std::string((char*)$filter.text->chars));
@@ -119,7 +119,7 @@ insert_expr returns [Command* val]
 		    obj->add("_revision", const_cast<char*>(rev->c_str())); 
 		    delete rev; 
 		} 
-	} INTO db=DB_NS COLON ns=DB_NS {
+	} INTO db=ID COLON ns=ID {
 	    cmd->setDB(std::string((char*)$db.text->chars));
 	    cmd->setNameSpace(std::string((char*)$ns.text->chars));
 	};
@@ -138,7 +138,7 @@ update_expr returns [Command* val]
 		}
 		cmd->setBSON(*obj);
 		delete obj;
-	} INTO db=DB_NS COLON ns=DB_NS {
+	} INTO db=ID COLON ns=ID {
 	    cmd->setDB(std::string((char*)$db.text->chars));
 	    cmd->setNameSpace(std::string((char*)$ns.text->chars));
 	};
@@ -151,7 +151,7 @@ remove_expr returns [Command* val]
 	    cmd->setId(std::string((char*)$id.text->chars));
         } (WITH rev=STRING {
 	    cmd->setRevision(std::string((char*)$rev.text->chars));
-        })? FROM db=DB_NS COLON ns=DB_NS {
+        })? FROM db=ID COLON ns=ID {
 	    cmd->setDB(std::string((char*)$db.text->chars));
 	    cmd->setNameSpace(std::string((char*)$ns.text->chars));
 	};
@@ -191,30 +191,41 @@ xpath_expr
 id_expr	: ID;
 
 constant_expr
-	: (NUMBER | STRING | BOOLEAN);
+	: (NUMBER | STRING | TRUE | FALSE);
 
 operand_expr
 	: OPER;
 
-json_const 
-	: STRING | NUMBER | json_array_expr | json_expr;
+json_const
+	: STRING 
+	| NUMBER 
+	| FLOAT
+	| (TRUE 
+	| FALSE
+	)  | json_array_expr
+	| json_expr;
 	
 json_array_expr
-	: LBRAK json_expr (COMMA json_expr)* RBRAK;
+	: LBRAK j1=json_expr 
+	(COMMA j2=json_expr)* RBRAK;
 	
-json_expr	: LBRAN json_fieldname COLON json_const
-			(COMMA json_fieldname COLON json_const)*
-                  RBRAN;
-                  
+json_expr
+: LBRAN (n1=json_fieldname COLON v1=json_const)? (COMMA n2=json_fieldname COLON v2=json_const)* RBRAN;
+
 json_fieldname
-	: STRING;
-	
-fragment TRUE	:	('t'|'T')('r'|'R')('u'|'U')('e'|'E');
-fragment FALSE	:	('f'|'F')('a'|'A')('l'|'L')('s'|'S')('e'|'E');
-BOOLEAN	:	TRUE | FALSE;
+	: STRING | ID;
+
+TRUE	:	('t'|'T')('r'|'R')('u'|'U')('e'|'E');
+FALSE	:	('f'|'F')('a'|'A')('l'|'L')('s'|'S')('e'|'E');
+
 NUMBER :	'0'..'9'+;
-fragment LETTER :	'a'..'z' | 'A'..'Z';
-fragment ID	:	LETTER (LETTER | NUMBER | '_' | '.')*;
+
+FLOAT
+    :   NUMBER '.' (NUMBER)* EXPONENT?
+    |   '.' (NUMBER)+ EXPONENT?
+    |   (NUMBER)+ EXPONENT
+    ;
+
 fragment DOLLAR 	: '$';
 fragment ADM   	        : ':';
 	
@@ -235,16 +246,10 @@ OR	:	('o' | 'O') ('R' | 'r');
 AND	:	('a' | 'A') ('n' | 'N') ('d' | 'D');
 TOP	:	('t'|'T')('o'|'O')('p'|'P');
 
-DB_NS
-	:	ID;
+ID  :	('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*;
+
 ALL_FIELDS
 	:	'*';
-
-FLOAT
-    :   NUMBER '.' (NUMBER)* EXPONENT?
-    |   '.' (NUMBER)+ EXPONENT?
-    |   (NUMBER)+ EXPONENT
-    ;
 
 COMMENT
     :   '//' ~('\n'|'\r')* '\r'? '\n' {$channel=HIDDEN;}
