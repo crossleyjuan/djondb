@@ -8,6 +8,7 @@ copy ..\..\bson\bsonutil.h .
 copy ..\..\driverbase\djondbconnection.h .
 copy ..\..\driverbase\djondb_client.h .
 copy ..\..\driverbase\djondbconnectionmanager.h .
+copy ..\..\driverbase\djonv8.h .
 copy ..\..\db\constantexpression.h .
 copy ..\..\db\expressionresult.h .
 copy ..\..\db\dbcontroller.h .

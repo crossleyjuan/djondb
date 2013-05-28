@@ -53,6 +53,19 @@ public class DjondbConnection : IDisposable {
     if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
   }
 
+  public string beginTransaction() {
+    string ret = djonwrapperPINVOKE.DjondbConnection_beginTransaction(swigCPtr);
+    return ret;
+  }
+
+  public void commitTransaction() {
+    djonwrapperPINVOKE.DjondbConnection_commitTransaction(swigCPtr);
+  }
+
+  public void rollbackTransaction() {
+    djonwrapperPINVOKE.DjondbConnection_rollbackTransaction(swigCPtr);
+  }
+
   public bool open() {
     bool ret = djonwrapperPINVOKE.DjondbConnection_open(swigCPtr);
     return ret;
@@ -109,15 +122,36 @@ public class DjondbConnection : IDisposable {
     return ret;
   }
 
+  public BSONArrayObj find(string db, string ns, BSONObj options) {
+    IntPtr cPtr = djonwrapperPINVOKE.DjondbConnection_find__SWIG_1(swigCPtr, db, ns, BSONObj.getCPtr(options));
+    BSONArrayObj ret = (cPtr == IntPtr.Zero) ? null : new BSONArrayObj(cPtr, false);
+    if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
   public BSONArrayObj find(string db, string ns, string filter) {
-    IntPtr cPtr = djonwrapperPINVOKE.DjondbConnection_find__SWIG_1(swigCPtr, db, ns, filter);
+    IntPtr cPtr = djonwrapperPINVOKE.DjondbConnection_find__SWIG_2(swigCPtr, db, ns, filter);
+    BSONArrayObj ret = (cPtr == IntPtr.Zero) ? null : new BSONArrayObj(cPtr, false);
+    if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public BSONArrayObj find(string db, string ns, string filter, BSONObj options) {
+    IntPtr cPtr = djonwrapperPINVOKE.DjondbConnection_find__SWIG_3(swigCPtr, db, ns, filter, BSONObj.getCPtr(options));
     BSONArrayObj ret = (cPtr == IntPtr.Zero) ? null : new BSONArrayObj(cPtr, false);
     if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public BSONArrayObj find(string db, string ns, string select, string filter) {
-    IntPtr cPtr = djonwrapperPINVOKE.DjondbConnection_find__SWIG_2(swigCPtr, db, ns, select, filter);
+    IntPtr cPtr = djonwrapperPINVOKE.DjondbConnection_find__SWIG_4(swigCPtr, db, ns, select, filter);
+    BSONArrayObj ret = (cPtr == IntPtr.Zero) ? null : new BSONArrayObj(cPtr, false);
+    if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public BSONArrayObj find(string db, string ns, string select, string filter, BSONObj options) {
+    IntPtr cPtr = djonwrapperPINVOKE.DjondbConnection_find__SWIG_5(swigCPtr, db, ns, select, filter, BSONObj.getCPtr(options));
     BSONArrayObj ret = (cPtr == IntPtr.Zero) ? null : new BSONArrayObj(cPtr, false);
     if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
     return ret;
@@ -137,6 +171,19 @@ public class DjondbConnection : IDisposable {
 
   public bool remove(string db, string ns, string id, string revision) {
     bool ret = djonwrapperPINVOKE.DjondbConnection_remove(swigCPtr, db, ns, id, revision);
+    if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public BSONArrayObj executeQuery(string query) {
+    IntPtr cPtr = djonwrapperPINVOKE.DjondbConnection_executeQuery(swigCPtr, query);
+    BSONArrayObj ret = (cPtr == IntPtr.Zero) ? null : new BSONArrayObj(cPtr, false);
+    if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public bool executeUpdate(string query) {
+    bool ret = djonwrapperPINVOKE.DjondbConnection_executeUpdate(swigCPtr, query);
     if (djonwrapperPINVOKE.SWIGPendingException.Pending) throw djonwrapperPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }

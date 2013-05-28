@@ -133,10 +133,32 @@ unary_expr returns [BaseExpression* val]
 	     val = NULL;
 	}
 	: (c1=constant_expr {
-	        $val = c1;
+	        $val = $c1.val;
 	} | x1=xpath_expr {
-	        $val = x1;
+	        $val = $x1.val;
+	} | e1=exists_expr {
+	        $val = $e1.val;
+	} | n1=not_expr {
+	        $val = $n1.val;
 	});
+	
+exists_expr returns [BaseExpression* val]
+	: EXISTS LPAREN xpath_expr RPAREN {
+	   UnaryExpression* ue = new UnaryExpression(FO_EXISTS);
+	   ue->push($xpath_expr.val);
+	   $val = ue;
+	};
+	
+not_expr returns  [BaseExpression* val]
+@init {
+	   UnaryExpression* ue = new UnaryExpression(FO_NOT);
+	   $val = ue;
+}
+	: (NOT LPAREN e1=exists_expr RPAREN {
+	   ue->push($e1.val);
+	}) | (NOT e2=exists_expr) {
+	   ue->push($e2.val);
+	};
 	
 xpath_expr returns [BaseExpression* val]
 	: XPATH {
@@ -174,16 +196,28 @@ constant_expr returns [BaseExpression* val]
 	    
 	    $val = new ConstantExpression(text);
 	    free (text);
+	} | be=boolean_val {
+	    $val = new ConstantExpression($be.val);
 	});
 
 operand_expr returns [BaseExpression* val]
 	: OPER;
-	
-NOT	:	'not';
 
-OPER	:	('==' | '>' | '>=' | '<' | '<=' );
+boolean_val returns [bool val]
+	: TRUE {
+		$val = true;
+	} | FALSE {
+		$val = true;
+	};
+	
+NOT	:	('n'|'N')('o'|'O')('t'|'T');
+TRUE	:	('t'|'T')('r'|'R')('u'|'U')('e'|'E');
+FALSE	:	('f'|'F')('a'|'A')('l'|'L')('s'|'S')('e'|'E');
+
+OPER	:	('==' | '>' | '>=' | '<' | '<=' | '!=' );
 OR	:	('o' | 'O') ('R' | 'r');
 AND	:	('a' | 'A') ('n' | 'N') ('d' | 'D');
+EXISTS	:	('e'|'E')('x'|'X')('i'|'I')('s'|'S')('t'|'T')('s'|'S');
 
 NUMBER :	'0'..'9'+;
 

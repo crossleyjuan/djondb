@@ -29,6 +29,8 @@
 #include "command.h"
 #include "commandreader.h"
 #include "dbcontroller.h"
+#include "basetransaction.h"
+#include "transactionmanager.h"
 #include "bson.h"
 #include <stdlib.h>
 #include <boost/shared_ptr.hpp>
@@ -66,6 +68,8 @@ pthread_cond_t  request_cv =   PTHREAD_COND_INITIALIZER;
 Thread* m_thread; // Main thread
 
 DBController* __dbController;
+BaseTransaction* _baseTransaction;
+TransactionManager* _transactionManager;
 
 std::map<int, NetworkInputStream*>  __mapInput;
 std::map<int, NetworkOutputStream*> __mapOutput;
@@ -92,6 +96,9 @@ void NetworkService::start() { //throw (NetworkException*) {
 
 	__dbController = new DBController();
 	__dbController->initialize();
+	_baseTransaction = new BaseTransaction(__dbController);
+	TransactionManager::initializeTransactionManager(_baseTransaction);
+	_transactionManager = TransactionManager::getTransactionManager();
 	setRunning(true);
 	m_thread = new Thread(&startSocketListener);
 	m_thread->start(this);
@@ -115,6 +122,8 @@ void NetworkService::stop() { //throw (NetworkException*) {
 			break;
 		}
 	}
+	delete _transactionManager;
+	delete _baseTransaction;
 	__dbController->shutdown();
 	setRunning(false);
 #ifndef WINDOWS
@@ -353,7 +362,13 @@ int processRequest(NetworkService* service, void *arg) {
 	// Reads command
 	Command* cmd = reader->readCommand();
 	commands++;
-	cmd->setDBController(__dbController);
+	BaseTransaction* transaction = _baseTransaction;
+	if (cmd->options() != NULL) {
+		if (cmd->options()->has("_transactionId")) {
+			transaction = (BaseTransaction*)_transactionManager->getTransaction(cmd->options()->getString("_transactionId"));
+		}
+	}
+	cmd->setDBController(transaction);
 	try {
 		if (cmd->commandType() != CLOSECONNECTION) {
 			cmd->execute();

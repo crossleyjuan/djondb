@@ -6,7 +6,7 @@
 using namespace std;
 
 class BSONObj;
-class DBController;
+class Controller;
 class OutputStream;
 class InputStream;
 
@@ -19,7 +19,9 @@ enum COMMANDTYPE {
     SHUTDOWN,
 	 SHOWDBS,
 	 SHOWNAMESPACES,
-	 REMOVE
+	 REMOVE,
+	 COMMIT,
+	 ROLLBACK
 };
 
 class Command {
@@ -36,11 +38,11 @@ class Command {
         virtual void writeResult(OutputStream* out) const = 0;
         virtual void readResult(InputStream* is) = 0;
 
-        DBController* dbController() const {
+        Controller* dbController() const {
             return  _dbController;
         }
 
-        void setDBController(DBController* dbController) {
+        void setDBController(Controller* dbController) {
             _dbController = dbController;
         }
 
@@ -51,6 +53,12 @@ class Command {
 
 		  std::string resultMessage() const {
 			  return _resultMessage;
+		  }
+
+		  void setOptions(const BSONObj* options);
+
+		  const BSONObj* options() const {
+			  return _options;
 		  }
 
 	 protected:
@@ -65,27 +73,28 @@ class Command {
 		  int _resultCode;
 		  std::string _resultMessage;
 
-    private:
-        COMMANDTYPE _commandType;
-        DBController* _dbController;
+	 private:
+		  COMMANDTYPE _commandType;
+		  Controller* _dbController;
+		  BSONObj* _options;
 };
 
 class CloseCommand: public Command {
-    public:
-        CloseCommand();
+	public:
+		CloseCommand();
 
-        CloseCommand(const CloseCommand& orig);
-        virtual ~CloseCommand();
+		CloseCommand(const CloseCommand& orig);
+		virtual ~CloseCommand();
 
-        virtual void execute();
+		virtual void execute();
 
-        virtual void* result() {
-            return NULL;
-        }
+		virtual void* result() {
+			return NULL;
+		}
 
-        virtual void writeCommand(OutputStream* out) const;
-        virtual void writeResult(OutputStream* out) const;
-        virtual void readResult(InputStream* is);
+		virtual void writeCommand(OutputStream* out) const;
+		virtual void writeResult(OutputStream* out) const;
+		virtual void readResult(InputStream* is);
 };
 
 

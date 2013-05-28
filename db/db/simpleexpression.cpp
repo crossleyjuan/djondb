@@ -54,6 +54,12 @@ ExpressionResult* SimpleExpression::eval(const BSONObj& bson) {
 	ExpressionResult::RESULT_TYPE type;
 	ExpressionResult* result = NULL;
 	switch (content->type()) {
+		case BOOL_TYPE:
+			{
+				bool b = (bool)*content;
+				result = new ExpressionResult(b);
+				break;
+			}
 		case INT_TYPE:
 			{
 				__int32 i = (__int32)*content;

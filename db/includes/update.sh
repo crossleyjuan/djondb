@@ -7,6 +7,7 @@ cp ../bson/bsonutil.h .
 cp ../driverbase/djondbconnection.h .
 cp ../driverbase/djondb_client.h .
 cp ../driverbase/djondbconnectionmanager.h .
+cp ../driverbase/djonv8.h .
 cp ../db/constantexpression.h .
 cp ../db/expressionresult.h .
 cp ../db/dbcontroller.h .
@@ -34,7 +35,7 @@ cp ../util/defs.h .
 cp ../util/datetime.h .
 cp ../util/dtime.h .
 cp ../util/errorhandle.h .
-cp ../util/errors.h .
+cp ../util/djon_error_codes.h .
 cp ../util/fileutil.h .
 cp ../util/circular_queue.h .
 cp ../obj/config.h .

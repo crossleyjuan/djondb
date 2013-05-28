@@ -44,10 +44,10 @@ class ExpressionResult {
 			RT_NULL
 		};
 	public:
+		ExpressionResult(bool value);
 		ExpressionResult(__int32 value);
 		ExpressionResult(__int64 value);
 		ExpressionResult(double value);
-		ExpressionResult(bool value);
 		ExpressionResult(std::string value);
 		ExpressionResult(BSONObj* value);
 		ExpressionResult(djondb::string value);

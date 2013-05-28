@@ -44,6 +44,12 @@ unsigned char FileInputStreamW32::readChar() {
     return v;
 }
 
+/* Reads 1 bytes in the input (little endian order) */
+bool FileInputStreamW32::readBoolean () {
+	bool result = (bool)readDataTmp<char>();
+	return result;
+}
+
 /* Reads 2 bytes in the input (little endian order) */
 __int16 FileInputStreamW32::readShortInt () {
 	__int16 result = readDataTmp<__int16>();

@@ -7,6 +7,5 @@ con.insert("testpython", "testns", "{ 'name': 'John' }");
 
 res = con.find("testpython", "testns", "");
 
-for n in res:
-	print n.toChar();
+print res.toChar();
 

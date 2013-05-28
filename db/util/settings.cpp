@@ -81,5 +81,8 @@ void setSetting(std::string key, std::string value) {
 	}
 
 	// This will override the settings file with the new value
-	__settingsValues.insert(std::pair<std::string, std::string>(key, value));
+	std::pair<std::map<std::string,std::string>::iterator,bool> ret = __settingsValues.insert(std::pair<std::string, std::string>(key, value));
+	if (ret.second == false) {
+		ret.first->second = value;
+	}
 }

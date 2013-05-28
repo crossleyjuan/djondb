@@ -1,0 +1,12 @@
+struct Buffer {
+    char flag;
+    __int64 startOffset;
+    __int64 len;
+	char* file;
+}
+
+struct {
+    __int64 bufferSize;
+	__int32 buffers;
+	Buffer[];
+}

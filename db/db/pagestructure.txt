@@ -1,0 +1,15 @@
+IndexPage
+
+__int32 elementcount // Number of elements per page
+
+// Loop by Index
+for 0 - elementcount
+   __int32 0 - NULL, 1 - Index in place
+   BSON (if 1)
+
+   // POinters
+   __int32 0 - NULL, 1 - Pointer (IndexPage)
+   __int32 BufferIndex   // If 1
+   __int32 BufferPos  // If 1
+
+

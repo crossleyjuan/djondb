@@ -19,7 +19,8 @@
 #include "indexfactory.h"
 
 #include "bson.h"
-#include "bplusindex.h"
+//#include "bplusindex.h"
+#include "bplusindexp.h"
 #include <stdio.h>
 #include <sstream>
 #include <string>
@@ -194,8 +195,15 @@ IndexAlgorithm* IndexFactory::index(const char* db, const char* ns, const std::s
 
 	IndexAlgorithm* indexImpl = findIndex(algorithms, keys);
 	if (indexImpl == NULL) {
-		indexImpl = new BPlusIndex(keys);
+		int len = strlen(db) + strlen(ns) + strlen(".ixp") + 20;
+		char* indexFileName = (char*)malloc(len);
+		memset(indexFileName, 0, len);
+		sprintf(indexFileName, "%s/%s.ixp", db, ns), 
+		//indexImpl = new BPlusIndex(keys);
+		indexImpl = new BPlusIndexP(indexFileName);
+		indexImpl->setKeys(keys);
 		algorithms->push_back(indexImpl);
+		free(indexFileName);
 	}
 
 	return indexImpl;

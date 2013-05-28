@@ -20,9 +20,9 @@
 #include <iostream>
 #include "defs.h"
 #ifdef WINDOWS
-	#include <Windows.h>
+#include <Windows.h>
 #else
-   #include <sys/time.h>
+#include <sys/time.h>
 #endif
 #include <time.h>
 
@@ -31,26 +31,43 @@ bool Thread::m_mutexInitalized;
 pthread_mutex_t Thread::m_mutex_t;
 
 Thread::Thread(void *(*run)(void* arg)) {
-    runFunction = run;
-    m_numtreads++;
-    m_threadId = m_numtreads;
+	runFunction = run;
+	m_numtreads++;
+	m_threadId = m_numtreads;
+	_attached = false;
 }
 
 void Thread::start(void* arg) {
-    int rc = pthread_create(&internal, NULL, runFunction, (void*)arg);
-    if (rc) {
-        throw "Error creating the thread";
-    }
+	_attached = true;
+   pthread_attr_t attr;	
+	pthread_attr_init(&attr);
+	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+	int rc = pthread_create(&internal, &attr, runFunction, (void*)arg);
+	if (rc) {
+		throw "Error creating the thread";
+	}
 }
 
 void Thread::join() {
-    pthread_join(internal, NULL);
+	if (_attached) {
+		pthread_join(internal, NULL);
+	}
+}
+
+void Thread::detach() {
+	if (_attached) {
+		pthread_detach(internal);
+		_attached = false;
+	}
 }
 
 Thread::~Thread() {
-    pthread_detach(internal);
+	detach();
 }
 
+void Thread::stop() {
+	detach();
+}
 
 void Thread::sleep(int milisecs) {
 #ifndef WINDOWS
@@ -78,14 +95,14 @@ void Thread::sleep(int milisecs) {
 
 
 void Thread::mutex_lock() {
-    if (!m_mutexInitalized) {
-        pthread_mutex_init(&m_mutex_t, NULL);
-        m_mutexInitalized = true;
-    }
-    pthread_mutex_lock(&m_mutex_t);
+	if (!m_mutexInitalized) {
+		pthread_mutex_init(&m_mutex_t, NULL);
+		m_mutexInitalized = true;
+	}
+	pthread_mutex_lock(&m_mutex_t);
 }
 
 void Thread::mutex_unlock() {
-    pthread_mutex_unlock(&m_mutex_t);
+	pthread_mutex_unlock(&m_mutex_t);
 }
 

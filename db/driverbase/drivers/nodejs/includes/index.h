@@ -24,6 +24,9 @@ class Index {
 
 class IndexAlgorithm {
 	public:
+		IndexAlgorithm() {
+		}
+
 		IndexAlgorithm(std::set<std::string> keys) {
 			_keys = keys;
 		}
@@ -34,11 +37,15 @@ class IndexAlgorithm {
 		virtual void remove(const BSONObj& elem) = 0;
 		virtual std::list<Index*> find(FilterParser* parser) = 0;
 
-		const std::set<std::string> keys() const {
+		virtual const std::set<std::string> keys() const {
 			return _keys;
 		}
 
-	private:
+		virtual void setKeys(std::set<std::string> keys) {
+			_keys = keys;
+		}
+
+	protected:
 		std::set<std::string> _keys;
 };
 

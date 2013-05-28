@@ -11,6 +11,7 @@ cp bsonutil.h php/includes/
 cp djondbconnection.h php/includes/
 cp djondb_client.h php/includes/
 cp djondbconnectionmanager.h php/includes/
+cp djonv8.h php/includes/
 cp constantexpression.h php/includes/
 cp expressionresult.h php/includes/
 cp dbcontroller.h php/includes/
@@ -38,7 +39,7 @@ cp defs.h php/includes/
 cp datetime.h php/includes/
 cp dtime.h php/includes/
 cp errorhandle.h php/includes/
-cp errors.h php/includes/
+cp djon_error_codes.h php/includes/
 cp fileutil.h php/includes/
 cp circular_queue.h php/includes/
 cp config.h php/includes/

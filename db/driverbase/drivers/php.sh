@@ -1,10 +1,11 @@
 #!/bin/sh
 
-while getopts j:d:u o
+while getopts s:j:d:u o
    do case "$o" in
 		d)  DIR="$OPTARG";;
 	   u)  UPLOAD="true";;
-		\?)  echo "Usage: $0 -d dist_dir" && exit 1;;
+	   s)  SUFFIX="$OPTARG";;
+		\?)  echo "Usage: $0 -d dist_dir [-s suffix]" && exit 1;;
 	esac
 done
 
@@ -15,9 +16,9 @@ mkdir php
 sh update-php.sh
 OS=`uname -s`
 if test "$OS" = "Darwin"; then
-cp ../../obj/usr/lib/libdjon-client.0.dylib ../../obj/usr/lib/libdjon-client.dylib php/
+cp ../../build/usr/lib/libdjon-client.0.dylib ../../build/usr/lib/libdjon-client.dylib php/
 else
-cp ../../obj/usr/lib/libdjon-client.la php/
+cp ../../build/usr/lib/libdjon-client.so php/
 fi
 
 swig -c++ -php -outdir php -o php/djonphpdriver.cpp driver.i
@@ -31,7 +32,7 @@ phpize
 make
 
 
-zipfile="djondb_phpext_`uname`_`uname -m`.zip"
+zipfile="djondb_phpext_`uname`_`uname -m`${SUFFIX}.zip"
 
 zip $zipfile test.php modules/djonwrapper.so djonwrapper.php
 

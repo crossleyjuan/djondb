@@ -22,6 +22,7 @@
 #include "bsoninputstream.h"
 #include "bsonoutputstream.h"
 #include "fileinputstreamw32.h"
+#include "bson.h"
 #include <stdlib.h>
 #include <memory>
 #include <cstring>
@@ -134,20 +135,23 @@ StreamType* StreamManager::checkVersion(StreamType* stream) {
 	return stream;
 }
 
-StreamType* StreamManager::open(std::string db, std::string ns, FILE_TYPE type) {
+StreamType* StreamManager::open(const char* db, const char* ns, FILE_TYPE type) {
 	Logger* log = getLogger(NULL);
 	StreamType* stream = NULL;
 
+	std::string sdb(db);
+	std::string sns(ns);
+
 	map<std::string, SpacesType>* spaces = NULL;
-	map<std::string, map<std::string, SpacesType>* >::iterator itDB = _spaces.find(db);
+	map<std::string, map<std::string, SpacesType>* >::iterator itDB = _spaces.find(sdb);
 	if (itDB == _spaces.end()) {
 		spaces = new map<std::string, SpacesType>();
-		_spaces.insert(pair<std::string, map<std::string, SpacesType>* >(db, spaces));
+		_spaces.insert(pair<std::string, map<std::string, SpacesType>* >(sdb, spaces));
 	} else {
 		spaces = itDB->second;
 	}
 
-	map<std::string, SpacesType>::iterator it = spaces->find(ns);
+	map<std::string, SpacesType>::iterator it = spaces->find(sns);
 
 	map<FILE_TYPE, StreamType*>* streams = NULL;
 	if (it != spaces->end()) {
@@ -162,14 +166,14 @@ StreamType* StreamManager::open(std::string db, std::string ns, FILE_TYPE type) 
 		return stream;
 	}
 
-	std::string filedir = concatStrings(_dataDir, db);
+	std::string filedir = concatStrings(_dataDir, sdb);
 	filedir += FILESEPARATOR;
 	if (log->isDebug()) log->debug(3, "StreamManager::open checking directory %s", filedir.c_str());
 	if (!existDir(filedir.c_str())) {
 		if (log->isDebug()) log->debug(3, "StreamManager::open creating directory %s", filedir.c_str());
 		makeDir(filedir.c_str());
 	}
-	std::string file = fileName(ns, type);
+	std::string file = fileName(sns, type);
 	std::string streamfile = concatStrings(filedir, file);
 	char* flags;
 	if (existFile(streamfile.c_str())) {
@@ -185,10 +189,10 @@ StreamType* StreamManager::open(std::string db, std::string ns, FILE_TYPE type) 
 		streams->insert(pair<FILE_TYPE, StreamType*>(type, output));
 	} else {
 		SpacesType space;
-		space.ns = ns;
+		space.ns = sns;
 		space.streams = new map<FILE_TYPE, StreamType*>();
 		space.streams->insert(pair<FILE_TYPE, StreamType*>(type, output));
-		spaces->insert(pair<std::string, SpacesType>(ns, space));
+		spaces->insert(pair<std::string, SpacesType>(sns, space));
 	}
 
 	if (!_initializing) {
@@ -198,7 +202,7 @@ StreamType* StreamManager::open(std::string db, std::string ns, FILE_TYPE type) 
 	return output;
 }
 
-bool StreamManager::close(char* db, char* ns) {
+bool StreamManager::close(const char* db, const char* ns) {
 	map<std::string, map<std::string, SpacesType>* >::iterator itDb = _spaces.find(std::string(db));
 	if (itDb != _spaces.end()) {
 		map<std::string, SpacesType>* spaces = itDb->second;
@@ -268,7 +272,11 @@ void StreamManager::saveDatabases() {
 	fos->close();
 }
 
-bool StreamManager::dropNamespace(char* db, char* ns) {
+bool StreamManager::dropNamespace(const char* db, const char* ns) {
+	// Ensures that the namespaces was loaded from disk if it exists
+	open(db, ns, DATA_FTYPE);
+	open(db, ns, INDEX_FTYPE);
+
 	StreamType* stream = NULL;
 	bool result = false;
 	map<std::string, map<std::string, SpacesType>* >::iterator itspaces = _spaces.find(std::string(db));

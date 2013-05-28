@@ -47,6 +47,18 @@ public class DjondbConnection {
     this(djonwrapperJNI.new_DjondbConnection__SWIG_2(DjondbConnection.getCPtr(orig), orig), true);
   }
 
+  public String beginTransaction() {
+    return djonwrapperJNI.DjondbConnection_beginTransaction(swigCPtr, this);
+  }
+
+  public void commitTransaction() {
+    djonwrapperJNI.DjondbConnection_commitTransaction(swigCPtr, this);
+  }
+
+  public void rollbackTransaction() {
+    djonwrapperJNI.DjondbConnection_rollbackTransaction(swigCPtr, this);
+  }
+
   public boolean open() {
     return djonwrapperJNI.DjondbConnection_open(swigCPtr, this);
   }
@@ -90,13 +102,28 @@ public class DjondbConnection {
     return (cPtr == 0) ? null : new BSONArrayObj(cPtr, false);
   }
 
+  public BSONArrayObj find(String db, String ns, BSONObj options) {
+    long cPtr = djonwrapperJNI.DjondbConnection_find__SWIG_1(swigCPtr, this, db, ns, BSONObj.getCPtr(options), options);
+    return (cPtr == 0) ? null : new BSONArrayObj(cPtr, false);
+  }
+
   public BSONArrayObj find(String db, String ns, String filter) {
-    long cPtr = djonwrapperJNI.DjondbConnection_find__SWIG_1(swigCPtr, this, db, ns, filter);
+    long cPtr = djonwrapperJNI.DjondbConnection_find__SWIG_2(swigCPtr, this, db, ns, filter);
+    return (cPtr == 0) ? null : new BSONArrayObj(cPtr, false);
+  }
+
+  public BSONArrayObj find(String db, String ns, String filter, BSONObj options) {
+    long cPtr = djonwrapperJNI.DjondbConnection_find__SWIG_3(swigCPtr, this, db, ns, filter, BSONObj.getCPtr(options), options);
     return (cPtr == 0) ? null : new BSONArrayObj(cPtr, false);
   }
 
   public BSONArrayObj find(String db, String ns, String select, String filter) {
-    long cPtr = djonwrapperJNI.DjondbConnection_find__SWIG_2(swigCPtr, this, db, ns, select, filter);
+    long cPtr = djonwrapperJNI.DjondbConnection_find__SWIG_4(swigCPtr, this, db, ns, select, filter);
+    return (cPtr == 0) ? null : new BSONArrayObj(cPtr, false);
+  }
+
+  public BSONArrayObj find(String db, String ns, String select, String filter, BSONObj options) {
+    long cPtr = djonwrapperJNI.DjondbConnection_find__SWIG_5(swigCPtr, this, db, ns, select, filter, BSONObj.getCPtr(options), options);
     return (cPtr == 0) ? null : new BSONArrayObj(cPtr, false);
   }
 
@@ -110,6 +137,15 @@ public class DjondbConnection {
 
   public boolean remove(String db, String ns, String id, String revision) {
     return djonwrapperJNI.DjondbConnection_remove(swigCPtr, this, db, ns, id, revision);
+  }
+
+  public BSONArrayObj executeQuery(String query) {
+    long cPtr = djonwrapperJNI.DjondbConnection_executeQuery(swigCPtr, this, query);
+    return (cPtr == 0) ? null : new BSONArrayObj(cPtr, false);
+  }
+
+  public boolean executeUpdate(String query) {
+    return djonwrapperJNI.DjondbConnection_executeUpdate(swigCPtr, this, query);
   }
 
   public boolean dropNamespace(String db, String ns) {

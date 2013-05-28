@@ -40,7 +40,7 @@ DBFileInputStream::DBFileInputStream(InputStream* stream) {
 		_versionOffset = stream->currentPos();
 		free(version);
 	} else {
-		_dbVersion = new Version("0.1");
+		_dbVersion = new Version("0.300000000");
 		stream->seek(0);
 	}
 	free(mark);
@@ -92,6 +92,11 @@ const std::string DBFileInputStream::fileName() const {
 
 unsigned char DBFileInputStream::readChar() {
 	return _stream->readChar();
+}
+
+/* Reads 1 bytes in the input (little endian order) */
+bool DBFileInputStream::readBoolean () {
+	return _stream->readBoolean();
 }
 
 /* Reads 2 bytes in the input (little endian order) */
@@ -148,3 +153,4 @@ bool DBFileInputStream::isClosed() {
 Version* DBFileInputStream::version() const {
 	return _dbVersion;
 }
+

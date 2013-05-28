@@ -26,17 +26,19 @@
 #include "showdbscommand.h"
 #include "removecommand.h"
 #include "bsoninputstream.h"
+#include "commitcommand.h"
+#include "rollbackcommand.h"
 #include "util.h"
 #include <memory>
 #include <assert.h>
 
 CommandReader::CommandReader(InputStream* is)
 {
-    _stream = is;
+	_stream = is;
 }
 
 CommandReader::CommandReader(const CommandReader& orig) {
-    this->_stream = orig._stream;
+	this->_stream = orig._stream;
 }
 
 CommandReader::~CommandReader()
@@ -44,163 +46,197 @@ CommandReader::~CommandReader()
 }
 
 InsertCommand* parseInsert(InputStream* is)  {
-	 Logger* log = getLogger(NULL);
-    InsertCommand* command = new InsertCommand();
-    std::string* db = is->readString();
-    command->setDB(*db);
-    std::string* ns = is->readString();
-    command->setNameSpace(*ns);
+	Logger* log = getLogger(NULL);
+	InsertCommand* command = new InsertCommand();
+	std::string* db = is->readString();
+	command->setDB(*db);
+	std::string* ns = is->readString();
+	command->setNameSpace(*ns);
 
-	 /*
-	 std::string* s = is->readString();
-	 BSONObj* obj = BSONParser::parse(*s);
-	 delete s;
-	 */
-    std::auto_ptr<BSONInputStream> bsonis(new BSONInputStream(is));
-    BSONObj* obj = bsonis->readBSON();
-    command->setBSON(*obj);
-	 
-    delete ns;
-    delete db;
-    delete obj;
-    return command;
+	std::auto_ptr<BSONInputStream> bsonis(new BSONInputStream(is));
+	BSONObj* obj = bsonis->readBSON();
+	command->setBSON(obj);
+
+	delete ns;
+	delete db;
+	return command;
 }
 
 DropnamespaceCommand* parseDropnamespace(InputStream* is)  {
-    DropnamespaceCommand* command = new DropnamespaceCommand();
-    std::string* db = is->readString();
-    command->setDB(*db);
-    std::string* ns = is->readString();
-    command->setNameSpace(*ns);
+	DropnamespaceCommand* command = new DropnamespaceCommand();
+	std::string* db = is->readString();
+	command->setDB(*db);
+	std::string* ns = is->readString();
+	command->setNameSpace(*ns);
 
-    delete db;
-    delete ns;
-    return command;
+	delete db;
+	delete ns;
+	return command;
 }
 
 ShowdbsCommand* parseShowdbsCommand(InputStream* is)  {
-    ShowdbsCommand* command = new ShowdbsCommand();
+	ShowdbsCommand* command = new ShowdbsCommand();
 
-    return command;
+	return command;
 }
 
 ShownamespacesCommand* parseShownamespacesCommand(InputStream* is)  {
-    ShownamespacesCommand* command = new ShownamespacesCommand();
-    std::string* db = is->readString();
-    command->setDB(*db);
+	ShownamespacesCommand* command = new ShownamespacesCommand();
+	std::string* db = is->readString();
+	command->setDB(*db);
 
-    delete db;
-    return command;
+	delete db;
+	return command;
 }
 
 ShutdownCommand* parseShutdown(InputStream* is)  {
-    ShutdownCommand* command = new ShutdownCommand();
+	ShutdownCommand* command = new ShutdownCommand();
 
-    return command;
+	return command;
 }
 
 UpdateCommand* parseUpdate(InputStream* is)  {
-    UpdateCommand* command = new UpdateCommand();
-    std::string* db = is->readString();
-    command->setDB(*db);
-    std::string* ns = is->readString();
-    command->setNameSpace(*ns);
-    std::auto_ptr<BSONInputStream> bsonis(new BSONInputStream(is));
-    BSONObj* obj = bsonis->readBSON();
-    command->setBSON(*obj);
+	UpdateCommand* command = new UpdateCommand();
+	std::string* db = is->readString();
+	command->setDB(*db);
+	std::string* ns = is->readString();
+	command->setNameSpace(*ns);
+	std::auto_ptr<BSONInputStream> bsonis(new BSONInputStream(is));
+	BSONObj* obj = bsonis->readBSON();
+	command->setBSON(*obj);
 
-    delete ns;
-    delete db;
-    delete obj;
-    return command;
+	delete ns;
+	delete db;
+	delete obj;
+	return command;
 }
 
 RemoveCommand* parseRemove(InputStream* is)  {
-    RemoveCommand* command = new RemoveCommand();
-    std::string* db = is->readString();
-    command->setDB(*db);
-    std::string* ns = is->readString();
-    command->setNameSpace(*ns);
-    std::string* id = is->readString();
-    command->setId(*id);
-    std::string* revision = is->readString();
-    command->setRevision(*revision);
+	RemoveCommand* command = new RemoveCommand();
+	std::string* db = is->readString();
+	command->setDB(*db);
+	std::string* ns = is->readString();
+	command->setNameSpace(*ns);
+	std::string* id = is->readString();
+	command->setId(*id);
+	std::string* revision = is->readString();
+	command->setRevision(*revision);
 
-    delete ns;
-    delete db;
-    delete id;
-    delete revision;
-    return command;
+	delete ns;
+	delete db;
+	delete id;
+	delete revision;
+	return command;
+}
+
+CommitCommand* parseCommit(InputStream* is)  {
+	CommitCommand* command = new CommitCommand();
+	std::string* txId = is->readString();
+	command->setTransactionId(*txId);
+
+	delete txId;
+	return command;
+}
+
+RollbackCommand* parseRollback(InputStream* is)  {
+	RollbackCommand* command = new RollbackCommand();
+	std::string* txId = is->readString();
+	command->setTransactionId(*txId);
+
+	delete txId;
+	return command;
 }
 
 FindCommand* parseFind(InputStream* is)  {
-    FindCommand* command = new FindCommand();
-    std::string* db = is->readString();
-    command->setDB(*db);
-    std::string* ns = is->readString();
-    command->setNameSpace(*ns);
-    std::string* filter = is->readString();
-    command->setFilter(*filter);
-	 std::string* select = is->readString();
-	 command->setSelect(*select);
+	FindCommand* command = new FindCommand();
+	std::string* db = is->readString();
+	command->setDB(*db);
+	std::string* ns = is->readString();
+	command->setNameSpace(*ns);
+	std::string* filter = is->readString();
+	command->setFilter(*filter);
+	std::string* select = is->readString();
+	command->setSelect(*select);
 
-    delete db;
-    delete ns;
-    delete filter;
-	 delete select;
-    return command;
+	delete db;
+	delete ns;
+	delete filter;
+	delete select;
+	return command;
+}
+
+BSONObj* readOptions(InputStream* stream) {
+	std::auto_ptr<BSONInputStream> bsonis(new BSONInputStream(stream));
+	BSONObj* obj = bsonis->readBSON();
+	return obj;
 }
 
 Command* CommandReader::readCommand() {
-    if (_stream->isClosed()) {
-        return NULL;
-    }
+	if (_stream->isClosed()) {
+		return NULL;
+	}
 	// at this moment no check has been made, but the version will
 	// allow to control that the sender has the same version of the
 	// server
 	Logger* log = getLogger(NULL);
 	if (log->isDebug()) log->debug("readCommand: reading version");
-	std::string* version = _stream->readString();
-	if (log->isDebug()) log->debug("readCommand: version %s", version->c_str());
-	delete version;
+	std::string* sversion = _stream->readString();
+	if (log->isDebug()) log->debug("readCommand: version %s", sversion->c_str());
 
-    COMMANDTYPE type = static_cast<COMMANDTYPE>(_stream->readInt());
+	Version version(*sversion);
+	delete sversion;
 
-	 if (log->isDebug()) log->debug("readCommand: type %d", type);
-    Command* cmd = NULL;
-    switch (type) {
-        case INSERT: // Insert
-            cmd = parseInsert(_stream);
-            break;
-        case UPDATE: // Update
-            cmd = parseUpdate(_stream);
-            break;
-        case FIND:
-            cmd = parseFind(_stream);
-            break;
-        case DROPNAMESPACE:
-            cmd = parseDropnamespace(_stream);
-            break;
-        case SHUTDOWN:
-            cmd = parseShutdown(_stream);
-            break;
-        case CLOSECONNECTION: // Insert
-            cmd = new CloseCommand();
-            break;
-        case SHOWDBS: // Showdbs
-				cmd = parseShowdbsCommand(_stream);
-            break;
-        case SHOWNAMESPACES: // Shownamepsaces
-				cmd = parseShownamespacesCommand(_stream);
-            break;
-        case REMOVE: // Remove
-				cmd = parseRemove(_stream);
-            break;
-        default:
-            cout << "unknown command type " << type << endl;
-            break;
-    }
-    assert(cmd != NULL);
-    return cmd;
+	COMMANDTYPE type = static_cast<COMMANDTYPE>(_stream->readInt());
+
+	BSONObj* options;
+	if (version >= Version("0.3.0")) {
+		options = readOptions(_stream);
+	} else {
+		options = new BSONObj();
+	}
+
+	if (log->isDebug()) log->debug("readCommand: type %d", type);
+	Command* cmd = NULL;
+	switch (type) {
+		case INSERT: // Insert
+			cmd = parseInsert(_stream);
+			break;
+		case UPDATE: // Update
+			cmd = parseUpdate(_stream);
+			break;
+		case FIND:
+			cmd = parseFind(_stream);
+			break;
+		case DROPNAMESPACE:
+			cmd = parseDropnamespace(_stream);
+			break;
+		case SHUTDOWN:
+			cmd = parseShutdown(_stream);
+			break;
+		case CLOSECONNECTION: // Insert
+			cmd = new CloseCommand();
+			break;
+		case SHOWDBS: // Showdbs
+			cmd = parseShowdbsCommand(_stream);
+			break;
+		case SHOWNAMESPACES: // Shownamepsaces
+			cmd = parseShownamespacesCommand(_stream);
+			break;
+		case REMOVE: // Remove
+			cmd = parseRemove(_stream);
+			break;
+		case COMMIT: // Commit transaction
+			cmd = parseCommit(_stream);
+			break;
+		case ROLLBACK: // Rollback transaction
+			cmd = parseRollback(_stream);
+			break;
+		default:
+			cout << "unknown command type " << type << endl;
+			break;
+	}
+	cmd->setOptions(options);
+	assert(cmd != NULL);
+	return cmd;
 }
 

@@ -43,6 +43,12 @@ void FileOutputStream::writeChar (unsigned char v)
     fwrite(&v, 1, 1, _pFile);
 }
 
+/* Write 1 bytes in the output (little endian order) */
+void FileOutputStream::writeBoolean (bool v)
+{
+	writeData<char>((char)v);
+}
+
 /* Write 2 bytes in the output (little endian order) */
 void FileOutputStream::writeShortInt (__int16 v)
 {

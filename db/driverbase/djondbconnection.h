@@ -16,7 +16,8 @@
 class NetworkOutputStream;
 class NetworkInputStream;
 class CommandWriter;
-class Transaction;
+class TransactionManager;
+class Command;
 
 #define SERVER_PORT 1243
 
@@ -34,6 +35,10 @@ namespace djondb {
 			/** Default destructor */
 			virtual ~DjondbConnection();
 
+			const char* beginTransaction();
+			void commitTransaction();
+			void rollbackTransaction();
+
 			bool open();
 			void close();
 			void internalClose();
@@ -46,11 +51,16 @@ namespace djondb {
 			BSONObj* findByKey(const std::string& db, const std::string& ns, const std::string& select, const std::string& id);
 			BSONObj* findByKey(const std::string& db, const std::string& ns, const std::string& id);
 			BSONArrayObj* find(const std::string& db, const std::string& ns);
+			BSONArrayObj* find(const std::string& db, const std::string& ns, const BSONObj& options);
 			BSONArrayObj* find(const std::string& db, const std::string& ns, const std::string& filter);
+			BSONArrayObj* find(const std::string& db, const std::string& ns, const std::string& filter, const BSONObj& options);
 			BSONArrayObj* find(const std::string& db, const std::string& ns, const std::string& select, const std::string& filter);
+			BSONArrayObj* find(const std::string& db, const std::string& ns, const std::string& select, const std::string& filter, const BSONObj& options);
 			bool update(const std::string& db, const std::string& ns, const std::string& json);
 			bool update(const std::string& db, const std::string& ns, const BSONObj& bson);
 			bool remove(const std::string& db, const std::string& ns, const std::string& id, const std::string& revision);
+			BSONArrayObj* executeQuery(const std::string& query);
+			bool executeUpdate(const std::string& query);
 
 			bool dropNamespace(const std::string& db, const std::string& ns);
 			std::vector<std::string>* dbs() const;
@@ -60,9 +70,14 @@ namespace djondb {
 
 		protected:
 		private:
+			void prepareOptions(Command* cmd);
+			Command* parseCommand(const std::string& expression);
+
+		private:
 			NetworkOutputStream*  _outputStream;
 			NetworkInputStream*   _inputStream;
 			CommandWriter*        _commandWriter;
+			std::string*          _activeTransactionId;
 
 			std::string _host;
 			int _port;

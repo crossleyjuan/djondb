@@ -21,9 +21,9 @@ cp ../*.h output/include/
 
 OS=`uname -s`
 if test "$OS" = "Darwin"; then
-cp ../../../obj/usr/lib/libdjon-client.0.dylib ../../obj/usr/lib/libdjon-client.dylib output/
+cp ../../../build/usr/lib/libdjon-client.0.dylib ../../obj/usr/lib/libdjon-client.dylib output/
 else
-cp ../../../obj/usr/lib/libdjon-client.la output/
+cp ../../../build/usr/lib/libdjon-client.so output/
 fi
 
 swig -c++ -python -outdir output -o output/djonpythondriver.cpp driver-python.i

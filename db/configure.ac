@@ -1,4 +1,4 @@
-AC_INIT(djondb, 0.25, crossleyjuan@gmail.com)
+AC_INIT(djondb, 0.30.0, crossleyjuan@gmail.com)
     AC_CONFIG_AUX_DIR(config)
 #    AC_CONFIG_SRCDIR(src/foobar.cpp)
 
@@ -59,5 +59,5 @@ AM_COND_IF([PROFILE], AC_DEFINE([PROFILE], [1], [Define Profile variable]))
 AC_PROG_CXX
 AC_PROG_LIBTOOL
 
-AC_OUTPUT(Makefile util/Makefile bson/Makefile cache/Makefile filesystem/Makefile db/Makefile command/Makefile network/Makefile service/Makefile driverbase/Makefile daemon/Makefile shell/Makefile)
+AC_OUTPUT(Makefile util/Makefile bson/Makefile cache/Makefile filesystem/Makefile db/Makefile command/Makefile tx/Makefile network/Makefile service/Makefile driverbase/Makefile daemon/Makefile shell/Makefile)
 

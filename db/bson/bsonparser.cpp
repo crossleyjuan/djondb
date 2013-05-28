@@ -20,6 +20,8 @@
 
 #include "bsonobj.h"
 #include "bsonarrayobj.h"
+#include "bson_grammarParser.h"
+#include "bson_grammarLexer.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
@@ -132,6 +134,11 @@ BSONObj* BSONParser::parseBSON(const char* c, __int32& pos) throw(BSONException)
 				len = 0;
 				memset(buffer, 0, lenBuffer);
 				switch (type) {
+					case BOOL_TYPE:{
+										  bool bVal = strcmp((char*)value, "true") == 0;
+										  res->add(name, bVal);
+										  break;
+									  }
 					case INT_TYPE:{
 										  __int32 iVal = atoi((char*)value);
 										  res->add(name, iVal);
@@ -187,13 +194,14 @@ BSONObj* BSONParser::parseBSON(const char* c, __int32& pos) throw(BSONException)
 					free(value);
 					value = NULL;
 				}
-				if (c[x] == '}')
-					break;
-				else {
+				if (c[x] != '}') {
 					state = 1; // name
 					type = LONG64_TYPE;
 					continue;
 				}
+			}
+			if (c[x] == '}') {
+				break;
 			}
 		}
 		if (c[x] == ':') {
@@ -281,16 +289,39 @@ BSONArrayObj* BSONParser::parseArray(const char* chrs, __int32& pos) {
 }
 
 BSONObj* BSONParser::parse(const std::string& sbson) {
+	Logger* log = getLogger(NULL);
+	BSONObj* root = NULL;
 
-	const char* c = sbson.c_str();
+	int errorCode = -1;
+	const char* errorMessage;
+	if (sbson.length() != 0) {
+		//throw (ParseException) {
+		pANTLR3_INPUT_STREAM           input;
+		pbson_grammarLexer               lex;
+		pANTLR3_COMMON_TOKEN_STREAM    tokens;
+		pbson_grammarParser              parser;
 
-	BSONObj* res = NULL;
-	for (int x= 0; x < strlen(c); x++) {
-		if (c[x] == '{') {
-			res = parseBSON(c, x);
-			break;
+		const char* bsonExpression = sbson.c_str();
+		input  = antlr3NewAsciiStringInPlaceStream((pANTLR3_UINT8)bsonExpression, strlen(bsonExpression), (pANTLR3_UINT8)"name");
+		lex    = bson_grammarLexerNew                (input);
+		tokens = antlr3CommonTokenStreamSourceNew  (ANTLR3_SIZE_HINT, TOKENSOURCE(lex));
+		parser = bson_grammarParserNew               (tokens);
+
+		root = parser ->start_point(parser);
+		if (parser->pParser->rec->state->exception != NULL) {
+			errorCode = D_ERROR_PARSEERROR;
+			errorMessage = (char*)parser->pParser->rec->state->exception->message;
 		}
 
+		// Must manually clean up
+		//
+		parser ->free(parser);
+		tokens ->free(tokens);
+		lex    ->free(lex);
+		input  ->close(input);
 	}
-	return res;
+	if (errorCode > -1) {
+		//throw ParseException(errorCode, errorMessage);
+	}
+	return root;
 }

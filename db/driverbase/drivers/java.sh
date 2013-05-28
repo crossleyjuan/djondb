@@ -1,12 +1,13 @@
 #!/bin/sh
 
 JAVA=$JAVA_HOME
-while getopts j:d:u o
+while getopts s:j:d:u o
    do case "$o" in
 		j)  JAVA="$OPTARG";;
 		d)  DIR="$OPTARG";;
 	   u)  UPLOAD="true";;
-		\?)  echo "Usage: $0 -jdkhome <java_home>" && exit 1;;
+	   s)  SUFFIX="$OPTARG";;
+		\?)  echo "Usage: $0 -jdkhome <java_home> [-s suffix]" && exit 1;;
 	esac
 done
 
@@ -21,7 +22,7 @@ sh update.sh
 swig -outdir java/java/src/djondb -o java/native/javadriver_wrap.cpp -c++ -java -package djondb driver.i
 
 cd java
-./release.sh
+./release.sh $@
 
 if [ ! -z "${DIR}" ]; 
 then

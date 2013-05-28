@@ -29,6 +29,7 @@
 
 // 100 is reserved for database errors
 const int D_ERROR_TOO_MANY_RESULTS = 100;
+const int D_ERROR_PARSEERROR = 101;
 
 // 600 is reserved for user errors
 const int D_ERROR_CONNECTION = 600;

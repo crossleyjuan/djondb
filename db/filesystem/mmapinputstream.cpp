@@ -27,6 +27,7 @@
 #include <boost/crc.hpp>
 #include <limits.h>
 #include <errno.h>
+#include <cmath>
 #include <assert.h>
 
 #ifndef WINDOWS
@@ -37,7 +38,7 @@
 #else
 #endif
 
-MMapInputStream::MMapInputStream(const char* fileName, const char* flags)
+MMapInputStream::MMapInputStream(const char* fileName, __int32 offset)
 {
 	Logger* log = getLogger(NULL);
 	_fileName = fileName;
@@ -50,12 +51,17 @@ MMapInputStream::MMapInputStream(const char* fileName, const char* flags)
 	_pFile = ::open(fileName, O_RDONLY);
 	if (_pFile > -1) {
 		_len = fileSize(fileName);
+		// this will ensure that the size of the mmap is greater than the size required
+		// avoiding truncate
+		long psize = pageSize();
+		int pages = ceil((double)_len / (double)psize);
+		 __int64 fileLenRequired = pages * psize;
 		bool shared = false;
 		bool advise = true;
 #ifdef LINUX
-		_addr = reinterpret_cast<char *>(mmap(NULL, _len, PROT_READ, MAP_FILE | (shared?MAP_SHARED:MAP_PRIVATE) | MAP_POPULATE , _pFile, 0));
+		_addr = reinterpret_cast<char *>(mmap(NULL, fileLenRequired, PROT_READ, MAP_FILE | (shared?MAP_SHARED:MAP_PRIVATE) | MAP_POPULATE , _pFile, offset));
 #else
-		_addr = reinterpret_cast<char *>(mmap(NULL, _len, PROT_READ, MAP_FILE | (shared?MAP_SHARED:MAP_PRIVATE), _pFile, 0));
+		_addr = reinterpret_cast<char *>(mmap(NULL, fileLenRequired, PROT_READ, MAP_FILE | (shared?MAP_SHARED:MAP_PRIVATE), _pFile, offset));
 #endif
 		_initaddr = _addr;    
 		if (_addr == MAP_FAILED) {
@@ -143,6 +149,7 @@ MMapInputStream::MMapInputStream(const char* fileName, const char* flags)
 }
 
 MMapInputStream::~MMapInputStream() {
+	close();
 }
 
 unsigned char MMapInputStream::readChar() {
@@ -151,6 +158,12 @@ unsigned char MMapInputStream::readChar() {
 	_addr++;
 	_pos++;
 	return v;
+}
+
+/* Reads 1 bytes in the input (little endian order) */
+bool MMapInputStream::readBoolean() {
+	bool result = (bool)readData<char>();
+	return result;
 }
 
 /* Reads 2 bytes in the input (little endian order) */

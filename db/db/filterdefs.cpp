@@ -23,6 +23,8 @@ FILTER_OPERATORS parseFilterOperator(const char* text) {
 		result = FO_OR;
 	} else if (compareInsensitive(text, "and")) {
 		result = FO_AND;
+	} else if (compareInsensitive(text, "!=")) {
+		result = FO_NOT_EQUALS;
 	} else if (compareInsensitive(text, "==")) {
 		result = FO_EQUALS;
 	} else if (compareInsensitive(text, ">")) {

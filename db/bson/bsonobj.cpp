@@ -58,6 +58,12 @@ BSONObj::~BSONObj()
 	}
 	*/
 
+void BSONObj::add(std::string key, bool val) {
+	remove(key);
+	BSONContentBoolean* content = new BSONContentBoolean(val); 
+	_elements.insert(pair<std::string, BSONContent* >(key, content));
+}
+
 void BSONObj::add(std::string key, __int32 val) {
 	remove(key);
 	BSONContentInt* content = new BSONContentInt(val); 
@@ -76,19 +82,25 @@ void BSONObj::add(std::string key, __int64 val) {
 	_elements.insert(pair<std::string, BSONContent* >(key, content));
 }
 
-void BSONObj::add(std::string key, char* val) {
+void BSONObj::add(std::string key, const char* val) {
 	add(key, val, strlen(val));
 }
 
-void BSONObj::add(std::string key, char* val, __int32 length) {
+void BSONObj::add(std::string key, const char* val, __int32 length) {
 	remove(key);
-	BSONContentString* content = new BSONContentString(strcpy(val, length), length); 
+	BSONContentString* content = new BSONContentString(strcpy(const_cast<char*>(val), length), length); 
 	_elements.insert(pair<std::string, BSONContent* >(key, content));
 }
 
 void BSONObj::add(std::string key, const BSONObj& val) {
 	remove(key);
 	BSONContentBSON* content = new BSONContentBSON(new BSONObj(val)); 
+	_elements.insert(pair<std::string, BSONContent* >(key, content));
+}
+
+void BSONObj::add(std::string key, const BSONContent& val) {
+	remove(key);
+	BSONContent* content = val.clone(); 
 	_elements.insert(pair<std::string, BSONContent* >(key, content));
 }
 
@@ -145,6 +157,11 @@ char* BSONObj::toChar() {
 											free(chrbsonarray);
 											break;
 										}
+			case BOOL_TYPE:  {
+									 BSONContentBoolean* bb = (BSONContentBoolean*)content;
+									 sprintf(result + pos, "%s", ((bool)*bb?"true": "false"));
+									 break;
+								 }
 			case INT_TYPE:  {
 									 BSONContentInt* bint = (BSONContentInt*)content;
 									 sprintf(result + pos, "%d", (__int32)*bint);
@@ -152,7 +169,7 @@ char* BSONObj::toChar() {
 								 }
 			case LONG_TYPE: {
 									 BSONContentLong* blong = (BSONContentLong*)content;
-									 sprintf(result + pos, "%lld", (__int64)*blong);
+									 sprintf(result + pos, "%ld", (__int64)*blong);
 									 break;
 								 }
 			case DOUBLE_TYPE: {
@@ -186,6 +203,16 @@ char* BSONObj::toChar() {
 	if (log->isDebug()) log->debug("toChar result: %s", cresult);
 
 	return cresult;
+}
+
+bool BSONObj::getBoolean(std::string key) const throw(BSONException) {
+	BSONContent* content = getContent(key);
+	if ((content != NULL) && (content->type() == BOOL_TYPE)) {
+		BSONContentBoolean* bb = (BSONContentBoolean*)content;
+		return *bb;
+	} else {
+		throw BSONException(format("key not found %s", key.c_str()).c_str());
+	}
 }
 
 __int32 BSONObj::getInt(std::string key) const throw(BSONException) {
@@ -303,6 +330,10 @@ BSONObj::BSONObj(const BSONObj& orig) {
 		BSONContent* origContent = i->second;
 		BSONContent* content;
 		switch (origContent->type()) {
+			case BOOL_TYPE: {
+									content = new BSONContentBoolean(*(BSONContentBoolean*)origContent);
+									break;
+								}
 			case INT_TYPE: {
 									content = new BSONContentInt(*(BSONContentInt*)origContent);
 									break;
@@ -393,12 +424,14 @@ BSONContent* BSONObj::getXpath(const std::string& xpath) const {
 }
 
 bool BSONObj::operator ==(const BSONObj& obj) const {
+	/* 
 	if (this->has("_id") && obj.has("_id")) {
 		BSONContent* idThis = this->getContent("_id");
 		BSONContent* idOther = obj.getContent("_id");
 
 		return (*idThis == *idOther);
 	}
+	*/
 	// Element count
 	if (this->length() != obj.length()) {
 		return false;
@@ -411,9 +444,53 @@ bool BSONObj::operator ==(const BSONObj& obj) const {
 		if (other == NULL) {
 			return false;
 		}
-		if (*content != *other) {
+		if (content->type() != other->type()) {
 			return false;
 		}
+		bool result;
+		switch (content->type()) {
+			case BOOL_TYPE: {
+									result = *((BSONContentBoolean*)content) == *((BSONContentBoolean*)other);
+									break;
+								}
+			case INT_TYPE: {
+									result = *((BSONContentInt*)content) == *((BSONContentInt*)other);
+									break;
+								}
+			case DOUBLE_TYPE: {
+										result = *((BSONContentDouble*)content) == *((BSONContentDouble*)other);
+										break;
+									}
+			case LONG64_TYPE: 
+			case LONG_TYPE: {
+									 result = *((BSONContentLong*)content) == *((BSONContentLong*)other);
+									 break;
+								 }
+			case PTRCHAR_TYPE: 
+			case STRING_TYPE: {
+										result = *((BSONContentString*)content) == *((BSONContentString*)other);
+										break;
+									}
+			case BSON_TYPE: {
+									 result = *((BSONContentBSON*)content) == *((BSONContentBSON*)other);
+									 break;
+								 }
+			case BSONARRAY_TYPE: {
+											result = *((BSONContentBSONArray*)content) == *((BSONContentBSONArray*)other);
+											break;
+										}
+			case NULL_TYPE: {
+									 result = true;
+									 break;
+								 }
+			case UNKNOWN_TYPE: 
+			default:
+										{
+											result = *((BSONContentInt*)content) == *((BSONContentInt*)other);
+											break;
+										}
+		}
+		return result;
 	}
 	return true;
 }
@@ -438,8 +515,54 @@ bool BSONObj::operator !=(const BSONObj& obj) const {
 		if (other == NULL) {
 			return true;
 		}
-		if (*content != *other) {
+		if (content->type() != other->type()) {
 			return true;
+		}
+		bool result;
+		switch (content->type()) {
+			case BOOL_TYPE: {
+									result = *((BSONContentBoolean*)content) != *((BSONContentBoolean*)other);
+									break;
+								}
+			case INT_TYPE: {
+									result = *((BSONContentInt*)content) != *((BSONContentInt*)other);
+									break;
+								}
+			case DOUBLE_TYPE: {
+										result = *((BSONContentDouble*)content) != *((BSONContentDouble*)other);
+										break;
+									}
+			case LONG64_TYPE: 
+			case LONG_TYPE: {
+									 result = *((BSONContentLong*)content) != *((BSONContentLong*)other);
+									 break;
+								 }
+			case PTRCHAR_TYPE: 
+			case STRING_TYPE: {
+										result = *((BSONContentString*)content) != *((BSONContentString*)other);
+										break;
+									}
+			case BSON_TYPE: {
+									 result = *((BSONContentBSON*)content) != *((BSONContentBSON*)other);
+									 break;
+								 }
+			case BSONARRAY_TYPE: {
+											result = *((BSONContentBSONArray*)content) != *((BSONContentBSONArray*)other);
+											break;
+										}
+			case NULL_TYPE: {
+									 result = true;
+									 break;
+								 }
+			case UNKNOWN_TYPE: 
+			default:
+										{
+											result = *((BSONContentInt*)content) != *((BSONContentInt*)other);
+											break;
+										}
+		}
+		if (result) {
+			return result;
 		}
 	}
 	return false;
@@ -484,6 +607,13 @@ BSONObj* BSONObj::select(const char* sel) const {
 						} else {
 							result->add(key, *innerArray);
 						}
+						break;
+					}
+				case BOOL_TYPE: 
+					{
+						BSONContentBoolean* bb = (BSONContentBoolean*)origContent;
+						bool val = *bb;
+						result->add(key, val);
 						break;
 					}
 				case INT_TYPE: 

@@ -78,6 +78,14 @@ unsigned char NetworkInputStream::readChar() {
 	return v;
 }
 
+/* Reads 1 bytes in the input (little endian order) */
+bool NetworkInputStream::readBoolean () {
+	if (_logger->isDebug()) _logger->debug(3, "NetworkInputStream::readBoolean");
+	bool result = (bool)readData<char>();
+	if (_logger->isDebug()) _logger->debug(3, "~NetworkInputStream::readBoolean");
+	return result;
+}
+
 /* Reads 2 bytes in the input (little endian order) */
 __int16 NetworkInputStream::readShortInt () {
 	if (_logger->isDebug()) _logger->debug(3, "NetworkInputStream::readShortInt");

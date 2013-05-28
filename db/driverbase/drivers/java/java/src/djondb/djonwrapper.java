@@ -21,4 +21,9 @@ public class djonwrapper implements djonwrapperConstants {
     return djonwrapperJNI.bson_subselect(select, elment);
   }
 
+  public static SWIGTYPE_p_void convert(SWIGTYPE_p_BSONTYPE fromType, SWIGTYPE_p_BSONTYPE toType, SWIGTYPE_p_void value) {
+    long cPtr = djonwrapperJNI.convert(SWIGTYPE_p_BSONTYPE.getCPtr(fromType), SWIGTYPE_p_BSONTYPE.getCPtr(toType), SWIGTYPE_p_void.getCPtr(value));
+    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
+  }
+
 }

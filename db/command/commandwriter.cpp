@@ -45,10 +45,18 @@ CommandWriter::CommandWriter(const CommandWriter& orig) {
 }
 
 int CommandWriter::writeCommand(Command* cmd) {
-	std::string version = "1.2.3";
+	std::string version = "0.3.0";
 	_stream->writeString(version);
 	int type = cmd->commandType();
 	_stream->writeInt(type);
+
+	BSONOutputStream out(_stream);
+	if (cmd->options() != NULL) {
+		out.writeBSON(*cmd->options());
+	} else {
+		BSONObj options;
+		out.writeBSON(options);
+	}
 	cmd->writeCommand(_stream);
 
 	return 0;

@@ -10,6 +10,7 @@ cp bsonutil.h nodejs/includes/
 cp djondbconnection.h nodejs/includes/
 cp djondb_client.h nodejs/includes/
 cp djondbconnectionmanager.h nodejs/includes/
+cp djonv8.h nodejs/includes/
 cp constantexpression.h nodejs/includes/
 cp expressionresult.h nodejs/includes/
 cp dbcontroller.h nodejs/includes/
@@ -37,7 +38,7 @@ cp defs.h nodejs/includes/
 cp datetime.h nodejs/includes/
 cp dtime.h nodejs/includes/
 cp errorhandle.h nodejs/includes/
-cp errors.h nodejs/includes/
+cp djon_error_codes.h nodejs/includes/
 cp fileutil.h nodejs/includes/
 cp circular_queue.h nodejs/includes/
 cp config.h nodejs/includes/

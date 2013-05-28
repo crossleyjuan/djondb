@@ -32,20 +32,26 @@ const int MEMORY_BUFFER_SIZE = 1024;
 MemoryStream::MemoryStream() {
     _open = true;
 	 _currentBuffer = NULL;
+	 _currentBufferPos = 0;
 	 _currentIndex = -1;
 	 _buffer = NULL;
 	 _length = 0;
 	 _bufferSize = MEMORY_BUFFER_SIZE;
+	 _pos = 0;
+	 _maxIndexes = 0;
 	 allocate(_bufferSize);
 }
 
 MemoryStream::MemoryStream(char* buffer, __int32 len) {
     _open = true;
 	 _currentBuffer = NULL;
+	 _currentBufferPos = 0;
 	 _currentIndex = -1;
 	 _buffer = NULL;
 	 _length = 0;
 	 _bufferSize = MEMORY_BUFFER_SIZE;
+	 _pos = 0;
+	 _maxIndexes = 0;
 	 allocate(_bufferSize);
 
 	 write(buffer, len);
@@ -67,7 +73,7 @@ MemoryStream::~MemoryStream() {
 		 char* r = _buffer[x];
 		 free(r);
 	 }
-
+	 free(_buffer);
 }
 
 void MemoryStream::allocate(size_t size) {
@@ -110,6 +116,10 @@ void MemoryStream::write(const char *ptr, size_t count) {
 	}
 }
 
+void MemoryStream::writeRaw(const char *ptr, size_t count) {
+	write(ptr, count);
+}
+
 size_t MemoryStream::read( char* ptr, size_t count) {
 	if (count > (_length - _currentBufferPos)) {
 		count = _length - _currentBufferPos;
@@ -131,10 +141,20 @@ size_t MemoryStream::read( char* ptr, size_t count) {
 	return readed;
 }
 
+const size_t MemoryStream::readRaw(char* ptr, size_t count) {
+	return read(ptr, count);
+}
+
 /* Write 1 byte in the output */
 void MemoryStream::writeChar (unsigned char v)
 {
 	write((char*)&v, 1);
+}
+
+/* Write 1 bytes in the output (little endian order) */
+void MemoryStream::writeBoolean (bool v)
+{
+	writeData<char>((char)v);
 }
 
 /* Write 2 bytes in the output (little endian order) */
@@ -207,6 +227,12 @@ void MemoryStream::flush() {
 unsigned char MemoryStream::readChar() {
 	unsigned char v = 0;
 	read((char*)&v,  1);
+	return v;
+}
+
+/* Reads 2 bytes in the input (little endian order) */
+bool MemoryStream::readBoolean () {
+	bool v = (bool)readData<char>();
 	return v;
 }
 

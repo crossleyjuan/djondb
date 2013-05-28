@@ -31,6 +31,10 @@
 #include "showdbscommand.h"
 #include "bsoninputstream.h"
 #include "djondbconnectionmanager.h"
+#include "commitcommand.h"
+#include "rollbackcommand.h"
+#include "dqlParser.h"
+#include "dqlLexer.h"
 #include "util.h"
 #include "bson.h"
 
@@ -46,6 +50,7 @@ DjondbConnection::DjondbConnection(std::string host)
 	_commandWriter = NULL;
 	_open = false;
 	_logger = getLogger(NULL);
+	_activeTransactionId = NULL;
 }
 
 DjondbConnection::DjondbConnection(std::string host, int port)
@@ -57,6 +62,7 @@ DjondbConnection::DjondbConnection(std::string host, int port)
 	_commandWriter = NULL;
 	_open = false;
 	_logger = getLogger(NULL);
+	_activeTransactionId = NULL;
 }
 
 DjondbConnection::DjondbConnection(const DjondbConnection& orig) {
@@ -67,11 +73,13 @@ DjondbConnection::DjondbConnection(const DjondbConnection& orig) {
 	this->_outputStream = orig._outputStream;
 	this->_commandWriter = orig._commandWriter;
 	_logger = getLogger(NULL);
+	this->_activeTransactionId = orig._activeTransactionId;
 }
 
 DjondbConnection::~DjondbConnection()
 {
 	internalClose();
+	if (_activeTransactionId != NULL) free(_activeTransactionId);
 }
 
 bool DjondbConnection::open() {
@@ -96,6 +104,35 @@ void DjondbConnection::close() {
 	_open = false;
 }
 
+const char* DjondbConnection::beginTransaction() {
+	_activeTransactionId = uuid();
+	return _activeTransactionId->c_str();
+}
+
+void DjondbConnection::commitTransaction() {
+	if (_logger->isDebug()) _logger->debug(2, "commitTransaction. transactionId: %s", _activeTransactionId->c_str());
+	CommitCommand cmd;
+	prepareOptions((Command*)&cmd);
+	cmd.setTransactionId(*_activeTransactionId);
+	_commandWriter->writeCommand(&cmd);
+
+	cmd.readResult(_inputStream);
+	delete _activeTransactionId;
+	_activeTransactionId = NULL;
+}
+
+void DjondbConnection::rollbackTransaction() {
+	if (_logger->isDebug()) _logger->debug(2, "rollbackTransaction. transactionId: %s", _activeTransactionId->c_str());
+	RollbackCommand cmd;
+	prepareOptions((Command*)&cmd);
+	cmd.setTransactionId(*_activeTransactionId);
+	_commandWriter->writeCommand(&cmd);
+
+	cmd.readResult(_inputStream);
+	delete _activeTransactionId;
+	_activeTransactionId = NULL;
+}
+
 void DjondbConnection::internalClose() {
 	if (_open) {
 		_inputStream->close();
@@ -114,6 +151,20 @@ void DjondbConnection::internalClose() {
 		}
 		_open = false;
 	}
+}
+
+void DjondbConnection::prepareOptions(Command* cmd) {
+	BSONObj* options;
+	if (cmd->options() != NULL) {
+		options = new BSONObj(*cmd->options());
+	} else {
+		options = new BSONObj();
+	}
+	if (_activeTransactionId != NULL) {
+		options->add("_transactionId", const_cast<char*>(_activeTransactionId->c_str()));
+	}
+
+	cmd->setOptions(options);
 }
 
 bool DjondbConnection::insert(const std::string& db, const std::string& ns, const std::string& json) {
@@ -138,21 +189,22 @@ bool DjondbConnection::insert(const std::string& db, const std::string& ns, cons
 	if (!isOpen()) {
 		throw DjondbException(D_ERROR_CONNECTION, "Not connected to any server");
 	}
-	BSONObj obj(bson);
+	BSONObj* obj = new BSONObj(bson);
 	InsertCommand cmd;
 	cmd.setDB(db);
-	if (!obj.has("_id")) {
+	if (!obj->has("_id")) {
 		std::string* id = uuid();
-		obj.add("_id", const_cast<char*>(id->c_str()));
+		obj->add("_id", const_cast<char*>(id->c_str()));
 		delete id;
 	}
-	if (!obj.has("_revision")) {
+	if (!obj->has("_revision")) {
 		std::string* rev = uuid();
-		obj.add("_revision", const_cast<char*>(rev->c_str()));
+		obj->add("_revision", const_cast<char*>(rev->c_str()));
 		delete rev;
 	}
 	cmd.setBSON(obj);
 	cmd.setNameSpace(ns);
+	prepareOptions((Command*)&cmd);
 	_commandWriter->writeCommand(&cmd);
 
 	cmd.readResult(_inputStream);
@@ -167,7 +219,7 @@ bool DjondbConnection::insert(const std::string& db, const std::string& ns, cons
 }
 
 bool DjondbConnection::update(const std::string& db, const std::string& ns, const std::string& json) {
-	if (_logger->isDebug()) _logger->debug(2, "Update command. db: %s, ns: %s", db.c_str(), ns.c_str());
+	if (_logger->isDebug()) _logger->debug(2, "Update command. db: %s, ns: %s, json: %s", db.c_str(), ns.c_str(), json.c_str());
 	BSONObj* obj = BSONParser::parse(json);
 	bool result = update(db, ns, *obj);
 	delete obj;
@@ -186,6 +238,7 @@ bool DjondbConnection::remove(const std::string& db, const std::string& ns, cons
 	cmd.setId(id);
 	cmd.setRevision(revision);
 
+	prepareOptions((Command*)&cmd);
 	_commandWriter->writeCommand(&cmd);
 	cmd.readResult(_inputStream);
 
@@ -193,7 +246,7 @@ bool DjondbConnection::remove(const std::string& db, const std::string& ns, cons
 }
 
 bool DjondbConnection::update(const std::string& db, const std::string& ns, const BSONObj& obj) {
-	if (_logger->isDebug()) _logger->debug(2, "Update command. db: %s, ns: %s", db.c_str(), ns.c_str());
+	if (_logger->isDebug()) _logger->debug(2, "Update command. db: %s, ns: %s, bson: %s", db.c_str(), ns.c_str(), BSONObj(obj).toChar());
 
 	if (!isOpen()) {
 		throw DjondbException(D_ERROR_CONNECTION, "Not connected to any server");
@@ -207,6 +260,7 @@ bool DjondbConnection::update(const std::string& db, const std::string& ns, cons
 	cmd.setDB(db);
 	cmd.setNameSpace(ns);
 
+	prepareOptions((Command*)&cmd);
 	_commandWriter->writeCommand(&cmd);
 	cmd.readResult(_inputStream);
 
@@ -280,14 +334,26 @@ BSONObj* DjondbConnection::findByKey(const std::string& db, const std::string& n
 }
 
 BSONArrayObj* DjondbConnection::find(const std::string& db, const std::string& ns) {
-	return find(db, ns, "*", "");
+	return find(db, ns, "*", "", BSONObj());
+}
+
+BSONArrayObj* DjondbConnection::find(const std::string& db, const std::string& ns, const BSONObj& options) {
+	return find(db, ns, "*", "", options);
 }
 
 BSONArrayObj* DjondbConnection::find(const std::string& db, const std::string& ns, const std::string& filter) {
-	return find(db, ns, "*", filter);
+	return find(db, ns, "*", filter, BSONObj());
+}
+
+BSONArrayObj* DjondbConnection::find(const std::string& db, const std::string& ns, const std::string& filter, const BSONObj& options) {
+	return find(db, ns, "*", filter, options);
 }
 
 BSONArrayObj* DjondbConnection::find(const std::string& db, const std::string& ns, const std::string& select, const std::string& filter) {
+	return find(db, ns, select, filter, BSONObj());
+}
+
+BSONArrayObj* DjondbConnection::find(const std::string& db, const std::string& ns, const std::string& select, const std::string& filter, const BSONObj& options) {
 	if (_logger->isDebug()) _logger->debug("executing find db: %s, ns: %s, select: %s, filter: %s", db.c_str(), ns.c_str(), select.c_str(), filter.c_str());
 
 	if (!isOpen()) {
@@ -305,6 +371,8 @@ BSONArrayObj* DjondbConnection::find(const std::string& db, const std::string& n
 	cmd.setSelect(select);
 	cmd.setDB(db);
 	cmd.setNameSpace(ns);
+	cmd.setOptions(&options);
+	prepareOptions((Command*)&cmd);
 	_commandWriter->writeCommand(&cmd);
 	
 	cmd.readResult(_inputStream);
@@ -331,8 +399,78 @@ bool DjondbConnection::dropNamespace(const std::string& db, const std::string& n
 	cmd.setDB(db);
 	cmd.setNameSpace(ns);
 
+	prepareOptions((Command*)&cmd);
 	_commandWriter->writeCommand(&cmd);
 	cmd.readResult(_inputStream);
 
 	return true;
 }
+
+BSONArrayObj* DjondbConnection::executeQuery(const std::string& query) {
+	Command* cmd = parseCommand(query);
+
+	prepareOptions(cmd);
+	_commandWriter->writeCommand(cmd);
+	cmd->readResult(_inputStream);
+	BSONArrayObj* result = NULL;
+	if (cmd->commandType() == FIND) {
+		BSONArrayObj* tmp = (BSONArrayObj*)cmd->result();
+		if (tmp != NULL) {
+			result = new BSONArrayObj(*tmp);
+			delete tmp;
+		}
+	}
+	delete cmd;
+	return result;
+}
+
+bool DjondbConnection::executeUpdate(const std::string& query) {
+	Command* cmd = parseCommand(query);
+
+	prepareOptions(cmd);
+	_commandWriter->writeCommand(cmd);
+	cmd->readResult(_inputStream);
+	delete cmd;
+	return true;
+}
+
+Command* DjondbConnection::parseCommand(const std::string& expression) {
+	Logger* log = getLogger(NULL);
+	Command* cmd = NULL;
+
+	int errorCode = -1;
+	const char* errorMessage;
+	if (expression.length() != 0) {
+		//throw (ParseException) {
+		pANTLR3_INPUT_STREAM           input;
+		pdqlLexer               lex;
+		pANTLR3_COMMON_TOKEN_STREAM    tokens;
+		pdqlParser              parser;
+
+		const char* cexpr = expression.c_str();
+		if (log->isDebug()) log->debug("query expression: %s, len: %d, Size Hint: %d", cexpr, strlen(cexpr), ANTLR3_SIZE_HINT);
+		input  = antlr3NewAsciiStringInPlaceStream((pANTLR3_UINT8)cexpr, strlen(cexpr), (pANTLR3_UINT8)"name");
+		lex    = dqlLexerNew                (input);
+		tokens = antlr3CommonTokenStreamSourceNew  (ANTLR3_SIZE_HINT, TOKENSOURCE(lex));
+		parser = dqlParserNew               (tokens);
+
+		cmd = parser ->start_point(parser);
+
+		if (parser->pParser->rec->state->exception != NULL) {
+			errorCode = 1;
+			errorMessage = (char*)parser->pParser->rec->state->exception->message;
+		}
+
+		// Must manually clean up
+		//
+		parser ->free(parser);
+		tokens ->free(tokens);
+		lex    ->free(lex);
+		input  ->close(input);
+	}
+	if (errorCode > -1) {
+		throw ParseException(errorCode, errorMessage);
+	}
+
+	return cmd;
+	}

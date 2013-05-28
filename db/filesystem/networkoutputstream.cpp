@@ -33,7 +33,7 @@
 #include <sys/ioctl.h>
 #include <netdb.h>
 #include <netinet/tcp.h>
-  #include <unistd.h>
+#include <unistd.h>
 #endif
 
 #ifdef LINUX 
@@ -80,12 +80,20 @@ void NetworkOutputStream::writeChar (unsigned char v)
 	//    write(_socket, &v, 1);
 }
 
+/* Write 1 bytes in the output (little endian order) */
+void NetworkOutputStream::writeBoolean (bool v)
+{
+	if (_logger->isDebug()) _logger->debug(3, "NetworkOutputStream::writeBoolean, boolean: %s", v?"true": "false");
+	writeData<char>((char)v);
+	if (_logger->isDebug()) _logger->debug(3, "~NetworkOutputStream::writeBoolean");
+}
+
 /* Write 2 bytes in the output (little endian order) */
 void NetworkOutputStream::writeShortInt (__int16 v)
 {
 	if (_logger->isDebug()) _logger->debug(3, "NetworkOutputStream::writeShortInt, short: %d", v);
 	writeData<__int16>(v);
-	if (_logger->isDebug()) _logger->debug(3, "~NetworkOutputStream::writeInt");
+	if (_logger->isDebug()) _logger->debug(3, "~NetworkOutputStream::writeShortInt");
 }
 
 /* Write 4 bytes in the output (little endian order) */

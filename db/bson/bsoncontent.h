@@ -29,6 +29,7 @@ class BSONContent {
 		virtual operator __int32() const;
 		virtual operator __int64() const;
 		virtual operator double() const;
+		virtual operator bool() const;
 		virtual operator BSONObj*() const;
 		virtual operator BSONArrayObj*() const;
 		virtual operator djondb::string() const;
@@ -36,6 +37,21 @@ class BSONContent {
 		virtual BSONContent* clone() const = 0;
 	protected:
 		BSONTYPE _type;
+};
+
+class BSONContentBoolean: public BSONContent {
+	public:
+		BSONContentBoolean(bool element);
+		virtual ~BSONContentBoolean();
+
+		BSONContentBoolean(const BSONContentBoolean& orig);
+
+		bool operator ==(const BSONContentBoolean& content);
+		bool operator !=(const BSONContentBoolean& content);
+		operator bool() const;
+		virtual BSONContentBoolean* clone() const;
+	public:
+		bool _element;
 };
 
 class BSONContentInt: public BSONContent {

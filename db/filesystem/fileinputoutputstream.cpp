@@ -32,7 +32,8 @@ FileInputOutputStream::FileInputOutputStream(const std::string& fileName, const 
 	Logger* log = getLogger(NULL);
 #ifndef A
     _pFile = fopen(fileName.c_str(), flags);
-	 setvbuf (_pFile, NULL , _IOFBF , 1024*4 ); // large buffer
+	 //setvbuf (_pFile, NULL , _IOFBF , 1024*4 ); // large buffer
+	 setvbuf (_pFile, NULL , _IONBF , 1024*4 ); // large buffer
     fseek(_pFile, 0, SEEK_END);
 #else
 	if (existFile(fileName.c_str())) {
@@ -106,6 +107,12 @@ void FileInputOutputStream::write(char* buffer, __int32 len) {
 void FileInputOutputStream::writeChar (unsigned char v)
 {
 	write((char*)&v, 1);
+}
+
+/* Write 1 bytes in the output (little endian order) */
+void FileInputOutputStream::writeBoolean (bool v)
+{
+	writeData<char>((char)v);
 }
 
 /* Write 2 bytes in the output (little endian order) */
@@ -191,10 +198,10 @@ __int64 FileInputOutputStream::currentPos() const {
 
 void FileInputOutputStream::close() {
 	Logger* log = getLogger(NULL);
-    if (_pFile) {
-        flush();
+	if (_pFile) {
+		flush();
 #ifndef A
-        int res = fclose(_pFile);
+		int res = fclose(_pFile);
 		if (res != 0) {
 #ifdef WINDOWS
 			log->error("An error ocurreed closing the file. Error: %d", GetLastError());
@@ -202,30 +209,36 @@ void FileInputOutputStream::close() {
 			log->error("An error ocurreed closing the file. Error: %d", strerror(errno));
 #endif
 		}
-        _pFile = 0;
+		_pFile = 0;
 #else
 		CloseHandle(_pFile);
 #endif
-        _open = false;
-    }
+		_open = false;
+	}
 }
 
 void FileInputOutputStream::flush() {
 #ifndef A
-    fflush(_pFile);
+	fflush(_pFile);
 #else
 	FlushFileBuffers(_pFile);
 #endif
 }
 
 const std::string FileInputOutputStream::fileName() const {
-    return _fileName;
+	return _fileName;
 }
 
 unsigned char FileInputOutputStream::readChar() {
-    unsigned char v = 0;
+	unsigned char v = 0;
 	read((char*)&v, 1);
-    return v;
+	return v;
+}
+
+/* Reads 1 bytes in the input (little endian order) */
+bool FileInputOutputStream::readBoolean () {
+	bool v = (bool)readData<char>();
+	return v;
 }
 
 /* Reads 2 bytes in the input (little endian order) */
@@ -233,9 +246,9 @@ __int16 FileInputOutputStream::readShortInt () {
 	__int32 v = readData<__int16>();
 	return v;
 	/*
-    int v = readChar() | readChar() << 8;
-    return v;
-	 */
+		int v = readChar() | readChar() << 8;
+		return v;
+		*/
 }
 
 /* Reads 4 bytes in the input (little endian order) */
@@ -256,51 +269,51 @@ __int64 FileInputOutputStream::readLong64() {
 
 /* Reads a 4 byte float in the input */
 float FileInputOutputStream::readFloatIEEE () {
-    float f;
+	float f;
 	read((char*)&f, sizeof(f));
-    return f;
+	return f;
 }
 
 /* Reads a 8 byte double in the input */
 double FileInputOutputStream::readDoubleIEEE () {
-    double d;
+	double d;
 	read((char*)&d, sizeof(d));
-    return d;
+	return d;
 }
 
 /* Read a chars */
 char* FileInputOutputStream::readChars() {
-    __int32 len = readInt();
-    char* res = readChars(len);
-    return res;
+	__int32 len = readInt();
+	char* res = readChars(len);
+	return res;
 }
 
 std::string* FileInputOutputStream::readString() {
-    char* c = readChars();
-    std::string* res = new std::string(c);
-    free(c);
-    return res;
+	char* c = readChars();
+	std::string* res = new std::string(c);
+	free(c);
+	return res;
 }
 
 char* FileInputOutputStream::readChars(__int32 length) {
-    char* res = (char*)malloc(length+1);
-    memset(res, 0, length+1);
+	char* res = (char*)malloc(length+1);
+	memset(res, 0, length+1);
 	read(res, length);
-    return res;
+	return res;
 }
 
 const char* FileInputOutputStream::readFull() {
 	seek(0);
-    std::stringstream ss;
-    char buffer[1024];
-    __int32 readed = 0;
-    while (!eof()) {
-        memset(buffer, 0, 1024);
+	std::stringstream ss;
+	char buffer[1024];
+	__int32 readed = 0;
+	while (!eof()) {
+		memset(buffer, 0, 1024);
 		readed = read(buffer, 1023);
-        ss << buffer;
-    }
-    std::string str = ss.str();
-    return strdup(str.c_str());
+		ss << buffer;
+	}
+	std::string str = ss.str();
+	return strdup(str.c_str());
 }
 
 bool FileInputOutputStream::eof() {
@@ -321,5 +334,5 @@ bool FileInputOutputStream::eof() {
 }
 
 bool FileInputOutputStream::isClosed() {
-    return !_open;
+	return !_open;
 }

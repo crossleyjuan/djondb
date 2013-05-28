@@ -28,6 +28,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 #ifndef WINDOWS
+#include <unistd.h>
 #include <dirent.h>
 #include <errno.h>
 #else
@@ -237,4 +238,37 @@ __int64 fileSize(const char* file) {
 		log->error("Error getting the file: %s size: %d", file, errno); 
 
 	return ret;
+}
+
+
+long pageSize() {
+#ifndef WINDOWS
+	long res = sysconf(_SC_PAGE_SIZE);
+	return res;
+#else
+	SYSTEM_INFO systemInfo;
+	GetSystemInfo(&systemInfo);
+	long page = (long)systemInfo.dwAllocationGranularity;
+	return page;
+#endif
+}
+
+char* combinePath(const char* path, const char* path2) {
+	char* result = NULL;
+	if (path != NULL) {
+		if (path2 != NULL) {
+			if (!endsWith(path, FILESEPARATOR)) {
+				result = strcpy(format("%s%s%s", path, FILESEPARATOR, path2).c_str());
+			} else {
+				result = strcpy(format("%s%s", path, path2).c_str());
+			}
+		} else {
+			result = strcpy(path);
+		}
+	} else {
+		if (path2 != NULL) {
+			result = strcpy(path2);
+		}
+	}
+	return result;
 }

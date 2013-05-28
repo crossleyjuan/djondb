@@ -8,6 +8,7 @@ cp ../../includes/bsonutil.h .
 cp ../../includes/djondbconnection.h .
 cp ../../includes/djondb_client.h .
 cp ../../includes/djondbconnectionmanager.h .
+cp ../../includes/djonv8.h . 
 cp ../../includes/constantexpression.h .
 cp ../../includes/expressionresult.h .
 cp ../../includes/dbcontroller.h .
@@ -35,7 +36,7 @@ cp ../../includes/defs.h .
 cp ../../includes/datetime.h .
 cp ../../includes/dtime.h .
 cp ../../includes/errorhandle.h .
-cp ../../includes/errors.h .
+cp ../../includes/djon_error_codes.h .
 cp ../../includes/fileutil.h .
 cp ../../includes/circular_queue.h .
 cp ../../includes/config.h .
