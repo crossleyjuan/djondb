@@ -16,6 +16,7 @@ class Command;
 class Logger;
 class FilterParser;
 class Index;
+class IndexAlgorithm;
 
 class DBController: public Controller
 {
@@ -49,10 +50,11 @@ class DBController: public Controller
 		  BSONArrayObj* findFullScan(const char* db, const char* ns, const char* select, FilterParser* parser, const BSONObj* options) throw (ParseException);
 		  void clearCache();
 		  long checkStructure(BSONObj* bson);
-		  void updateIndex(const char* db, const char* ns, Index* index, long filePos);
 		  Index* findIndex(const char* db, const char* ns, BSONObj* bson);
 		  void insertIndex(const char* db, const char* ns, BSONObj* bson, long filePos);
+		  void updateIndex(const char* db, const char* ns, BSONObj* bson, long filePos);
 		  void writeBSON(StreamType* stream, BSONObj* obj);
+		  void migrateIndex0_3(const char* db, const char* ns, InputStream* stream, IndexAlgorithm* impl);
 };
 
 #endif // DBCONTROLLER_H

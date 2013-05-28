@@ -8,6 +8,7 @@ Required Packages
 
 djondb uses some external libraries that need to be installed prior compilation, these are:
 
+* cmake g++ make
 * libv8-dev: Google's V8 javascript engine
 * libantlr3c-dev: Antlr
 * libxss-dev
@@ -25,10 +26,9 @@ As any other standard linux application djondb can be compiled using configure/m
 the configuration file use the autoreconf command line. Here're the steps to do the compilation:
 
     cd db
-    autoreconf --install --force
-    mkdir obj
-    cd obj
-    ../configure --prefix=/usr
+    mkdir build
+    cd build
+    cmake ..
     make
     sudo make install
 
@@ -38,7 +38,7 @@ Release Compilation
 To make the release compilation even easier there's an script at the root of the folder db for each operating system:
 
 * Linux:   release.sh -j <java path> -o <output dir>
-* Mac:   release-mac.sh
+* Mac:     release-mac.sh
 * Windows: release-windows.bat
 
 These scripts will compile the server and the drivers and will place the binaries in a destination folder
