@@ -538,7 +538,7 @@ TEST(TestDriver, testDQL) {
 	if (connection->open()) {
 		connection->dropNamespace("db", "TestQL");
 
-		char* ql = "Insert { 'name': 'John', 'last': 'Smith', 'age': 15} INTO db:TestQL";
+		char* ql = "Insert { 'name': 'John', 'last': 'Smith', 'age': 15, 'male': true} INTO db:TestQL";
 		connection->executeUpdate(ql);
 
 		char* qlFind = "Select * FROM db:TestQL";
@@ -546,6 +546,8 @@ TEST(TestDriver, testDQL) {
 		ASSERT_TRUE(result->length() == 1);
 		ASSERT_TRUE(result->get(0)->has("name"));
 		ASSERT_TRUE(result->get(0)->getString("name").compare("John") == 0);
+		ASSERT_TRUE(result->get(0)->has("male"));
+		ASSERT_TRUE(result->get(0)->getBoolean("male"));
 		delete result;
 
 		ql = "Insert { 'name': 'Peter', 'last': 'Strauss', 'age': 25} INTO db:TestQL";
@@ -585,6 +587,13 @@ TEST(TestDriver, testDQL) {
 		ASSERT_TRUE(result->length() == 1);
 		ASSERT_TRUE(result->get(0)->has("name"));
 		ASSERT_TRUE(result->get(0)->getString("name").compare("Test Not Exist") == 0);
+		delete result;
+
+		qlFind = "Select * FROM db:TestQL where exists($'other')";
+		result = connection->executeQuery(qlFind);
+		ASSERT_TRUE(result->length() == 1);
+		ASSERT_TRUE(result->get(0)->has("other"));
+		ASSERT_TRUE(result->get(0)->getString("other").compare("1") == 0);
 		delete result;
 
 		qlFind = "Select * FROM db:TestQL where exists($'other')";

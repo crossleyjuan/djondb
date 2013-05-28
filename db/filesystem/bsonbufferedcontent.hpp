@@ -60,6 +60,11 @@ class BSONBufferedContent: public BSONContent {
 			return djondb::string((const char*)const_cast<const char*>(_element), _size);
 		}
 
+		operator bool() const {
+			bool* e = (bool*)_element;
+			return *e;
+		}
+
 		operator __int32() const {
 			__int32* e = (__int32*)_element;
 			return *e;

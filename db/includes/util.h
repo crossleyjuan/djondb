@@ -23,6 +23,9 @@
 #include <string>
 #include <vector>
 #include <map>
+#ifndef WINDOWS
+#include <time.h>
+#endif
 
 class DjondbException: public std::exception {
 	public:
@@ -54,6 +57,11 @@ std::string getTempDir();
 
 Version getCurrentVersion();
 Version getVersion(const char* version);
+
+#ifndef LINUX
+int clock_gettime(int X, struct timespec *tv);
+#define CLOCK_REALTIME 0
+#endif
 
 /***********************************************************************
  * Memory functions

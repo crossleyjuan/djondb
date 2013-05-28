@@ -69,6 +69,9 @@ TEST(testBSON, testBSON)
 	EXPECT_TRUE(obj->has("bool"));
 	EXPECT_TRUE(obj->getBoolean("bool"));
 
+	bool t = *obj->getContent("bool");
+	EXPECT_TRUE(t);
+
 	EXPECT_TRUE(obj->has("rel1"));
 	EXPECT_TRUE(strcmp(obj->getBSON("rel1")->getString("innertext").c_str(), "inner text") == 0);
 
