@@ -39,7 +39,7 @@ class Thread;
 class BufferManager
 {
 	public:
-		BufferManager(const char* fileName);
+		BufferManager(const char* fileName, int pages);
 		// This prevents copying the buffer manager
 		BufferManager(const BufferManager& orig);
 		~BufferManager();

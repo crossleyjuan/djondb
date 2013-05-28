@@ -32,10 +32,8 @@
 #include <stdlib.h>
 #include <errno.h>
 
-__int64 DEFAULT_BUFFER_SIZE = pageSize() * 20;
-
-BufferManager::BufferManager(const char* file) {
-	_buffersSize = DEFAULT_BUFFER_SIZE;
+BufferManager::BufferManager(const char* file, int pages) {
+	_buffersSize = pageSize() * pages;
 	_buffersCount = 0;
 	_dataDir = getSetting("DATA_DIR");
 	_lockActiveBuffers = new Lock();

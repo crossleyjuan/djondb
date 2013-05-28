@@ -130,7 +130,7 @@ Index::Index(const Index& orig) {
 
 BPlusIndexP::BPlusIndexP(const char* fileName)
 {
-	_bufferManager = new BufferManager(fileName);
+	_bufferManager = new BufferManager(fileName, 1);
 
 	initializeIndex();
 }
