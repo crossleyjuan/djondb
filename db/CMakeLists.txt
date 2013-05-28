@@ -103,6 +103,14 @@ IF (NOT WIN32)
 		DESTINATION /etc)
 ENDIF (NOT WIN32)
 
+IF (DARWIN)
+	INSTALL(FILES /usr/lib/libv8.dylib
+	              /usr/lib/libantlr3c.dylib 
+            DESTINATION /usr/lib)
+	INSTALL(FILES ${PROJECT_SOURCE_DIR}/other/djondb.conf
+            DESTINATION /etc)
+ENDIF (DARWIN)
+
 IF ( WIN32 )
 	include_directories("${PROJECT_SOURCE_DIR}/third_party/pthreads")
 	include_directories("${PROJECT_SOURCE_DIR}/third_party/boost")
