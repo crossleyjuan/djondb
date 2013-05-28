@@ -34,14 +34,8 @@ class Logger {
 		static Config* _configSettings;
 
 		int _interval;
-#ifdef LINUX
 		timespec _ts1;
 		timespec _ts2;
-#else
-		struct timeval _ts1;
-		struct timeval _ts2;
-#endif
-
 
 	private:
 		void print(std::string type, std::string message);
