@@ -9,17 +9,22 @@ include_directories("${PROJECT_SOURCE_DIR}/network")
 
 IF (NOT WIN32)
 	add_library(djon-client SHARED djondbconnection.cpp djondbconnectionmanager.cpp dqlParser.cpp dqlLexer.cpp djonv8.cpp)
+	install (TARGETS djon-client 
+		DESTINATION /usr/lib
+		PERMISSIONS OWNER_READ GROUP_READ WORLD_READ OWNER_WRITE OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE)
+	install (FILES djondb_client.h 
+   	DESTINATION /usr/include)
 ENDIF (NOT WIN32)
+
 IF (WIN32)
 	include_directories("${PROJECT_SOURCE_DIR}/third_party/includes")
 
 	add_library(djon-client djondbconnection.cpp djondbconnectionmanager.cpp dqlParser.cpp dqlLexer.cpp djonv8.cpp)
+	install (TARGETS djon-client 
+		DESTINATION lib
+		PERMISSIONS OWNER_READ GROUP_READ WORLD_READ OWNER_WRITE OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE)
+	install (FILES djondb_client.h DESTINATION include)
 ENDIF (WIN32)
-
-install (TARGETS djon-client 
-	DESTINATION lib
-	PERMISSIONS OWNER_READ GROUP_READ WORLD_READ OWNER_WRITE OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE)
-install (FILES djondb_client.h DESTINATION include)
 
 IF (LINUX)
 	target_link_libraries (djon-client djon-network djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util antlr3c pthread uuid rt v8)
