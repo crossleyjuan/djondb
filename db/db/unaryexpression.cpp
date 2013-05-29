@@ -55,6 +55,7 @@ ExpressionResult* exists(BaseExpression* expression, const BSONObj& bson) {
 		const char* expression = sexpre->expression();
 		bool bres = bson.has(expression);
 		result = new ExpressionResult(bres);
+		return result;
 	} else {
 		throw ParseException(D_ERROR_PARSEERROR, "Exists signature is wrong. Use Exists($'field').");
 	}
