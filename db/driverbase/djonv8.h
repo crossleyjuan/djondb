@@ -23,6 +23,7 @@
 #ifndef DJONV8_INCLUDED_H
 #define DJONV8_INCLUDED_H 
 #include <v8.h>
+#include <string>
 
 v8::Handle<v8::Value> Print(const v8::Arguments& args);
 v8::Handle<v8::Value> find(const v8::Arguments& args);
@@ -48,4 +49,5 @@ void ReportException(v8::TryCatch* handler);
 v8::Handle<v8::Value> parseJSON(v8::Handle<v8::Value> object);
 bool ExecuteString(v8::Handle<v8::String> source, v8::Handle<v8::Value> name,	bool print_result, bool report_exceptions);
 char* getFile(const char* name);
+std::string ToCString(const v8::String::Utf8Value& value);
 #endif /* DJONV8_INCLUDED_H */

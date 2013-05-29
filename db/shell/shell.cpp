@@ -151,12 +151,6 @@ void completion(const char *buf, linenoiseCompletions *lc) {
 }
 #endif
 
-// Extracts a C string from a V8 Utf8Value.
-std::string ToCString(const v8::String::Utf8Value& value) {
-	return *value ? std::string(*value) : "<string conversion failed>";
-}
-
-
 // Creates a new execution environment containing the built-in
 // functions.
 v8::Persistent<v8::Context> CreateShellContext() {

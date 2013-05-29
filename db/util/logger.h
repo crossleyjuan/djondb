@@ -8,7 +8,21 @@
 #include <ctime>
 #ifndef WINDOWS
 #include <time.h>
+#else
+
+// The pthread.h already defines the timespec struct, this wards prevent double reference
+#if !defined(HAVE_STRUCT_TIMESPEC)
+#define HAVE_STRUCT_TIMESPEC
+#if !defined(_TIMESPEC_DEFINED)
+#define _TIMESPEC_DEFINED
+struct timespec {
+        time_t tv_sec;
+        long tv_nsec;
+};
+#endif /* _TIMESPEC_DEFINED */
+#endif /* HAVE_STRUCT_TIMESPEC */
 #endif
+
 #ifdef WINDOWS
 	#include <Windows.h>
 	#include <winsock.h>
@@ -34,8 +48,8 @@ class Logger {
 		static Config* _configSettings;
 
 		int _interval;
-		timespec _ts1;
-		timespec _ts2;
+		struct timespec _ts1;
+		struct timespec _ts2;
 
 	private:
 		void print(std::string type, std::string message);

@@ -9,7 +9,10 @@ include_directories("${PROJECT_SOURCE_DIR}/command")
 include_directories("${PROJECT_SOURCE_DIR}/driverbase")
 
 add_executable(test-driverbase main.cpp)
+IF (NOT WIN32)
 add_executable(test-performance testperformance.cpp)
+ENDIF (NOT WIN32)
+
 IF (LINUX)
 	target_link_libraries (test-driverbase djon-client djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}gtest${LIBRARY_SUFFIX} ${LIBRARY_PREFIX}gtest_main${LIBRARY_SUFFIX} rt uuid)
 	target_link_libraries (test-performance djon-client djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}gtest${LIBRARY_SUFFIX} ${LIBRARY_PREFIX}gtest_main${LIBRARY_SUFFIX} rt uuid)
@@ -21,7 +24,6 @@ ENDIF (DARWIN)
 
 IF (WIN32)
 	target_link_libraries (test-driverbase djon-client djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}gtest${LIBRARY_SUFFIX} ${LIBRARY_PREFIX}gtest_main${LIBRARY_SUFFIX})
-	target_link_libraries (test-performance djon-client djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}gtest${LIBRARY_SUFFIX} ${LIBRARY_PREFIX}gtest_main${LIBRARY_SUFFIX})
 ENDIF (WIN32)
 
 add_test(test-driverbase test-driverbase)

@@ -1,12 +1,12 @@
+rem set CONFIGURATION=Release
+set CONFIGURATION=Debug
+
 mkdir build
 cd build
-cmake .. 
+cmake .. -DCMAKE_BUILD_TYPE=%CONFIGURATION%
 pause
 
-set CONFIGURATION=Release
-rem set CONFIGURATION=Release
 rem C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\MSBuild djondb.sln /t:Rebuild /p:Configuration=Debug 
-rem C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\MSBuild djondb.sln /p:Configuration=Debug 
 C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\MSBuild djondb.sln /p:Configuration=%CONFIGURATION% 
 
 copy /Y driverbase\%CONFIGURATION%\djon-client.*  shell\%CONFIGURATION%
