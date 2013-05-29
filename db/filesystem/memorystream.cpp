@@ -321,7 +321,8 @@ bool MemoryStream::isClosed() {
 }
 
 char* MemoryStream::toChars() {
-	char* result = (char*)malloc(_length);
+	char* result = (char*)malloc(_length + 1);
+	memset(result, 0, _length + 1);
 
 	__int64 offset = 0;
 	for (__int32 x = 0; x < _maxIndexes - 1; x++) {
