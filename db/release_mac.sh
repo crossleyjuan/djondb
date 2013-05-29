@@ -2,28 +2,59 @@
 
 echo "<<<<<  Executing autoreconf  >>>>>"
 
-autoreconf --install --force
+while getopts s:j:d:u o
+   do case "$o" in
+		j)  JAVA="$OPTARG";;
+		d)  DIR="$OPTARG";;
+	   u)  UPLOAD="true";;
+	   s)  SUFFIX="$OPTARG";;
+		\?)  echo "Usage: $0 [-j java_home] [-d output_dir] [-u] [-s suffix]" && exit 1;;
+	esac
+done
 
-rm -rf obj
-mkdir obj
-cd obj
-../configure --prefix=/usr
+cd includes
+./update.sh
+cd ..
+
+if [ ! -z "${DIR}" ]; 
+then
+	mkdir -p $DIR
+fi
+
+#rm -rf build
+mkdir build
+cd build
+cmake ..
 make
+cpack -G PackageMaker
+
 make DESTDIR=`pwd` install
-rm usr/bin/test*
+sudo make install
+
+dmgfile="djondb_`uname`_`uname -m`${SUFFIX}.dmg"
+dmg=`find djondb*Darwin.dmg`
+mv $dmg $dmgfile
+
+if [ ! -z "${DIR}" ]; 
+then
+	cp $dmgfile $DIR
+fi
 
 cd ..
-sh createMacPackage.sh
-sh createMacDevPackage.sh
 
-# cd ../mac
-# sh macpackage.sh
+cd driverbase/drivers
 
-# rm djondb_mac/*
-# cp djondb.app/* djondb_mac/
-# rm djondb_mac/Info*
-# rm djondb_mac/*.png
-# tar cvfz dist/djondb_0.1.tar.gz  djondb_mac/*
+./update.sh
+./php.sh $@
 
-# scp dist/djondb_0.1.tar.gz crossleyjuan@d-jon.com:html/downloads/djondb_0.1.tar.gz
- 
+if [ ! -z "${JAVA}" ]; 
+then
+	./java.sh $@
+fi
+
+cd python
+./python.sh
+cd ..
+
+sh nodejs.sh $@
+

@@ -16,7 +16,7 @@ mkdir php
 sh update-php.sh
 OS=`uname -s`
 if test "$OS" = "Darwin"; then
-cp ../../build/usr/lib/libdjon-client.0.dylib ../../build/usr/lib/libdjon-client.dylib php/
+cp ../../build/usr/lib/libdjon-client.dylib ../../build/usr/lib/libdjon-client.dylib php/
 else
 cp ../../build/usr/lib/libdjon-client.so php/
 fi

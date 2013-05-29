@@ -10,7 +10,13 @@ include_directories("${PROJECT_SOURCE_DIR}/service")
 
 add_executable(djondbd main.cpp)
 
+IF (NOT WIN32)
+install (TARGETS djondbd DESTINATION /usr/bin)
+ENDIF (NOT WIN32)
+
+IF (WIN32)
 install (TARGETS djondbd DESTINATION bin)
+ENDIF (WIN32)
 
 IF (LINUX)
 	target_link_libraries (djondbd djon-service djon-network djon-client djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util antlr3c pthread uuid rt)
