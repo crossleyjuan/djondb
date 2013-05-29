@@ -1,5 +1,5 @@
-rem set CONFIGURATION=Release
-set CONFIGURATION=Debug
+set CONFIGURATION=Release
+rem set CONFIGURATION=Debug
 
 mkdir build
 cd build
@@ -13,4 +13,5 @@ copy /Y driverbase\%CONFIGURATION%\djon-client.*  shell\%CONFIGURATION%
 copy /Y ..\third_party\libs\Win32\*.dll  shell\%CONFIGURATION%
 copy /Y ..\third_party\libs\Win32\*.dll  djondb_win\%CONFIGURATION%
 
+cpack
 cd ..

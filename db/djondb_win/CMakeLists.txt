@@ -19,7 +19,8 @@ set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ${PROJECT_SOURCE_DIR}/third_party/l
 #Rpcrt4.lib WINMM.LIB antlr3c.lib 
 link_directories(${PROJECT_SOURCE_DIR}/third_party/libs)
 
-install (TARGETS djondb_win DESTINATION .)
+install (TARGETS djondb_win DESTINATION bin)
+
 set_target_properties(djondb_win PROPERTIES VS_DOTNET_REFERENCES "System")
 set_target_properties(djondb_win PROPERTIES CMAKE_EXE_LINKER_FLAGS "-static")
 
@@ -27,5 +28,5 @@ IF (WIN32)
 	SET( CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS} "/NODEFAULTLIB:MSVCRTD.lib") 
 ENDIF (WIN32)
 
-target_link_libraries (djondb_win djon-service djon-network djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${PROJECT_SOURCE_DIR}/third_party/libs/Win32/antlr3c.lib ${PROJECT_SOURCE_DIR}/third_party/libs/Win32/pthreadVC2.lib Rpcrt4.lib ${PROJECT_SOURCE_DIR}/third_party/libs/Win32/v8.lib)
+target_link_libraries (djondb_win djon-service djon-network djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}/antlr3c.lib ${LIBRARY_PREFIX}/pthreadVC2.lib Rpcrt4.lib ${LIBRARY_PREFIX}/v8.lib)
 

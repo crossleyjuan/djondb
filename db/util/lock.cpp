@@ -28,6 +28,9 @@
 #include "logger.h"
 #include <errno.h>
 #include <string.h>
+#ifdef WINDOWS
+#include <windows.h>
+#endif
 
 Lock::Lock() {
 	pthread_mutexattr_t mutexattr;
@@ -82,10 +85,18 @@ void Lock::wait(__int32 timeout) {
 	initializeCondition();
 	bool wait = true;
 	while (wait) {
+#ifdef WINDOWS
+		time_t now;
+		time(&now);
+		timeToWait.tv_sec = now;
+		timeToWait.tv_nsec = now * 1000000000;
+#else
 		clock_gettime(CLOCK_REALTIME, &timeToWait);
+#endif
 		timeToWait.tv_sec += timeout;
 		rt = pthread_cond_timedwait(&_cond, &_mutexLock, &timeToWait);
-		if (rt == ETIMEDOUT) {
+		// windows overrides the default ETIMEDOUT from pthread
+		if ((rt == ETIMEDOUT) || (rt == 10060)) {
 			wait = false;
 		} else if (rt > 0) {
 			getLogger(NULL)->error("pthread_cond_timedwait rt: %d, error: %d, description: %s", rt, errno, strerror(errno));

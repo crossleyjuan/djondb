@@ -9,18 +9,8 @@
 #ifndef WINDOWS
 #include <time.h>
 #else
-
-// The pthread.h already defines the timespec struct, this wards prevent double reference
-#if !defined(HAVE_STRUCT_TIMESPEC)
-#define HAVE_STRUCT_TIMESPEC
-#if !defined(_TIMESPEC_DEFINED)
-#define _TIMESPEC_DEFINED
-struct timespec {
-        time_t tv_sec;
-        long tv_nsec;
-};
-#endif /* _TIMESPEC_DEFINED */
-#endif /* HAVE_STRUCT_TIMESPEC */
+// Include this to reference the timespec struct
+#include <pthread.h>
 #endif
 
 #ifdef WINDOWS
