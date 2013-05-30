@@ -52,7 +52,9 @@ public class djonwrapperJNI {
   public final static native void BSONObj_add__SWIG_5(long jarg1, BSONObj jarg1_, String jarg2, long jarg3, BSONObj jarg3_);
   public final static native void BSONObj_add__SWIG_6(long jarg1, BSONObj jarg1_, String jarg2, long jarg3, BSONArrayObj jarg3_);
   public final static native void BSONObj_add__SWIG_7(long jarg1, BSONObj jarg1_, String jarg2, long jarg3);
+  public final static native void BSONObj_add__SWIG_8(long jarg1, BSONObj jarg1_, String jarg2, boolean jarg3);
   public final static native boolean BSONObj_has(long jarg1, BSONObj jarg1_, String jarg2);
+  public final static native boolean BSONObj_getBoolean(long jarg1, BSONObj jarg1_, String jarg2);
   public final static native int BSONObj_getInt(long jarg1, BSONObj jarg1_, String jarg2);
   public final static native double BSONObj_getDouble(long jarg1, BSONObj jarg1_, String jarg2);
   public final static native long BSONObj_getLong(long jarg1, BSONObj jarg1_, String jarg2);

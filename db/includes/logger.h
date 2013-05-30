@@ -8,7 +8,11 @@
 #include <ctime>
 #ifndef WINDOWS
 #include <time.h>
+#else
+// Include this to reference the timespec struct
+#include <pthread.h>
 #endif
+
 #ifdef WINDOWS
 	#include <Windows.h>
 	#include <winsock.h>
@@ -34,8 +38,8 @@ class Logger {
 		static Config* _configSettings;
 
 		int _interval;
-		timespec _ts1;
-		timespec _ts2;
+		struct timespec _ts1;
+		struct timespec _ts2;
 
 	private:
 		void print(std::string type, std::string message);

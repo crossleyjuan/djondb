@@ -1015,6 +1015,28 @@ SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_BSONObj_1add_1_1SWIG_17(JNIEn
 }
 
 
+SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_BSONObj_1add_1_1SWIG_18(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jboolean jarg3) {
+  BSONObj *arg1 = (BSONObj *) 0 ;
+  std::string arg2 ;
+  bool arg3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(BSONObj **)&jarg1; 
+  if(!jarg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null string");
+    return ;
+  } 
+  const char *arg2_pstr = (const char *)jenv->GetStringUTFChars(jarg2, 0); 
+  if (!arg2_pstr) return ;
+  (&arg2)->assign(arg2_pstr);
+  jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
+  arg3 = jarg3 ? true : false; 
+  (arg1)->add(arg2,arg3);
+}
+
+
 SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_BSONObj_1has(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   jboolean jresult = 0 ;
   BSONObj *arg1 = (BSONObj *) 0 ;
@@ -1034,6 +1056,38 @@ SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_BSONObj_1has(JNIEnv *jenv
   (&arg2)->assign(arg2_pstr);
   jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
   result = (bool)((BSONObj const *)arg1)->has(arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_djondb_djonwrapperJNI_BSONObj_1getBoolean(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+  jboolean jresult = 0 ;
+  BSONObj *arg1 = (BSONObj *) 0 ;
+  std::string arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(BSONObj **)&jarg1; 
+  if(!jarg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null string");
+    return 0;
+  } 
+  const char *arg2_pstr = (const char *)jenv->GetStringUTFChars(jarg2, 0); 
+  if (!arg2_pstr) return 0;
+  (&arg2)->assign(arg2_pstr);
+  jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
+  try {
+    result = (bool)((BSONObj const *)arg1)->getBoolean(arg2);
+  }
+  catch(BSONException &_e) {
+    (void)_e;
+    SWIG_JavaThrowException(jenv, SWIG_JavaRuntimeException, "C++ BSONException exception thrown");
+    return 0; 
+  }
+  
   jresult = (jboolean)result; 
   return jresult;
 }

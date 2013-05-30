@@ -341,6 +341,10 @@ class BSONObj {
 		return BSONObj_has($this->_cPtr,$arg1);
 	}
 
+	function getBoolean($arg1) {
+		return BSONObj_getBoolean($this->_cPtr,$arg1);
+	}
+
 	function getInt($arg1) {
 		return BSONObj_getInt($this->_cPtr,$arg1);
 	}

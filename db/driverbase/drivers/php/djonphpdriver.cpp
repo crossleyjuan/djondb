@@ -2858,6 +2858,41 @@ fail:
 }
 
 
+ZEND_NAMED_FUNCTION(_wrap_BSONObj_add__SWIG_8) {
+  BSONObj *arg1 = (BSONObj *) 0 ;
+  std::string arg2 ;
+  bool arg3 ;
+  zval **args[3];
+  
+  SWIG_ResetError();
+  if(ZEND_NUM_ARGS() != 3 || zend_get_parameters_array_ex(3, args) != SUCCESS) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_BSONObj, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of BSONObj_add. Expected SWIGTYPE_p_BSONObj");
+    }
+  }
+  if(!arg1) SWIG_PHP_Error(E_ERROR, "this pointer is NULL");
+  
+  convert_to_string_ex(args[1]);
+  (&arg2)->assign(Z_STRVAL_PP(args[1]), Z_STRLEN_PP(args[1]));
+  
+  
+  /*@SWIG:/usr/local/share/swig/2.0.9/php/utils.i,2,CONVERT_BOOL_IN@*/
+  convert_to_boolean_ex(args[2]);
+  arg3 = (bool) Z_LVAL_PP(args[2]);
+  /*@SWIG@*/;
+  
+  (arg1)->add(arg2,arg3);
+  
+  return;
+fail:
+  SWIG_FAIL();
+}
+
+
 ZEND_NAMED_FUNCTION(_wrap_BSONObj_add) {
   int argc;
   zval **argv[4];
@@ -2920,6 +2955,23 @@ ZEND_NAMED_FUNCTION(_wrap_BSONObj_add) {
         }
         if (_v) {
           _wrap_BSONObj_add__SWIG_7(INTERNAL_FUNCTION_PARAM_PASSTHRU); return;
+        }
+      }
+    }
+  }
+  if (argc == 3) {
+    int _v;
+    {
+      void *tmp;
+      _v = (SWIG_ConvertPtr(*argv[0], (void**)&tmp, SWIGTYPE_p_BSONObj, 0) >= 0);
+    }
+    if (_v) {
+      _v = ( Z_TYPE_PP(argv[1]) == IS_STRING ) ? 1 : 0;
+      
+      if (_v) {
+        _v = (Z_TYPE_PP(argv[2]) == IS_BOOL); 
+        if (_v) {
+          _wrap_BSONObj_add__SWIG_8(INTERNAL_FUNCTION_PARAM_PASSTHRU); return;
         }
       }
     }
@@ -3041,6 +3093,46 @@ ZEND_NAMED_FUNCTION(_wrap_BSONObj_has) {
   (&arg2)->assign(Z_STRVAL_PP(args[1]), Z_STRLEN_PP(args[1]));
   
   result = (bool)((BSONObj const *)arg1)->has(arg2);
+  {
+    ZVAL_BOOL(return_value,(result)?1:0);
+  }
+  return;
+fail:
+  SWIG_FAIL();
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_BSONObj_getBoolean) {
+  BSONObj *arg1 = (BSONObj *) 0 ;
+  std::string arg2 ;
+  zval **args[2];
+  bool result;
+  
+  SWIG_ResetError();
+  if(ZEND_NUM_ARGS() != 2 || zend_get_parameters_array_ex(2, args) != SUCCESS) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_BSONObj, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of BSONObj_getBoolean. Expected SWIGTYPE_p_BSONObj");
+    }
+  }
+  if(!arg1) SWIG_PHP_Error(E_ERROR, "this pointer is NULL");
+  
+  convert_to_string_ex(args[1]);
+  (&arg2)->assign(Z_STRVAL_PP(args[1]), Z_STRLEN_PP(args[1]));
+  
+  try {
+    result = (bool)((BSONObj const *)arg1)->getBoolean(arg2);
+  }
+  catch(BSONException &_e) {
+    (void)_e;
+    zend_throw_exception(NULL, const_cast<char*>("C++ BSONException exception thrown"), 0 TSRMLS_CC);
+    return;
+    
+  }
+  
   {
     ZVAL_BOOL(return_value,(result)?1:0);
   }
@@ -6108,6 +6200,7 @@ static zend_function_entry djonwrapper_functions[] = {
  SWIG_ZEND_NAMED_FE(new_bsonobj,_wrap_new_BSONObj,NULL)
  SWIG_ZEND_NAMED_FE(bsonobj_add,_wrap_BSONObj_add,NULL)
  SWIG_ZEND_NAMED_FE(bsonobj_has,_wrap_BSONObj_has,NULL)
+ SWIG_ZEND_NAMED_FE(bsonobj_getboolean,_wrap_BSONObj_getBoolean,NULL)
  SWIG_ZEND_NAMED_FE(bsonobj_getint,_wrap_BSONObj_getInt,NULL)
  SWIG_ZEND_NAMED_FE(bsonobj_getdouble,_wrap_BSONObj_getDouble,NULL)
  SWIG_ZEND_NAMED_FE(bsonobj_getlong,_wrap_BSONObj_getLong,NULL)

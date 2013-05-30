@@ -25,9 +25,11 @@ class BSONObj
         void add(std::string, const BSONObj&);
         void add(std::string, const BSONArrayObj&);
         void add(std::string, const BSONContent&);
+        void add(std::string, bool);
 
         virtual bool has(std::string) const;
 
+        virtual bool getBoolean(std::string) const throw(BSONException);
         virtual __int32 getInt(std::string) const throw(BSONException);
         virtual double getDouble(std::string) const throw(BSONException);
         virtual __int64 getLong(std::string) const throw(BSONException);

@@ -1734,6 +1734,22 @@ SWIGEXPORT void SWIGSTDCALL CSharp_BSONObj_add__SWIG_7(void * jarg1, char * jarg
 }
 
 
+SWIGEXPORT void SWIGSTDCALL CSharp_BSONObj_add__SWIG_8(void * jarg1, char * jarg2, unsigned int jarg3) {
+  BSONObj *arg1 = (BSONObj *) 0 ;
+  std::string arg2 ;
+  bool arg3 ;
+  
+  arg1 = (BSONObj *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return ;
+  }
+  (&arg2)->assign(jarg2); 
+  arg3 = jarg3 ? true : false; 
+  (arg1)->add(arg2,arg3);
+}
+
+
 SWIGEXPORT unsigned int SWIGSTDCALL CSharp_BSONObj_has(void * jarg1, char * jarg2) {
   unsigned int jresult ;
   BSONObj *arg1 = (BSONObj *) 0 ;
@@ -1747,6 +1763,32 @@ SWIGEXPORT unsigned int SWIGSTDCALL CSharp_BSONObj_has(void * jarg1, char * jarg
   }
   (&arg2)->assign(jarg2); 
   result = (bool)((BSONObj const *)arg1)->has(arg2);
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_BSONObj_getBoolean(void * jarg1, char * jarg2) {
+  unsigned int jresult ;
+  BSONObj *arg1 = (BSONObj *) 0 ;
+  std::string arg2 ;
+  bool result;
+  
+  arg1 = (BSONObj *)jarg1; 
+  if (!jarg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  (&arg2)->assign(jarg2); 
+  try {
+    result = (bool)((BSONObj const *)arg1)->getBoolean(arg2);
+  }
+  catch(BSONException &_e) {
+    (void)_e;
+    SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, "C++ BSONException exception thrown");
+    return 0; 
+  }
+  
   jresult = result; 
   return jresult;
 }

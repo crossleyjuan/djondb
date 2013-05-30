@@ -3,6 +3,11 @@
     * Transaction support added (begin, commit and rollback)
     * C# x64 driver
     * Windows x64 installer
+    * dql implemented
+    * New buffered Index implementation
+    * New boolean type support
+    * New filter function exists
+    * New compilation method, now cmake is the default compilation method
     * Changes to the build.js nodejs installer to validate requirements
     * Fixed an error when the filter is longer than 127 chars
 	 * Fixed an error when the BSONObj received on update command does not contain the
