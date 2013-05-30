@@ -275,7 +275,7 @@ TEST(TestDriver, testFinds) {
 TEST(TestDriver, testFindByFilter) {
 	// Insert record to search for
 
-	BSONObj* obj = BSONParser::parse("{'name': 'Test', 'bool': true, 'inner': { 'x': 1 }}");
+	BSONObj* obj = BSONParser::parse("{'name': 'Test', 'bool': true, 'nbool': false, 'inner': { 'x': 1 }}");
 
 	//delete id;
 
@@ -315,6 +315,12 @@ TEST(TestDriver, testFindByFilter) {
 	EXPECT_TRUE(result->length() == 1);
 
 	result = conn->find("db", "test.filter2", "*", "$'bool'");
+	EXPECT_TRUE(result->length() == 1);
+
+	result = conn->find("db", "test.filter2", "*", "$'nbool'");
+	EXPECT_TRUE(result->length() == 0);
+
+	result = conn->find("db", "test.filter2", "*", "$'nbool' == false");
 	EXPECT_TRUE(result->length() == 1);
 
 	result = conn->find("db", "test.filter2", "*", "$'name' == 'Test'");
