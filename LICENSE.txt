@@ -1,0 +1,21 @@
+The engine has different licenses including:
+
+For Open Source Projects:
+If you are developing and distributing open source applications under the GPL License, then you are free to use djondb under the GPL License.
+
+For Commercial OEMs, ISVs and VARs:
+For OEMs, ISVs, and VARs who distribute djondb with their products, and do not license and distribute their source code under the GPL, djondb provides a flexible OEM Commercial License.
+
+For Web Sites, Enterprise IT, and Government IT:
+djodb Enterprise is the comprehensive subscription offering that provides database developers and DBAs with everything they need to successfully develop and deploy database solutions with djodb. 
+It includes Certified Software, updates and upgrades, proactive alerts and advisors, the online djondb Knowledge Base, and full production-level technical support. 
+The Certified Software (database server, connectors) is provided under the GPL License. Optionally, customers may choose a Commercial License.
+
+The licenses are included here for further reading.
+
+All the files included are licensed under GPL unless the file explicit express some other license.
+
+Please refer to COPYING.GPL and COPYING.LGPL to get a copy of the terms of these licenses.
+
+
+
