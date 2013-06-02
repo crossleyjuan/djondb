@@ -467,9 +467,9 @@ v8::Handle<v8::Value> WrapConnection::executeUpdate(const v8::Arguments& args) {
 
 		return v8::Undefined();
 	} catch (ParseException e) {
-		return v8::ThrowException(v8::String::New(e.what()));
+		return v8::ThrowException(v8::String::New("there is an error in the expression.\n"));
 	} catch (DjondbException e) {
-		return v8::ThrowException(v8::String::New(e.what()));
+		return v8::ThrowException(v8::String::New("An error ocurred executing the update expression.\n"));
 	}
 }
 
@@ -499,9 +499,9 @@ v8::Handle<v8::Value> WrapConnection::executeQuery(const v8::Arguments& args) {
 			return v8::Undefined();
 		}
 	} catch (ParseException e) {
-		return v8::ThrowException(v8::String::New(e.what()));
+		return v8::ThrowException(v8::String::New("there is an error in the expression.\n"));
 	} catch (DjondbException e) {
-		return v8::ThrowException(v8::String::New(e.what()));
+		return v8::ThrowException(v8::String::New("An error ocurred executing the update expression.\n"));
 	}
 }
 

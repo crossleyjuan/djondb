@@ -20,11 +20,13 @@ enum BSONTYPE {
 
 class BSONException: public std::exception {
 	public:
-		BSONException(const char* error) {
+		BSONException(const char* error):
+  		  std::exception()	{
 			_errorMessage = error;
 		}
 
-		BSONException(const BSONException& orig) {
+		BSONException(const BSONException& orig) :
+			std::exception()	{
 			this->_errorMessage = orig._errorMessage;
 		}
 
