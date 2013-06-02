@@ -22,6 +22,9 @@ call setenv.bat
 cd %PATH_SRC_STARTUP%\driverbase\drivers
 call update.bat
 
+echo Creating output dir
+del /Q   "%OUTPUTDIR%\*.*"
+mkdir  "%OUTPUTDIR%"
 cd %PATH_SRC_STARTUP%
 
 :Win32
@@ -44,14 +47,35 @@ GOTO END
 
 :ExecuteJob
 mkdir build%PLATFORM%
+rem pause
 cd build%PLATFORM%
+rem pause
 rem cmake .. -G "Visual Studio 10 Win64"  -DCMAKE_BUILD_TYPE=Debug
-cmake .. -G "Visual Studio 10 Win64"  -DCMAKE_BUILD_TYPE=Release
+if %PLATFORM% == x64 (
+	cmake .. -G "Visual Studio 10 Win64" -DPLATFORM_NAME=%PLATFORM% -DCMAKE_BUILD_TYPE=Release
+)
+if %PLATFORM% == Win32 (
+	cmake .. -G "Visual Studio 10" -DPLATFORM_NAME=%PLATFORM% -DCMAKE_BUILD_TYPE=Release
+)
+rem pause
 rem %PATH_MSBUILD%\msbuild djondb.sln /t:Rebuild /p:Configuration=Release /p:Platform=%PLATFORM%
 %PATH_MSBUILD%\msbuild djondb.sln /p:Configuration=Release /p:Platform=%PLATFORM%
+rem pause
 rem %PATH_MSBUILD%\msbuild djondb.sln /p:Configuration=Debug /p:Platform=%PLATFORM%
 
 cpack
+rem pause
+
+cd ..
+REM Everything done, now it's time to create the output
+REM
+
+copy   "%PATH_SRC_STARTUP%\build%PLATFORM%\djondb-*.exe" "%OUTPUTDIR%"
+rem copy   "%PATH_SRC_STARTUP%\driverbase\drivers\java\java\dist\lib\djondb_java.jar" "%OUTPUTDIR%\djondb_client_Windows_i686.jar"
+pause
+
+GOTO %NEXT_STEP%
+
 xcopy /y %PATH_SRC_STARTUP%\build%PLATFORM%\driverbase\drivers\java\native\Release\djonjavadriver.dll "%PATH_SRC_STARTUP%\driverbase\drivers\java\native\vs2008\"
 cd %PATH_SRC_STARTUP%\driverbase\drivers\java\java
 call "%ANT_PATH%\bin\ant"
@@ -68,8 +92,6 @@ move "%PATH_SRC_STARTUP%\windows\output\djondb_client_Windows_i686.jar" "%PATH_S
 rem move "%PATH_SRC_STARTUP%\windows\output\setup_djoncsharp.exe" "%PATH_SRC_STARTUP%\windows\output\setup_djoncsharp_%PLATFORM%.exe" 
 rem move "%PATH_SRC_STARTUP%\windows\output\setup_djondb.exe" "%PATH_SRC_STARTUP%\windows\output\setup_djondb_%PLATFORM%.exe" 
 
-REM Everything done, now it's time to create the output
-REM
 
 GOTO END
 

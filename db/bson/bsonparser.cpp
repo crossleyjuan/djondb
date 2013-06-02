@@ -302,7 +302,7 @@ BSONObj* BSONParser::parse(const std::string& sbson) {
 		pbson_grammarParser              parser;
 
 		const char* bsonExpression = sbson.c_str();
-		input  = antlr3NewAsciiStringInPlaceStream((pANTLR3_UINT8)bsonExpression, strlen(bsonExpression), (pANTLR3_UINT8)"name");
+		input  = antlr3StringStreamNew((pANTLR3_UINT8)bsonExpression, 8, (ANTLR3_UINT32)strlen(bsonExpression), (pANTLR3_UINT8)"name");
 		lex    = bson_grammarLexerNew                (input);
 		tokens = antlr3CommonTokenStreamSourceNew  (ANTLR3_SIZE_HINT, TOKENSOURCE(lex));
 		parser = bson_grammarParserNew               (tokens);

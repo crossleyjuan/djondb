@@ -20,6 +20,7 @@ IF (WIN32)
 ENDIF ( WIN32 )
 
 IF (NOT WIN32)
-	target_link_libraries (djon-util antlr3c pthread)
+	#target_link_libraries (djon-util antlr3c pthread)
+	target_link_libraries (djon-util ${LIBRARY_PREFIX}antlr3c.a pthread)
 ENDIF (NOT WIN32)
 

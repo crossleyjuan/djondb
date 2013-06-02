@@ -729,7 +729,7 @@ TEST_F(TestDB, testAntlrParser) {
 	pfilter_expressionParser              parser;
 
 	char* filter = "a == 1";
-	input  = antlr3NewAsciiStringInPlaceStream((pANTLR3_UINT8)filter, (ANTLR3_INT8)strlen(filter), (pANTLR3_UINT8)"name");
+	input  = antlr3StringStreamNew((pANTLR3_UINT8)filter, 8, (ANTLR3_UINT32)strlen(filter), (pANTLR3_UINT8)"name");
 	lex    = filter_expressionLexerNew                (input);
 	tokens = antlr3CommonTokenStreamSourceNew  (ANTLR3_SIZE_HINT, TOKENSOURCE(lex));
 	parser = filter_expressionParserNew               (tokens);
@@ -959,8 +959,8 @@ TEST_F(TestDB, testFindPrevious)
 }
 
 /* 
-TEST_F(TestDB, testManualIndex)
-{
+	TEST_F(TestDB, testManualIndex)
+	{
 	cout << "\ntestManualIndex" << endl;
 	std::set<std::string> keys;
 	keys.insert("_id");
@@ -969,23 +969,23 @@ TEST_F(TestDB, testManualIndex)
 	Logger* log = getLogger(NULL);
 
 	log->startTimeRecord();
-	// Inserting
-	int x = 0;
-	char chr[100];
-	do {
-		cout << "Element: ";
-		scanf("%s", chr);
-		if (strncmp(chr, "end", 3) == 0) {
-			break;
-		}
-		cout << "Number readed: " << chr << endl;
-		BSONObj id;
-		id.add("_id", const_cast<char*>(chr));
-		tree->add(id, djondb::string(chr, strlen(chr)), 0, 0);
-		tree->debug();
-		getchar();
-		x++;
-	} while (strncmp(chr, "end", 3) != 0);
+// Inserting
+int x = 0;
+char chr[100];
+do {
+cout << "Element: ";
+scanf("%s", chr);
+if (strncmp(chr, "end", 3) == 0) {
+break;
+}
+cout << "Number readed: " << chr << endl;
+BSONObj id;
+id.add("_id", const_cast<char*>(chr));
+tree->add(id, djondb::string(chr, strlen(chr)), 0, 0);
+tree->debug();
+getchar();
+x++;
+} while (strncmp(chr, "end", 3) != 0);
 }
 */
 
@@ -1035,33 +1035,33 @@ TEST_F(TestDB, testIndexPage) {
 }
 
 /*
-TEST_F(TestDB, testMassiveInsertIndex)
-{
+	TEST_F(TestDB, testMassiveInsertIndex)
+	{
 	std::set<std::string> keys;
 	keys.insert("_id");
 	std::auto_ptr<BPlusIndexP> tree(new BPlusIndexP(keys));
 
 	Logger* log = getLogger(NULL);
 
-	// Inserting
-	for (int n = 0; n < 100; n++)
-	{
-		log->startTimeRecord();
-		for (int x = 0; x < 100000; x++) {
-			BSONObj id;
-			std::string* sid = uuid();
+// Inserting
+for (int n = 0; n < 100; n++)
+{
+log->startTimeRecord();
+for (int x = 0; x < 100000; x++) {
+BSONObj id;
+std::string* sid = uuid();
 
-			id.add("_id", const_cast<char*>(sid->c_str()));
+id.add("_id", const_cast<char*>(sid->c_str()));
 
-			tree->add(id, djondb::string(sid->c_str(), sid->length()), 0, 0);
-			delete sid;
+tree->add(id, djondb::string(sid->c_str(), sid->length()), 0, 0);
+delete sid;
 
-		}
-		log->stopTimeRecord();
-		DTime time = log->recordedTime();
-		log->info("Inserted in: %d", time.totalSecs());
-		log->info("Total inserted: %d", 100000 * (n + 1));
-	}
+}
+log->stopTimeRecord();
+DTime time = log->recordedTime();
+log->info("Inserted in: %d", time.totalSecs());
+log->info("Total inserted: %d", 100000 * (n + 1));
+}
 
 }
 */
@@ -1093,15 +1093,15 @@ std::vector<std::string> generateGuids(int count) {
 }
 
 /* 
-TEST_F(TestDB, testHighMemIndex)
-{
+	TEST_F(TestDB, testHighMemIndex)
+	{
 	cout << "\ntestHighMemIndex" << endl;
 
 	int x = 100000;
 	cout << "testing " << x << " ids" << endl;
 	std::vector<std::string> ids = generateGuids(x);
 	testIndex(ids);
-	
+
 //		cout << "testing 100 ids" << endl;
 //		ids = generateGuids(100);
 //		testIndex(ids);
@@ -1226,37 +1226,37 @@ TEST_F(TestDB, testErrorHandling) {
 
 /* Not supported yet, this will require some code */
 /*
-TEST_F(TestDB, testId) {
+	TEST_F(TestDB, testId) {
 	cout << "Testing different id types" << endl;
 
 	cout << "Testing string ids" << endl;
 	controller->dropNamespace("TestDB", "TestIds");
-	// Lets start with the easy one (String)
-	BSONObj obj;
-	obj.add("_id", "test");
-	obj.add("data", "asdfasdf");
+// Lets start with the easy one (String)
+BSONObj obj;
+obj.add("_id", "test");
+obj.add("data", "asdfasdf");
 
-	controller->insert("TestDB", "TestIds", &obj);
+controller->insert("TestDB", "TestIds", &obj);
 
-	BSONArrayObj* result = controller->find("TestDB", "TestIds", "*", "$'_id' == 'test'");
+BSONArrayObj* result = controller->find("TestDB", "TestIds", "*", "$'_id' == 'test'");
 
-	ASSERT_TRUE(result != NULL);
-	ASSERT_TRUE(result->length() == 1);
-	EXPECT_TRUE(obj == *result->get(0));
+ASSERT_TRUE(result != NULL);
+ASSERT_TRUE(result->length() == 1);
+EXPECT_TRUE(obj == *result->get(0));
 
-	cout << "Testing int ids" << endl;
-	controller->dropNamespace("TestDB", "TestIdsWithInt");
+cout << "Testing int ids" << endl;
+controller->dropNamespace("TestDB", "TestIdsWithInt");
 
-	BSONObj obj2;
-	obj2.add("_id", (__int32)10);
-	obj2.add("data", "asdfasdf");
+BSONObj obj2;
+obj2.add("_id", (__int32)10);
+obj2.add("data", "asdfasdf");
 
-	controller->insert("TestDB", "TestIdsWithInt", &obj2);
+controller->insert("TestDB", "TestIdsWithInt", &obj2);
 
-	BSONArrayObj* result2 = controller->find("TestDB", "TestIdsWithInt", "*", "$'_id' == 10");
+BSONArrayObj* result2 = controller->find("TestDB", "TestIdsWithInt", "*", "$'_id' == 10");
 
-	ASSERT_TRUE(result2 != NULL);
-	ASSERT_TRUE(result2->length() == 1);
-	EXPECT_TRUE(obj2 == *result2->get(0));
+ASSERT_TRUE(result2 != NULL);
+ASSERT_TRUE(result2->length() == 1);
+EXPECT_TRUE(obj2 == *result2->get(0));
 }
 */

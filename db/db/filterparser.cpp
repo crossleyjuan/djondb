@@ -313,7 +313,7 @@ FilterParser* FilterParser::parse(const std::string& expression) throw(ParseExce
 
 		const char* filter = expression.c_str();
 		if (log->isDebug()) log->debug("filter expression: %s, len: %d, Size Hint: %d", filter, strlen(filter), ANTLR3_SIZE_HINT);
-		input  = antlr3NewAsciiStringInPlaceStream((pANTLR3_UINT8)filter, strlen(filter), (pANTLR3_UINT8)"name");
+		input  = antlr3StringStreamNew((pANTLR3_UINT8)filter, 8, (ANTLR3_UINT32)strlen(filter), (pANTLR3_UINT8)"name");
 		lex    = filter_expressionLexerNew                (input);
 		tokens = antlr3CommonTokenStreamSourceNew  (ANTLR3_SIZE_HINT, TOKENSOURCE(lex));
 		parser = filter_expressionParserNew               (tokens);
@@ -339,11 +339,11 @@ FilterParser* FilterParser::parse(const std::string& expression) throw(ParseExce
 	filterparser->setTokens(xpathTokens);
 
 	return filterparser;
-}
+	}
 
-std::set<std::string> FilterParser::xpathTokens() {
-	return _xpathTokens;
-}
+	std::set<std::string> FilterParser::xpathTokens() {
+		return _xpathTokens;
+	}
 
 
 
