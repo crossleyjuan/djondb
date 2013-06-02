@@ -77,20 +77,7 @@ function checkDependencies() {
 		process.exit(1);
 	}
 
-	if (checkExists(path.join(includePath, "node/node.h"))) {
-		generateDefs("node/node.h");
-	} else if (checkExists(path.join(includePath, "nodejs/node.h"))) {
-		generateDefs("nodejs/node.h");
-	} else {
-		if (process.platform == "linux") {
-			console.error("This can be installed using: sudo apt-get install nodejs-dev");
-      } else if (process.platform == "darwing") {
-			console.error("This can be installed easily with Homebrew executing brew install node");
-      } else {
-			console.error("node development files not found, please install nodejs-dev package and try again.");
-		}
-		process.exit(1);
-	}
+	generateDefs("node.h");
 }
 
 function configure(done) {
