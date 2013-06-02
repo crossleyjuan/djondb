@@ -26,7 +26,6 @@
  */ 
 #ifndef NODEUTIL_INCLUDED_H
 #define NODEUTIL_INCLUDED_H 
-#include "nodeutil.h"
 #include <v8.h>
 #include <string>
 

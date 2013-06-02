@@ -25,7 +25,6 @@
  * =====================================================================================
  */
 
-#define BUILDING_NODE_EXTENSION
 #include <node.h>
 #include "wrapconnection.h"
 #include "wrapconnectionmanager.h"

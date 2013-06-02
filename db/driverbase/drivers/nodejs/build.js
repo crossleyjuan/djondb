@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 var spawn = require('child_process').spawn,
 	 fs = require('fs'),
 	 path = require('path');
@@ -47,7 +46,7 @@ function generateDefs(nodeh) {
 	var fs = require('fs');
 	var text = "#ifndef DJONDB_DEFS_H\n";
 	text += "#define DJONDB_DEFS_H\n";
-	text += "#include <" + nodeh + ">;\n";
+	text += "#include <" + nodeh + ">\n";
 	text += "#endif // DJONDB_DEFS_H\n";
 	fs.writeFileSync("djondefs.h", text);
 }
