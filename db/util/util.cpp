@@ -174,7 +174,7 @@ int clock_gettime(int X, struct timespec *tv)
 	mach_port_deallocate(mach_task_self(), cclock);
 	tv->tv_sec = mts.tv_sec;
 	tv->tv_nsec = mts.tv_nsec; 
-
+	return 0;
 }
 #endif
 

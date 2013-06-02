@@ -25,29 +25,4 @@
 #include <v8.h>
 #include <string>
 
-v8::Handle<v8::Value> Print(const v8::Arguments& args);
-v8::Handle<v8::Value> find(const v8::Arguments& args);
-v8::Handle<v8::Value> executeUpdate(const v8::Arguments& args);
-v8::Handle<v8::Value> executeQuery(const v8::Arguments& args);
-v8::Handle<v8::Value> dropNamespace(const v8::Arguments& args);
-v8::Handle<v8::Value> showDbs(const v8::Arguments& args);
-v8::Handle<v8::Value> showNamespaces(const v8::Arguments& args);
-v8::Handle<v8::Value> Read(const v8::Arguments& args);
-v8::Handle<v8::Value> Load(const v8::Arguments& args);
-v8::Handle<v8::Value> insert(const v8::Arguments& args);
-v8::Handle<v8::Value> update(const v8::Arguments& args);
-v8::Handle<v8::Value> remove(const v8::Arguments& args);
-v8::Handle<v8::Value> shutdown(const v8::Arguments& args);
-v8::Handle<v8::Value> fuuid(const v8::Arguments& args);
-v8::Handle<v8::Value> connect(const v8::Arguments& args);
-v8::Handle<v8::String> ReadFile(const char* name);
-v8::Handle<v8::Value> beginTransaction(const v8::Arguments& args);
-v8::Handle<v8::Value> commitTransaction(const v8::Arguments& args);
-v8::Handle<v8::Value> rollbackTransaction(const v8::Arguments& args);
-void ReportException(v8::TryCatch* handler);
-
-v8::Handle<v8::Value> parseJSON(v8::Handle<v8::Value> object);
-bool ExecuteString(v8::Handle<v8::String> source, v8::Handle<v8::Value> name,	bool print_result, bool report_exceptions);
-char* getFile(const char* name);
-std::string ToCString(const v8::String::Utf8Value& value);
 #endif /* DJONV8_INCLUDED_H */

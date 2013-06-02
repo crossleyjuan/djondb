@@ -9,24 +9,27 @@ ENDIF ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
 
 IF ("${CMAKE_SYSTEM_NAME}" MATCHES "Windows")
 	set(WIN32 true)
-
 	set(LIBRARY_PREFIX "${PROJECT_SOURCE_DIR}/third_party/libs/${PLATFORM_NAME}/${CMAKE_BUILD_TYPE}")
-	message("Library suffix:" ${LIBRARY_PREFIX})
+
 	set(LIBRARY_SUFFIX ".lib")
-	set(PLATFORM_ESSENCIAL_LIBS, "")
 ENDIF ("${CMAKE_SYSTEM_NAME}" MATCHES "Windows")
 
 IF ("${CMAKE_SYSTEM_NAME}" MATCHES "Darwin")
+	set(LIBRARY_PREFIX "${PROJECT_SOURCE_DIR}/third_party/libs/lib")
+	set(LIBRARY_SUFFIX "")
 	set(DARWIN true)
 ENDIF ("${CMAKE_SYSTEM_NAME}" MATCHES "Darwin")
 
 IF (LINUX)
+	set(LIBRARY_PREFIX "${PROJECT_SOURCE_DIR}/third_party/libs/lib")
+	set(LIBRARY_SUFFIX "")
 	IF( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )
 	add_definitions(-fPIC)
 	#SET_TARGET_PROPERTIES(djon-client PROPERTIES COMPILE_FLAGS "-fPIC")
 	ENDIF( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )
-
 ENDIF (LINUX)
+
+message("Library suffix:" ${LIBRARY_PREFIX})
 
 SET(DJONDB_VERSION_MAJOR "0")
 SET(DJONDB_VERSION_MINOR "3")
@@ -41,6 +44,7 @@ configure_file (
 enable_testing()
 
 include_directories("${PROJECT_BINARY_DIR}")
+include_directories("/usr/include")
 
 INCLUDE(InstallRequiredSystemLibraries)
 
@@ -109,9 +113,9 @@ IF (DARWIN)
 	INSTALL(FILES ${PROJECT_SOURCE_DIR}/other/osx/djondb.conf
 		DESTINATION /etc
 	PERMISSIONS OWNER_READ GROUP_READ WORLD_READ OWNER_WRITE OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE)
-   install (FILES /usr/lib/libv8.dylib /usr/lib/libantlr3c.dylib
-   	DESTINATION /usr/lib
-   	PERMISSIONS OWNER_READ GROUP_READ WORLD_READ OWNER_WRITE OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE)
+# install (FILES /usr/lib/libv8.dylib /usr/lib/libantlr3c.dylib
+#   	DESTINATION /usr/lib
+#   	PERMISSIONS OWNER_READ GROUP_READ WORLD_READ OWNER_WRITE OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE)
 ENDIF (DARWIN)
 
 IF ( WIN32 )

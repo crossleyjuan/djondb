@@ -103,9 +103,9 @@ void DTime::time(int& hour, int& min, int& sec) const {
     sec = tmpSecs;
 }
 
-const char* DTime::toChar() const {
+char* DTime::toChar() const {
 
-    char buffer[20];
+    char* buffer = (char*)malloc(20);
     memset(buffer, 0, 20);
 
     int hour;

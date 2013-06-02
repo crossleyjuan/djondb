@@ -23,5 +23,6 @@ IF (LINUX)
 ENDIF (LINUX)
 
 IF (DARWIN)
-	target_link_libraries (djondbd djon-service djon-network djon-client djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util antlr3c pthread)
+	target_link_libraries (djondbd djon-service djon-network djon-client djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}antlr3c.a pthread)
+	#target_link_libraries (djondbd djon-service djon-network djon-client djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util antlr3c pthread)
 ENDIF (DARWIN)

@@ -449,7 +449,7 @@ Command* DjondbConnection::parseCommand(const std::string& expression) {
 
 		const char* cexpr = expression.c_str();
 		if (log->isDebug()) log->debug("query expression: %s, len: %d, Size Hint: %d", cexpr, strlen(cexpr), ANTLR3_SIZE_HINT);
-		input  = antlr3NewAsciiStringInPlaceStream((pANTLR3_UINT8)cexpr, strlen(cexpr), (pANTLR3_UINT8)"name");
+		input  = antlr3StringStreamNew((pANTLR3_UINT8)cexpr, 8, (ANTLR3_UINT32)strlen(cexpr), (pANTLR3_UINT8)"name");
 		lex    = dqlLexerNew                (input);
 		tokens = antlr3CommonTokenStreamSourceNew  (ANTLR3_SIZE_HINT, TOKENSOURCE(lex));
 		parser = dqlParserNew               (tokens);
