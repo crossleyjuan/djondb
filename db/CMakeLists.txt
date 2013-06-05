@@ -51,7 +51,7 @@ INCLUDE(InstallRequiredSystemLibraries)
 #debian variables
 SET(CPACK_DEBIAN_PACKAGE_NAME "djondb")
 SET(CPACK_DEBIAN_PACKAGE_VERSION "${DJONDB_VERSION_MAJOR}.${DJONDB_VERSION_MINOR}.${DJONDB_VERSION_REVISION}")
-SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libantlr3c-3.2-0, libuuid1 (>= 2.17.2), libstdc++6 (>= 4.5), libv8-dev (>= 3.1)")
+SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libuuid1 (>= 2.17.2), libstdc++6 (>= 4.5)")
 SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Enterprise NoSQL Server 
  djondb is a NoSQL document store created to be 
   easy to use and ready enterprise level. Your 
@@ -121,7 +121,7 @@ ENDIF (DARWIN)
 IF ( WIN32 )
 	include_directories("${PROJECT_SOURCE_DIR}/third_party/pthreads")
 	include_directories("${PROJECT_SOURCE_DIR}/third_party/boost")
-	include_directories("${PROJECT_SOURCE_DIR}/third_party/libantlr3c-3.2/include")
+	include_directories("${PROJECT_SOURCE_DIR}/third_party/libantlr3c-3.4/include")
 ENDIF ( WIN32 )
 
 add_subdirectory(util) 
@@ -142,6 +142,7 @@ IF (WIN32)
 ENDIF (WIN32)
 add_subdirectory(shell) 
 
+add_subdirectory(driverbase/drivers/java/native)
 IF (NOT WIN32)
 IF (${CMAKE_BUILD_TYPE} MATCHES "Debug")
 	add_subdirectory(util/tests) 
