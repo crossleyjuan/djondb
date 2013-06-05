@@ -1,23 +1,10 @@
 @echo off
+setlocal enabledelayedexpansion
 
 if [%1] ==[] goto usage
 
-set x32=false
-if [%1] == [-x32] (
-   set x32=true
-)
-if [%2] == [-x32] (
-   set x32=true
-)
-set x64=false
-if [%1] == [-x64] (
-   set x64=true
-)
-if [%2] == [-x64] (
-   set x64=true
-)
-
 call setenv.bat
+call:parseArguments %*
 
 cd %PATH_SRC_STARTUP%\driverbase\drivers
 call update.bat
@@ -103,5 +90,44 @@ goto exit
 :END
 
 Echo Done!
+
+goto Exit
+
+:getArg
+set valname=%~1
+echo arg: !%valname%!
+goto:eof
+
+:parseArguments
+rem ----------------------------------------------------------------------------------
+@echo off
+
+:loop
+IF "%~1"=="" GOTO cont
+
+set argname=%~1
+set argname=%argname:~1,100%
+set value=%~2
+
+@rem if the next value starts with - then it's a new parameter
+if "%value:~0,1%" == "-" (
+   set !argname!=true
+   SHIFT & GOTO loop
+)
+
+if "%value%" == "" (
+   set !argname!=true
+   SHIFT & GOTO loop
+)
+
+set !argname!=%~2
+
+@rem jumps first and second parameter
+SHIFT & SHIFT & GOTO loop
+
+:cont
+
+goto:eof
+rem ----------------------------------------------------------------------------------
 
 :Exit
