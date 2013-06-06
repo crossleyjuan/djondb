@@ -26,5 +26,17 @@ IF (WIN32)
 	target_link_libraries (test-driverbase djon-client djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}gtest${LIBRARY_SUFFIX} ${LIBRARY_PREFIX}gtest_main${LIBRARY_SUFFIX})
 ENDIF (WIN32)
 
+IF (NOT WIN32)
+	add_custom_command(TARGET test-performance
+		POST_BUILD
+		COMMAND cp ${PROJECT_SOURCE_DIR}/driverbase/tests/*.csv ${PROJECT_BINARY_DIR}/driverbase/tests/)
+ENDIF (NOT WIN32)
+
+IF (WIN32)
+	add_custom_command(TARGET test-performance
+		POST_BUILD
+		COMMAND copy ${PROJECT_SOURCE_DIR}/driverbase/tests/*.csv ${PROJECT_BINARY_DIR}/driverbase/tests/)
+ENDIF (WIN32)
+
 add_test(test-driverbase test-driverbase)
 
