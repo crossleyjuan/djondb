@@ -19,7 +19,7 @@ install (TARGETS djondbd DESTINATION bin)
 ENDIF (WIN32)
 
 IF (LINUX)
-	target_link_libraries (djondbd djon-service djon-network djon-client djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util antlr3c pthread uuid rt)
+	target_link_libraries (djondbd djon-service djon-network djon-client djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}antlr3c.a pthread uuid rt)
 ENDIF (LINUX)
 
 IF (DARWIN)

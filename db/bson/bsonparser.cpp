@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <antlr3.h>
 
 struct BSONStruct {
 	char* name;

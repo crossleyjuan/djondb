@@ -44,7 +44,7 @@ configure_file (
 enable_testing()
 
 include_directories("${PROJECT_BINARY_DIR}")
-include_directories("/usr/include")
+include_directories("${PROJECT_SOURCE_DIR}/third_party/includes")
 
 INCLUDE(InstallRequiredSystemLibraries)
 
