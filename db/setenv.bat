@@ -19,3 +19,5 @@
 @set INNO_PATH=c:\Program Files (x86)\Inno Setup 5
 @set ANT_PATH=C:\development\Java\apache-ant-1.8.4
 @SET OUTPUTDIR=%PATH_SRC_STARTUP%\windows\output
+
+
