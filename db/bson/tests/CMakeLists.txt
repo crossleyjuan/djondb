@@ -4,7 +4,7 @@ include_directories("${PROJECT_SOURCE_DIR}/bson")
 
 add_executable(test-bson main.cpp)
 IF (LINUX)
-	target_link_libraries (test-bson djon-bson djon-util ${LIBRARY_PREFIX}gtest${LIBRARY_SUFFIX} ${LIBRARY_PREFIX}gtest_main${LIBRARY_SUFFIX} rt uuid)
+	target_link_libraries (test-bson djon-bson djon-util ${LIBRARY_PREFIX}gtest.a ${LIBRARY_PREFIX}gtest_main.a rt uuid)
 ENDIF (LINUX)
 IF (DARWIN)
 	target_link_libraries (test-bson djon-bson djon-util ${LIBRARY_PREFIX}gtest.a ${LIBRARY_PREFIX}gtest_main.a)

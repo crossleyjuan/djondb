@@ -35,7 +35,7 @@ TEST(testBuffers, testBuffers)
 	if (existFile((dataDir + "/test.trc").c_str())) {
 		removeFile((dataDir + "/test.trc").c_str());
 	}
-	BufferManager* manager = new BufferManager("test");
+	BufferManager* manager = new BufferManager("test", 10);
 
 	Buffer* buffer = NULL;
 	char test[1001];

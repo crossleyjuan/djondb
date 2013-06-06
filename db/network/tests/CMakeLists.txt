@@ -10,7 +10,7 @@ include_directories("${PROJECT_SOURCE_DIR}/network")
 
 add_executable(test-network main.cpp)
 IF (LINUX)
-	target_link_libraries (test-network djon-network djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}gtest${LIBRARY_SUFFIX} ${LIBRARY_PREFIX}gtest_main${LIBRARY_SUFFIX} rt uuid ${LIBRARY_PREFIX}pthread)
+	target_link_libraries (test-network djon-network djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}gtest.a ${LIBRARY_PREFIX}gtest_main.a rt uuid pthread)
 ENDIF (LINUX)
 IF (DARWIN)
 	target_link_libraries (test-network djon-network djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}gtest.a ${LIBRARY_PREFIX}gtest_main.a pthread)

@@ -3,7 +3,7 @@ include_directories("${PROJECT_SOURCE_DIR}/util")
 
 add_executable(test-util main.cpp)
 IF (LINUX)
-	target_link_libraries (test-util djon-util ${LIBRARY_PREFIX}gtest${LIBRARY_SUFFIX} ${LIBRARY_PREFIX}gtest_main${LIBRARY_SUFFIX} rt uuid) 
+	target_link_libraries (test-util djon-util ${LIBRARY_PREFIX}gtest.a ${LIBRARY_PREFIX}gtest_main.a rt uuid) 
 ENDIF (LINUX)
 IF (DARWIN)
 	target_link_libraries (test-util djon-util ${LIBRARY_PREFIX}gtest.a ${LIBRARY_PREFIX}gtest_main.a) 
