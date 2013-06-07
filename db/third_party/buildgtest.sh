@@ -2,10 +2,11 @@
 
 mkdir gtest
 cd gtest
-unzip ../gtest-1.6.0.zip 
+unzip -o ../gtest-1.6.0.zip 
+cd gtest-1.6.0
 ./configure
 make
 
-cp .libs/libgtest*.a ../libs/
-cp include/*.h ../includes/
+cp -f lib/.libs/libgtest*.a ../../libs/
+cp -fR include/* ../../includes/
 

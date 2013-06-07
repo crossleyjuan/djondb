@@ -40,6 +40,7 @@ class Logger {
 		int _interval;
 		struct timespec _ts1;
 		struct timespec _ts2;
+		bool _timerRunning;
 
 	private:
 		void print(std::string type, std::string message);

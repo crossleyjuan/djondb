@@ -13,9 +13,10 @@ else
 	options=""
 fi
 
+options="--enable-64bit"
 ./configure $options
 make
 cp .libs/libantlr3c.a ../libs
 
-cp include/*.h ../includes/
+cp -f include/*.h ../includes/
 

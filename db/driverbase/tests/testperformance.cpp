@@ -93,6 +93,14 @@ class TestPerfomance {
 
 				conn->insert("db", "test.performance", obj);
 				free(text);
+				if ((x % 1000) == 0) {
+					DTime timeTemp = log->recordedTime();
+					if (timeTemp.totalSecs() > 0) {
+						printf("Inserted :%d, throughtput: %d´n", x, (x / timeTemp.totalSecs()));
+					} else {
+						printf("Inserted :%d, throughtput too high to be measured´n", x);
+					}
+				}
 			}
 
 			log->stopTimeRecord();

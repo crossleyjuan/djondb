@@ -118,6 +118,7 @@ Logger* getLogger(void* clazz) {
 
 Logger::Logger(void* clazz) {
 	m_clazz = clazz;
+	_timerRunning = false;
 	if (_configSettings == NULL) {
 		// this will be readed from a configuration file
 		// but right now it'll be hardcoded by config.h
@@ -232,6 +233,7 @@ bool Logger::isWarn() {
 
 void Logger::startTimeRecord() {
 	int interval = 0;
+	_timerRunning = true;
 #ifdef LINUX
 	interval = CLOCK_REALTIME;// CLOCK_PROCESS_CPUTIME_ID;
 #endif
@@ -239,17 +241,28 @@ void Logger::startTimeRecord() {
 	clock_gettime(interval, &_ts1);
 }
 
-void Logger::stopTimeRecord() {
+void getCurrentTime(struct timespec* ts) {
 #ifdef LINUX
 	int interval = CLOCK_REALTIME;// CLOCK_PROCESS_CPUTIME_ID;
 #else
 	int interval = 0;// CLOCK_PROCESS_CPUTIME_ID;
 #endif
-	clock_gettime(interval, &_ts2);
+	clock_gettime(interval, ts);
+}
+
+void Logger::stopTimeRecord() {
+	_timerRunning = false;
+	getCurrentTime(&_ts2);
 }
 
 DTime Logger::recordedTime() {
-	timespec etime = diff(_ts1, _ts2);
+	struct timespec ts;
+	if (_timerRunning) {
+		getCurrentTime(&ts);
+	} else {
+		ts = _ts2;
+	}
+	timespec etime = diff(_ts1, ts);
 	double secs = etime.tv_sec + ((double)etime.tv_nsec / 1000000000.0);
 
 	DTime result(secs);

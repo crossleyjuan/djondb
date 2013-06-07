@@ -142,7 +142,7 @@ IF (WIN32)
 ENDIF (WIN32)
 add_subdirectory(shell) 
 
-add_subdirectory(driverbase/drivers/java/native)
+#add_subdirectory(driverbase/drivers/java/native)
 IF (NOT WIN32)
 IF (${CMAKE_BUILD_TYPE} MATCHES "Debug")
 	add_subdirectory(util/tests) 
