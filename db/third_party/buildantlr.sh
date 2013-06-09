@@ -18,5 +18,6 @@ options="--enable-64bit"
 make
 cp .libs/libantlr3c.a ../libs
 
+cp -f antlr3config.h ../includes/
 cp -f include/*.h ../includes/
 
