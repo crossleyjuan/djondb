@@ -79,7 +79,7 @@ class TestPerfomance {
 			std::vector<std::string>* names = generateNames(top);
 
 			log->startTimeRecord();
-			cout << "Testing performance over: " << top << " inserts" << endl;
+			log->info("Testing performance over: %s inserts.", top);
 			for (int x = 0; x < top; x++) {
 				BSONObj obj;
 				char* text = (char*)malloc(1001);
@@ -93,33 +93,30 @@ class TestPerfomance {
 
 				conn->insert("db", "test.performance", obj);
 				free(text);
-				if ((x % 1000) == 0) {
+				// every 10 % will print a message showing the progress
+				if ((x % (top / 10)) == 0) {
 					DTime timeTemp = log->recordedTime();
+					int progress = (x * 100) / top;
 					if (timeTemp.totalSecs() > 0) {
-						printf("Inserted :%d, throughtput: %d´n", x, (x / timeTemp.totalSecs()));
+						log->info("Inserted %d: throughtput: %d per sec. %d comnpleted", x, (x / timeTemp.totalSecs()), progress);
 					} else {
-						printf("Inserted :%d, throughtput too high to be measured´n", x);
+						log->info("Inserted :%d, throughtput too high to be measured. %d completed.", x, progress);
 					}
 				}
 			}
 
 			log->stopTimeRecord();
 
-			cout << "doing count" << endl;
-			BSONArrayObj* temp = conn->find("db", "test.performance", "count", "");
-
-			cout << "Inserted: " << top << ", returned: " << temp->get(0)->getInt("count") << endl;
-
 			DTime time = log->recordedTime();
 
 			cout << "Total secs: " << time.totalSecs() << endl;
 			if (time.totalSecs() > 0) {
-				cout << "Performance over: " << top << " inserts:" << (top / time.totalSecs()) << endl;
+				log->info("Inserted %d: throughtput: %d.", top, (top / time.totalSecs()));
 			} else {
-				cout << "Total time is not enough to do some calculations" << endl;
+				log->info("Inserted :%d, throughtput too high to be measured´n", top);
 			}
 			if ((time.totalSecs() > 0) && ((top / time.totalSecs()) < 16000))  {
-				cout << "Performance is not good enough" << endl;
+				log->info("Performance is not good enough");
 			}
 
 			//			conn->shutdown();
