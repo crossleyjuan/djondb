@@ -1,9 +1,0 @@
-{
-	LSUIElement = 1;
-	CFBundleExecutable = djondbd;
-	CFBundleName = djondb;
-	CFBundlePackageType = APPL;
-	CFBundleIdentifier = "com.djon";
-	"CFBundleGetInfoString" = "Created by @CrossDevelop";
-	CFBundleIconFile = "djondbIcon.png";
-}
