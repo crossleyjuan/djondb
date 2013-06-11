@@ -2,7 +2,7 @@
 
 tar xvfz libantlr3c-3.4.tar.gz
 cd libantlr3c-3.4
-MACHINE=`uname -m`
+MACHINE=`uname -i`
 X64="x86_64"
 
 echo ${MACHINE}
@@ -13,7 +13,14 @@ else
 	options=""
 fi
 
-options="--enable-64bit"
+OS=`uname -s`
+if [ "${OS}" = "Linux" ];
+then
+	options="${options} --with-pic"
+fi
+
+echo "Options: ${options}"
+
 ./configure $options
 make
 cp .libs/libantlr3c.a ../libs
