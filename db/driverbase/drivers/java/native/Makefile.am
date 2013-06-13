@@ -13,7 +13,7 @@ libdjon_javadriver_la_LDFLAGS = -shared -fPIC
 libdjon_javadriver_la_SOURCES = javadriver_wrap.cpp
 
 #libdjon_javadriver_la_LIBADD = -ldjon-client -ldjon-command -ldjon-db -ldjon-filesystem -ldjon-cache -ldjon-bson -ldjon-util -lX11 -lXss -lrt /usr/lib/x86_64-linux-gnu/libuuid.a  -lantlr3c  -lcpptest -lstdc++
-libdjon_javadriver_la_LIBADD = -ldjon-client -lX11 -lXss -lrt -luuid  -lantlr3c  -lcpptest -lstdc++
+libdjon_javadriver_la_LIBADD = -ldjon-client -lX11 -lXss -lrt -luuid  -lcpptest -lstdc++
 
 library_includedir=$(includedir)/djon-javadriver-1.0/djon-javadriver
 # library_include_HEADERS = Connection.h

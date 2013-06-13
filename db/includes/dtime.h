@@ -20,7 +20,7 @@ public:
     int minutes() const;
     int seconds() const;
 
-    const char* toChar() const;
+    char* toChar() const;
 
     void add(long secs);
     void add(const DTime time);
