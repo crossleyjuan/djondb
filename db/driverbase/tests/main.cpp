@@ -55,6 +55,7 @@ FAIL() << "Cannot establish a connection with the server";
 */
 
 TEST(TestDriver, testDbsNamespaces) {
+	getLogger(NULL)->info("testDbsNamespaces");
 	DjondbConnection* conn = DjondbConnectionManager::getConnection(_host);
 
 	if (!conn->open()) {
@@ -67,14 +68,17 @@ TEST(TestDriver, testDbsNamespaces) {
 	conn->insert("db2", "ns1", bson);
 	conn->insert("db3", "ns1", bson);
 
+	getLogger(NULL)->info("testDbsNamespaces: retrieving dbs");
 	std::vector<std::string>* dbs = conn->dbs();
 
 	EXPECT_TRUE(dbs->size() >= 3);
 
 	delete dbs;
+	getLogger(NULL)->info("~testDbsNamespaces");
 }
 
 TEST(TestDriver, testDropNamespace) {
+	getLogger(NULL)->info("testDropNamespace");
 	DjondbConnection* conn = DjondbConnectionManager::getConnection(_host);
 
 	if (!conn->open()) {
@@ -92,9 +96,11 @@ TEST(TestDriver, testDropNamespace) {
 
 	EXPECT_TRUE(testresult->length() == 0);
 	delete testresult;
+	getLogger(NULL)->info("~testDropNamespace");
 }
 
 TEST(TestDriver, testInsertComplex) {
+	getLogger(NULL)->info("testInsertComplex");
 	DjondbConnection* conn = DjondbConnectionManager::getConnection(_host);
 
 	if (!conn->open()) {
@@ -153,6 +159,7 @@ TEST(TestDriver, testInsertComplex) {
 		EXPECT_TRUE(d == 150000);
 	}
 	delete res2;
+	getLogger(NULL)->info("testInsertComplex");
 }
 
 TEST(TestDriver, testInsert) {

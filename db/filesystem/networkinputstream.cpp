@@ -69,12 +69,12 @@ NetworkInputStream::~NetworkInputStream() {
 }
 
 unsigned char NetworkInputStream::readChar() {
-	if (_logger->isDebug()) _logger->debug(3, "NetworkInputStream::readChar");
+	//if (_logger->isDebug()) _logger->debug(3, "NetworkInputStream::readChar");
 	unsigned char v;
 	readBufferData(&v, 1);
 
-	if (_logger->isDebug()) _logger->debug(3, "char: %d", v);
-	if (_logger->isDebug()) _logger->debug(3, "~NetworkInputStream::readChar");
+	//if (_logger->isDebug()) _logger->debug(3, "char: %d", v);
+	//if (_logger->isDebug()) _logger->debug(3, "~NetworkInputStream::readChar");
 	return v;
 }
 

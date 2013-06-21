@@ -6,4 +6,4 @@ include_directories("${PROJECT_SOURCE_DIR}/db")
 include_directories("${PROJECT_SOURCE_DIR}/tx")
 include_directories("${PROJECT_SOURCE_DIR}/command")
 
-add_library(djon-network networkservice.cpp)
+add_library(djon-network networkservice.cpp networkserver.cpp)

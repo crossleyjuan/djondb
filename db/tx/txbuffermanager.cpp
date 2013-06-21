@@ -418,12 +418,11 @@ void TxBufferManager::stopMonitor() {
 void* TxBufferManager::monitorBuffers(void* arg) {
 	TxBufferManager* manager = (TxBufferManager*)arg;
 	Logger* log = getLogger(NULL);
+	if (log->isDebug()) log->debug(3, "monitorBuffers started");
 
 	while (manager->runningMonitor()) {
-		if (log->isDebug()) log->debug(3, "checking buffers to be flushed");
 		// Waiting for notifications on new buffers
 		manager->flushBuffer();
-		if (log->isDebug()) log->debug(3, "~checking buffers to be flushed");
 	}
 	if (log->isDebug()) log->debug(3, "~TxBufferManager::monitorBuffers(void* arg)");
 
@@ -436,12 +435,12 @@ void TxBufferManager::flushBuffer() {
 	_lockWait->wait(1);
 	_flushingBuffers = true;
 	if (buffersCount() > 1) {
-		if (_log->isDebug()) _log->debug(2, "TxBufferManager::flushBuffer()");
+		//if (_log->isDebug()) _log->debug(2, "TxBufferManager::flushBuffer()");
 		TxBuffer* buffer = pop();
 
-		if (_log->isDebug()) _log->debug(2, "Buffer popped up. filename: %s, mainLog: %s", buffer->fileName().c_str(), buffer->mainLog()?"true": "false");
+		//if (_log->isDebug()) _log->debug(2, "Buffer popped up. filename: %s, mainLog: %s", buffer->fileName().c_str(), buffer->mainLog()?"true": "false");
 
-		if (_log->isDebug()) _log->debug(3, "buffer->acquireLock();");
+		//if (_log->isDebug()) _log->debug(3, "buffer->acquireLock();");
 		buffer->acquireLock();
 		TransactionOperation* operation = NULL;
 		buffer->seek(0);
@@ -492,7 +491,7 @@ void TxBufferManager::flushBuffer() {
 			free(ns);
 			delete operation;
 		}
-		if (_log->isDebug()) _log->debug(3, "buffer->releaseLock();");
+		//if (_log->isDebug()) _log->debug(3, "buffer->releaseLock();");
 		buffer->releaseLock();
 		if (buffer->mainLog()) {
 			addReusable(buffer);

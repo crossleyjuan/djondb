@@ -47,14 +47,10 @@ Lock::~Lock() {
 }
 
 void Lock::lock() {
-	Logger* log = getLogger(NULL);
-	if (log->isDebug()) log->debug(3, "Lock::lock() %d", (long)this);
 	pthread_mutex_lock(&_mutexLock);
 }
 
 void Lock::unlock() {
-	Logger* log = getLogger(NULL);
-	if (log->isDebug()) log->debug(3, "Lock::unlock() %d", (long)this);
 	pthread_mutex_unlock(&_mutexLock);
 }
 

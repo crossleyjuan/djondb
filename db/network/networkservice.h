@@ -14,6 +14,10 @@
 
 #include "util.h"
 
+class NetworkServer;
+class NetworkInputStream;
+class NetworkOutputStream;
+
 class NetworkService {
 public:
     NetworkService();
@@ -25,9 +29,12 @@ public:
 
 	 bool running() const;
 	 void setRunning(bool);
+	 static int callbackListen(void* service, NetworkInputStream* const nis, NetworkOutputStream* const nos);
+	 int executeRequest(NetworkInputStream* nis, NetworkOutputStream* nos);
 private:
 	 bool _running;
 	 Logger* _log;
+	 NetworkServer* _ntserver;
 };
 
 
