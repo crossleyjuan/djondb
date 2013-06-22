@@ -53,6 +53,22 @@ TEST(testUtil, testDates)
 	EXPECT_TRUE(diff == 19);
 }
 
+TEST(testUtil, testLogger) {
+	// Test timer
+	//
+	Logger* log = getLogger(NULL);
+	log->startTimeRecord();
+	Thread::sleep(3000);
+	log->stopTimeRecord();
+
+	DTime time = log->recordedTime();
+
+	long secs = time.totalSecs();
+
+	EXPECT_TRUE(secs > 2);
+	EXPECT_TRUE(secs < 4);
+}
+
 TEST(testUtil, testCircularQueue) {
 	CircularQueue<int> c(3);
 	c.push_back(1);

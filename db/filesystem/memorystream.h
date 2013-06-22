@@ -34,7 +34,7 @@ class MemoryStream: public InputStream, public OutputStream
 		/* Read a chars */
 		virtual char* readChars();
 		virtual char* readChars(__int32 length);
-		virtual const char* readFull();
+		virtual char* readFull();
 		virtual const size_t readRaw(char* ptr, size_t count);
 
 		virtual std::string* readString();
@@ -64,6 +64,10 @@ class MemoryStream: public InputStream, public OutputStream
 		virtual void close();
 
 		virtual void flush();
+		// this will reset the memory stream in length, pos, etc
+		// leaving it ready to receive new data, but will preserve the
+		// space reserved in memory 
+		virtual void reset();
 
 		virtual bool isClosed();
 

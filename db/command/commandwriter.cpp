@@ -59,6 +59,8 @@ int CommandWriter::writeCommand(Command* cmd) {
 	}
 	cmd->writeCommand(_stream);
 
+	_stream->flush();
+
 	return 0;
 }
 

@@ -83,7 +83,7 @@ Logger* __logger = NULL;
 	const char* cmessage = message.c_str(); \
 	int log_Print_bufferSize = 10000; \
 	char* log_Print_buffer = (char*)malloc(log_Print_bufferSize + 1); \
-   log_Print_buffer[log_Print_bufferSize] = '\0'; \
+	memset(log_Print_buffer, 0, log_Print_bufferSize + 1); \
 va_list args; \
 va_start (args, message); \
 vsprintf (log_Print_buffer, cmessage, args); \

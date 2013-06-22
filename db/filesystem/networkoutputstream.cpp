@@ -47,61 +47,57 @@
 	#define SHUT_RDWR 2 // SD_BOTH
 #endif
 
+int MAX_ALLOWED = 1024;
+
 using namespace std;
 
 NetworkOutputStream::NetworkOutputStream()
 {
 	_logger = getLogger(NULL);
+	_bufferStream = new MemoryStream(2048);
 }
 
 NetworkOutputStream::~NetworkOutputStream()
 {
+	delete _bufferStream;
 }
 
 NetworkOutputStream::NetworkOutputStream(int socket)
 {
 	_logger = getLogger(NULL);
 	_socket = socket;
+	_bufferStream = new MemoryStream(2048);
 }
 
-NetworkOutputStream::NetworkOutputStream(const NetworkOutputStream& origin) {
-	this->_socket = origin._socket;
+NetworkOutputStream::NetworkOutputStream(const NetworkOutputStream& orig) {
+	this->_socket = orig._socket;
 	_logger = getLogger(NULL);
+	_bufferStream = orig._bufferStream;
 }
 
 
 /* Write 1 byte in the output */
 void NetworkOutputStream::writeChar (unsigned char v)
 {
-	if (send(_socket, (const char*)&v, 1, __sendFlags_networkoutput) < 0) {
-		throw DjondbException(errno, strerror(errno));
-	}
-
-	//    write(_socket, &v, 1);
+	_bufferStream->writeChar(v);
 }
 
 /* Write 1 bytes in the output (little endian order) */
 void NetworkOutputStream::writeBoolean (bool v)
 {
-	if (_logger->isDebug()) _logger->debug(3, "NetworkOutputStream::writeBoolean, boolean: %s", v?"true": "false");
 	writeData<char>((char)v);
-	if (_logger->isDebug()) _logger->debug(3, "~NetworkOutputStream::writeBoolean");
 }
 
 /* Write 2 bytes in the output (little endian order) */
 void NetworkOutputStream::writeShortInt (__int16 v)
 {
-	if (_logger->isDebug()) _logger->debug(3, "NetworkOutputStream::writeShortInt, short: %d", v);
 	writeData<__int16>(v);
-	if (_logger->isDebug()) _logger->debug(3, "~NetworkOutputStream::writeShortInt");
 }
 
 /* Write 4 bytes in the output (little endian order) */
 void NetworkOutputStream::writeInt (__int32 v)
 {
-	if (_logger->isDebug()) _logger->debug(3, "NetworkOutputStream::writeInt, int: %d", v);
 	writeData<__int32>(v);
-	if (_logger->isDebug()) _logger->debug(3, "~NetworkOutputStream::writeInt");
 }
 
 /* Write 8 bytes in the output (little endian order) */
@@ -113,69 +109,21 @@ void NetworkOutputStream::writeLong (__int64 v)
 /* Write a 4 byte float in the output */
 void NetworkOutputStream::writeFloatIEEE (float v)
 {
-	if (send(_socket, (const char*)&v, sizeof(v), __sendFlags_networkoutput) < 0) {
-		throw DjondbException(errno, strerror(errno));
-	}
-	//    write(_socket, &v, sizeof(v));
+	_bufferStream->writeFloatIEEE(v);
 }
 
 /* Write a 8 byte double in the output */
 void NetworkOutputStream::writeDoubleIEEE (double v)
 {
-	if (send(_socket, (const char*)&v, sizeof(v), __sendFlags_networkoutput) < 0) {
-		throw DjondbException(errno, strerror(errno));
-	}
-	//    write(_socket, &v, sizeof(v));
-
+	_bufferStream->writeDoubleIEEE(v);
 }
 
 void NetworkOutputStream::writeChars(const char *text, __int32 len) {
-	assert(text != NULL);
-
-	if (_logger->isDebug()) _logger->debug(3, "NetworkOutputStream::writeChars, chars: %s, len: %d", text, len);
-	writeInt(len);
-	if (len > 0) {
-		char buffer[1024];
-		int pos = 0;
-		while (pos < len) {
-			memset(buffer, 0, 1024);
-			int size;
-			if ((len-pos) > 1024) {
-				size = 1024;
-				memcpy(buffer, &(text[pos]), size);
-			} else {
-				size = len-pos;
-				memcpy(buffer, &(text[pos]), size);
-			}
-			pos += size;
-			int sent = 0;
-			int retries = 0;
-			while (sent < size) {
-				int lastSent;
-				if ((lastSent = send(_socket, &buffer[sent], size - sent, __sendFlags_networkoutput)) < 0) {
-					throw DjondbException(errno, strerror(errno));
-				};
-				sent += lastSent;
-				retries++;
-				if (sent < 0) {
-					_logger->error("NetworkOutputStream error sending stream. Error: %d, Description: %s", errno, strerror(errno));
-				}
-				if ((sent <= 0) && (retries > 1000)) {
-					assert(sent > 0);
-				}
-			}
-		}
-	}
-	if (_logger->isDebug()) _logger->debug(3, "~NetworkOutputStream::writeChars");
-	//    write(_socket, text, len);
+	_bufferStream->writeChars(text, len);
 }
 
 void NetworkOutputStream::writeString(const std::string& text) {
-	if (_logger->isDebug()) _logger->debug(3, "NetworkOutputStream::writeString, text: %s", text.c_str());
-	const char* c = text.c_str();
-	int l = strlen(c);
-	writeChars(c, l);
-	if (_logger->isDebug()) _logger->debug(3, "~NetworkOutputStream::writeString");
+	_bufferStream->writeString(text);
 }
 
 int NetworkOutputStream::open(const char* hostname, int port)
@@ -257,4 +205,21 @@ int NetworkOutputStream::disableNagle() {
 
 	int ret = setsockopt( _socket, IPPROTO_TCP, TCP_NODELAY, (char *)&flag, sizeof(flag) );
 	return ret;
+}
+
+void NetworkOutputStream::checkBuffer() {
+	if (_bufferStream->size() > MAX_ALLOWED) {
+		flush();
+	}
+}
+
+void NetworkOutputStream::flush() {
+	int size = _bufferStream->size();
+	if (size > 0) {
+		char* data = _bufferStream->toChars();
+		if (send(_socket, data, size, __sendFlags_networkoutput) < 0) {
+			throw DjondbException(errno, strerror(errno));
+		}
+	}
+	_bufferStream->reset();
 }

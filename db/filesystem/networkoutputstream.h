@@ -2,6 +2,7 @@
 #define NETWORKOUTPUTSTREAM_H
 #include "outputstream.h"
 #include "util.h"
+#include "memorystream.h"
 
 class NetworkOutputStream: public OutputStream
 {
@@ -9,7 +10,7 @@ class NetworkOutputStream: public OutputStream
 		/** Default constructor */
 		NetworkOutputStream();
 		NetworkOutputStream(int socket);
-		NetworkOutputStream(const NetworkOutputStream& origin);
+		NetworkOutputStream(const NetworkOutputStream& orig);
 
 		int open(const char* hostname, int port);
 		/** Default destructor */
@@ -38,11 +39,17 @@ class NetworkOutputStream: public OutputStream
 
 		bool isOpen();
 
+		void flush();
+
+	private:
+		void checkBuffer();
+
 	protected:
 	private:
 		int _socket;
 		Logger* _logger;
 		bool _isOpen;
+		MemoryStream* _bufferStream;
 };
 
 #endif // NETWORKOUTPUTSTREAM_H

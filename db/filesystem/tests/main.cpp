@@ -173,6 +173,20 @@ TEST(testFilesystem, testMMapIOOffset)
 	streamo.close();
 }
 
+char* getRandomChars(int maxLength) {
+	// the minimum length will be 1
+	int len = 1 + (rand() % (maxLength));
+
+	char* result = (char*)malloc(len + 1);
+	memset(result, 0, len + 1);
+	for (int x = 0; x < len; x++) {
+		int c = 96 + (rand() % 27); // Any letter
+		result[x] = c;
+	}
+
+	return result;
+}
+
 TEST(testFilesystem, testMemoryStream) {
 	cout << "\ntestMemoryStream\n" << endl;
 	MemoryStream ms(10);
@@ -214,6 +228,43 @@ TEST(testFilesystem, testMemoryStream) {
 
 	free(c);
 	free(res);
+
+
+	// testing a very large set
+	char* longData = getRandomChars(100000);
+	MemoryStream* testLong = new MemoryStream();
+	testLong->writeRaw(longData, strlen(longData));
+
+	char* result = testLong->toChars();
+	EXPECT_EQ(strlen(longData), strlen(result));
+	EXPECT_TRUE(strcmp(longData, result) == 0);
+	free(result);
+	free(longData);
+	delete testLong;
+
+	// testing buffer reuse
+	//
+	MemoryStream* reusable = new MemoryStream();
+	for (int y = 0; y < 100; y++) {
+		reusable->reset();
+		std::stringstream ss;
+		for (int x = 0; x < 100; x++) {
+			char* data = getRandomChars(1000);
+			reusable->writeChars(data, strlen(data));
+			ss << data;
+			free(data);
+		}	
+
+		std::stringstream dataCollected;
+		reusable->seek(0);
+		while (!reusable->eof()) {
+			dataCollected << reusable->readChars();
+		}
+		std::string sdata = dataCollected.str();
+		std::string expected = ss.str();
+		EXPECT_TRUE(sdata.compare(expected) == 0);
+	}
+	delete reusable;
 }
 
 TEST(testFilesystem, testFileInputOutputStreams)

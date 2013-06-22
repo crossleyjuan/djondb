@@ -62,7 +62,7 @@ bool __running;
 const char* _host = "localhost";
 int _port = 1243;
 
-int MAX_INSERT = 1000;
+int MAX_INSERT = 100000;
 
 int __insertCount = 0;
 
@@ -105,6 +105,8 @@ void* producer(void* arg) {
 			writer->writeCommand(cmd.get());
 
 			int result = nis->readInt();
+
+			EXPECT_EQ(result, 1);
 			if (result != 1) {
 				break;
 			}
@@ -117,23 +119,22 @@ void* producer(void* arg) {
 	log->stopTimeRecord();
 
 	DTime time = log->recordedTime();
-	log->info("Producer time: %d", time.toChar());
+	if (time.totalSecs() > 0) {
+		log->info("Producer time: %d secs. Operations per sec: %d", time.totalSecs(), MAX_INSERT / time.totalSecs());
+	} else {
+		EXPECT_TRUE(false) << "Something was wrong network could not execute " << MAX_INSERT << " in 0 secs.";
+	}
 }
 
-int callBack(void* objCallback, NetworkInputStream* nis, NetworkOutputStream* nos) {
-   printf("callback\n");
+int callBackPerformance(void* objCallback, NetworkInputStream* nis, NetworkOutputStream* nos) {
 	CommandReader* reader = new CommandReader(const_cast<NetworkInputStream*>(nis));
 
-	getLogger(NULL)->info("Consumer starter");
-	while (__insertCount < MAX_INSERT) {
-		Command* cmd = reader->readCommand();
+	Command* cmd = reader->readCommand();
 
-		nos->writeInt(1); // ok
-		__insertCount++;
-		delete cmd;
-	}
-	nis->close();
-	getLogger(NULL)->info("Consumer end");
+	nos->writeInt(1); // ok
+	nos->flush();
+	__insertCount++;
+	delete cmd;
 }
 
 
@@ -150,12 +151,18 @@ int callbackServer(void* instance, NetworkInputStream* const nis, NetworkOutputS
 	if (strcmp(stat, "say") == 0) {
 		log->info("server: Received say, waiting data");
 		char* data = nis->readChars();
-		char* response = (char*)malloc(200);
-		memset(response, 0, 200);
+		int len = rand() % 1000;
+		char* response = (char*)malloc(7 + len + strlen(data));
+		memset(response, 0, 8 + len);
 		memcpy(response, "Hello ", 6);
 		memcpy(response + 6, data, strlen(data));
+		int offset = strlen(response);
+		for (int x = 0; x < len; x++) {
+			response[x + offset] = (rand() % 30 ) + 96;
+		}
 		log->info("server: Sending greeting");
 		nos->writeChars(response, strlen(response));
+		nos->flush();
 		free(data);
 		free(response);
 	}
@@ -188,6 +195,7 @@ int callbackCommandServer(void* instance, NetworkInputStream* const nis, Network
 			nos->writeString(std::string("db1"));
 			nos->writeString(std::string("db2"));
 			nos->writeString(std::string("db3"));
+			nos->flush();
 			break;
 		case SHUTDOWN:
 			log->info("server: received shutdown");
@@ -213,9 +221,12 @@ void* clients(void* arg) {
 		log->info("client: Sending say");
 		nos->writeChars("say", 3);
 		nos->writeChars("Name", 4);
+		nos->flush();
+
 		log->info("client: Waiting greeting");
 		char* greeting = nis->readChars();
-		EXPECT_TRUE(strcmp(greeting, "Hello Name") == 0);
+		EXPECT_TRUE(strncmp(greeting, "Hello Name", strlen("Hello Name")) == 0);
+		EXPECT_TRUE(strlen(greeting) > 20);
 		free(greeting);
 		log->info("client: Received greeting");
 		Thread::sleep(100);
@@ -223,11 +234,13 @@ void* clients(void* arg) {
 		log->info("client: Sending execute");
 		nos->writeChars("execute", 7);
 		nos->writeChars("command", 7);
+		nos->flush();
 		Thread::sleep(100);
 
 		log->info("client: Sending say 2");
 		nos->writeChars("say", 3);
 		nos->writeChars("Name", 4);
+		nos->flush();
 		log->info("client: Waiting greeting 2");
 		greeting = nis->readChars();
 		EXPECT_TRUE(strcmp(greeting, "Hello Name") == 0);
@@ -355,9 +368,7 @@ TEST(TestNetwork, testPerformance) {
 	log->startTimeRecord();
 
 	NetworkServer* server = new NetworkServer(_port);
-	server->listen(NULL, callBack);
-
-	Thread::sleep(10000);
+	server->listen(NULL, &callBackPerformance);
 
 	cout << "Starting producer thread" << endl;
 	Thread* threadProducer = new Thread(producer);

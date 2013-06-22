@@ -23,6 +23,10 @@ public:
 	 virtual void writeChars(const char* text, __int32 len) = 0;
 	 virtual void writeString(const std::string& text) = 0;
 
+	// Does nothing at the base, but can be overriden to provide flush capabilities
+	 virtual void flush() {
+	 };
+
 	 template<typename T>
 		 void writeData(T data) {
 			 unsigned char* v = (unsigned char*)&data;

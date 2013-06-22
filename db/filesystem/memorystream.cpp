@@ -25,7 +25,7 @@
 #include <errno.h>
 #include <sstream>
 #include <limits.h>
-
+#include <cmath>
 
 const int MEMORY_BUFFER_SIZE = 1024;
 
@@ -78,19 +78,25 @@ MemoryStream::~MemoryStream() {
 
 void MemoryStream::allocate(size_t size) {
 	if (_buffer == NULL) {
-		_buffer = (char**)malloc(sizeof(char*) * 10);
+		_buffer = (char**)malloc(sizeof(char*) * 100);
+		for (int x = 0; x < 100; x++) {
+			_buffer[x] = NULL;
+		}
 	}
-	_currentBuffer = (char*)malloc(_bufferSize + 1);
-	memset(_currentBuffer, 0, _bufferSize + 1);
-
 	_currentIndex++;
-	if (_currentIndex > 9) {
+	if (_currentIndex >= 100) {
 		// Throw an exception
 		assert(false);
 	}
-	_buffer[_currentIndex] = _currentBuffer;
+	_currentBuffer = _buffer[_currentIndex];
+	if (_buffer[_currentIndex] == NULL) {
+		_currentBuffer = (char*)malloc(_bufferSize + 1);
+		memset(_currentBuffer, 0, _bufferSize + 1);
+		_buffer[_currentIndex] = _currentBuffer;
+		_maxIndexes = _currentIndex + 1;
+	}
+
 	_currentBufferPos = 0;
-	_maxIndexes = _currentIndex + 1;
 }
 
 void MemoryStream::nextBuffer() {
@@ -207,7 +213,7 @@ void MemoryStream::seek(__int64 i, SEEK_DIRECTION direction) {
 		_currentBuffer = _buffer[_currentIndex];
 		_currentBufferPos = i % _bufferSize;
 	} else {
-		_currentIndex = _maxIndexes * _bufferSize;
+		_currentIndex = ceil((double)_length / (double)_bufferSize);
 		_currentBuffer = _buffer[_currentIndex];
 		_currentBufferPos = _length - (_length % _bufferSize);
 	}
@@ -294,22 +300,12 @@ char* MemoryStream::readChars(__int32 length) {
 	return res;
 }
 
-const char* MemoryStream::readFull() {
-	seek(0);
-	std::stringstream ss;
-	char buffer[1024];
-	__int32 readed = 0;
-	while (!eof()) {
-		memset(buffer, 0, 1024);
-		readed = read(buffer, 1023);
-		ss << buffer;
-	}
-	std::string str = ss.str();
-	return strdup(str.c_str());
+char* MemoryStream::readFull() {
+	return toChars();
 }
 
 bool MemoryStream::eof() {
-	if (_length < ((_currentIndex * _bufferSize) + _currentBufferPos)) {
+	if (_length > ((_currentIndex * _bufferSize) + _currentBufferPos)) {
 		return false;
 	} else {
 		return true;
@@ -325,16 +321,22 @@ char* MemoryStream::toChars() {
 	memset(result, 0, _length + 1);
 
 	__int64 offset = 0;
-	for (__int32 x = 0; x < _maxIndexes - 1; x++) {
+	int maxCurrentIndexes = ceil((double)_length / (double)_bufferSize);
+	for (__int32 x = 0; x < maxCurrentIndexes - 1; x++) {
 		char* b = _buffer[x];
 		memcpy(result + offset, b, _bufferSize); 
 		offset += _bufferSize;
 	}
-	memcpy(result + offset, _buffer[_maxIndexes - 1], _length - (_bufferSize * (_maxIndexes - 1)));
+	memcpy(result + offset, _buffer[maxCurrentIndexes - 1], _length - (_bufferSize * (maxCurrentIndexes - 1)));
 
 	return result;
 }
 
 __int64 MemoryStream::size() const {
 	return _length;
+}
+
+void MemoryStream::reset() {
+	_length = 0;
+	seek(0);
 }

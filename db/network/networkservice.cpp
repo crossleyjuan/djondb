@@ -155,6 +155,7 @@ int NetworkService::executeRequest(NetworkInputStream* nis, NetworkOutputStream*
 		if (cmd->commandType() != CLOSECONNECTION) {
 			cmd->execute();
 			cmd->writeResult(nos);
+			nos->flush();
 		} else {
 			if (log->isDebug()) log->debug("Close command received");
 		}
