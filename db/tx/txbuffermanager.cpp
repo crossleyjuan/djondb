@@ -362,15 +362,6 @@ TxBuffer* TxBufferManager::pop() {
 	}
 	_lockActiveBuffers->unlock();
 
-	__int64 controlPos = buffer->controlPosition();
-	if (_log->isDebug()) _log->debug(3, "_controlFile->acquireLock();");
-	_controlFile->acquireLock();
-	_controlFile->seek(controlPos);
-	_controlFile->writeChar((char)0x02); // reusable
-	_buffersCount--;
-	if (_log->isDebug()) _log->debug(3, "_controlFile->releaseLock();");
-	_controlFile->releaseLock();
-
 	if (_log->isDebug()) _log->debug(2, "~TxBuffer* TxBufferManager::pop()");
 	return buffer;
 }
@@ -494,7 +485,9 @@ void TxBufferManager::flushBuffer() {
 		//if (_log->isDebug()) _log->debug(3, "buffer->releaseLock();");
 		buffer->releaseLock();
 		if (buffer->mainLog()) {
+			buffer->reset();
 			addReusable(buffer);
+			registerBufferControlFile(buffer, false, 0x02);
 		} else {
 			dropBuffer(buffer);
 		}

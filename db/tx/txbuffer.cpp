@@ -228,7 +228,7 @@ const std::string TxBuffer::fileName() const {
 };
 
 bool TxBuffer::eof() {
-	return (_bufferLength - _currentPos) == 0; 
+	return (_bufferLength <= _currentPos); 
 };
 
 void TxBuffer::close() {
