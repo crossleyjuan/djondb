@@ -57,7 +57,7 @@ class TestTX: public testing::Test
 			_controller->initialize();
 		}
 
-		virtual void TearDown() {
+		virtual void SetDown() {
 			_controller->shutdown();
 			delete _controller;
 		}
@@ -80,13 +80,13 @@ TEST_F(TestTX, testSimpleOperations) {
 	obj->add("a", 2);
 	tx->update("test", "simple-tx", obj);
 	delete id;
-	delete obj;
 	delete arr;
 
 	arr = tx->find("test", "simple-tx", "*", "$'a' == 1");
 	EXPECT_TRUE(arr->length() == 0);
 
 	log->info("~testSimpleOperations");
+	delete arr;
 }
 
 TEST_F(TestTX, testTransactionSimplest)

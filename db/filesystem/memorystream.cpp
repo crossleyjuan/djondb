@@ -232,7 +232,17 @@ void MemoryStream::flush() {
 
 unsigned char MemoryStream::readChar() {
 	unsigned char v = 0;
-	read((char*)&v,  1);
+	int count = 1;
+	if (_length < _currentBufferPos) {
+		count = 0;
+	}
+	if ((_currentBufferPos + count) < _bufferSize) {
+		v = *(_currentBuffer + _currentBufferPos);
+		_currentBufferPos += 1;
+	} else {
+		nextBuffer();
+		v = readChar();
+	}
 	return v;
 }
 

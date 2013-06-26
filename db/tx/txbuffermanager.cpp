@@ -360,6 +360,7 @@ TxBuffer* TxBufferManager::pop() {
 		int* count = itBuffersByLog->second;
 		(*count)--;
 	}
+	_buffersCount--;
 	_lockActiveBuffers->unlock();
 
 	if (_log->isDebug()) _log->debug(2, "~TxBuffer* TxBufferManager::pop()");

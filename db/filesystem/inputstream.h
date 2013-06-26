@@ -56,9 +56,11 @@ public:
 			 T result = 0;
 			 unsigned char* v = (unsigned char*)&result;
 			 int size = sizeof(T);
+			 char* data = readChars(size);
 			 for (int i = 0; i < size; i++) {
-				 v[i] = readChar() & UCHAR_MAX;
+				 v[i] = data[i] & UCHAR_MAX;
 			 }
+			 free(data);
 			 T clear = 0;
 			 for (int i = 0; i < size; i++) {
 				 clear = clear << 8;

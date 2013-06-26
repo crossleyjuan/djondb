@@ -228,7 +228,7 @@ int main(int argc, char** arg) {
 							 break;
 						 }
 			case '?': {
-							 printf("Usage: -p PORT t TOP\n");
+							 printf("Usage: -p PORT t TOP c f\n");
 							 exit(0);
 							 break;
 						 }
