@@ -463,7 +463,10 @@ BSONObj* DBController::findFirst(const char* db, const char* ns, const char* sel
 	dbStream->close();
 	delete dbStream;
 
+	mmis->close();
+	delete mmis;
 	delete parser;
+	delete bis;
 	return bsonResult;
 }
 

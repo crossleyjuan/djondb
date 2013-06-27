@@ -92,6 +92,7 @@ ExpressionResult* SimpleExpression::eval(const BSONObj& bson) {
 				break;
 			}
 		default:
+			delete content;
 			throw BSONException("Unsupported type");
 
 	}

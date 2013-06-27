@@ -364,6 +364,7 @@ std::vector<std::string>* BaseTransaction::dbs(const BSONObj* options) const {
 	}
 
 	delete operations;
+	delete dbss;
 
 	std::vector<std::string>* result = new std::vector<std::string>();
 

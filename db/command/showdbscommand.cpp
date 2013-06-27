@@ -40,6 +40,9 @@ ShowdbsCommand::ShowdbsCommand(const ShowdbsCommand& orig)
 }
 
 ShowdbsCommand::~ShowdbsCommand() {
+	if (_results != NULL)  {
+		delete _results;
+	}
 }
 
 void ShowdbsCommand::execute() {

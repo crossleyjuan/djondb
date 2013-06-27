@@ -835,6 +835,7 @@ void BPlusIndexP::persistPage(IndexPage* page) {
 
 	page->setLoaded(true);
 
+	free(pageContent);
 	delete helperStream;
 }
 
