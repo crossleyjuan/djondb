@@ -3,7 +3,7 @@ djondb
 
 Welcome to djondb, this is a quick readme with very simple compilation instructions. 
 
-Required Packages
+Third party Packages
 =================
 
 djondb uses some external libraries that need to be installed prior compilation, these are:
@@ -11,19 +11,21 @@ djondb uses some external libraries that need to be installed prior compilation,
 * cmake g++ make
 * libv8-dev: Google's V8 javascript engine
 * libantlr3c-dev: Antlr
-* libxss-dev
-* libX11-dev
 * libuuid1
+* gtest
 
-In ubuntu that could be easily installed using apt-get as follows:
+djondb source comes with copy of the antlr, v8 and gtest libraries in the folder db/third_party if
+you are in linux or OSX you can use "make dependencies" to build the required libraries as follows:
 
-    sudo apt-get install libv8-dev libantlr3c-dev libxss-dev libx11-dev libuuid1
+   cd db
+   make dependencies
+
+This command will execute the scripts: third_party/buildantlr.sh third_parth/buildv8.sh and third_party/buildgtest.sh.
     
 Compilation
 ===========
 
-As any other standard linux application djondb can be compiled using configure/make/make install steps, to create
-the configuration file use the autoreconf command line. Here're the steps to do the compilation:
+As any other standard linux application djondb can be compiled using cmake/make/make install steps, as follows:
 
     cd db
     mkdir build
@@ -31,6 +33,9 @@ the configuration file use the autoreconf command line. Here're the steps to do 
     cmake ..
     make
     sudo make install
+
+To compile djondb with debugging symbols you could use: cmake .. -DCMAKE_BUILD_TYPE=Debug, if you already executed cmake command
+you will need to erase the contents of the folder prior executing the cmake.
 
 Release Compilation
 ===================
@@ -55,6 +60,5 @@ the files required for each driver.
 * php.sh -d <outputdir>
 * ruby.sh
 * python/python.sh
-
 
 
