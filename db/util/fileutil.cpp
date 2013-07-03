@@ -253,22 +253,41 @@ long pageSize() {
 #endif
 }
 
+//! This method combines two paths into one
+/*! it'll add the file separator char 
+  if not present in the first path, also it will check if one of the paths is NULL to avoid
+  wrong concatenation. The caller should call free on the result.
+  \param path A null terminated string, it could be NULL
+  \param path2 A null terminated string, it could be NULL
+*/
 char* combinePath(const char* path, const char* path2) {
-	char* result = NULL;
+	int len = 0;
+	int len1 = 0;
+	int len2 = 0;
 	if (path != NULL) {
-		if (path2 != NULL) {
-			if (!endsWith(path, FILESEPARATOR)) {
-				result = strcpy(format("%s%s%s", path, FILESEPARATOR, path2).c_str());
-			} else {
-				result = strcpy(format("%s%s", path, path2).c_str());
-			}
-		} else {
-			result = strcpy(path);
-		}
-	} else {
-		if (path2 != NULL) {
-			result = strcpy(path2);
-		}
+		len1 = strlen(path);
+	}
+	if (path2 != NULL) {
+		len2 = strlen(path2);
+	}
+	// Reserves 1 for null terminate and 1 for path separator
+	len = len1 + len2 + 1;
+
+	// Prepares the space for the resultant string
+	char* result = (char*)malloc(len + 1);
+	memset(result, 0, len + 1);
+	int pos = 0;
+	if (path != NULL) {
+		memcpy(result, path, len1);
+		pos += len1;
+	}
+	if (!endsWith(result, (char*)FILESEPARATOR)) {
+		memcpy(result + pos, FILESEPARATOR, strlen(FILESEPARATOR));
+		pos += strlen(FILESEPARATOR);	
+	}
+	if (path2 != NULL) {
+		memcpy(result + pos, path2, len2);
+		pos += len2;
 	}
 	return result;
 }

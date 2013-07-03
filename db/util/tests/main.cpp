@@ -358,7 +358,7 @@ TEST(testUtil, testDjonStrings) {
 
 std::vector<int> pcList;
 
-int MAX_NUMBER = 10000;
+int MAX_NUMBER = 100;
 
 static void* testMethodProduce(void* val) {
 	cout << "\nProduce method started" << endl;
@@ -366,21 +366,24 @@ static void* testMethodProduce(void* val) {
 
 	cout << "Produce: Sleeping for 3 segs" << endl;
 
-	for (int x= 0; x < MAX_NUMBER; x++) {
+	int x = 0;
+	while (x < MAX_NUMBER) {
+		lock->lock();
 		if (pcList.size() >= 10) {
-			lock->lock();
+			printf("Queue is full. Last produced: %d\n", x);
 			lock->wait(1);
-			lock->unlock();
 		} else {
+			printf("Last produced: %d\n", x);
+			x++;
 			pcList.push_back(x);
-			if (pcList.size() > 5) {
-				lock->lock();
-				lock->notify();
-				lock->unlock();
-			}
+			lock->notify();
 		}
+		lock->unlock();
 	}
-	cout << "Produce: notification sent" << endl;
+	cout << "Produce: notification sent. Waiting for confirmation" << endl;
+	lock->lock();
+	lock->notify();
+	lock->unlock();
 
 	return NULL;
 }
@@ -392,17 +395,17 @@ static void* testMethodConsume(void* val) {
 	cout << "Consume method waiting" << endl;
 	int x = 0; // last receieved number
 	while (x < MAX_NUMBER) {
+		lock->lock();
 		if (pcList.size() == 0) {
-			lock->lock();
-			printf("Waiting for more numbers\n");
+			printf("Queue is empty. Last number: %d.\n", x);
 			lock->wait(1);
-			lock->unlock();
 		} else {
 			x = *pcList.begin();
+			printf("Last number: %d.\n", x);
 			pcList.erase(pcList.begin());
-			printf("Last received: %d\n", x);
+			lock->notify();
 		}
-
+		lock->unlock();
 	}
 
 	cout << "Consume received notification" << endl;
