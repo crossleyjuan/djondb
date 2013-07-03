@@ -17,8 +17,8 @@ djondb uses some external libraries that need to be installed prior compilation,
 djondb source comes with copy of the antlr, v8 and gtest libraries in the folder db/third_party if
 you are in linux or OSX you can use "make dependencies" to build the required libraries as follows:
 
-   cd db
-   make dependencies
+    cd db
+    make dependencies
 
 This command will execute the scripts: third_party/buildantlr.sh third_parth/buildv8.sh and third_party/buildgtest.sh.
     
