@@ -16,8 +16,7 @@
  *
  * This file is part of the djondb project, for license information please refer to the LICENSE file,
  * the application and libraries are provided as-is and free of use under the terms explained in the file LICENSE
- * Its authors create this application in order to make the world a better place to live, but you should use it on
- * your own risks.
+ * Its authors create this application in order to make the world a better place to live, but you should use it on * your own risks.
  * 
  * Also, be adviced that, the GPL license force the committers to ensure this application will be free of use, thus
  * if you do any modification you will be required to provide it for free unless you use it for personal use (you may 
@@ -37,6 +36,7 @@ class InputOuputStream;
 class TransactionOperation;
 class Controller;
 class Thread;
+class MemoryStream;
 
 class TxBufferManager
 {
@@ -52,8 +52,10 @@ class TxBufferManager
 		__int32 buffersCount() const;
 
 		void writeOperationToRegister(const char* db, const char* ns, const TransactionOperation& operation);
-		TransactionOperation* readOperationFromRegister(TxBuffer* buffer);
-		TransactionOperation* readOperationFromRegister(TxBuffer* buffer, char* db, char* ns);
+		//! reads an operation from the registry, the temporalBuffer is used to avoid wasting memory allocs
+		TransactionOperation* readOperationFromRegister(MemoryStream* temporalBuffer, TxBuffer* buffer);
+		//! reads an operation from the registry, the temporalBuffer is used to avoid wasting memory allocs
+		TransactionOperation* readOperationFromRegister(MemoryStream* temporalBuffer, TxBuffer* buffer, char* db, char* ns);
 		void addBuffers(std::vector<TxBuffer*> buffers);
 		void startMonitor();
 		void stopMonitor();

@@ -436,8 +436,9 @@ void TxBufferManager::flushBuffer() {
 		buffer->acquireLock();
 		TransactionOperation* operation = NULL;
 		buffer->seek(0);
+		MemoryStream* temporal = new MemoryStream(2048); // Used to preallocate space
 		while (true) {
-			operation = readOperationFromRegister(buffer);
+			operation = readOperationFromRegister(temporal, buffer);
 			if (operation == NULL) {
 				break;
 			}
@@ -483,6 +484,7 @@ void TxBufferManager::flushBuffer() {
 			free(ns);
 			delete operation;
 		}
+		delete temporal;
 		//if (_log->isDebug()) _log->debug(3, "buffer->releaseLock();");
 		buffer->releaseLock();
 		if (buffer->mainLog()) {
@@ -614,8 +616,8 @@ void TxBufferManager::writeOperationToRegister(const char* db, const char* ns, c
 	free(chrs);
 }
 
-TransactionOperation* TxBufferManager::readOperationFromRegister(TxBuffer* buffer) {
-	return readOperationFromRegister(buffer, NULL, NULL);
+TransactionOperation* TxBufferManager::readOperationFromRegister(MemoryStream* temporalBuffer, TxBuffer* buffer) {
+	return readOperationFromRegister(temporalBuffer, buffer, NULL, NULL);
 }
 
 /*
@@ -625,7 +627,7 @@ TransactionOperation* TxBufferManager::readOperationFromRegister(TxBuffer* buffe
  * if db is NULL then all the operations are going to be included
  * if ns is NULL all the operations within the db will be included
  * */
-TransactionOperation* TxBufferManager::readOperationFromRegister(TxBuffer* buffer, char* db, char* ns) {
+TransactionOperation* TxBufferManager::readOperationFromRegister(MemoryStream* temporalBuffer, TxBuffer* buffer, char* db, char* ns) {
 	if (buffer->eof()) {
 		return NULL;
 	}
@@ -635,7 +637,8 @@ TransactionOperation* TxBufferManager::readOperationFromRegister(TxBuffer* buffe
 	__int64 size = buffer->readLong();
 
 	char* fullBuffer = buffer->readChars();
-	MemoryStream* stream = new MemoryStream(fullBuffer, size);
+	MemoryStream* stream = temporalBuffer;
+	stream->writeRaw(fullBuffer, size);
 	if (_log->isDebug()) _log->debug(3, "buffer->releaseLock();");
 	buffer->releaseLock();
 
@@ -703,7 +706,6 @@ jumpoperation:
 
 	free(rdb);
 	free(rns);
-	delete stream;
 	free(fullBuffer);
 	return result;
 }
