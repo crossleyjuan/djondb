@@ -638,6 +638,7 @@ TransactionOperation* TxBufferManager::readOperationFromRegister(MemoryStream* t
 
 	char* fullBuffer = buffer->readChars();
 	MemoryStream* stream = temporalBuffer;
+	stream->reset();
 	stream->writeRaw(fullBuffer, size);
 	if (_log->isDebug()) _log->debug(3, "buffer->releaseLock();");
 	buffer->releaseLock();
