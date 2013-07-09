@@ -84,12 +84,16 @@ std::list<TransactionOperation*>* BaseTransaction::findOperations(const char* db
 	MemoryStream* temporal = new MemoryStream(2048); // Preallocated space
 	for (std::vector<TxBuffer*>::const_iterator i = buffers->begin(); i != buffers->end(); i++) {
 		TxBuffer* buffer = *i;
-		buffer->seek(0);
-		while (!buffer->eof()) {
-			TransactionOperation* operation = _bufferManager->readOperationFromRegister(temporal, buffer, const_cast<char*>(db), NULL);
-			if (operation != NULL) {
-				result->push_back(operation);
+		if (buffer != NULL) {
+			buffer->acquireLock();
+			buffer->seek(0);
+			while (!buffer->eof()) {
+				TransactionOperation* operation = _bufferManager->readOperationFromRegister(temporal, buffer, const_cast<char*>(db), NULL);
+				if (operation != NULL) {
+					result->push_back(operation);
+				}
 			}
+			buffer->releaseLock();
 		}
 	}
 
