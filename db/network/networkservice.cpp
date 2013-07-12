@@ -48,11 +48,6 @@
 #include "defs.h"
 //#include "dbjaguar.h"
 
-// Windows does not have this definition
-#ifdef WINDOWS
-#define socklen_t int
-#endif
-
 int __networkservice_port = SERVER_PORT;
 
 long processing;
@@ -130,6 +125,7 @@ int __status;
 int NetworkService::callbackListen(void* service, NetworkInputStream* const nis, NetworkOutputStream* const nos) {
 	NetworkService* instance = (NetworkService*)service;
 	instance->executeRequest(nis, nos);
+	return 0;
 }
 
 int NetworkService::executeRequest(NetworkInputStream* nis, NetworkOutputStream* nos) {

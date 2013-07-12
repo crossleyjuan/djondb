@@ -24,6 +24,7 @@
 #define NETWORKSERVER_INCLUDED_H 
 
 #include <map>
+#include "defs.h"
 #ifndef WINDOWS
 #include <sys/types.h>
 #include <sys/socket.h>
