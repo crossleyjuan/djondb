@@ -29,12 +29,6 @@
 #ifndef WINDOWS
 #include <uuid/uuid.h>
 #endif
-#ifdef LINUX
-//#include <QX11Info>
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <X11/extensions/scrnsaver.h>
-#endif
 #ifdef MAC
 #include <mach/clock.h>
 #include <mach/mach.h>

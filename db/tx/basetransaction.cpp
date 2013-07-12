@@ -81,32 +81,41 @@ BaseTransaction::~BaseTransaction() {
 std::list<TransactionOperation*>* BaseTransaction::findOperations(const char* db) const {
 	std::list<TransactionOperation*>* result = new std::list<TransactionOperation*>();
 	const std::vector<TxBuffer*>* buffers = _bufferManager->getActiveBuffers();
+	MemoryStream* temporal = new MemoryStream(2048); // Preallocated space
 	for (std::vector<TxBuffer*>::const_iterator i = buffers->begin(); i != buffers->end(); i++) {
 		TxBuffer* buffer = *i;
-		buffer->seek(0);
-		while (!buffer->eof()) {
-			TransactionOperation* operation = _bufferManager->readOperationFromRegister(buffer, const_cast<char*>(db), NULL);
-			if (operation != NULL) {
-				result->push_back(operation);
+		if (buffer != NULL) {
+			buffer->acquireLock();
+			buffer->seek(0);
+			while (!buffer->eof()) {
+				TransactionOperation* operation = _bufferManager->readOperationFromRegister(temporal, buffer, const_cast<char*>(db), NULL);
+				if (operation != NULL) {
+					result->push_back(operation);
+				}
 			}
+			buffer->releaseLock();
 		}
 	}
+
+	delete temporal;
 	return result;
 }
 
 std::list<TransactionOperation*>* BaseTransaction::findOperations(const char* db, const char* ns) const {
 	std::list<TransactionOperation*>* result = new std::list<TransactionOperation*>();
 	const std::vector<TxBuffer*>* buffers = _bufferManager->getActiveBuffers();
+	MemoryStream* temporal = new MemoryStream(2048); // Preallocated space
 	for (std::vector<TxBuffer*>::const_iterator i = buffers->begin(); i != buffers->end(); i++) {
 		TxBuffer* buffer = *i;
 		buffer->seek(0);
 		while (!buffer->eof()) {
-			TransactionOperation* operation = _bufferManager->readOperationFromRegister(buffer, const_cast<char*>(db), const_cast<char*>(ns));
+			TransactionOperation* operation = _bufferManager->readOperationFromRegister(temporal, buffer, const_cast<char*>(db), const_cast<char*>(ns));
 			if (operation != NULL) {
 				result->push_back(operation);
 			}
 		}
 	}
+	delete temporal;
 	return result;
 }
 
