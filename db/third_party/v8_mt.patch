@@ -1,0 +1,8 @@
+405c405
+<                 'RuntimeLibrary': '1',  # /MTd
+---
+>                 'RuntimeLibrary': '3',  # /MTd
+497c497
+<                     'RuntimeLibrary': '0',  #/MT
+---
+>                     'RuntimeLibrary': '2',  #/MT

@@ -26,6 +26,11 @@
 #include "networkoutputstream.h"
 #include "util.h"
 
+// Windows does not have this definition
+#ifdef WINDOWS
+#define socklen_t int
+#endif
+
 void* startListen(void* arg);
 
 NetworkServer::NetworkServer(int port) {
@@ -89,6 +94,8 @@ void* startListen(void* arg) {
 	NetworkServer* server = (NetworkServer*)arg;
 
 	server->process();
+
+	return NULL;
 }
 
 void NetworkServer::process() {
@@ -104,7 +111,7 @@ void NetworkServer::process() {
 		/* Tell the user that we could not find a usable */
 		/* Winsock DLL.                                  */
 		printf("WSAStartup failed with error: %d\n", err);
-		return NULL;
+		return;
 	}
 #endif
 

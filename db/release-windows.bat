@@ -33,6 +33,7 @@ if %x64% == true (
 GOTO END
 
 :ExecuteJob
+del /S /Q build%PLATFORM%
 mkdir build%PLATFORM%
 rem pause
 cd build%PLATFORM%

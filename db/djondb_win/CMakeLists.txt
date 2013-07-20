@@ -28,5 +28,5 @@ IF (WIN32)
 	SET( CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS} "/NODEFAULTLIB:MSVCRTD.lib") 
 ENDIF (WIN32)
 
-target_link_libraries (djondb_win djon-service djon-network djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}/antlr3c.lib ${LIBRARY_PREFIX}/pthreadVC2.lib Rpcrt4.lib ${LIBRARY_PREFIX}/v8.lib)
+target_link_libraries (djondb_win djon-service djon-network djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}/antlr3c.lib ${LIBRARY_PREFIX}/pthreadVC2.lib Rpcrt4.lib)
 
