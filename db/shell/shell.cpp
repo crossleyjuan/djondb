@@ -150,18 +150,21 @@ char* getHistoryFilename() {
 
 int main(int argc, char* argv[]) {
 	v8::V8::SetFlagsFromCommandLine(&argc, argv, true);
+	v8::Isolate* isolate = v8::Isolate::GetCurrent();
 	run_shell = (argc == 1);
-	v8::HandleScope handle_scope;
-	v8::Persistent<v8::Context> context = CreateShellContext();
-	if (context.IsEmpty()) {
-		printf("Error creating context\n");
-		return 1;
+	int result;
+	{
+		v8::HandleScope handle_scope;
+		v8::Persistent<v8::Context> context = CreateShellContext();
+		if (context.IsEmpty()) {
+			printf("Error creating context\n");
+			return 1;
+		}
+		context->Enter();
+		result = RunMain(argc, argv);
+		if (run_shell) RunShell(context);
+		context->Exit();
 	}
-	context->Enter();
-	int result = RunMain(argc, argv);
-	if (run_shell) RunShell(context);
-	context->Exit();
-	context.Dispose();
 	v8::V8::Dispose();
 	return result;
 }
@@ -232,27 +235,27 @@ v8::Handle<v8::Value> help(const v8::Arguments& args) {
 		v8::String::Utf8Value str(args[0]);
 		std::string cmd = ToCString(str);
 	} else {
-			printf("beginTransaction();\n\tStarts a new transaction\n");
-			printf("commit()\n\tCommits the current transaction.\n");
-			printf("connect('hostname', [port])\n\tEstablish a connection with a server.\n");
-			printf("dropNamespace('db', 'namespace');\n\tDrops a namespace from the db.\n");
-			printf("executeQuery('select query');\n\tExecutes a query using dql format.\n");
-			printf("executeUpdate('update query');\n\tExecutes an insert, update, remove command using dql.\n");
-			printf("find('db', 'namespace'[, 'select'][, 'filter']);\n\tExecutes a find using the provided filter.\n");
-			printf("help();\n\tThis help\n");
-			printf("insert('db', 'namespace', { json...object});\n\tInserts a new document.\n");
-			printf("load('file');\n\tLoads and executes a script.\n");
-			printf("print(data);\n\tPrint console messages.\n");
-			printf("quit();\n\tBye bye fellow.\n");
-			printf("remove('db', 'namespace', 'id', 'revision');\n\tRemoves a document.\n");
-			printf("rollback()\n\tRollbacks the current transaction.\n");
-			printf("read('file');\n\tReads the contents of a file.\n");
-			printf("showDbs();\n\tReturns a list of the available databases.\n");
-			printf("showNamespaces('db');\n\tReturns the namespaces in that database.\n");
-			printf("shutdown();\n\tRemotely shutdowns the server (Are you sure?).\n");
-			printf("update('db', 'namespace', { json...object});\n\tUpdates a document.\n");
-			printf("uuid();\n\tGenerates a new UUID (Universal Unique Identifier).\n");
-			printf("version();\n\tReturns the current shell version.\n");
+		printf("beginTransaction();\n\tStarts a new transaction\n");
+		printf("commit()\n\tCommits the current transaction.\n");
+		printf("connect('hostname', [port])\n\tEstablish a connection with a server.\n");
+		printf("dropNamespace('db', 'namespace');\n\tDrops a namespace from the db.\n");
+		printf("executeQuery('select query');\n\tExecutes a query using dql format.\n");
+		printf("executeUpdate('update query');\n\tExecutes an insert, update, remove command using dql.\n");
+		printf("find('db', 'namespace'[, 'select'][, 'filter']);\n\tExecutes a find using the provided filter.\n");
+		printf("help();\n\tThis help\n");
+		printf("insert('db', 'namespace', { json...object});\n\tInserts a new document.\n");
+		printf("load('file');\n\tLoads and executes a script.\n");
+		printf("print(data);\n\tPrint console messages.\n");
+		printf("quit();\n\tBye bye fellow.\n");
+		printf("remove('db', 'namespace', 'id', 'revision');\n\tRemoves a document.\n");
+		printf("rollback()\n\tRollbacks the current transaction.\n");
+		printf("read('file');\n\tReads the contents of a file.\n");
+		printf("showDbs();\n\tReturns a list of the available databases.\n");
+		printf("showNamespaces('db');\n\tReturns the namespaces in that database.\n");
+		printf("shutdown();\n\tRemotely shutdowns the server (Are you sure?).\n");
+		printf("update('db', 'namespace', { json...object});\n\tUpdates a document.\n");
+		printf("uuid();\n\tGenerates a new UUID (Universal Unique Identifier).\n");
+		printf("version();\n\tReturns the current shell version.\n");
 	}
 	return v8::Undefined();
 }
