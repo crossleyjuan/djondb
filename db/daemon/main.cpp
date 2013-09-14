@@ -72,11 +72,12 @@ bool __stopRunning;
  **************************************************************************/
 void PrintUsage(int argc, char *argv[]) {
 	if (argc >=1) {
-		printf("Usage: %s -h -n -p PORT\n", argv[0]);
+		printf("Usage: %s [-h] [-n] [-p PORT] [-d directory]\n", argv[0]);
 		printf("  Options:\n");
-		printf("      -n\tDon't fork off as a daemon.\n");
-		printf("      -h\tShow this help screen.\n");
-		printf("      -p port\tChange the default port (1243).");
+		printf("      -n\t\tDon't fork off as a daemon.\n");
+		printf("      -h\t\tShow this help screen.\n");
+		printf("      -p port\t\tChange the default port (1243).\n");
+		printf("      -d directory\tUse this folder as default data dir.");
 		printf("\n");
 	}
 }
@@ -157,7 +158,7 @@ int main(int argc, char *argv[]) {
 	signal(SIGQUIT, signal_handler);
 
 	int c;
-	while( (c = getopt(argc, argv, "nhp:|help")) != -1) {
+	while( (c = getopt(argc, argv, "nhp:d:|help")) != -1) {
 		switch(c){
 			case 'h':
 				PrintUsage(argc, argv);
@@ -166,6 +167,11 @@ int main(int argc, char *argv[]) {
 			case 'n':
 				daemonize = 0;
 				break;
+			case 'd': {
+							 char* datadir = optarg;
+							 setSetting("DATA_DIR", datadir);
+							 break;
+						 }
 			case 'p': {
 							 char* port = optarg;
 							 setSetting("SERVER_PORT", port);

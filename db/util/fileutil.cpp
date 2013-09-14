@@ -203,7 +203,12 @@ bool makeDir(const char* dir) {
 	std::stringstream ss;
 
 #ifndef WINDOWS
-	ss << FILESEPARATOR;
+	// if the path starts from / the split will remove it, we need
+	// to know the starter point
+	bool startsFromRoot = startsWith(dir, FILESEPARATOR);
+	if (startsFromRoot) {
+		ss << FILESEPARATOR;
+	}
 #endif
 	for (std::vector<std::string>::const_iterator it = dirs.begin(); it != dirs.end(); it++) {
 		std::string cdir = *it;
@@ -259,7 +264,7 @@ long pageSize() {
   wrong concatenation. The caller should call free on the result.
   \param path A null terminated string, it could be NULL
   \param path2 A null terminated string, it could be NULL
-*/
+  */
 char* combinePath(const char* path, const char* path2) {
 	int len = 0;
 	int len1 = 0;

@@ -96,7 +96,7 @@ query_expr	returns [Command* val]
 	    cmd->setSelect(ms.toChars());
 	   }
 	    cmd->setDB(std::string((char*)$d1.text->chars));
-	} COLON ns=ID {
+	} COLON ns=(ID | NS_ID) {
 	    cmd->setNameSpace(std::string((char*)$ns.text->chars));
 	} (WHERE filter=filter_expr {
 	    cmd->setFilter(std::string((char*)$filter.text->chars));
@@ -119,7 +119,7 @@ insert_expr returns [Command* val]
 		    obj->add("_revision", const_cast<char*>(rev->c_str())); 
 		    delete rev; 
 		} 
-	} INTO db=ID COLON ns=ID {
+	} INTO db=ID COLON ns=(ID | NS_ID) {
 	    cmd->setDB(std::string((char*)$db.text->chars));
 	    cmd->setNameSpace(std::string((char*)$ns.text->chars));
 	};
@@ -138,7 +138,7 @@ update_expr returns [Command* val]
 		}
 		cmd->setBSON(*obj);
 		delete obj;
-	} INTO db=ID COLON ns=ID {
+	} INTO db=ID COLON ns=(ID | NS_ID)  {
 	    cmd->setDB(std::string((char*)$db.text->chars));
 	    cmd->setNameSpace(std::string((char*)$ns.text->chars));
 	};
@@ -151,7 +151,7 @@ remove_expr returns [Command* val]
 	    cmd->setId(std::string((char*)$id.text->chars));
         } (WITH rev=STRING {
 	    cmd->setRevision(std::string((char*)$rev.text->chars));
-        })? FROM db=ID COLON ns=ID {
+        })? FROM db=ID COLON ns=(ID | NS_ID) {
 	    cmd->setDB(std::string((char*)$db.text->chars));
 	    cmd->setNameSpace(std::string((char*)$ns.text->chars));
 	};
@@ -193,8 +193,6 @@ id_expr	: ID;
 constant_expr
 	: (NUMBER | STRING | TRUE | FALSE);
 
-operand_expr
-	: OPER;
 
 json_const
 	: STRING 
@@ -204,6 +202,9 @@ json_const
 	| FALSE
 	)  | json_array_expr
 	| json_expr;
+operand_expr
+	: OPER;
+
 	
 json_array_expr
 	: LBRAK j1=json_expr 
@@ -247,6 +248,7 @@ AND	:	('a' | 'A') ('n' | 'N') ('d' | 'D');
 TOP	:	('t'|'T')('o'|'O')('p'|'P');
 
 ID  :	('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*;
+NS_ID	:	ID ('.' ID)+;
 
 ALL_FIELDS
 	:	'*';

@@ -622,6 +622,12 @@ TEST(TestDriver, testDQL) {
 		ASSERT_TRUE(result->get(0)->getString("other").compare("1") == 0);
 		delete result;
 
+		// test dots at the namespace problem reported at github
+		ql = "Insert { 'name': 'Test Not Exist', 'other': '1'} INTO db:DQL.namess";
+		connection->executeUpdate(ql);
+		qlFind = "Select * FROM db:DQL.namess";
+		result = connection->executeQuery(qlFind);
+		ASSERT_TRUE(result->length() >= 1);
 	}
 
 }
