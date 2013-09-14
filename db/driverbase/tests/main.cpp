@@ -92,7 +92,7 @@ TEST(TestDriver, testDropNamespace) {
 
 	EXPECT_TRUE(result);
 
-	BSONArrayObj* testresult = conn->find("db", "testdrop.namespace", "*", std::string(""));
+	DjondbCursor* testresult = conn->find("db", "testdrop.namespace", "*", std::string(""));
 
 	EXPECT_TRUE(testresult->length() == 0);
 	delete testresult;
@@ -121,9 +121,9 @@ TEST(TestDriver, testInsertComplex) {
 
 	conn->insert("test", "ns", obj);
 
-	BSONArrayObj* res = conn->find("test", "ns", "*", "$'_id' == '" + *id + "'");
-	EXPECT_TRUE(res->length() == 1);
-	BSONObj* bres = *res->begin();
+	DjondbCursor* res = conn->find("test", "ns", "*", "$'_id' == '" + *id + "'");
+	ASSERT_TRUE(res->next());
+	BSONObj* bres = res->current();
 	EXPECT_TRUE(bres->has("inner"));
 	BSONObj* innerres = bres->getBSON("inner");
 	EXPECT_TRUE(innerres != NULL);
@@ -135,9 +135,9 @@ TEST(TestDriver, testInsertComplex) {
 	std::string* id2 = uuid();
 	conn->insert("test", "ns", "{ '_id': '" + *id2 + "', 'array': [ { 'x': 'test', 'y': 3},  { 'x': 'test2', 'y': 4}]  }");
 
-	BSONArrayObj* res2 = conn->find("test", "ns", "*", "$'_id' == '" + *id2 + "'");
-	EXPECT_TRUE(res2->length() == 1);
-	BSONObj* o2 = *res2->begin();
+	DjondbCursor* res2 = conn->find("test", "ns", "*", "$'_id' == '" + *id2 + "'");
+	ASSERT_TRUE(res2->next());
+	BSONObj* o2 = res2->current();
 	EXPECT_TRUE(o2 != NULL);
 
 	EXPECT_TRUE(o2->has("array"));
@@ -152,12 +152,11 @@ TEST(TestDriver, testInsertComplex) {
 	delete customer;
 
 	res2 = conn->find("db", "testcustomer", "*", "$'name' == 'Martin'");
-	EXPECT_TRUE(res2->length() == 1);
-	if (res2->length() == 1) {
-		BSONObj* objCustomer = *res2->begin();
-		int d = *objCustomer->getXpath("finantial.salary");
-		EXPECT_TRUE(d == 150000);
-	}
+	ASSERT_TRUE(res2->next());
+
+	BSONObj* objCustomer = res2->current();
+	int d = *objCustomer->getXpath("finantial.salary");
+	EXPECT_TRUE(d == 150000);
 	delete res2;
 	getLogger(NULL)->info("testInsertComplex");
 }
@@ -303,14 +302,14 @@ TEST(TestDriver, testFindByFilter) {
 
 	cout << "\nTestbyfilter" << endl;
 	std::string filter = "";
-	BSONArrayObj* result = conn->find("db", "test.filter2", "*", filter);			
-	EXPECT_TRUE(result->length() > 0);
+	DjondbCursor* result = conn->find("db", "test.filter2", "*", filter);			
+	ASSERT_TRUE(result->next());
 	filter = "$'name' == 'Test'";
 	delete result;
 	result = conn->find("db", "test.filter2", filter);			
-	EXPECT_TRUE(result->length() > 0);
+	ASSERT_TRUE(result->next());
 
-	BSONObj* objR = *result->begin();
+	BSONObj* objR = result->current();
 	EXPECT_TRUE(objR != NULL);
 	EXPECT_TRUE(objR->has("name"));
 	EXPECT_TRUE(objR->getString("name").compare("Test") == 0);
@@ -320,30 +319,37 @@ TEST(TestDriver, testFindByFilter) {
 
 	result = conn->find("db", "test.filter2", "*", "$'bool' == true");
 	EXPECT_TRUE(result->length() == 1);
+	delete result;
 
 	result = conn->find("db", "test.filter2", "*", "$'bool'");
 	EXPECT_TRUE(result->length() == 1);
+	delete result;
 
 	result = conn->find("db", "test.filter2", "*", "$'nbool'");
 	EXPECT_TRUE(result->length() == 0);
+	delete result;
 
 	result = conn->find("db", "test.filter2", "*", "$'nbool' == false");
 	EXPECT_TRUE(result->length() == 1);
+	delete result;
 
 	result = conn->find("db", "test.filter2", "*", "$'name' == 'Test'");
 	EXPECT_TRUE(result->length() == 1);
+	delete result;
 
 	result = conn->find("db", "test.filter2", "$'inner.x' == 1");
 	EXPECT_TRUE(result->length() == 1);
+	delete result;
 
 	result = conn->find("db", "test.filter2", "*", "$'inner.x' > 0");
 	EXPECT_TRUE(result->length() == 1);
+	delete result;
 
 	result = conn->find("db", "test.filter2", "$'inner.x' > 1");
 	EXPECT_TRUE(result->length() == 0);
+	delete result;
 
 	delete objR;
-	delete result;
 
 }
 
@@ -509,8 +515,8 @@ TEST(TestDriver, testTransactions) {
 		}
 
 		// Test records out of the transaction
-		BSONArrayObj* array1 = connection->find("testdb", "tx", "*", "");
-		EXPECT_TRUE(array1->length() == 2);
+		DjondbCursor* cursor = connection->find("testdb", "tx", "*", "");
+		EXPECT_TRUE(cursor->length() == 2);
 
 		connection->commitTransaction();
 

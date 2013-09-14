@@ -28,6 +28,8 @@
 #include "bsoninputstream.h"
 #include "commitcommand.h"
 #include "rollbackcommand.h"
+#include "fetchcommand.h"
+#include "commandfactory.h"
 #include "util.h"
 #include <memory>
 #include <assert.h>
@@ -165,6 +167,14 @@ FindCommand* parseFind(InputStream* is)  {
 	return command;
 }
 
+FetchCommand* parseFetchCursor(InputStream* is) {
+	char* cursorId = is->readChars();
+	FetchCommand* cmd = fetchCommand(cursorId);
+
+	free(cursorId);
+	return cmd;
+}
+
 BSONObj* readOptions(InputStream* stream) {
 	std::auto_ptr<BSONInputStream> bsonis(new BSONInputStream(stream));
 	BSONObj* obj = bsonis->readBSON();
@@ -231,11 +241,15 @@ Command* CommandReader::readCommand() {
 		case ROLLBACK: // Rollback transaction
 			cmd = parseRollback(_stream);
 			break;
+		case FETCHCURSOR: // fetch Cursor
+			cmd = parseFetchCursor(_stream);
+			break;
 		default:
 			cout << "unknown command type " << type << endl;
 			break;
 	}
 	cmd->setOptions(options);
+	cmd->setVersion(version);
 	assert(cmd != NULL);
 	return cmd;
 }

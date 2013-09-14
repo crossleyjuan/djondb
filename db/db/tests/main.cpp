@@ -46,6 +46,7 @@
 #include "simpleexpression.h"
 #include "binaryexpression.h"
 #include "expressionresult.h"
+#include "dbcursor.h"
 
 #include    <antlr3treeparser.h>
 #include    <antlr3defs.h>
@@ -225,7 +226,7 @@ TEST_F(TestDB, testExpressions) {
 	BSONObj obj;
 	obj.add("age", 35);
 	obj.add("name", "John");
-	obj.add("alive", true);
+	obj.add("alive", (bool)true);
 	BSONObj inner;
 	inner.add("i", 100);
 	obj.add("child", inner);
@@ -623,7 +624,9 @@ TEST_F(TestDB, testInsertComplexBSON) {
 
 	controller->insert("dbtest", "sp1.customercomplex", &obj);
 
-	BSONArrayObj* array = controller->find("dbtest", "sp1.customercomplex", "*", "$'int' == 1");
+	const DBCursor* cursor = controller->find("dbtest", "sp1.customercomplex", "*", "$'int' == 1");
+	EXPECT_TRUE(cursor->currentPage != NULL);
+	const BSONArrayObj* array = cursor->currentPage;
 	EXPECT_TRUE(array->length() == 1);
 	if (array->length() == 1) {
 		BSONObj* res = *array->begin();
@@ -666,7 +669,8 @@ TEST_F(TestDB, testInsertComplexBSON) {
 			}
 		}
 	}
-	delete array;
+
+	controller->releaseCursor(cursor->cursorId);
 }
 
 TEST_F(TestDB, testMassiveInsert)
@@ -728,7 +732,7 @@ TEST_F(TestDB, testAntlrParser) {
 	pANTLR3_COMMON_TOKEN_STREAM    tokens;
 	pfilter_expressionParser              parser;
 
-	char* filter = "a == 1";
+	const char* filter = "a == 1";
 	input  = antlr3StringStreamNew((pANTLR3_UINT8)filter, 8, (ANTLR3_UINT32)strlen(filter), (pANTLR3_UINT8)"name");
 	lex    = filter_expressionLexerNew                (input);
 	tokens = antlr3CommonTokenStreamSourceNew  (ANTLR3_SIZE_HINT, TOKENSOURCE(lex));
@@ -797,8 +801,10 @@ TEST_F(TestDB, testFindPartial) {
 
 	controller->insert("testdb", "partial", obj);
 
-	BSONArrayObj* result = controller->find("testdb", "partial", "$\"name\", $\"lastName\"", "");
+	DBCursor* cursor = controller->find("testdb", "partial", "$\"name\", $\"lastName\"", "");
 
+	ASSERT_TRUE(cursor->currentPage != NULL);
+	const BSONArrayObj* result = cursor->currentPage;
 	EXPECT_TRUE(result != NULL);
 	if (result != NULL) {
 		BSONObj testObj;
@@ -810,10 +816,10 @@ TEST_F(TestDB, testFindPartial) {
 
 			EXPECT_TRUE(*test == testObj);
 		}
-		delete result;
 	}
 
 	delete obj;
+	controller->releaseCursor(cursor->cursorId);
 }
 
 TEST_F(TestDB, testFindsFilterErrors) {
@@ -848,26 +854,37 @@ TEST_F(TestDB, testFindsByFilter)
 	BSONObj* filter = BSONParser::parse("{lastName: 'Crossley'}");
 
 	// Starting find by filter
-	BSONArrayObj* found = controller->find("dbtest", "find.filter", "*", "$\"lastName\" == \"Crossley\"");
+	DBCursor* cursor = controller->find("dbtest", "find.filter", "*", "$\"lastName\" == \"Crossley\"");
+	EXPECT_TRUE(cursor->currentPage != NULL);
+	const BSONArrayObj* found = cursor->currentPage;
+
 	EXPECT_TRUE(found->length() == 5); 
-	delete found;
 	delete filter;
+	controller->releaseCursor(cursor->cursorId);
 
-	found = controller->find("dbtest", "find.filter", "*", "");
+	cursor = controller->find("dbtest", "find.filter", "*", "");
+	EXPECT_TRUE(cursor->currentPage != NULL);
+	found = cursor->currentPage;
 	EXPECT_TRUE(found->length() == 8); 
-	delete found;
+	controller->releaseCursor(cursor->cursorId);
 
-	found = controller->find("dbtest", "find.filter", "*", "$\"name\" == \"Juan\"");
+	cursor = controller->find("dbtest", "find.filter", "*", "$\"name\" == \"Juan\"");
+	EXPECT_TRUE(cursor->currentPage != NULL);
+	found = cursor->currentPage;
 	EXPECT_TRUE(found->length() == 7); 
-	delete found;
+	controller->releaseCursor(cursor->cursorId);
 
-	found = controller->find("dbtest", "find.filter", "*", "$'name' == 'Juan' and $'lastName' == 'Smith'");
+	cursor = controller->find("dbtest", "find.filter", "*", "$'name' == 'Juan' and $'lastName' == 'Smith'");
+	EXPECT_TRUE(cursor->currentPage != NULL);
+	found = cursor->currentPage;
 	EXPECT_TRUE(found->length() == 1); 
-	delete found;
+	controller->releaseCursor(cursor->cursorId);
 
-	found = controller->find("dbtest", "find.filter", "*", "$'name' == 'Juan' and $'lastName' == 'Last'");
+	cursor = controller->find("dbtest", "find.filter", "*", "$'name' == 'Juan' and $'lastName' == 'Last'");
+	EXPECT_TRUE(cursor->currentPage != NULL);
+	found = cursor->currentPage;
 	EXPECT_TRUE(found->length() == 1); 
-	delete found;
+	controller->releaseCursor(cursor->cursorId);
 }
 
 TEST_F(TestDB, testFindsByTextFilter)
@@ -882,29 +899,39 @@ TEST_F(TestDB, testFindsByTextFilter)
 	controller->insert("dbtest", "find.filter2", BSONParser::parse("{name: 'Juan', lastName:'Clark', age: 38, inner: { x: 3}}"));
 
 	std::string filter = "$'age' == 45";
-	BSONArrayObj* found = controller->find("dbtest", "find.filter2","*", filter.c_str());
+	const DBCursor* cursor = controller->find("dbtest", "find.filter2","*", filter.c_str());
+	ASSERT_TRUE(cursor->currentPage != NULL);
+	const BSONArrayObj* found = cursor->currentPage;
 	EXPECT_TRUE(found->length() == 1); 
 	djondb::string name = found->get(0)->getDJString("lastName");
 	EXPECT_TRUE(name.compare("Smith", 5) == 0);
 
 	filter = "";
-	delete found;
-	found = controller->find("dbtest", "find.filter2","*", filter.c_str());
+	controller->releaseCursor(cursor->cursorId);
+
+	cursor = controller->find("dbtest", "find.filter2","*", filter.c_str());
+	ASSERT_TRUE(cursor->currentPage != NULL);
+	found = cursor->currentPage;
 	EXPECT_TRUE(found->length() == 4); 
 
 	filter = "$'age' == 38";
-	delete found;
-	found = controller->find("dbtest", "find.filter2","*", filter.c_str());
+	controller->releaseCursor(cursor->cursorId);
+
+	cursor = controller->find("dbtest", "find.filter2","*", filter.c_str());
+	EXPECT_TRUE(cursor->currentPage != NULL);
+	found = cursor->currentPage;
 	EXPECT_TRUE(found->length() == 2); 
 	name = found->get(0)->getDJString("lastName");
 	EXPECT_TRUE(name.compare("Crossley", 8) == 0);
 	name = found->get(1)->getDJString("lastName");
 	EXPECT_TRUE(name.compare("Clark", 5) == 0);
-	delete found;
+	controller->releaseCursor(cursor->cursorId);
 
-	found = controller->find("dbtest", "find.filter2", "*", "$'inner.x' == 1");
+	cursor = controller->find("dbtest", "find.filter2", "*", "$'inner.x' == 1");
+	EXPECT_TRUE(cursor->currentPage != NULL);
+	found = cursor->currentPage;
 	EXPECT_TRUE(found->length() == 2); 
-	delete found;
+	controller->releaseCursor(cursor->cursorId);
 }
 
 TEST_F(TestDB, testFindPrevious)
@@ -1209,11 +1236,11 @@ TEST_F(TestDB, testDropnamespace)
 	bool result = controller->dropNamespace("dbtest", "ns.drop");
 	EXPECT_TRUE(result);
 
-	BSONArrayObj* finds = controller->find("dbtest", "ns.drop", "*", "");
+	DBCursor* cursor = controller->find("dbtest", "ns.drop", "*", "");
 
-	EXPECT_TRUE(finds->length() == 0);
+	EXPECT_TRUE(cursor->currentPage == NULL);
 
-	delete finds;
+	controller->releaseCursor(cursor->cursorId);
 }
 
 TEST_F(TestDB, testErrorHandling) {
@@ -1223,6 +1250,39 @@ TEST_F(TestDB, testErrorHandling) {
 	// EXPECT_TRUE(parser == NULL);
 }
 
+TEST_F(TestDB, testDBCursor) {
+	controller->dropNamespace("dbtest", "cursor");
+
+	BSONObj* options = new BSONObj();
+	
+	for (int x = 0; x < 83; x++) {
+		BSONObj* obj = new BSONObj();
+		obj->add("name", "Test");
+		obj->add("lastname", "Last");
+		obj->add("i", x);
+		controller->insert("dbtest", "cursor", obj, options);
+
+		delete obj;
+	}
+	delete options;
+
+	BSONObj* optionsCursor = new BSONObj();
+	options->add("rowsPerPage", 10);
+	DBCursor* cursor = controller->find("dbtest", "cursor", "*", "", optionsCursor);
+
+	int validX = 0;
+	while ((cursor = controller->fetchCursor(cursor->cursorId))->currentPage != NULL) {
+		const BSONArrayObj* page = cursor->currentPage;
+		for (int n = 0; n < page->length(); n++) {
+			BSONObj* row = page->get(n);
+			ASSERT_TRUE(row->getInt("i") == validX);
+			validX++;
+		}
+	}
+
+	delete optionsCursor;
+	controller->releaseCursor(cursor->cursorId);
+}
 
 /* Not supported yet, this will require some code */
 /*

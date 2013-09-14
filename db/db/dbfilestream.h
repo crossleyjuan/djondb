@@ -5,6 +5,8 @@
 #include "util.h"
 #include <string>
 
+const int DB_HEADER_SIZE = 29; //!< Size of the header used to identify file details (like version, etc)
+
 using namespace std;
 
 class DBFileStream: public InputOutputStream

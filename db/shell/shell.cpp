@@ -137,7 +137,7 @@ char* commands[] = {
 	"readfile"
 };
 
-int COMMANDS_LENGTH = 19;
+int COMMANDS_LENGTH = 22;
 
 char* getHistoryFilename() {
 	std::string* homeDir = getHomeDir();
@@ -236,7 +236,7 @@ v8::Handle<v8::Value> help(const v8::Arguments& args) {
 		std::string cmd = ToCString(str);
 	} else {
 		printf("beginTransaction();\n\tStarts a new transaction\n");
-		printf("commit()\n\tCommits the current transaction.\n");
+		printf("commitTransaction()\n\tCommits the current transaction.\n");
 		printf("connect('hostname', [port])\n\tEstablish a connection with a server.\n");
 		printf("dropNamespace('db', 'namespace');\n\tDrops a namespace from the db.\n");
 		printf("executeQuery('select query');\n\tExecutes a query using dql format.\n");
@@ -733,7 +733,13 @@ v8::Handle<v8::Value> find(const v8::Arguments& args) {
 		*/
 
 	try {
-		BSONArrayObj* result = __djonConnection->find(db, ns, select, filter);
+		//BSONArrayObj* result = __djonConnection->find(db, ns, select, filter);
+		DjondbCursor* cursor = __djonConnection->find(db, ns, select, filter);
+
+		BSONArrayObj* result = new BSONArrayObj();
+		if (cursor->next()) {
+			result->add(*cursor->current());
+		}
 
 		char* str = result->toChar();
 
@@ -744,16 +750,6 @@ v8::Handle<v8::Value> find(const v8::Arguments& args) {
 	} catch (DjondbException e) {
 		return v8::ThrowException(v8::String::New(e.what()));
 	}
-	/* 
-		v8::Handle<v8::Context> context = v8::Context::GetCurrent();
-		v8::Handle<v8::Object> global = context->Global();
-
-		v8::Handle<v8::Object> objresult = global->Get(v8::String::New(sresult.c_str()))->ToObject();
-
-
-		return objresult;
-	//return v8::String::New(sresult.c_str());
-	*/
 }
 
 v8::Handle<v8::Value> fuuid(const v8::Arguments& args) {

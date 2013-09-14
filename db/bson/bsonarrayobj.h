@@ -38,14 +38,30 @@ public:
 	BSONArrayObj(const BSONArrayObj& orig);
 
 	virtual __int32 length() const;
+	/**
+	 * @brief Adds the BSONObj to the array
+	 *
+	 * @param obj
+	 */
 	void add(const BSONObj& obj);
+	/**
+	 * @brief Adds all the elements of the argument to the current elements
+	 *
+	 * @param array
+	 */
+	void addAll(const BSONArrayObj& array);
 	virtual BSONObj* get(__int32 index) const;
    virtual char* toChar() const;
 	typedef std::vector<BSONObj*>::iterator iterator;
+	typedef std::vector<BSONObj*>::const_iterator const_iterator;
 	virtual BSONArrayObj* select(const char* select) const;
 	
 	virtual iterator begin();
 	virtual iterator end();
+
+	virtual const_iterator begin() const;
+	virtual const_iterator end() const;
+
 
 private:
 	std::vector<BSONObj*> _elements;

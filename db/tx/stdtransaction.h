@@ -47,6 +47,7 @@ class FileOutputStream;
 class Command;
 class TxBufferManager;
 class TxBuffer;
+class DBCursor;
 
 class StdTransaction: public BaseTransaction 
 {
@@ -59,7 +60,8 @@ class StdTransaction: public BaseTransaction
 		virtual bool dropNamespace(char* db, char* ns, const BSONObj* options = NULL);
 		virtual void update(char* db, char* ns, BSONObj* bson, const BSONObj* options = NULL);
 		virtual void remove(char* db, char* ns, char* documentId, char* revision, const BSONObj* options = NULL);
-		virtual BSONArrayObj* find(char* db, char* ns, const char* select, const char* filter, const BSONObj* options = NULL) throw (ParseException);
+		virtual DBCursor* const find(char* db, char* ns, const char* select, const char* filter, const BSONObj* options = NULL) throw (ParseException);
+		virtual DBCursor* const fetchCursor(const char* cursorId);
 		virtual BSONObj* findFirst(char* db, char* ns, const char* select, const char* filter, const BSONObj* options = NULL) throw (ParseException);
 		virtual std::vector<std::string>* dbs(const BSONObj* options = NULL) const;
 		virtual std::vector<std::string>* namespaces(const char* db, const BSONObj* options = NULL) const;
@@ -67,6 +69,7 @@ class StdTransaction: public BaseTransaction
 		virtual bool commit();
 		virtual bool rollback();
 
+		virtual void releaseCursor(const char* cursorId);
 	private:
 		BaseTransaction* _baseTransaction;
 };

@@ -25,6 +25,7 @@
 #include "networkinputstream.h"
 #include "networkoutputstream.h"
 #include "util.h"
+#include "workerengine.h"
 
 // Windows does not have this definition
 #ifdef WINDOWS
@@ -169,8 +170,8 @@ void NetworkServer::process() {
 		FD_ZERO(&read);
 		FD_SET(sock, &read);
 		timeval val;
-		val.tv_sec = 1;
-		val.tv_usec = 0;
+		val.tv_sec = 0;
+		val.tv_usec = 100;
 		read_fds = master;
 		int newsocket = select(fdmax + 1, &read_fds, NULL, NULL, &val);
 		for (int i = 0; i <= fdmax; i++) {
@@ -227,6 +228,9 @@ void NetworkServer::process() {
 					}
 				}
 			}
+
+			// execute any pending task that is running
+			WorkerEngine::workerEngine()->executeSteps();
 		}
 	}
 

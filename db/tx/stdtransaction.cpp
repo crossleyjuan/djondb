@@ -27,6 +27,7 @@
 #include "stdtransaction.h"
 #include "txbuffermanager.h"
 #include "util.h"
+#include "dbcursor.h"
 #include <stdlib.h>
 
 StdTransaction::StdTransaction(BaseTransaction* base, std::string transactionId)
@@ -60,8 +61,12 @@ void StdTransaction::remove(char* db, char* ns, char* documentId, char* revision
 	BaseTransaction::remove(db, ns, documentId, revision, options);
 }
 
-BSONArrayObj* StdTransaction::find(char* db, char* ns, const char* select, const char* filter, const BSONObj* options) throw (ParseException) {
+DBCursor* const StdTransaction::find(char* db, char* ns, const char* select, const char* filter, const BSONObj* options) throw (ParseException) {
 	return BaseTransaction::find(db, ns, select, filter, options);
+}
+
+DBCursor* const StdTransaction::fetchCursor(const char* cursorId) {
+	return BaseTransaction::fetchCursor(cursorId);
 }
 
 BSONObj* StdTransaction::findFirst(char* db, char* ns, const char* select, const char* filter, const BSONObj* options) throw (ParseException) {
@@ -93,4 +98,8 @@ bool StdTransaction::rollback() {
 	_bufferManager->dropControlFile();
 
 	return true;
+}
+
+void StdTransaction::releaseCursor(const char* cursorId) {
+	_controller->releaseCursor(cursorId);
 }

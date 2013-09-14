@@ -146,6 +146,10 @@ char* strcpy(char* str, int offset, int len) {
 	return result;
 }
 
+char* strcpy(const char* str, int len) {
+	return strcpy(const_cast<char*>(str), len);
+}
+
 char* strcpy(char* str, int len) {
 	return strcpy(str, 0, len);
 }

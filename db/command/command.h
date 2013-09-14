@@ -2,6 +2,7 @@
 #define COMMAND_H_INCLUDED
 
 #include <string>
+#include "util.h"
 
 using namespace std;
 
@@ -21,9 +22,15 @@ enum COMMANDTYPE {
 	 SHOWNAMESPACES,
 	 REMOVE,
 	 COMMIT,
-	 ROLLBACK
+	 ROLLBACK,
+	 FETCHCURSOR
 };
 
+/**
+ * @brief Every command requested by the client driver will end in a command at the database level, this is the base class for all the supported commands
+ * in djondb. The COMMANDTYPE enum will list all the possible options that djondb will support at the server side. Some commands might react different
+ * based on the version of the client.
+ */
 class Command {
     public:
         Command(COMMANDTYPE commandType);
@@ -61,6 +68,23 @@ class Command {
 			  return _options;
 		  }
 
+		  /**
+			* @brief Version of the command, some commands would react diferent depending on the version used by the client
+			*
+			* @param version
+			*/
+		  void setVersion(const Version& version) {
+			  _version = new Version(version);
+		  }
+
+		  /**
+			* @brief Version of the command, some commands would react diferent depending on the version used by the client
+			*
+			*/
+		  const Version* version() const {
+			  return _version;
+		  }
+
 	 protected:
 		  void setResultCode(int rc) {
 			  _resultCode = rc;
@@ -77,6 +101,7 @@ class Command {
 		  COMMANDTYPE _commandType;
 		  Controller* _dbController;
 		  BSONObj* _options;
+		  Version* _version;
 };
 
 class CloseCommand: public Command {

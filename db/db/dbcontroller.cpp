@@ -25,12 +25,14 @@
 #include "mmapinputstream.h"
 #include "fileoutputstream.h"
 #include "dbfileinputstream.h"
+#include "dbfilestream.h"
 
 #include "bsonoutputstream.h"
 #include "bsoninputstream.h"
 #include "filterparser.h"
 #include "baseexpression.h"
 #include "expressionresult.h"
+#include "dbcursor.h"
 
 #include "cachemanager.h"
 #include "indexfactory.h"
@@ -362,58 +364,77 @@ void DBController::insertIndex(const char* db, const char* ns, BSONObj* bson, lo
 	impl->add(indexBSON, id, filePos);
 }
 
-BSONArrayObj* DBController::find(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options) throw(ParseException) {
+void DBController::registerCursor(DBCursor* cursor) {
+	const char* cursorId = cursor->cursorId;
+	_cursors.insert(std::pair<const char*, DBCursor*>(cursorId, cursor));
+}
+
+DBCursor* const DBController::find(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options) throw(ParseException) {
 	if (_logger->isDebug()) _logger->debug(2, "DBController::find db: %s, ns: %s, select: %s, filter: %s", db, ns, select, filter);
 
-	BSONArrayObj* result;
-
-	FilterParser* parser = FilterParser::parse(filter);
-
-	std::set<std::string> tokens = parser->tokens();
-
-	if (IndexFactory::indexFactory.containsIndex(db, ns, tokens)) {
-		IndexAlgorithm* impl = IndexFactory::indexFactory.index(db, ns, tokens);
-
-		std::list<Index*> elements = impl->find(parser);
-
-		std::string filedir = _dataDir + db;
-		filedir = filedir + FILESEPARATOR;
-
-		std::stringstream ss;
-		ss << filedir << ns << ".dat";
-
-		std::string filename = ss.str();
-		result = new BSONArrayObj();
-		FileInputStream* fis = new FileInputStream(filename.c_str(), "rb");
-		DBFileInputStream* dbStream = new DBFileInputStream(fis);
-
-		BSONInputStream* bis = new BSONInputStream(dbStream);
-		for (std::list<Index*>::iterator it = elements.begin(); it != elements.end(); it++) {
-			Index* index = *it;
-
-			long posData = index->posData;
-			dbStream->seek(posData);
-
-			BSONObj* obj = bis->readBSON(select);
-
-			result->add(*obj);
-
-			delete obj;
+	DBCursor* cursor = initializeCursor(db, ns, select, filter, options);
+	registerCursor(cursor);
+	while (true) {
+		if (!readNextPage(cursor)) {
+			break;
 		}
-		delete bis;
-		delete dbStream;
-
-	} else {
-		result = findFullScan(db, ns, select, parser, options);
+		cursor->currentPageIndex++;
 	}
 
-	delete parser;
-	return result;
+	// resets the start position
+	cursor->currentPageIndex = 0;
+	cursor->currentPosition = 0;
+	dbcursor_currentPage(cursor);
+
+	return cursor;
+}
+
+bool DBController::fetchInternalCursor(DBCursor* cursor) {
+	return nextPage(cursor);
+}
+
+DBCursor* const DBController::fetchCursor(const char* cursorId) {
+	DBCursor* cursor = DBController::cursor(cursorId);
+	if (cursor != NULL) {
+		fetchInternalCursor(cursor);
+		return cursor;
+	} else {
+		return NULL;
+	}
+}
+
+DBCursor* DBController::cursor(const char* cursorId) {
+	std::map<const char*, DBCursor*>::iterator i = _cursors.find(cursorId);
+	if (i != _cursors.end()) {
+		return i->second;
+	} else {
+		return NULL;
+	}
+}
+
+void DBController::releaseCursor(const char* cursorId) {
+	std::map<const char*, DBCursor*>::iterator i = _cursors.find(cursorId);
+	if (i != _cursors.end()) {
+		DBCursor* cursor = i->second;
+
+		if (cursor->rows != NULL) delete cursor->rows;
+		if (cursor->currentPage != NULL) delete cursor->currentPage;
+
+		_cursors.erase(i);
+		free(cursor->db);
+		free(cursor->ns);
+		if (cursor->select != NULL) free(cursor->select);
+		if (cursor->filter != NULL) free(cursor->filter);
+		if (cursor->options != NULL) delete cursor->options;
+		if (cursor->parser != NULL) delete cursor->parser;
+		if (cursor->fileName != NULL) free(cursor->fileName);
+		delete cursor;
+	}
 }
 
 BSONObj* DBController::findFirst(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options) throw(ParseException) {
 	if (_logger->isDebug()) _logger->debug(2, "DBController::findFirst db: %s, ns: %s, select: %s, filter: %s", db, ns, select, filter);
-	std::string filedir = _dataDir + db;
+	std::string filedir = combinePath(_dataDir.c_str(), db);
 	filedir = filedir + FILESEPARATOR;
 
 	std::stringstream ss;
@@ -463,43 +484,80 @@ BSONObj* DBController::findFirst(const char* db, const char* ns, const char* sel
 	dbStream->close();
 	delete dbStream;
 
-	mmis->close();
-	delete mmis;
 	delete parser;
 	delete bis;
 	return bsonResult;
 }
 
-BSONArrayObj* DBController::findFullScan(const char* db, const char* ns, const char* select, FilterParser* parser, const BSONObj* options) throw(ParseException) {
-	if (_logger->isDebug()) _logger->debug(2, "DBController::findFullScan with parser db: %s, ns: %s", db, ns);
-	std::string filedir = _dataDir + db;
+DBCursor* DBController::initializeCursor(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options)
+{
+	DBCursor* cursor = createCursor(db, ns, select, filter, options);
+
+	std::string tempSetting = getSetting("DATA_DIR");
+	_dataDir = strcpy(tempSetting.c_str());
+	cursor->parser = NULL;
+	_logger = getLogger(NULL);
+	cursor->position = DB_HEADER_SIZE;
+
+	std::stringstream ss;
+	ss << ns << ".dat";
+	std::string fileName = ss.str();
+
+	char* filedir = combinePath(_dataDir.c_str(), cursor->db);
+	char* fullFileName = combinePath(filedir, fileName.c_str());
+	cursor->fileName = strcpy(fullFileName, strlen(fullFileName));
+
+	cursor->parser = FilterParser::parse(cursor->filter);
+
+	cursor->tokens = cursor->parser->tokens();
+	cursor->currentPageIndex = 0;
+	cursor->currentPosition = 0;
+	cursor->currentPage = NULL;
+	cursor->rowsPerPage = 20;
+	cursor->allRecordsLoaded = false;
+	// Check if the options contains a hint of the number of rows per page
+	if (cursor->options != NULL) {
+		if (cursor->options->has("rowsPerPage")) {
+			cursor->rowsPerPage = cursor->options->getInt("rowsPerPage");
+		}
+	}
+
+	if (IndexFactory::indexFactory.containsIndex(cursor->db, cursor->ns, cursor->tokens)) {
+		initializeIndexCursor(cursor);
+	} else {
+		initializeFullScanCursor(cursor);
+	}
+	cursor->status = 1;
+
+	free(filedir);
+	return cursor;
+}
+
+void DBController::initializeFullScanCursor(DBCursor* cursor) {
+	cursor->cursorType = 1;
+	std::string filedir = combinePath(_dataDir.c_str(), cursor->db);
 	filedir = filedir + FILESEPARATOR;
 
 	std::stringstream ss;
-	ss << filedir << ns << ".dat";
+	ss << cursor->ns << ".dat";
+	std::string fileName = ss.str();
 
-	std::string filename = ss.str();
+	char* fullFileName = combinePath(filedir.c_str(), fileName.c_str());
 
 	// Execute open on streammanager, just to check that the file was alrady opened
-	StreamManager::getStreamManager()->open(db, ns, INDEX_FTYPE);
+	StreamManager::getStreamManager()->open(cursor->db, cursor->ns, INDEX_FTYPE);
 	// Execute open on streammanager, just to check that the file was alrady opened
-	StreamManager::getStreamManager()->open(db, ns, DATA_FTYPE);
+	StreamManager::getStreamManager()->open(cursor->db, cursor->ns, DATA_FTYPE);
 
-	//FileInputStream* fis = new FileInputStream(filename.c_str(), "rb");
-	MMapInputStream* mmis = new MMapInputStream(filename.c_str(), 0);
-	DBFileInputStream* dbStream = new DBFileInputStream(mmis);
-	BSONArrayObj* result = new BSONArrayObj();
+	//FileInputStream* fis = new FileInputStream(fullFileName.c_str(), "rb");
 
-	BSONInputStream* bis = new BSONInputStream(dbStream);
-
-	std::set<std::string> tokens = parser->xpathTokens();
 	std::string filterSelect;
 
-	if ((strcmp(select, "*") != 0) && (tokens.size() > 0)) {
+	if ((strcmp(cursor->select, "*") != 0) && (cursor->tokens.size() > 0)) {
 		// this will reserve enough space to concat the filter tokens
-		filterSelect.reserve(tokens.size() * 100);
+		filterSelect.reserve(cursor->tokens.size() * 100);
 		filterSelect.append("$'_status'");
-		for (std::set<std::string>::iterator i = tokens.begin(); i != tokens.end(); i++) {
+		for (std::set<std::string>::iterator i = cursor->tokens.begin(); i != cursor->tokens.end(); i++) {
 			std::string token = *i;
 			filterSelect.append(", ");
 			filterSelect.append("$'");
@@ -510,58 +568,186 @@ BSONArrayObj* DBController::findFullScan(const char* db, const char* ns, const c
 		filterSelect = "*";
 	}
 
-	mmis->seek(29);
-	BSONBufferedObj* obj = NULL;
-
-	__int64 maxResults = 3000;
-	if ((options != NULL) && options->has("limit")) {
-		BSONContent* content = options->getContent("limit");
+	cursor->maxResults = 3000;
+	if ((cursor->options != NULL) && cursor->options->has("limit")) {
+		BSONContent* content = cursor->options->getContent("limit");
 		if (content->type() == INT_TYPE) {
-			maxResults = options->getInt("limit");
+			cursor->maxResults = cursor->options->getInt("limit");
 		} else if (content->type() == LONG_TYPE) {
-			maxResults = options->getLong("limit");
+			cursor->maxResults = cursor->options->getLong("limit");
 		}
 	} else {
 		std::string smax = getSetting("max_results");
 		if (smax.length() > 0) {
 #ifdef WINDOWS
-			maxResults = _atoi64(smax.c_str());
+			cursor->maxResults = _atoi64(smax.c_str());
 #else
-			maxResults = atoll(smax.c_str());
+			cursor->maxResults = atoll(smax.c_str());
 #endif
 		}
 	}
-	__int64 count = 0;
-	while (!mmis->eof() && (count < maxResults)) {
-		if (obj == NULL) {
-			obj = new BSONBufferedObj(mmis->pointer(), mmis->length() - mmis->currentPos());
-		} else {
-			obj->reset(mmis->pointer(), mmis->length() - mmis->currentPos());
-		}
-		mmis->seek(mmis->currentPos() + obj->bufferLength());
-		// Only "active" Records
-		if (obj->getInt("_status") == 1) {
-			bool match = false;
-			ExpressionResult* expresult = parser->eval(*obj);
-			if (expresult->type() == ExpressionResult::RT_BOOLEAN) {
-				match = *expresult;
-			}
-			delete expresult;
-			if (match) {
-				BSONObj* objSubselect = obj->select(select);
-				result->add(*objSubselect);
-				delete objSubselect;
-				count++;
-			}
-		}
+	cursor->count = 0;
+
+	cursor->rows = new BSONArrayObj();
+	free(fullFileName);
+}
+
+void DBController::initializeIndexCursor(DBCursor* cursor) {
+	cursor->cursorType = 0;
+	IndexAlgorithm* impl = IndexFactory::indexFactory.index(cursor->db, cursor->ns, cursor->tokens);
+
+	std::list<Index*> elements = impl->find(cursor->parser);
+
+	std::string filedir = combinePath(_dataDir.c_str(), cursor->db);
+	filedir = filedir + FILESEPARATOR;
+
+	std::stringstream ss;
+	ss << filedir << cursor->ns << ".dat";
+
+	std::string filename = ss.str();
+	cursor->rows = new BSONArrayObj();
+	FileInputStream* fis = new FileInputStream(filename.c_str(), "rb");
+	DBFileInputStream* dbStream = new DBFileInputStream(fis);
+
+	BSONInputStream* bis = new BSONInputStream(dbStream);
+	for (std::list<Index*>::iterator it = elements.begin(); it != elements.end(); it++) {
+		Index* index = *it;
+
+		long posData = index->posData;
+		dbStream->seek(posData);
+
+		BSONObj* obj = bis->readBSON(cursor->select);
+
+		cursor->rows->add(*obj);
+
+		delete obj;
+	}
+	delete bis;
+	delete dbStream;
+}
+
+bool DBController::readNextPage(DBCursor* cursor) {
+	bool pageLoaded = false;
+	if (false && cursor->cursorType == 0) {
+		pageLoaded = nextPageIndex(cursor);
+	} else {
+		pageLoaded = nextPageFullScan(cursor);
+	}
+	return pageLoaded;
+}
+
+bool DBController::nextPage(DBCursor* cursor) {
+	// if it's not open then return false
+	if (cursor->status == 0) {
+		return false;
 	}
 
-	if (obj != NULL) delete obj;
+	bool loadNextPage = false;
+	if (!cursor->allRecordsLoaded) {
+		if (cursor->currentPageIndex < 0) {
+			loadNextPage = true;
+		} else if (cursor->currentPageIndex < ((cursor->count / cursor->rowsPerPage) - 1)) {
+			loadNextPage = false;
+		} else {
+			loadNextPage = true;
+		}
+	}
+	bool pageLoaded = false;
+	if (loadNextPage) {
+		pageLoaded = readNextPage(cursor);
+	}
+	dbcursor_currentPage(cursor);
+	cursor->currentPageIndex++;
+	return (cursor->currentPage != NULL);
+}
+
+bool DBController::nextPageFullScan(DBCursor* cursor) {
+	if (_logger->isDebug()) _logger->debug(2, "DBController::findFullScan with parser dbcursor");
+
+	// if it's not open then return false
+	if (cursor->status == 0 || cursor->allRecordsLoaded) {
+		return false;
+	}
+	// Execute open on streammanager, just to check that the file was alrady opened
+	StreamManager::getStreamManager()->open(cursor->db, cursor->ns, INDEX_FTYPE);
+	// Execute open on streammanager, just to check that the file was alrady opened
+	StreamManager::getStreamManager()->open(cursor->db, cursor->ns, DATA_FTYPE);
+
+	if (!existFile(cursor->fileName)) {
+		return false;
+	}
+	//FileInputStream* fis = new FileInputStream(filename.c_str(), "rb");
+	MMapInputStream* mmis = new MMapInputStream(cursor->fileName, 0);
+	DBFileInputStream* dbStream = new DBFileInputStream(mmis);
+	BSONArrayObj* result = new BSONArrayObj();
+
+	BSONInputStream* bis = new BSONInputStream(dbStream);
+
+	mmis->seek(cursor->position);
+	BSONBufferedObj* bufferedObj = NULL;
+
+	// Calculates which is the next top row to retrieve based on the page size and the currentPageIndex
+	int nextTop = (cursor->currentPageIndex + 1) * cursor->rowsPerPage;
+
+	bool nextPageAvailable = false;
+
+	// checks if the page is already loaded
+	if (cursor->count > nextTop) {
+		nextPageAvailable = true;
+	} else {
+		// if it's already at the end then it should not increase the currentPage
+		if (!mmis->eof()) {
+			while (true) {
+				if (!mmis->eof() && (cursor->count < cursor->maxResults)) {
+					if (cursor->count < nextTop) {
+						if (bufferedObj == NULL) {
+							bufferedObj = new BSONBufferedObj(mmis->pointer(), mmis->length() - mmis->currentPos());
+						} else {
+							bufferedObj->reset(mmis->pointer(), mmis->length() - mmis->currentPos());
+						}
+						mmis->seek(mmis->currentPos() + bufferedObj->bufferLength());
+						// Only "active" Records
+						if (bufferedObj->getInt("_status") == 1) {
+							bool match = false;
+							ExpressionResult* expresult = cursor->parser->eval(*bufferedObj);
+							if (expresult->type() == ExpressionResult::RT_BOOLEAN) {
+								match = *expresult;
+							}
+							delete expresult;
+							if (match) {
+								BSONObj* objSubselect = bufferedObj->select(cursor->select);
+								cursor->rows->add(*objSubselect);
+								delete objSubselect;
+								cursor->count++;
+							}
+						}
+					} else {
+						break;
+					}
+				} else {
+					break;
+				}
+			}
+			nextPageAvailable = true;
+		}
+	}
+	if (mmis->eof()) {
+		cursor->allRecordsLoaded = true;
+	}
+	if (cursor->currentPage != NULL) delete cursor->currentPage;
+	cursor->currentPage = NULL;
+	cursor->currentPosition = cursor->currentPosition + cursor->rowsPerPage;
+	cursor->position = mmis->currentPos();
+
+	if (bufferedObj != NULL) delete bufferedObj;
 	delete bis;
 	dbStream->close();
 	delete dbStream;
+	return true;
+}
 
-	return result;
+bool DBController::nextPageIndex(DBCursor* cursor) {
+	throw "unsupported yet";
 }
 
 std::vector<std::string>* DBController::dbs(const BSONObj* options) const {

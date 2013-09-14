@@ -23,6 +23,7 @@
 #include "dbcontroller.h"
 #include "bson.h"
 #include "util.h"
+#include "dbcursor.h"
 #include "transactionmanager.h"
 #include <stdlib.h>
 #include <memory>
@@ -75,79 +76,21 @@ TEST_F(TestTX, testSimpleOperations) {
 	test.add("_id", id->c_str());
 	test.add("a", 1);
 	tx->insert("test", "simple-tx", &test);
-	BSONArrayObj* arr = tx->find("test", "simple-tx", "*", "");
+	DBCursor* cursor = tx->find("test", "simple-tx", "*", "");
+	BSONArrayObj* arr = tx->fetchCursor(cursor->cursorId)->currentPage;
 	BSONObj* obj = arr->get(0);
 	obj->add("a", 2);
 	tx->update("test", "simple-tx", obj);
 	delete id;
 	delete arr;
 
-	arr = tx->find("test", "simple-tx", "*", "$'a' == 1");
-	EXPECT_TRUE(arr->length() == 0);
+	cursor = tx->find("test", "simple-tx", "*", "$'a' == 1");
+	arr = tx->fetchCursor(cursor->cursorId)->currentPage;
+	// No records means no current page
+	EXPECT_TRUE(arr == NULL);
 
 	log->info("~testSimpleOperations");
 	delete arr;
-}
-
-TEST_F(TestTX, testTransactionSimplest)
-{
-	Logger* log = getLogger(NULL);
-	log->info("testTransactionSimplest");
-	DummyController* controller = new DummyController();
-
-	BaseTransaction* tx = new BaseTransaction(controller);
-
-	tx->dropNamespace("db", "txns");
-
-	delete tx;
-	delete controller;
-
-	controller = new DummyController();
-
-	tx = new BaseTransaction(controller);
-
-	tx->dropNamespace("db", "txns");
-
-	delete tx;
-	delete controller;
-}
-
-TEST_F(TestTX, testTransaction)
-{
-	Logger* log = getLogger(NULL);
-	log->info("testTransaction");
-	DummyController* controller = new DummyController();
-
-	BaseTransaction* tx = new BaseTransaction(controller);
-
-	tx->dropNamespace("db", "txns");
-
-	BSONObj o;
-	std::string* id = uuid();
-	o.add("_id", const_cast<char*>(id->c_str()));
-	o.add("name", "John");
-	tx->insert("db", "txns", &o);
-
-	BSONArrayObj* res = tx->find("db", "txns", "*", "");
-
-	EXPECT_TRUE(res->length() == 1);
-	BSONObj* test1 = *res->begin();
-	EXPECT_TRUE(test1->getString("name").compare("John") == 0);
-	test1->add("name", "Peter");
-	tx->update("db", "txns", test1);
-
-	delete res;
-
-	res = tx->find("db", "txns", "*", "");
-
-	EXPECT_TRUE(res->length() == 1);
-	BSONObj* test2 = *res->begin();
-	EXPECT_TRUE(test2->getString("name").compare("Peter") == 0);
-
-	delete res;
-	delete tx;
-	delete controller;
-	delete id;
 }
 
 TEST_F(TestTX, testTransactionSimpleCommit)
@@ -255,16 +198,20 @@ TEST_F(TestTX, testTransactionMergedData)
 	o.add("name", "John");
 	stx->insert("db", "testcommit", &o);
 
-	BSONArrayObj* res = stx->find("db", "testcommit", "*", "");
+	DBCursor* cursor = stx->find("db", "testcommit", "*", "");
+	BSONArrayObj* res = stx->fetchCursor(cursor->cursorId)->currentPage;
 	EXPECT_TRUE(res->length() == 2);
 
-	BSONArrayObj* resOut = tx->find("db", "testcommit", "*", "");
+	cursor = tx->find("db", "testcommit", "*", "");
+	BSONArrayObj* resOut = tx->fetchCursor(cursor->cursorId)->currentPage;
 	EXPECT_TRUE(resOut->length() == 1);
 
 	stx->commit();
 	delete stx;
 
-	BSONArrayObj* resOut2 = tx->find("db", "testcommit", "*", "");
+	cursor = tx->find("db", "testcommit", "*", "");
+	cursor = tx->fetchCursor(cursor->cursorId);
+	BSONArrayObj* resOut2 = cursor->currentPage;
 	EXPECT_TRUE(resOut2->length() == 2);
 
 	delete tx;
@@ -294,24 +241,29 @@ TEST_F(TestTX, testTransactionManager) {
 	std::string* t1 = uuid();
 
 	StdTransaction* transaction = manager->getTransaction(*t1);
-	std::auto_ptr<BSONArrayObj> array(transaction->find("db", "mtx", "*", "$'cod' == 1"));
-	BSONObj* obj1up = array->get(0);
+	DBCursor* cursor = transaction->find("db", "mtx", "*", "$'cod' == 1");
+	cursor = transaction->fetchCursor(cursor->cursorId);
+	BSONObj* obj1up = cursor->currentPage->get(0);
 	obj1up->add("lastName", "Shakespeare");
 	transaction->update("db", "mtx", obj1up);
 
-	std::auto_ptr<BSONArrayObj> array0(wal->find("db", "mtx", "*", "$'cod' == 1"));
-	BSONObj* origin1 = array0->get(0); 
+	cursor = wal->find("db", "mtx", "*", "$'cod' == 1");
+	wal->fetchCursor(cursor->cursorId);
+	BSONObj* origin1 = cursor->currentPage->get(0); 
 	EXPECT_TRUE(!origin1->has("lastName"));
 
-	std::auto_ptr<BSONArrayObj> array1(transaction->find("db", "mtx", "*", "$'cod' == 1"));
-	BSONObj* objtx1 = array1->get(0);
+	cursor = transaction->find("db", "mtx", "*", "$'cod' == 1");
+	ASSERT_TRUE((cursor = transaction->fetchCursor(cursor->cursorId)) != NULL);
+	ASSERT_TRUE(cursor->currentPage != NULL);
+	BSONObj* objtx1 = cursor->currentPage->get(0);
 	EXPECT_TRUE(objtx1->has("lastName"));
 
 	transaction->commit();
-	manager->dropTransaction(*t1);
+	////manager->dropTransaction(*t1);
 
-	std::auto_ptr<BSONArrayObj> array2(wal->find("db", "mtx", "*", "$'cod' == 1"));
-	BSONObj* origin2 = array2->get(0);
+	cursor = wal->find("db", "mtx", "*", "$'cod' == 1");
+	ASSERT_TRUE((cursor = transaction->fetchCursor(cursor->cursorId)) != NULL);
+	BSONObj* origin2 = cursor->currentPage->get(0);
 	EXPECT_TRUE(origin2->has("lastName"));
 
 	delete t1;

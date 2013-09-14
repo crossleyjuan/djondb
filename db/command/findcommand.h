@@ -5,6 +5,8 @@
 #include "bson.h"
 #include <vector>
 
+class DBCursor;
+
 class FindCommand : public Command
 {
     public:
@@ -32,6 +34,17 @@ class FindCommand : public Command
 		  std::string* select() const;
         void setFilter(const std::string& filter);
 		  std::string* filter() const;
+
+		  const char* cursorId() const;
+
+		  /**
+			* @brief This will return the current loaded array, if this is an old version prior 0.3.2 then it should
+			* contain the full rows array
+			*
+			* @return bson array
+			*/
+		  BSONArrayObj* const arrayResult() const;
+		  BSONArrayObj* const readedResult() const;
     protected:
     private:
     private:
@@ -40,7 +53,9 @@ class FindCommand : public Command
         std::string* _db;
 		  std::string* _filter;
 
-		  BSONArrayObj* _findresult;
+		  char* _cursorId; //!< This will store the id of the cursor returned by the find command, if the client is 0.3.1 or above
+		  BSONArrayObj* _arrayresult; //!< Used on commands version 0.3.0 or below, if the client is newer than that then this will be NULL
+		  BSONArrayObj* _readedResult; //!< contains the result readed of the incoming response 
 };
 
 #endif // FINDCOMMAND_H

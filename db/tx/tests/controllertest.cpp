@@ -41,8 +41,8 @@ void DummyController::update(const char* db, const char* ns, BSONObj* bson, cons
 void DummyController::remove(const char* db, const char* ns, const char* documentId, const char* revision, const BSONObj* options) {
 }
 
-BSONArrayObj* DummyController::find(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options) throw (ParseException) {
-	return new BSONArrayObj();
+DBCursor* const DummyController::find(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options) throw (ParseException) {
+	return NULL;
 }
 
 BSONObj* DummyController::findFirst(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options)  throw (ParseException) {
@@ -57,3 +57,9 @@ std::vector<std::string>* DummyController::namespaces(const char* db, const BSON
 	return new std::vector<std::string>();
 }
 
+DBCursor* const DummyController::fetchCursor(const char* cursorId) {
+	return NULL;
+}
+
+void DummyController::releaseCursor(const char* cursorId) {
+}

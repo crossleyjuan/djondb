@@ -45,8 +45,8 @@ CommandWriter::CommandWriter(const CommandWriter& orig) {
 }
 
 int CommandWriter::writeCommand(Command* cmd) {
-	std::string version = "0.3.0";
-	_stream->writeString(version);
+	Version v = getCurrentVersion();
+	_stream->writeString((std::string)v);
 	int type = cmd->commandType();
 	_stream->writeInt(type);
 

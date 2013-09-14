@@ -504,3 +504,41 @@ TEST(testBSON, testBSONSelect) {
 
 	delete obj;
 }
+
+TEST(testBSON, testBSONArrayAddAll) {
+	cout << "\ntestBSONArrayAddAll()" << endl;
+
+	BSONArrayObj* array = new BSONArrayObj();
+
+	BSONArrayObj* arr1 = new BSONArrayObj();
+	for (int x = 0; x < 100; x++) {
+		BSONObj* o = new BSONObj();
+		o->add("int", x);
+
+		arr1->add(*o);
+		delete o;
+	}
+
+	array->addAll(*arr1);
+	EXPECT_TRUE(array->length() == 100);
+
+	BSONArrayObj* arr2 = new BSONArrayObj();
+	for (int x = 100; x < 200; x++) {
+		BSONObj* o = new BSONObj();
+		o->add("int", x);
+
+		arr2->add(*o);
+		delete o;
+	}
+
+	array->addAll(*arr2);
+	ASSERT_TRUE(array->length() == 200);
+
+	EXPECT_TRUE(array->get(0)->getInt("int") == 0);
+	EXPECT_TRUE(array->get(100)->getInt("int") == 100);
+	EXPECT_TRUE(array->get(199)->getInt("int") == 199);
+
+	delete array;
+	delete arr1;
+	delete arr2;
+}

@@ -46,6 +46,7 @@ class FileOutputStream;
 class Command;
 class TxBufferManager;
 class TxBuffer;
+class DBCursor;
 
 class BaseTransaction: public Controller 
 {
@@ -59,7 +60,8 @@ class BaseTransaction: public Controller
 		virtual bool dropNamespace(const char* db, const char* ns, const BSONObj* options = NULL);
 		virtual void update(const char* db, const char* ns, BSONObj* bson, const BSONObj* options = NULL);
 		virtual void remove(const char* db, const char* ns, const char* documentId, const char* revision, const BSONObj* options = NULL);
-		virtual BSONArrayObj* find(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options = NULL) throw (ParseException);
+		virtual DBCursor* const find(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options = NULL) throw (ParseException);
+		virtual DBCursor* const fetchCursor(const char* cursorId);
 		virtual BSONObj* findFirst(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options = NULL) throw (ParseException);
 		virtual std::vector<std::string>* dbs(const BSONObj* options = NULL) const;
 		virtual std::vector<std::string>* namespaces(const char* db, const BSONObj* options = NULL) const;
@@ -67,6 +69,7 @@ class BaseTransaction: public Controller
 		Controller* controller() const;
 		void addBuffers(std::vector<TxBuffer*> buffers);
 		void join();
+		virtual void releaseCursor(const char* cursorId);
 
 	protected:
 		BaseTransaction(Controller* controller, std::string transactionId);
@@ -85,7 +88,9 @@ class BaseTransaction: public Controller
 		void checkState();
 		std::list<TransactionOperation*>* findOperations(const char* db) const;
 		std::list<TransactionOperation*>* findOperations(const char* db, const char* ns) const;
+		void applyOperations(DBCursor* cursor, std::list<TransactionOperation*>* operations);
 
+		DBCursor* initializeCursor(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options);
 };
 
 #endif // BASETRANSACTION_INCLUDED_H

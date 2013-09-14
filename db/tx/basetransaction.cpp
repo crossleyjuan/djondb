@@ -38,6 +38,7 @@
 #include "txbuffermanager.h"
 #include "txbuffer.h"
 #include "dbcontroller.h"
+#include "dbcursor.h"
 #include <stdlib.h>
 
 BaseTransaction::BaseTransaction(Controller* controller) {
@@ -79,6 +80,10 @@ BaseTransaction::~BaseTransaction() {
 }
 
 std::list<TransactionOperation*>* BaseTransaction::findOperations(const char* db) const {
+	return findOperations(db, NULL);
+}
+
+std::list<TransactionOperation*>* BaseTransaction::findOperations(const char* db, const char* ns) const {
 	std::list<TransactionOperation*>* result = new std::list<TransactionOperation*>();
 	const std::vector<TxBuffer*>* buffers = _bufferManager->getActiveBuffers();
 	MemoryStream* temporal = new MemoryStream(2048); // Preallocated space
@@ -88,31 +93,12 @@ std::list<TransactionOperation*>* BaseTransaction::findOperations(const char* db
 			buffer->acquireLock();
 			buffer->seek(0);
 			while (!buffer->eof()) {
-				TransactionOperation* operation = _bufferManager->readOperationFromRegister(temporal, buffer, const_cast<char*>(db), NULL);
+				TransactionOperation* operation = _bufferManager->readOperationFromRegister(temporal, buffer, const_cast<char*>(db), const_cast<char*>(ns));
 				if (operation != NULL) {
 					result->push_back(operation);
 				}
 			}
 			buffer->releaseLock();
-		}
-	}
-
-	delete temporal;
-	return result;
-}
-
-std::list<TransactionOperation*>* BaseTransaction::findOperations(const char* db, const char* ns) const {
-	std::list<TransactionOperation*>* result = new std::list<TransactionOperation*>();
-	const std::vector<TxBuffer*>* buffers = _bufferManager->getActiveBuffers();
-	MemoryStream* temporal = new MemoryStream(2048); // Preallocated space
-	for (std::vector<TxBuffer*>::const_iterator i = buffers->begin(); i != buffers->end(); i++) {
-		TxBuffer* buffer = *i;
-		buffer->seek(0);
-		while (!buffer->eof()) {
-			TransactionOperation* operation = _bufferManager->readOperationFromRegister(temporal, buffer, const_cast<char*>(db), const_cast<char*>(ns));
-			if (operation != NULL) {
-				result->push_back(operation);
-			}
 		}
 	}
 	delete temporal;
@@ -188,13 +174,16 @@ bool compareStrings(std::string s1, std::string s2) {
 	return s1.compare(s2) == 0;
 }
 
-BSONArrayObj* BaseTransaction::find(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options) throw (ParseException) {
-	std::list<TransactionOperation*>* operations = findOperations(db, ns);
+void BaseTransaction::applyOperations(DBCursor* cursor, std::list<TransactionOperation*>* operations) {
+	// namespace and operations by instance
 	LinkedMap<std::string, BSONObj*> map(compareStrings);
+
+	FilterParser* parser = cursor->parser;
 
 	// this uses the "*" to select all the fields, later in this method
 	// the correct select will be used to create the result
-	BSONArrayObj* origList = _controller->find(db, ns, "*", filter, options);
+	BSONArrayObj* origList = cursor->rows;
+
 	if (origList != NULL) {
 		for (BSONArrayObj::iterator itOrig = origList->begin(); itOrig != origList->end(); itOrig++) {
 			BSONObj* obj = *itOrig;
@@ -202,7 +191,8 @@ BSONArrayObj* BaseTransaction::find(const char* db, const char* ns, const char* 
 		}
 	}
 
-	FilterParser* parser = FilterParser::parse(filter);
+	char* select = cursor->select;
+	int maxResults = cursor->maxResults;
 
 	for (std::list<TransactionOperation*>::iterator i = operations->begin(); i != operations->end(); i++) {
 		TransactionOperation* operation = *i;
@@ -278,29 +268,8 @@ BSONArrayObj* BaseTransaction::find(const char* db, const char* ns, const char* 
 				};
 				break;
 		}
-		free(operation->db);
-		free(operation->ns);
-		delete operation;
 	}
 
-	__int64 maxResults = 3000;
-	if ((options != NULL) && options->has("limit")) {
-		BSONContent* content = options->getContent("limit");
-		if (content->type() == INT_TYPE) {
-			maxResults = options->getInt("limit");
-		} else if (content->type() == LONG_TYPE) {
-			maxResults = options->getLong("limit");
-		}
-	} else {
-		std::string smax = getSetting("max_results");
-		if (smax.length() > 0) {
-#ifdef WINDOWS
-			maxResults = _atoi64(smax.c_str());
-#else
-			maxResults = atoll(smax.c_str());
-#endif
-		}
-	}
 	__int64 count = 0;
 	BSONArrayObj* result = new BSONArrayObj();
 	for (LinkedMap<std::string, BSONObj*>::iterator it = map.begin(); it != map.end(); it++) {
@@ -314,23 +283,52 @@ BSONArrayObj* BaseTransaction::find(const char* db, const char* ns, const char* 
 		}
 	}
 	map.clear();
-	delete parser;
-	delete operations;
-	delete origList;
 
-	return result;
+	if (cursor->currentPage != NULL) delete cursor->currentPage;
+	if (cursor->rows != NULL) 	delete cursor->rows;
+	cursor->rows = result;
+	cursor->currentPageIndex = 0;
+	cursor->currentPosition = 0;
+	cursor->count = result->length();
+
+	delete operations;
+}
+
+DBCursor* const BaseTransaction::find(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options) throw (ParseException) {
+
+	// This will get the first page of the current cursor, 
+	// then this will put the current Operations attached to the cursor
+	// everytime this fetch a new page the changes will be applied to the
+	// current page.
+	DBCursor* const cursor = _controller->find(db, ns, select, filter, options);
+
+	// Apply the operations to the currentPage
+	std::list<TransactionOperation*>* operations = findOperations(db, ns);
+
+	applyOperations(cursor, operations);
+
+	return cursor;
+}
+
+
+DBCursor* const BaseTransaction::fetchCursor(const char* cursorId) {
+	DBCursor* cursor = _controller->fetchCursor(cursorId);
+	return cursor;
 }
 
 BSONObj* BaseTransaction::findFirst(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options) throw (ParseException) {
-	BSONArrayObj* fullList = find(db, ns, select, filter, options);
+	DBCursor* cursor = find(db, ns, select, filter, options);
 
 	BSONObj* result = NULL;
-	if (fullList != NULL) {
-		for (BSONArrayObj::iterator it = fullList->begin(); it != fullList->end(); it++) {
-			result = new BSONObj(**it);
-			break;
+	if (cursor != NULL) {
+		if ((cursor = fetchCursor(cursor->cursorId))->currentPage != NULL) {
+			const BSONArrayObj* fullList = cursor->currentPage;
+			for (BSONArrayObj::const_iterator it = fullList->begin(); it != fullList->end(); it++) {
+				result = new BSONObj(**it);
+				break;
+			}
 		}
-		delete fullList;
+		_controller->releaseCursor(cursor->cursorId);
 	}
 
 	return result;
@@ -442,3 +440,8 @@ void BaseTransaction::addBuffers(std::vector<TxBuffer*> buffers) {
 void BaseTransaction::join() {
 	_bufferManager->join();
 }
+
+void BaseTransaction::releaseCursor(const char* cursorId) {
+	_controller->releaseCursor(cursorId);
+}
+

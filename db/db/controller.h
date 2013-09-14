@@ -34,6 +34,7 @@
 
 class BSONObj;
 class BSONArrayObj;
+class DBCursor;
 using namespace std;
 
 class Controller 
@@ -43,9 +44,11 @@ class Controller
 		virtual bool dropNamespace(const char* db, const char* ns, const BSONObj* options = NULL) = 0;
 		virtual void update(const char* db, const char* ns, BSONObj* bson, const BSONObj* options = NULL) = 0;
 		virtual void remove(const char* db, const char* ns, const char* documentId, const char* revision, const BSONObj* options = NULL) = 0;
-		virtual BSONArrayObj* find(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options = NULL) throw (ParseException) = 0;
+		virtual DBCursor* const find(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options = NULL) throw (ParseException) = 0;
+		virtual DBCursor* const fetchCursor(const char* cursorId) = 0;
 		virtual BSONObj* findFirst(const char* db, const char* ns, const char* select, const char* filter, const BSONObj* options = NULL) throw (ParseException) = 0;
 		virtual std::vector<std::string>* dbs(const BSONObj* options = NULL) const = 0;
 		virtual std::vector<std::string>* namespaces(const char* db, const BSONObj* options = NULL) const = 0;
+		virtual void releaseCursor(const char* cursorId) = 0;
 };
 #endif // CONTROLLER_INCLUDED_H

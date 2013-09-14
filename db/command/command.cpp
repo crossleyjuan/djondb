@@ -24,6 +24,7 @@ Command::Command(COMMANDTYPE commandType)
 {
     _commandType = commandType;
 	 _options = NULL;
+	 _version = new Version(getCurrentVersion());
 }
 
 Command::Command(const Command& orig) {
@@ -33,10 +34,16 @@ Command::Command(const Command& orig) {
 	 } else {
 		 this->_options = NULL;
 	 }
+	 if (orig._version != NULL) {
+		 this->_version = new Version(*orig._version);
+	 } else {
+		 this->_version = NULL;
+	 }
 }
 
 Command::~Command() {
-	if (_options) delete _options;
+	if (_options != NULL) delete _options;
+	if (_version != NULL) delete _version;
 }
 
 COMMANDTYPE Command::commandType() const

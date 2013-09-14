@@ -238,7 +238,12 @@ v8::Handle<v8::Value> WrapConnection::find(const v8::Arguments& args) {
 	try {
 		WrapConnection* obj = ObjectWrap::Unwrap<WrapConnection>(args.This());
 
-		BSONArrayObj* result = obj->_con->find(db, ns, select, filter);
+		DjondbCursor* cursor = obj->_con->find(db, ns, select, filter);
+
+		BSONArrayObj* result = new BSONArrayObj();
+		if (cursor->next()) {
+			result->add(*cursor->current());
+		}
 
 		char* str = result->toChar();
 

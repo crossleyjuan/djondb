@@ -32,11 +32,39 @@
 #include "showdbscommand.h"
 #include "shownamespacescommand.h"
 #include "util.h"
+#include "dbcontroller.h"
+#include "worker.h"
+#include "workerengine.h"
+#include "findfsworker.h"
+#include "workerfactory.h"
+#include "bsoninputstream.h"
+#include "fileinputstream.h"
+#include "fileoutputstream.h"
 #include <gtest/gtest.h>
 
 #include <string>
 
-TEST(TestCommand, testInsertCommand) {
+class TestCommand: public testing::Test
+{
+	protected:
+		static DBController* controller;
+		std::vector<std::string> __ids;
+
+	protected:
+		static void SetUpTestCase()
+		{
+			controller = new DBController();
+			controller->initialize();
+		}
+
+		static void TearDownTestCase() {
+			controller->shutdown();
+		}
+};
+
+DBController* TestCommand::controller;
+
+TEST_F(TestCommand, testInsertCommand) {
 	cout << "testInsertCommand" << endl;
 	FileOutputStream* fos = new FileOutputStream("test.dat", "wb");
 
@@ -67,7 +95,7 @@ TEST(TestCommand, testInsertCommand) {
 	EXPECT_TRUE(objResult->getString("name").compare("Cross") == 0);
 }
 
-TEST(TestCommand, testOptionsCommand) {
+TEST_F(TestCommand, testOptionsCommand) {
 	cout << "testOptionsCommand" << endl;
 	FileOutputStream* fos = new FileOutputStream("test.dat", "wb");
 
@@ -112,7 +140,7 @@ TEST(TestCommand, testOptionsCommand) {
 	}
 }
 
-TEST(TestCommand, testShowdbs) {
+TEST_F(TestCommand, testShowdbs) {
 	cout << "testShowdbs" << endl;
 	FileOutputStream* fos = new FileOutputStream("test.dat", "wb");
 
@@ -137,7 +165,7 @@ TEST(TestCommand, testShowdbs) {
 	delete reader;
 }
 
-TEST(TestCommand, testShownamespacesCommand) {
+TEST_F(TestCommand, testShownamespacesCommand) {
 	cout << "testShownamespacesCommand" << endl;
 	FileOutputStream* fos = new FileOutputStream("test.dat", "wb");
 
@@ -165,7 +193,7 @@ TEST(TestCommand, testShownamespacesCommand) {
 	delete reader;
 }
 
-TEST(TestCommand, testUpdateCommand) {
+TEST_F(TestCommand, testUpdateCommand) {
 	cout << "testUpdateCommand" << endl;
 	FileOutputStream* fos = new FileOutputStream("test.dat", "wb");
 
@@ -199,7 +227,7 @@ TEST(TestCommand, testUpdateCommand) {
 	EXPECT_TRUE(objResult->getString("name").compare("Cross") == 0);
 }
 
-TEST(TestCommand, testRemoveCommand) {
+TEST_F(TestCommand, testRemoveCommand) {
 	cout << "testRemoveCommand" << endl;
 	FileOutputStream* fos = new FileOutputStream("test.dat", "wb");
 
@@ -232,7 +260,7 @@ TEST(TestCommand, testRemoveCommand) {
 	delete rdCmd;
 }
 
-TEST(TestCommand, testFindCommand) {
+TEST_F(TestCommand, testFindCommand) {
 	cout << "testFindCommand" << endl;
 	FileOutputStream* fos = new FileOutputStream("test.dat", "wb");
 
@@ -259,7 +287,7 @@ TEST(TestCommand, testFindCommand) {
 	EXPECT_TRUE(rdCmd->filter()->compare("$'a.b.c' == 1") == 0);
 }
 
-TEST(TestCommand, testDropnamespaceCommand) {
+TEST_F(TestCommand, testDropnamespaceCommand) {
 	cout << "testDropnamespaceCommand" << endl;
 	FileOutputStream* fos = new FileOutputStream("test.dat", "wb");
 
@@ -280,4 +308,211 @@ TEST(TestCommand, testDropnamespaceCommand) {
 	EXPECT_TRUE(rdCmd != NULL);
 	EXPECT_TRUE(rdCmd->nameSpace()->compare("test.namespace.db") == 0);
 	EXPECT_TRUE(rdCmd->DB()->compare("testdb") == 0);
+}
+
+TEST_F(TestCommand, testFindFSWorker) {
+	// Used to store the result of the worker
+	if (existFile("temp_fs.dat")) {
+		removeFile("temp_fs.dat");
+	}
+	FileOutputStream* output = new FileOutputStream("temp_fs.dat", "wb+");
+
+	WorkerEngine* engine = WorkerEngine::workerEngine();
+
+	InsertCommand cmd;
+	cmd.setDBController(controller);
+	cmd.setDB("testdb");
+	cmd.setNameSpace("test.namespace.db");
+	BSONObj* obj = new BSONObj();
+	obj->add("name", "Cross");
+	obj->add("age", 18);
+	cmd.setBSON(obj);
+
+	cmd.setDBController(controller);
+	engine->enqueueTask(&cmd, NULL, output);
+	while (engine->length()) {
+		engine->executeSteps();
+	}
+
+	FindCommand find;
+	find.setDBController(controller);
+	find.setDB("testdb");
+	find.setNameSpace("test.namespace.db");
+	find.setSelect("*");
+	find.setFilter("");
+
+	engine->enqueueTask(&find, NULL, output);
+	while (engine->length()) {
+		engine->executeSteps();
+	}
+
+	output->close();
+	FileInputStream fis("temp_fs.dat", "rb+");
+	BSONInputStream bis(&fis);
+	
+	BSONArrayObj* result = bis.readBSONArray();
+
+	EXPECT_TRUE(result != NULL);
+	EXPECT_TRUE(result->length() >= 1);
+	delete result;
+	fis.close();
+
+	engine->shutdownEngine();
+}
+
+TEST_F(TestCommand, testUpdateWorker) {
+	controller->dropNamespace("testdb", "test.testfs.db");
+
+	// Used to store the result of the worker
+	if (existFile("temp_fs.dat")) {
+		removeFile("temp_fs.dat");
+	}
+	FileOutputStream* output = new FileOutputStream("temp_fs.dat", "wb+");
+
+	WorkerEngine* engine = WorkerEngine::workerEngine();
+
+	BSONObj* obj = new BSONObj();
+	std::string* id = uuid();
+	std::string* revision = uuid();
+	obj->add("_id", id->c_str());
+	obj->add("_revision", revision->c_str());
+	obj->add("name", "Cross");
+	obj->add("age", 18);
+	// this is just to isolate the variable scopes and avoid unwanted errors on the test
+	{
+		InsertCommand cmd;
+		cmd.setDBController(controller);
+		cmd.setDB("testdb");
+		cmd.setNameSpace("test.testfs.db");
+		// because the InsertCommand will take ownership of this bson we need to create a copy
+		// to avoid pointer exceptions in the test
+		cmd.setBSON(new BSONObj(*obj));
+
+		cmd.setDBController(controller);
+		engine->enqueueTask(&cmd, NULL, output);
+		while (engine->length()) {
+			engine->executeSteps();
+		}
+
+	}
+
+	// this is just to isolate the variable scopes and avoid unwanted errors on the test
+	UpdateCommand ucmd;
+	{
+		ucmd.setDBController(controller);
+		ucmd.setDB("testdb");
+		ucmd.setNameSpace("test.testfs.db");
+		obj->add("age", 28);
+		ucmd.setBSON(*obj);
+
+		ucmd.setDBController(controller);
+		engine->enqueueTask(&ucmd, NULL, output);
+		while (engine->length()) {
+			engine->executeSteps();
+		}
+	}
+
+	FindCommand find;
+	find.setDBController(controller);
+	find.setDB("testdb");
+	find.setNameSpace("test.testfs.db");
+	find.setSelect("*");
+	find.setFilter("");
+
+	engine->enqueueTask(&find, NULL, output);
+	while (engine->length()) {
+		engine->executeSteps();
+	}
+
+	output->close();
+	FileInputStream fis("temp_fs.dat", "rb+");
+	BSONInputStream bis(&fis);
+
+	BSONArrayObj* result = bis.readBSONArray();
+
+	EXPECT_TRUE(result != NULL);
+	EXPECT_TRUE(result->length() == 1);
+	EXPECT_TRUE(result->get(0)->getInt("age") == 28);
+	delete result;
+	fis.close();
+
+	engine->shutdownEngine();
+}
+
+TEST_F(TestCommand, testRemoveWorker) {
+	controller->dropNamespace("testdb", "test.testfs.db");
+
+	// Used to store the result of the worker
+	if (existFile("temp_fs.dat")) {
+		removeFile("temp_fs.dat");
+	}
+	FileOutputStream* output = new FileOutputStream("temp_fs.dat", "wb+");
+
+	WorkerEngine* engine = WorkerEngine::workerEngine();
+
+	BSONObj* obj = new BSONObj();
+	std::string* id = uuid();
+	std::string* revision = uuid();
+	obj->add("_id", id->c_str());
+	obj->add("_revision", revision->c_str());
+	obj->add("name", "Cross");
+	obj->add("age", 18);
+	// this is just to isolate the variable scopes and avoid unwanted errors on the test
+	{
+		InsertCommand cmd;
+		cmd.setDBController(controller);
+		cmd.setDB("testdb");
+		cmd.setNameSpace("test.testfs.db");
+		// because the InsertCommand will take ownership of this bson we need to create a copy
+		// to avoid pointer exceptions in the test
+		cmd.setBSON(new BSONObj(*obj));
+
+		cmd.setDBController(controller);
+		engine->enqueueTask(&cmd, NULL, output);
+		while (engine->length()) {
+			engine->executeSteps();
+		}
+
+	}
+
+	// this is just to isolate the variable scopes and avoid unwanted errors on the test
+	RemoveCommand rcmd;
+	{
+		rcmd.setDBController(controller);
+		rcmd.setDB("testdb");
+		rcmd.setNameSpace("test.testfs.db");
+		rcmd.setId(obj->getString("_id"));
+		rcmd.setRevision(obj->getString("_revision"));
+
+		rcmd.setDBController(controller);
+		engine->enqueueTask(&rcmd, NULL, output);
+		while (engine->length()) {
+			engine->executeSteps();
+		}
+	}
+
+	FindCommand find;
+	find.setDBController(controller);
+	find.setDB("testdb");
+	find.setNameSpace("test.testfs.db");
+	find.setSelect("*");
+	find.setFilter("");
+
+	engine->enqueueTask(&find, NULL, output);
+	while (engine->length()) {
+		engine->executeSteps();
+	}
+
+	output->close();
+	FileInputStream fis("temp_fs.dat", "rb+");
+	BSONInputStream bis(&fis);
+
+	BSONArrayObj* result = bis.readBSONArray();
+
+	EXPECT_TRUE(result != NULL);
+	EXPECT_TRUE(result->length() == 0);
+	delete result;
+	fis.close();
+
+	engine->shutdownEngine();
 }

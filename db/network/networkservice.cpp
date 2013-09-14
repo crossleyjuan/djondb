@@ -32,6 +32,7 @@
 #include "transactionmanager.h"
 #include "bson.h"
 #include "networkserver.h"
+#include "workerengine.h"
 #include <stdlib.h>
 #include <boost/shared_ptr.hpp>
 #include <memory>
@@ -135,7 +136,7 @@ int NetworkService::executeRequest(NetworkInputStream* nis, NetworkOutputStream*
 
 	// Checks version
 	int commands = 0;
-	std::auto_ptr<CommandReader> reader(new CommandReader(nis));
+	CommandReader* reader = new CommandReader(nis);
 
 	// Reads command
 	Command* cmd = reader->readCommand();
@@ -148,29 +149,31 @@ int NetworkService::executeRequest(NetworkInputStream* nis, NetworkOutputStream*
 	}
 	cmd->setDBController(transaction);
 	try {
-		if (cmd->commandType() != CLOSECONNECTION) {
-			cmd->execute();
-			cmd->writeResult(nos);
-			nos->flush();
-		} else {
-			if (log->isDebug()) log->debug("Close command received");
-		}
-		if (cmd->commandType() == SHUTDOWN) {
-			// Shutting down the server
-			long l = 0;
-			// the current request should be the only one alive
-			while (processing > 1) {
-				Thread::sleep(1000);
-				l++;
-				// if the time exceeded then shutdown anyway
-				if (l > 10) {
+		switch (cmd->commandType()) {
+			case CLOSECONNECTION:
+				break;
+			case SHUTDOWN:
+				{
+					// Shutting down the server
+					long l = 0;
+					// the current request should be the only one alive
+					while (processing > 1) {
+						Thread::sleep(1000);
+						l++;
+						// if the time exceeded then shutdown anyway
+						if (l > 10) {
+							break;
+						}
+					}
+					// Hack to avoid the count of the stop process
+					processing--;
+					stop();
+					processing++;
 					break;
 				}
-			}
-			// Hack to avoid the count of the stop process
-			processing--;
-			stop();
-			processing++;
+			default:
+				WorkerEngine::workerEngine()->enqueueTask(cmd, nis, nos);
+				break;
 		}
 	} catch (const char *errmsg)
 	{
@@ -181,6 +184,8 @@ int NetworkService::executeRequest(NetworkInputStream* nis, NetworkOutputStream*
 	if (log->isDebug()) log->debug("%d Executed.", commands);
 
 	delete cmd;
+	delete reader;
+	return 0;
 }
 
 

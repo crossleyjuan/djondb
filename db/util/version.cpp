@@ -43,14 +43,15 @@ Version::Version(std::string version)
 Version::Version(const Version &version) {
     _mayor = version._mayor;
     _revision = version._revision;
+	 _minor = version._minor;
     _version = version._version;
 }
 
 Version::~Version() {
 }
 
-bool Version::operator>(const Version& version) {
-    Version* current = this;
+bool Version::operator>(const Version& version) const {
+    const Version* current = this;
     if (current->_mayor > version._mayor) {
         return true;
     } else if ((current->_mayor == version._mayor) && (current->_minor > version._minor)) {
@@ -62,8 +63,8 @@ bool Version::operator>(const Version& version) {
     }
 }
 
-bool Version::operator>=(const Version& version) {
-    Version* current = this;
+bool Version::operator>=(const Version& version) const {
+    const Version* current = this;
     if (*current == version) {
         return true;
     } else {
@@ -71,8 +72,8 @@ bool Version::operator>=(const Version& version) {
     }
 }
 
-bool Version::operator<(const Version& version) {
-    Version* current = this;
+bool Version::operator<(const Version& version) const {
+    const Version* current = this;
     if (current->_mayor < version._mayor) {
         return true;
     } else if ((current->_mayor == version._mayor) && (current->_minor < version._minor)) {
@@ -84,8 +85,8 @@ bool Version::operator<(const Version& version) {
     }
 }
 
-bool Version::operator<=(const Version& version) {
-    Version* current = this;
+bool Version::operator<=(const Version& version) const {
+    const Version* current = this;
     if (*current == version) {
         return true;
     } else {
@@ -93,8 +94,8 @@ bool Version::operator<=(const Version& version) {
     }
 }
 
-bool Version::operator==(const Version& version) {
-    Version* current = this;
+bool Version::operator==(const Version& version) const {
+    const Version* current = this;
     return ((current->_mayor == version._mayor) && (current->_minor == version._minor) && (current->_revision == version._revision));
 }
 

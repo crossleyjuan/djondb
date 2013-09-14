@@ -56,6 +56,13 @@ void BSONArrayObj::add(const BSONObj& obj) {
 	_elements.push_back(new BSONObj(obj));
 }
 
+void BSONArrayObj::addAll(const BSONArrayObj& array) {
+	for (BSONArrayObj::const_iterator i = array.begin(); i != array.end(); i++) {
+		BSONObj* o = *i;
+		add(*o);
+	}
+}
+
 BSONObj* BSONArrayObj::get(__int32 index) const {
 	return _elements.at(index);
 }
@@ -86,6 +93,14 @@ BSONArrayObj::iterator BSONArrayObj::begin() {
 }
 
 BSONArrayObj::iterator BSONArrayObj::end() {
+	return _elements.end();
+}
+
+BSONArrayObj::const_iterator BSONArrayObj::begin() const {
+	return _elements.begin();
+}
+
+BSONArrayObj::const_iterator BSONArrayObj::end() const {
 	return _elements.end();
 }
 
