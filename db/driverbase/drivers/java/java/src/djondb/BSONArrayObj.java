@@ -51,6 +51,10 @@ public class BSONArrayObj {
     djonwrapperJNI.BSONArrayObj_add(swigCPtr, this, BSONObj.getCPtr(obj), obj);
   }
 
+  public void addAll(BSONArrayObj array) {
+    djonwrapperJNI.BSONArrayObj_addAll(swigCPtr, this, BSONArrayObj.getCPtr(array), array);
+  }
+
   public BSONObj get(int index) {
     long cPtr = djonwrapperJNI.BSONArrayObj_get(swigCPtr, this, index);
     return (cPtr == 0) ? null : new BSONObj(cPtr, false);
@@ -66,11 +70,11 @@ public class BSONArrayObj {
   }
 
   public SWIGTYPE_p_std__vectorT_BSONObj_p_t__iterator begin() {
-    return new SWIGTYPE_p_std__vectorT_BSONObj_p_t__iterator(djonwrapperJNI.BSONArrayObj_begin(swigCPtr, this), true);
+    return new SWIGTYPE_p_std__vectorT_BSONObj_p_t__iterator(djonwrapperJNI.BSONArrayObj_begin__SWIG_0(swigCPtr, this), true);
   }
 
   public SWIGTYPE_p_std__vectorT_BSONObj_p_t__iterator end() {
-    return new SWIGTYPE_p_std__vectorT_BSONObj_p_t__iterator(djonwrapperJNI.BSONArrayObj_end(swigCPtr, this), true);
+    return new SWIGTYPE_p_std__vectorT_BSONObj_p_t__iterator(djonwrapperJNI.BSONArrayObj_end__SWIG_0(swigCPtr, this), true);
   }
 
 }

@@ -53,6 +53,7 @@ ZEND_NAMED_FUNCTION(_wrap_StringVector_set);
 ZEND_NAMED_FUNCTION(_wrap_new_BSONArrayObj);
 ZEND_NAMED_FUNCTION(_wrap_BSONArrayObj_length);
 ZEND_NAMED_FUNCTION(_wrap_BSONArrayObj_add);
+ZEND_NAMED_FUNCTION(_wrap_BSONArrayObj_addAll);
 ZEND_NAMED_FUNCTION(_wrap_BSONArrayObj_get);
 ZEND_NAMED_FUNCTION(_wrap_BSONArrayObj_toChar);
 ZEND_NAMED_FUNCTION(_wrap_BSONArrayObj_select);

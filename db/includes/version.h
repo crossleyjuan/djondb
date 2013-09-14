@@ -10,11 +10,11 @@ public:
     Version(const Version& version);
     ~Version();
 
-    bool operator>(const Version& version);
-    bool operator>=(const Version& version);
-    bool operator<(const Version& version);
-    bool operator<=(const Version& version);
-    bool operator==(const Version& version);
+    bool operator>(const Version& version) const;
+    bool operator>=(const Version& version) const;
+    bool operator<(const Version& version) const;
+    bool operator<=(const Version& version) const;
+    bool operator==(const Version& version) const;
     operator std::string();
 private:
     std::string _version;

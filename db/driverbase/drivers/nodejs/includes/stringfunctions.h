@@ -103,6 +103,7 @@ namespace djondb {
 };
 
 char* strcpy(char* str, int len);
+char* strcpy(const char* str, int len);
 char* strcpy(char* str, int offset, int len);
 char* strcpy(std::string str);
 bool endsWith(char* source, char* check);

@@ -6,6 +6,7 @@ cp ../../includes/bsonobj.h .
 cp ../../includes/bsonparser.h .
 cp ../../includes/bsonutil.h .
 cp ../../includes/djondbconnection.h .
+cp ../../includes/djondbcursor.h .
 cp ../../includes/djondb_client.h .
 cp ../../includes/djondbconnectionmanager.h .
 cp ../../includes/djonv8.h . 

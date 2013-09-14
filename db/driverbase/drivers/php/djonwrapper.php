@@ -267,6 +267,10 @@ class BSONArrayObj {
 		BSONArrayObj_add($this->_cPtr,$obj);
 	}
 
+	function addAll($array) {
+		BSONArrayObj_addAll($this->_cPtr,$array);
+	}
+
 	function get($index) {
 		$r=BSONArrayObj_get($this->_cPtr,$index);
 		if (is_resource($r)) {
@@ -600,11 +604,7 @@ class DjondbConnection {
 		case 4: $r=DjondbConnection_find($this->_cPtr,$db,$ns,$options_or_filter_or_select,$options_or_filter); break;
 		default: $r=DjondbConnection_find($this->_cPtr,$db,$ns,$options_or_filter_or_select,$options_or_filter,$options);
 		}
-		if (!is_resource($r)) return $r;
-		switch (get_resource_type($r)) {
-		case '_p_BSONArrayObj': return new BSONArrayObj($r);
-		default: return new BSONArrayObj($r);
-		}
+		return $r;
 	}
 
 	function update($db,$ns,$json_or_bson) {

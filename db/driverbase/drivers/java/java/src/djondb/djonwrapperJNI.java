@@ -36,11 +36,12 @@ public class djonwrapperJNI {
   public final static native long new_BSONArrayObj__SWIG_1(long jarg1, BSONArrayObj jarg1_);
   public final static native int BSONArrayObj_length(long jarg1, BSONArrayObj jarg1_);
   public final static native void BSONArrayObj_add(long jarg1, BSONArrayObj jarg1_, long jarg2, BSONObj jarg2_);
+  public final static native void BSONArrayObj_addAll(long jarg1, BSONArrayObj jarg1_, long jarg2, BSONArrayObj jarg2_);
   public final static native long BSONArrayObj_get(long jarg1, BSONArrayObj jarg1_, int jarg2);
   public final static native String BSONArrayObj_toChar(long jarg1, BSONArrayObj jarg1_);
   public final static native long BSONArrayObj_select(long jarg1, BSONArrayObj jarg1_, String jarg2);
-  public final static native long BSONArrayObj_begin(long jarg1, BSONArrayObj jarg1_);
-  public final static native long BSONArrayObj_end(long jarg1, BSONArrayObj jarg1_);
+  public final static native long BSONArrayObj_begin__SWIG_0(long jarg1, BSONArrayObj jarg1_);
+  public final static native long BSONArrayObj_end__SWIG_0(long jarg1, BSONArrayObj jarg1_);
   public final static native long new_BSONObj__SWIG_0();
   public final static native long new_BSONObj__SWIG_1(long jarg1, BSONObj jarg1_);
   public final static native void delete_BSONObj(long jarg1);

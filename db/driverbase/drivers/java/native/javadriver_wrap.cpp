@@ -688,6 +688,24 @@ SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_BSONArrayObj_1add(JNIEnv *jen
 }
 
 
+SWIGEXPORT void JNICALL Java_djondb_djonwrapperJNI_BSONArrayObj_1addAll(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  BSONArrayObj *arg1 = (BSONArrayObj *) 0 ;
+  BSONArrayObj *arg2 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(BSONArrayObj **)&jarg1; 
+  arg2 = *(BSONArrayObj **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "BSONArrayObj const & reference is null");
+    return ;
+  } 
+  (arg1)->addAll((BSONArrayObj const &)*arg2);
+}
+
+
 SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_BSONArrayObj_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jlong jresult = 0 ;
   BSONArrayObj *arg1 = (BSONArrayObj *) 0 ;
@@ -742,7 +760,7 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_BSONArrayObj_1select(JNIEnv 
 }
 
 
-SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_BSONArrayObj_1begin(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_BSONArrayObj_1begin_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   BSONArrayObj *arg1 = (BSONArrayObj *) 0 ;
   SwigValueWrapper< std::vector< BSONObj * >::iterator > result;
@@ -757,7 +775,7 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_BSONArrayObj_1begin(JNIEnv *
 }
 
 
-SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_BSONArrayObj_1end(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_BSONArrayObj_1end_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   BSONArrayObj *arg1 = (BSONArrayObj *) 0 ;
   SwigValueWrapper< std::vector< BSONObj * >::iterator > result;
@@ -2125,7 +2143,7 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1find_1_1SW
   djondb::DjondbConnection *arg1 = (djondb::DjondbConnection *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
-  BSONArrayObj *result = 0 ;
+  djondb::DjondbCursor *result = 0 ;
   
   (void)jenv;
   (void)jcls;
@@ -2149,8 +2167,8 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1find_1_1SW
   std::string arg3_str(arg3_pstr);
   arg3 = &arg3_str;
   jenv->ReleaseStringUTFChars(jarg3, arg3_pstr); 
-  result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3);
-  *(BSONArrayObj **)&jresult = result; 
+  result = (djondb::DjondbCursor *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3);
+  *(djondb::DjondbCursor **)&jresult = result; 
   return jresult;
 }
 
@@ -2161,7 +2179,7 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1find_1_1SW
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
   BSONObj *arg4 = 0 ;
-  BSONArrayObj *result = 0 ;
+  djondb::DjondbCursor *result = 0 ;
   
   (void)jenv;
   (void)jcls;
@@ -2191,8 +2209,8 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1find_1_1SW
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "BSONObj const & reference is null");
     return 0;
   } 
-  result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(BSONObj const &)*arg4);
-  *(BSONArrayObj **)&jresult = result; 
+  result = (djondb::DjondbCursor *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(BSONObj const &)*arg4);
+  *(djondb::DjondbCursor **)&jresult = result; 
   return jresult;
 }
 
@@ -2203,7 +2221,7 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1find_1_1SW
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
   std::string *arg4 = 0 ;
-  BSONArrayObj *result = 0 ;
+  djondb::DjondbCursor *result = 0 ;
   
   (void)jenv;
   (void)jcls;
@@ -2236,8 +2254,8 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1find_1_1SW
   std::string arg4_str(arg4_pstr);
   arg4 = &arg4_str;
   jenv->ReleaseStringUTFChars(jarg4, arg4_pstr); 
-  result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4);
-  *(BSONArrayObj **)&jresult = result; 
+  result = (djondb::DjondbCursor *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4);
+  *(djondb::DjondbCursor **)&jresult = result; 
   return jresult;
 }
 
@@ -2249,7 +2267,7 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1find_1_1SW
   std::string *arg3 = 0 ;
   std::string *arg4 = 0 ;
   BSONObj *arg5 = 0 ;
-  BSONArrayObj *result = 0 ;
+  djondb::DjondbCursor *result = 0 ;
   
   (void)jenv;
   (void)jcls;
@@ -2288,8 +2306,8 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1find_1_1SW
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "BSONObj const & reference is null");
     return 0;
   } 
-  result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4,(BSONObj const &)*arg5);
-  *(BSONArrayObj **)&jresult = result; 
+  result = (djondb::DjondbCursor *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4,(BSONObj const &)*arg5);
+  *(djondb::DjondbCursor **)&jresult = result; 
   return jresult;
 }
 
@@ -2301,7 +2319,7 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1find_1_1SW
   std::string *arg3 = 0 ;
   std::string *arg4 = 0 ;
   std::string *arg5 = 0 ;
-  BSONArrayObj *result = 0 ;
+  djondb::DjondbCursor *result = 0 ;
   
   (void)jenv;
   (void)jcls;
@@ -2343,8 +2361,8 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1find_1_1SW
   std::string arg5_str(arg5_pstr);
   arg5 = &arg5_str;
   jenv->ReleaseStringUTFChars(jarg5, arg5_pstr); 
-  result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4,(std::string const &)*arg5);
-  *(BSONArrayObj **)&jresult = result; 
+  result = (djondb::DjondbCursor *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4,(std::string const &)*arg5);
+  *(djondb::DjondbCursor **)&jresult = result; 
   return jresult;
 }
 
@@ -2357,7 +2375,7 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1find_1_1SW
   std::string *arg4 = 0 ;
   std::string *arg5 = 0 ;
   BSONObj *arg6 = 0 ;
-  BSONArrayObj *result = 0 ;
+  djondb::DjondbCursor *result = 0 ;
   
   (void)jenv;
   (void)jcls;
@@ -2405,8 +2423,8 @@ SWIGEXPORT jlong JNICALL Java_djondb_djonwrapperJNI_DjondbConnection_1find_1_1SW
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "BSONObj const & reference is null");
     return 0;
   } 
-  result = (BSONArrayObj *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4,(std::string const &)*arg5,(BSONObj const &)*arg6);
-  *(BSONArrayObj **)&jresult = result; 
+  result = (djondb::DjondbCursor *)(arg1)->find((std::string const &)*arg2,(std::string const &)*arg3,(std::string const &)*arg4,(std::string const &)*arg5,(BSONObj const &)*arg6);
+  *(djondb::DjondbCursor **)&jresult = result; 
   return jresult;
 }
 

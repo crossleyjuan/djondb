@@ -9,6 +9,7 @@ cp bsonobj.h php/includes/
 cp bsonparser.h php/includes/
 cp bsonutil.h php/includes/
 cp djondbconnection.h php/includes/
+cp djondbcursor.h php/includes/
 cp djondb_client.h php/includes/
 cp djondbconnectionmanager.h php/includes/
 cp djonv8.h php/includes/

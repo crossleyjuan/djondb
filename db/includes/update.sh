@@ -6,6 +6,7 @@ cp ../bson/bsonobj.h .
 cp ../bson/bsonparser.h .
 cp ../bson/bsonutil.h .
 cp ../driverbase/djondbconnection.h .
+cp ../driverbase/djondbcursor.h .
 cp ../driverbase/djondb_client.h .
 cp ../driverbase/djondbconnectionmanager.h .
 cp ../driverbase/djonv8.h .
@@ -39,4 +40,4 @@ cp ../util/errorhandle.h .
 cp ../util/djon_error_codes.h .
 cp ../util/fileutil.h .
 cp ../util/circular_queue.h .
-cp ../obj/config.h .
+cp ../build/config.h .

@@ -360,6 +360,9 @@ class djonwrapperPINVOKE {
   [DllImport("djonwrapper", EntryPoint="CSharp_BSONArrayObj_add")]
   public static extern void BSONArrayObj_add(HandleRef jarg1, HandleRef jarg2);
 
+  [DllImport("djonwrapper", EntryPoint="CSharp_BSONArrayObj_addAll")]
+  public static extern void BSONArrayObj_addAll(HandleRef jarg1, HandleRef jarg2);
+
   [DllImport("djonwrapper", EntryPoint="CSharp_BSONArrayObj_get")]
   public static extern IntPtr BSONArrayObj_get(HandleRef jarg1, int jarg2);
 
@@ -369,11 +372,11 @@ class djonwrapperPINVOKE {
   [DllImport("djonwrapper", EntryPoint="CSharp_BSONArrayObj_select")]
   public static extern IntPtr BSONArrayObj_select(HandleRef jarg1, string jarg2);
 
-  [DllImport("djonwrapper", EntryPoint="CSharp_BSONArrayObj_begin")]
-  public static extern IntPtr BSONArrayObj_begin(HandleRef jarg1);
+  [DllImport("djonwrapper", EntryPoint="CSharp_BSONArrayObj_begin__SWIG_0")]
+  public static extern IntPtr BSONArrayObj_begin__SWIG_0(HandleRef jarg1);
 
-  [DllImport("djonwrapper", EntryPoint="CSharp_BSONArrayObj_end")]
-  public static extern IntPtr BSONArrayObj_end(HandleRef jarg1);
+  [DllImport("djonwrapper", EntryPoint="CSharp_BSONArrayObj_end__SWIG_0")]
+  public static extern IntPtr BSONArrayObj_end__SWIG_0(HandleRef jarg1);
 
   [DllImport("djonwrapper", EntryPoint="CSharp_new_BSONObj__SWIG_0")]
   public static extern IntPtr new_BSONObj__SWIG_0();
