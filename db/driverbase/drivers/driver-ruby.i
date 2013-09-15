@@ -12,6 +12,7 @@
 #include "filterdefs.h"
 #include "bsonutil.h"
 #include "djondbconnection.h"
+#include "djondbcursor.h"
 #include "djondbconnectionmanager.h"
 #include "djondb_client.h"
 %}
@@ -31,6 +32,7 @@ namespace std {
 %include "filterdefs.h"
 %include "bsonutil.h"
 %include "djondbconnection.h"
+%include "djondbcursor.h"
 %include "djondbconnectionmanager.h"
 %include "djondb_client.h"
 
