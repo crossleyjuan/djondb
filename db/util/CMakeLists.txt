@@ -17,6 +17,7 @@ IF (WIN32)
 		)
 	link_directories(${PROJECT_SOURCE_DIR}/third_party/libs)
 	target_link_libraries (djon-util ${LIBRARY_PREFIX}/antlr3c.lib ${LIBRARY_PREFIX}/pthreadVC2.lib Rpcrt4.lib)
+
 ENDIF ( WIN32 )
 
 IF (NOT WIN32)

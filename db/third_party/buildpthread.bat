@@ -20,14 +20,14 @@ if "%x64%" == "true" (
 
 call :checkrequired unzip.exe unzippath
 
-%unzippath% -o pthreads-w32-2-9-1-release.zip -d pthreads
-cd pthreads
+TarTool pthreads-w32-2-9-1-release.tar.gz
+cd pthreads-w32-2-9-1-release
 
 IF "%PLATFORM%" == "x64" (
-    copy Pre-built.2\lib\x64\pthreadVC2.lib ..\libs
+    copy Pre-built.2\dll\x64\pthreadVC2.dll ..\libs
 )
 IF "%PLATFORM%" == "Win32" (
-    copy Pre-built.2\lib\x86\pthreadVC2.lib ..\libs
+    copy Pre-built.2\dll\x86\pthreadVC2.dll ..\libs
 )
 
 copy /y Pre-built.2\include\*.h ..\includes\

@@ -38,27 +38,36 @@ call :checkrequired unzip.exe unzippath
 
 TarTool v8.tar.gz
 cd v8
+
 if NOT EXIST third_party\cygwin (
 	echo Getting cygwin from chromium
 	"%svnexepath%" co http://src.chromium.org/svn/trunk/deps/third_party/cygwin@66844 third_party\cygwin
 )
 
-IF "%PLATFORM%" == "x64" (
-	"%pythonpath%" build\gyp_v8 -Dtarget_arch=x64 -Dcomponent=static_library -G msvs_version=2010
-	rem make x64.release
+@rem ..\patch\bin\patch --binary -R -p1 build\common.gypi ..\v8_mt.patch
+
+if "%x64%" == "true" (
+echo Executing python
+	@rem "%pythonpath%" build\gyp_v8 -Dtarget_arch=x64 -Dcomponent=static_library -G msvs_version=2010
+	@rem "%pythonpath%" build\gyp_v8 -Dtarget_arch=x64 -Dcomponent=shared_library -G msvs_version=2010
+	"%pythonpath%" build\gyp_v8 -Dtarget_arch=x64 -G msvs_version=2010
 )
-IF "%PLATFORM%" == "Win32" (
-	"%pythonpath%" build\gyp_v8 -Dtarget_arch=ia32 -Dcomponent=static_library -G msvs_version=2010
+if "%x32%" == "true" (
+echo Executing python
+	@rem "%pythonpath%" build\gyp_v8 -Dtarget_arch=ia32 -Dcomponent=static_library -G msvs_version=2010
+	@rem "%pythonpath%" build\gyp_v8 -Dtarget_arch=ia32 -Dcomponent=shared_library -G msvs_version=2010
+	"%pythonpath%" build\gyp_v8 -Dtarget_arch=ia32 -G msvs_version=2010
 )
 
-..\patch\bin\patch -p v8_mt.patch
-goto end
+@rem %PATH_MSBUILD%\msbuild build\all.sln /p:Configuration=Release /p:Platform=%PLATFORM%
 
-%PATH_MSBUILD%\msbuild build\all.sln /p:Configuration=Release /p:Platform=%PLATFORM%
+copy /Y build\Release\v8.dll ..\libs\v8.dll
 
+call :findfile build\Release\lib v8.lib file
+copy /Y %file% ..\libs\v8.lib
 
 call :findfile build\Release\lib v8_base*.lib file
-copy /Y "%file%" ..\libs\v8_base.lib
+copy /Y %file% ..\libs\v8_base.lib
 
 call :findfile build\Release\lib v8_nosnapshot*.lib file
 copy /y %file% ..\libs\v8_nosnapshot.lib

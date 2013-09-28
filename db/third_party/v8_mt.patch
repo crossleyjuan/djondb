@@ -1,8 +1,20 @@
-405c405
-<                 'RuntimeLibrary': '1',  # /MTd
----
->                 'RuntimeLibrary': '3',  # /MTd
-497c497
-<                     'RuntimeLibrary': '0',  #/MT
----
->                     'RuntimeLibrary': '2',  #/MT
+--- v8/build/common.gypi	2013-08-09 09:58:46.203599900 -0500
++++ v8/build/common_orig.gypi	2013-08-09 09:58:19.704372400 -0500
+@@ -402,7 +402,7 @@
+               ['OS=="win" and component=="shared_library"', {
+                 'RuntimeLibrary': '3',  # /MDd
+               }, {
+-                'RuntimeLibrary': '3',  # /MTd
++                'RuntimeLibrary': '1',  # /MTd
+               }],
+             ],
+           },
+@@ -494,7 +494,7 @@
+                   ['OS=="win" and component=="shared_library"', {
+                     'RuntimeLibrary': '2',  #/MD
+                   }, {
+-                    'RuntimeLibrary': '2',  #/MT
++                    'RuntimeLibrary': '0',  #/MT
+                   }],
+                   ['v8_target_arch=="x64"', {
+                     # TODO(2207): remove this option once the bug is fixed.

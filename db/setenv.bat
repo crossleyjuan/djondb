@@ -6,8 +6,6 @@
 @pushd "%CD%"
 @CD /D "%PATH_SRC_STARTUP%..\..\.."
 
-@rem Sample: D:\dv\Src\BizAgiSuite_9.1\Development\Team\Source
-@SET PATH_SRC_ALL_BIZAGI="%CD%"
 @popd
 
 @rem Applications Paths

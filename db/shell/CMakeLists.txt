@@ -18,7 +18,7 @@ IF ( WIN32 )
 	set_target_properties(djon-shell PROPERTIES CMAKE_EXE_LINKER_FLAGS "-static")
 	SET( CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS} "/NODEFAULTLIB:MSVCRTD.lib") 
 	message ("shell libraries" djon-shell djon-client djon-service djon-network djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}/antlr3c.lib ${LIBRARY_PREFIX}/pthreadVC2.lib Rpcrt4.lib ${LIBRARY_PREFIX}/v8_base.lib ${LIBRARY_PREFIX}/v8_snapshot.lib)
-	target_link_libraries (djon-shell djon-client djon-service djon-network djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}/antlr3c.lib ${LIBRARY_PREFIX}/pthreadVC2.lib Rpcrt4.lib ${LIBRARY_PREFIX}/v8_base.lib ${LIBRARY_PREFIX}/v8_snapshot.lib)
+	target_link_libraries (djon-shell djon-client djon-service djon-network djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}/antlr3c.lib ${LIBRARY_PREFIX}/pthreadVC2.lib Rpcrt4.lib ${LIBRARY_PREFIX}/v8.lib)
 ENDIF ( WIN32 )
 
 IF (NOT WIN32)
