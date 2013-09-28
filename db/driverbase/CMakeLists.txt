@@ -27,7 +27,7 @@ IF (WIN32)
 ENDIF (WIN32)
 
 IF (LINUX)
-	target_link_libraries (djon-client djon-network djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}antlr3c.a pthread ${LIBRARY_PREFIX}v8_base.a ${LIBRARY_PREFIX}v8_snapshot.a)
+	target_link_libraries (djon-client djon-network djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}antlr3c.a pthread ${LIBRARY_PREFIX}v8_base.a ${LIBRARY_PREFIX}v8_snapshot.a uuid rt)
 ENDIF (LINUX)
 IF (WIN32)
 	target_link_libraries (djon-client djon-network djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}/antlr3c.lib ${LIBRARY_PREFIX}/pthreadVC2.lib ${LIBRARY_PREFIX}/v8.lib)
