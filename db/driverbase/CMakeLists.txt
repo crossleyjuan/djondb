@@ -7,8 +7,9 @@ include_directories("${PROJECT_SOURCE_DIR}/tx")
 include_directories("${PROJECT_SOURCE_DIR}/command")
 include_directories("${PROJECT_SOURCE_DIR}/network")
 
+add_library(djon-clientStatic STATIC djondbconnection.cpp djondbconnectionmanager.cpp dqlParser.cpp dqlLexer.cpp)
+add_library(djon-client SHARED djondbconnection.cpp djondbconnectionmanager.cpp dqlParser.cpp dqlLexer.cpp)
 IF (NOT WIN32)
-	add_library(djon-client SHARED djondbconnection.cpp djondbconnectionmanager.cpp dqlParser.cpp dqlLexer.cpp)
 	install (TARGETS djon-client 
 		DESTINATION /usr/lib
 		PERMISSIONS OWNER_READ GROUP_READ WORLD_READ OWNER_WRITE OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE)
@@ -19,7 +20,6 @@ ENDIF (NOT WIN32)
 IF (WIN32)
 	include_directories("${PROJECT_SOURCE_DIR}/third_party/includes")
 
-	add_library(djon-client djondbconnection.cpp djondbconnectionmanager.cpp dqlParser.cpp dqlLexer.cpp)
 	install (TARGETS djon-client 
 		DESTINATION lib
 		PERMISSIONS OWNER_READ GROUP_READ WORLD_READ OWNER_WRITE OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE)
@@ -30,7 +30,7 @@ IF (LINUX)
 	target_link_libraries (djon-client djon-network djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}antlr3c.a pthread ${LIBRARY_PREFIX}v8_base.a ${LIBRARY_PREFIX}v8_snapshot.a)
 ENDIF (LINUX)
 IF (WIN32)
-	target_link_libraries (djon-client djon-network djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}/antlr3c.lib ${LIBRARY_PREFIX}/pthreadVC2.lib ${LIBRARY_PREFIX}/v8_base.lib ${LIBRARY_PREFIX}/v8_snapshot.lib)
+	target_link_libraries (djon-client djon-network djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}/antlr3c.lib ${LIBRARY_PREFIX}/pthreadVC2.lib ${LIBRARY_PREFIX}/v8.lib ${LIBRARY_PREFIX}/v8_base.lib ${LIBRARY_PREFIX}/v8_snapshot.lib)
 ENDIF (WIN32)
 IF (DARWIN)
 	target_link_libraries (djon-client djon-network djon-command djon-tx djon-db djon-filesystem djon-cache djon-bson djon-util ${LIBRARY_PREFIX}antlr3c.a pthread ${LIBRARY_PREFIX}v8_base.a ${LIBRARY_PREFIX}v8_snapshot.a)

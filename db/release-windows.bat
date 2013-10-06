@@ -10,7 +10,9 @@ cd %PATH_SRC_STARTUP%\driverbase\drivers
 call update.bat
 
 echo Creating output dir
-del /Q   "%OUTPUTDIR%\*.*"
+if "%debug%" == "" (
+del /Q  "%OUTPUTDIR%\*.*"
+)
 mkdir  "%OUTPUTDIR%"
 cd %PATH_SRC_STARTUP%
 

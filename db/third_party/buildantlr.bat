@@ -24,9 +24,9 @@ cd libantlr3c-3.4
 
 %PATH_MSBUILD%\msbuild C.sln /p:Configuration=Release /p:Platform=%PLATFORM%
 
-xcopy /Y Release\antlr3c.lib ..\libs
-xcopy /Y antlr3config.h ..\includes\
-xcopy /Y include\*.h ..\includes\
+copy /Y Release\antlr3c.lib ..\libs
+copy /Y antlr3config.h ..\includes\
+copy /Y include\*.h ..\includes\
 GOTO END
 
 :usage

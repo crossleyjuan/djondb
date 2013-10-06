@@ -18,25 +18,25 @@ if "%x64%" == "true" (
 	SET PLATFORM=x64
 )
 
-call :checkrequired unzip.exe unzippath
-
-%unzippath% -o pthreads-w32-2-9-1-release.zip -d pthreads
+TarTool pthreads.tar.gz
 cd pthreads
 
 IF "%PLATFORM%" == "x64" (
-    copy Pre-built.2\lib\x64\pthreadVC2.lib ..\libs
+    copy dll\x64\pthreadVC2.dll ..\libs
+    copy lib\x64\pthreadVC2.lib ..\libs
 )
 IF "%PLATFORM%" == "Win32" (
-    copy Pre-built.2\lib\x86\pthreadVC2.lib ..\libs
+    copy dll\x86\pthreadVC2.dll ..\libs
+    copy lib\x86\pthreadVC2.lib ..\libs
 )
 
-copy /y Pre-built.2\include\*.h ..\includes\
+copy /y include\*.h ..\includes\
 
 GOTO END
 
 :usage
 
-Echo Usage: %0 [-x32] [-x64]
+Echo Usage: %0 [-x32] [-x64] [-python PYTHON_DIR] [-svnpath SVN_PATH]
 goto exit
 
 :END
