@@ -33,4 +33,3 @@ Debug
 *.obj
 
 db/third_party/boost
-db/third_party
