@@ -19,7 +19,7 @@ if "%x64%" == "true" (
 IF NOT EXIST libs mkdir libs
 IF NOT EXIST includes mkdir includes
 
-tartool libantlr3c-3.4.tar.gz
+@rem tartool libantlr3c-3.4.tar.gz
 cd libantlr3c-3.4
 
 %PATH_MSBUILD%\msbuild C.sln /p:Configuration=Release /p:Platform=%PLATFORM%

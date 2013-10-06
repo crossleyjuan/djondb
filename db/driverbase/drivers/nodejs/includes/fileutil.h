@@ -22,6 +22,14 @@ bool checkFileCreation(const char* dir);
 bool removeFile(const char* file);
 __int64 fileSize(const char* file);
 long pageSize();
+
+//! This method combines two paths into one
+/*! it'll add the file separator char 
+  if not present in the first path, also it will check if one of the paths is NULL to avoid
+  wrong concatenation. The caller should call free on the result.
+  \param path A null terminated string, it could be NULL
+  \param path2 A null terminated string, it could be NULL
+*/
 char* combinePath(const char* path, const char* path2);
 
 #ifndef WINDOWS
